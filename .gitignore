@@ -26,3 +26,6 @@ scripts/notebooks/.ipynb_checkpoints/
 # Environment variables
 .env
 .env.local
+
+# Donnees
+donnees/QA-labelisé-Question_par_guide.csv
