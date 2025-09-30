@@ -1,0 +1,15 @@
+REF Guide,REF Question,Question type,Tags,REF Réponse,Réponse envisagée,Numéro page (lecteur),Localisation paragraphe,Réponse Bot
+GAUT,GAUT.Q.1,Qu'est-ce que l'authentification ?,Usuelle,GAUT.R.1,"La fonction d’authentification en tant que telle a pour objectif de permettre au prouveur de démontrer son identité (souvent annoncée lors de la phase d’identification).
+
+L’authentification est un mécanisme faisant intervenir deux entités distinctes : un prouveur et un
+vérifieur.
+Le prouveur cherche à prouver son identité au vérifieur. Il s’agit par exemple pour le prouveur
+de démontrer sa connaissance d’une donnée secrète comme un mot de passe.
+Le vérifieur doit être capable de s’assurer de la validité de l’identité du prouveur. Il s’agit par
+exemple pour le vérifieur de contrôler l’exactitude du mot de passe fourni par le prouveur.
+
+Un prouveur est un utilisateur du système d’information cherchant à s’authentifier. Le vérifieur est
+quant à lui classiquement un serveur du système d’information qui a la charge de vérifier l’identité
+d’un utilisateur.",10,Deuxième à cinquième paragraphe,
+GAUT,GAUT.Q.2,Qu'est-ce que l'enregistrement ? ,Usuelle,GAUT.R.2,"L'enregistrement est une étape préalable à l'authentification consistant à enregistrer une entité (son identité, son moyen d’authentification, etc.) appelée prouveur auprès d’un vérifieur, c'est-à-dire l'entité en capacité de vérifier son identité.
+Cela correspond par exemple à la création d’un compte sur un site Web.",10,Sixième paragraphe,
