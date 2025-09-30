@@ -1,0 +1,28 @@
+# Amazon Q
+.amazonq/
+
+# Python
+__pycache__/
+
+
+# Virtual environments
+.venv/
+./scripts/notebooks/.venv/
+
+
+#Notebooks
+scripts/notebooks/.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+
+# Testing
+.pytest_cache/
+
+# Environment variables
+.env
+.env.local
