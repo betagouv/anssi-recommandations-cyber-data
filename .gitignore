@@ -29,3 +29,4 @@ scripts/notebooks/.ipynb_checkpoints/
 
 # Donnees
 donnees/QA-labelisé-Question_par_guide.csv
+donnees/sortie
