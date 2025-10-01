@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import List
 import requests
 from src.configuration import Evalap
-from src.evalap_modele import DatasetReponse, DATASET_REPONSE_VIDE
+from src.evalap_modele import DatasetPayload, DatasetReponse, DATASET_REPONSE_VIDE
 
 
 class ClientEvalap:
@@ -22,3 +22,14 @@ class ClientEvalap:
             return [DATASET_REPONSE_VIDE]
         except (requests.Timeout, requests.RequestException):
             return [DATASET_REPONSE_VIDE]
+
+    def ajoute_dataset(self, payload: DatasetPayload) -> DatasetReponse:
+        try:
+            r: requests.Response = self.session.post(
+                f"{self.evalap_url}/dataset", json=payload._asdict(), timeout=20
+            )
+            r.raise_for_status()
+            data = r.json()
+            return DatasetReponse(**data)
+        except (requests.Timeout, requests.RequestException):
+            return DATASET_REPONSE_VIDE

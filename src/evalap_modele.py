@@ -26,3 +26,10 @@ DATASET_REPONSE_VIDE = DatasetReponse(
     parquet_size=0,
     parquet_columns=[],
 )
+
+
+class DatasetPayload(NamedTuple):
+    name: str
+    readme: str
+    default_metric: str
+    df: str
