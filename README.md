@@ -37,6 +37,7 @@ A minima, ce fichier devra défnir les variables déclarées dans le fichier `.e
 2. Vérifier que l’application **MQC** démarre bien en local (endpoint `/pose_question` accessible).
 
 ### ▶️ Génération des réponses
+<a id="gen-reponses"></a>
 
 Exécuter la commande suivante :
 
@@ -74,3 +75,13 @@ S’assurer que les conteneurs démarrent correctement et que l’interface Eval
 - l'IHM de l'application web est accessible à l'adresse : http://localhost:8501
 
 Si les urls ne semblent pas accessibles, vérifier qu’aucun conflit de port n’apparaît dans les logs.
+
+### 📊 Évaluation
+
+Une fois l'application lancée, pour évaluer un jeu de données :
+
+1) Ajouter un dataset. Exécutez :
+```bash
+uv run python -m src.main_evalap --csv donnees/sortie/evaluation_2025-09-30_17-20-16.csv --nom nom_dataset 
+```
+Le chemin passé à `--csv` est celui généré à l’étape [« ▶️ Génération des réponses »](#gen-reponses)
