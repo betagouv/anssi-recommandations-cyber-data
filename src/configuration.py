@@ -9,7 +9,16 @@ class MQC(NamedTuple):
     route_pose_question: str
 
 
-def recupere_configuration() -> MQC:
+class Evalap(NamedTuple):
+    url: str
+
+
+class Configuration(NamedTuple):
+    mqc: MQC
+    evalap: Evalap
+
+
+def recupere_configuration() -> Configuration:
     configuration_mqc = MQC(
         port=int(os.getenv("MQC_PORT", "8002")),
         hote=os.getenv("MQC_HOTE", "localhost"),
@@ -17,4 +26,8 @@ def recupere_configuration() -> MQC:
         route_pose_question=os.getenv("MQC_ROUTE_POSE_QUESTION", "pose_question"),
     )
 
-    return configuration_mqc
+    evalap: Evalap = Evalap(
+        url=os.getenv("EVALAP_URL", "http://localhost:8000/v1"),
+    )
+
+    return Configuration(mqc=configuration_mqc, evalap=evalap)

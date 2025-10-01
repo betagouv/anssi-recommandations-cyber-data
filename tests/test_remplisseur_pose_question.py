@@ -17,7 +17,7 @@ from src.remplisseur_reponses import (
 
 @pytest.fixture()
 def configuration() -> MQC:
-    return recupere_configuration()
+    return recupere_configuration().mqc
 
 
 @respx.mock

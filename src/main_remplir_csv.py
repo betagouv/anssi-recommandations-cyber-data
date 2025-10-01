@@ -18,7 +18,7 @@ def main() -> None:
     p.add_argument("--sortie", default="donnees/sortie", help="Sous-dossier de sortie")
     args = p.parse_args()
 
-    cfg = recupere_configuration()
+    cfg = recupere_configuration().mqc
     client = ClientMQCHTTP(cfg=cfg)
     remplisseur = RemplisseurReponses(client=client)
 
