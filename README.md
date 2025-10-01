@@ -88,3 +88,27 @@ uv run python -m src.main_remplir_csv   --csv donnees/QA-labelisé-Question_par_
 - `--sortie` : dossier où sera écrit le CSV enrichi.  
 
 Un fichier nommé `evaluation_YYYY-MM-DD_H_M_S.csv` sera alors généré dans `donnees/sortie/` avec une colonne **Réponse Bot** remplie automatiquement.
+
+## 📊 Évaluer avec Evalap
+
+### 🎒 Prérequis
+
+1. Avoir défini dans votre fichier `.env` la variable `ALBERT_CLE_API`.  
+⚠️ Sans cette variable, Evalap ne pourra pas interroger l’API Albert.
+2. Disposer de [docker](https://docs.docker.com/get-docker/) et [docker compose](https://docs.docker.com/compose/install/) installés sur votre machine.  
+
+### ▶️ Lancer Evalap
+
+Depuis la racine du projet, exécuter :
+
+```bash
+docker compose -f evalap-compose.yml up -d
+```
+
+### ✅ Vérifications
+
+S’assurer que les conteneurs démarrent correctement et que l’interface Evalap est accessible :
+- l'IHM de l'API est accessible à l'adresse : http://localhost:8000/docs
+- l'IHM de l'application web est accessible à l'adresse : http://localhost:8501
+
+Si les urls ne semblent pas accessibles, vérifier qu’aucun conflit de port n’apparaît dans les logs.
