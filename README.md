@@ -112,3 +112,13 @@ S’assurer que les conteneurs démarrent correctement et que l’interface Eval
 - l'IHM de l'application web est accessible à l'adresse : http://localhost:8501
 
 Si les urls ne semblent pas accessibles, vérifier qu’aucun conflit de port n’apparaît dans les logs.
+
+### 📊 Évaluation
+
+Une fois l'application lancée, pour évaluer un jeu de données :
+
+1) Ajouter un dataset. Exécutez :
+```bash
+uv run python -m src.main_evalap --csv donnees/sortie/evaluation_2025-09-30_17-20-16.csv --nom nom_dataset 
+```
+Le chemin passé à `--csv` est celui généré à l’étape [« ▶️ Génération des réponses »](https://github.com/betagouv/anssi-recommandations-cyber-data/tree/refacto_evalap_client?tab=readme-ov-file#%EF%B8%8F-g%C3%A9n%C3%A9ration-des-r%C3%A9ponses).
