@@ -1,7 +1,7 @@
 from __future__ import annotations
 import requests
 from src.configuration import Evalap
-from typing import NamedTuple, Dict, List
+from typing import NamedTuple, Dict, List, Optional
 
 
 class DatasetReponse(NamedTuple):
@@ -15,6 +15,13 @@ class DatasetReponse(NamedTuple):
     columns: List[str]
     parquet_size: int
     parquet_columns: List[str]
+
+
+class DatasetPayload(NamedTuple):
+    name: str
+    readme: str
+    default_metric: str
+    df: str
 
 
 class ClientEvalap:
@@ -34,3 +41,14 @@ class ClientEvalap:
             return []
         except (requests.Timeout, requests.RequestException):
             return []
+
+    def ajoute_dataset(self, payload: DatasetPayload) -> Optional[DatasetReponse]:
+        try:
+            r: requests.Response = self.session.post(
+                f"{self.evalap_url}/dataset", json=payload._asdict(), timeout=20
+            )
+            r.raise_for_status()
+            data = r.json()
+            return DatasetReponse(**data)
+        except (requests.Timeout, requests.RequestException):
+            return None
