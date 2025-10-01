@@ -31,6 +31,13 @@ DATASET_REPONSE_VIDE = DatasetReponse(
 )
 
 
+class DatasetPayload(NamedTuple):
+    name: str
+    readme: str
+    default_metric: str
+    df: str
+
+
 class ClientEvalap:
     def __init__(self, configuration_evalap: Evalap, session: requests.Session) -> None:
         self.evalap_url = configuration_evalap.url
@@ -48,3 +55,14 @@ class ClientEvalap:
             return [DATASET_REPONSE_VIDE]
         except (requests.Timeout, requests.RequestException):
             return [DATASET_REPONSE_VIDE]
+
+    def ajoute_dataset(self, payload: DatasetPayload) -> DatasetReponse:
+        try:
+            r: requests.Response = self.session.post(
+                f"{self.evalap_url}/dataset", json=payload._asdict(), timeout=20
+            )
+            r.raise_for_status()
+            data = r.json()
+            return DatasetReponse(**data)
+        except (requests.Timeout, requests.RequestException):
+            return DATASET_REPONSE_VIDE

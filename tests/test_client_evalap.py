@@ -1,14 +1,35 @@
 from unittest.mock import Mock
 from requests import Response
-from src.client_evalap import ClientEvalap, DATASET_REPONSE_VIDE
-from src.configuration import Configuration, Mode, Evalap, MQC
+from src.client_evalap import ClientEvalap, DATASET_REPONSE_VIDE, DatasetPayload
+from src.configuration import Configuration, Mode, Evalap, MQC, Albert
 import pytest
 import requests
+import pandas as pd
 
 
 @pytest.fixture()
 def configuration_evalap() -> Evalap:
     return Evalap(url="http://localhost:8000/v1")
+
+
+@pytest.fixture()
+def configuration() -> Configuration:
+    configuration_mqc = MQC(
+        port=8002,
+        hote="localhost",
+        prefix_api="",
+        route_pose_question="pose_question",
+    )
+    mode: Mode = Mode("production")
+    evalap: Evalap = Evalap(
+        url="http://localhost:8000/v1",
+    )
+    albert: Albert = Albert(
+        cle_api="cle_factice",
+        url="https://albert.api.etalab.gouv.fr/v1",
+    )
+
+    return Configuration(mqc=configuration_mqc, mode=mode, albert=albert, evalap=evalap)
 
 
 def fabrique_reponse(objet_json, status=200):
@@ -58,3 +79,60 @@ def test_liste_datasets_timeout_retourne_modele_par_defaut(
     result = client.liste_datasets()
 
     assert result == [DATASET_REPONSE_VIDE]
+
+
+def test_ajoute_dataset_retourne_resultat_attendu(
+    configuration_evalap: Evalap,
+):
+    session = Mock()
+    reponse_dict = {
+        "id": 10,
+        "name": "QA",
+        "readme": "JEU QA",
+        "default_metric": "judge_precision",
+        "size": 1,
+        "created_at": "2024-01-01",
+        "parquet_size": 42,
+        "parquet_columns": [""],
+        "columns_map": {},
+        "columns": [],
+    }
+    reponse_mockee = Mock(spec=Response)
+    reponse_mockee.status_code = 200
+    reponse_mockee.json.return_value = reponse_dict
+    reponse_mockee.raise_for_status = Mock()
+    session.post.return_value = reponse_mockee
+
+    client = ClientEvalap(configuration_evalap, session=session)
+    df = pd.DataFrame([{"query": "Q", "output": "A", "output_true": "A"}])
+
+    payload: DatasetPayload = DatasetPayload(
+        name="QA",
+        readme="JEU QA",
+        default_metric="judge_precision",
+        df=df.astype(object).where(pd.notnull(df), None).to_json(),
+    )
+    resultat_ajoute_dataset = client.ajoute_dataset(payload)
+
+    assert resultat_ajoute_dataset.id == reponse_dict["id"]
+    assert resultat_ajoute_dataset.name == reponse_dict["name"]
+    session.post.assert_called_once()
+
+
+def test_ajoute_dataset_timeout_retourne_modele_par_defaut(configuration_evalap):
+    session = Mock()
+    session.post.side_effect = requests.Timeout("timeout simulé")
+
+    client = ClientEvalap(configuration_evalap, session=session)
+    df = pd.DataFrame([{"query": "Q", "output": "A", "output_true": "A"}])
+
+    payload = DatasetPayload(
+        name="QA",
+        readme="JEU QA",
+        default_metric="judge_precision",
+        df=df.astype(object).where(pd.notnull(df), None).to_json(),
+    )
+
+    resultat = client.ajoute_dataset(payload)
+
+    assert resultat == DATASET_REPONSE_VIDE
