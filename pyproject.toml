@@ -8,6 +8,7 @@ dependencies = [
     "pandas",
     "pandas-stubs",
     "pytest",
+    "requests",
     "respx"
 ]
 
