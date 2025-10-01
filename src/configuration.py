@@ -20,9 +20,20 @@ class MQC(NamedTuple):
     route_pose_question: str
 
 
+class Albert(NamedTuple):
+    cle_api: str
+    url: str
+
+
+class Evalap(NamedTuple):
+    url: str
+
+
 class Configuration(NamedTuple):
+    albert: Albert
     mqc: MQC
     mode: Mode
+    evalap: Evalap
 
 
 def recupere_configuration() -> Configuration:
@@ -33,5 +44,12 @@ def recupere_configuration() -> Configuration:
         route_pose_question=os.getenv("MQC_ROUTE_POSE_QUESTION", "pose_question"),
     )
     mode: Mode = Mode(os.getenv("MODE", "production"))
+    evalap: Evalap = Evalap(
+        url=os.getenv("EVALAP_URL", "http://localhost:8000/v1"),
+    )
+    albert: Albert = Albert(
+        cle_api=os.getenv("ALBERT_API_KEY", ""),
+        url=os.getenv("ALBERT_API_KEY", "https://albert.api.etalab.gouv.fr/v1"),
+    )
 
-    return Configuration(mqc=configuration_mqc, mode=mode)
+    return Configuration(mqc=configuration_mqc, mode=mode, albert=albert, evalap=evalap)
