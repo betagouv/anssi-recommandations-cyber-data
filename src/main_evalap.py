@@ -1,7 +1,9 @@
 import pandas as pd
 from pathlib import Path
 from argparse import ArgumentParser
-from src.client_evalap import ClientEvalap, DatasetPayload
+from src.evalap.evalap_dataset_http import DatasetPayload
+from src.configuration import Evalap
+from src.evalap import EvalapClient
 from src.configuration import recupere_configuration
 import requests
 
@@ -30,11 +32,13 @@ def main():
         df=df_mapped.astype(object).where(pd.notnull(df_mapped), None).to_json(),
     )
     session = requests.Session()
-    client = ClientEvalap(conf, session=session)
-    _ = client.ajoute_dataset(payload)
+    cfg = Evalap(url=conf.url)
+
+    client = EvalapClient(cfg, session=session)
+    _resultat = client.dataset.ajoute(payload)
 
     print("Dataset ajouté :")
-    print(client.liste_datasets())
+    print(client.dataset.liste())
 
 
 if __name__ == "__main__":
