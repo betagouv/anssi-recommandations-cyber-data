@@ -2,6 +2,41 @@
 
 Une interface permettant d'évaluer le bot de l'ANSSI, basé sur Albert [Albert](https://github.com/betagouv/anssi-recommandations-cyber), et d'y indexer de nouveaux documents RAG.
 
+## 🗺️ Diagramme des interactions entre les composants de l'application
+
+```mermaid
+flowchart LR
+  %% === Projet local ===
+  subgraph Projet["anssi-recommandations-cyber-data"]
+    DataSrc["donnees/QA-labelisé-Question_par_guide.csv"]
+    Lecteur[LecteurCSV]
+    Remplisseur[RemplisseurReponses]
+    Ecrivain[EcrivainSortie]
+    ClientMQC[ClientMQCHTTP]
+    Sortie["donnees/sortie/&lt;prefixe&gt;_&lt;horodatage&gt;.csv"]
+  end
+
+  %% === Système externe (mise en évidence) ===
+  subgraph Externe["anssi-recommendations-cyber (externe)"]
+    MQC[/Route HTTP POST /pose_question/]
+  end
+
+  %% Flux conforme au code
+  Lecteur -->| lit | DataSrc
+  Lecteur -->| utilise pour chaque question| Remplisseur
+  Remplisseur -->|"remplit 'Réponse Bot'"| Lecteur
+
+  Remplisseur -->|pose_question| ClientMQC
+  ClientMQC -->|POST JSON| MQC
+  MQC -->|réponse JSON| ClientMQC
+  ClientMQC -->|renvoie texte| Remplisseur
+
+  Lecteur -->|DataFrame| Ecrivain
+  Ecrivain -->|écrit CSV horodaté| Sortie
+
+  style Externe fill:#fff3cd,stroke:#f0ad4e,stroke-width:2.5px,color:#333
+```
+
 ## 📦 Comment installer ?
 
 ### Directement sur l'hôte
@@ -17,3 +52,39 @@ Les dépendances déclarées sont installables via `uv sync`.
 Dans un environnement virtuel :
 * lancer `mypy` pour vérifier la validité des annotations de types,
 * et lancer `pytest` pour valider le comportement à l'exécution.
+
+## ⚙️ Comment Définir mes variables d'environnement ?
+
+Il faut créer à la racine du projet un fichier `.env`.
+A minima, ce fichier devra définir les variables déclarées dans le fichier `.env.template`.
+
+## 🧪 Générer les réponses du bot pour le jeu de validation
+
+### 🎒 Prérequis
+
+1. Lancer l’application [anssi-recommandations-cyber](https://github.com/betagouv/anssi-recommandations-cyber).
+Pour cela, nous vous recommandons de démarrer l'application dans le **conteneur** construit avec les instructions de ce dépôt :  
+   ```bash
+   docker container run --rm -it \
+    --network=host \
+    --volume $(pwd):/app \
+    localhost/mqc/api \
+    bash -c "env \$(cat .env) python src/main.py"
+    ```
+   ⚠️ Pensez à compléter le fichier `.env` à partir du modèle `.env.template`.
+
+2. Vérifier que l’application **MQC** démarre bien en local (endpoint `/pose_question` accessible).
+
+### ▶️ Génération des réponses
+
+Exécuter la commande suivante :
+
+```bash
+uv run python -m src.main_remplir_csv   --csv donnees/QA-labelisé-Question_par_guide.csv   --prefixe evaluation   --sortie donnees/sortie
+```
+
+- `--csv` : chemin vers le fichier CSV contenant les questions à évaluer.  
+- `--prefixe` : préfixe utilisé dans le nom du fichier de sortie.  
+- `--sortie` : dossier où sera écrit le CSV enrichi.  
+
+Un fichier nommé `evaluation_YYYY-MM-DD_H_M_S.csv` sera alors généré dans `donnees/sortie/` avec une colonne **Réponse Bot** remplie automatiquement.

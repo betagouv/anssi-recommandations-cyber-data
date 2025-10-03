@@ -1,5 +1,5 @@
 from pathlib import Path
-from lecteur_csv import LecteurCSV
+from src.lecteur_csv import LecteurCSV
 
 
 def test_peut_lire_un_fichier_csv_et_compter_les_lignes(tmp_path: Path):
