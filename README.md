@@ -2,6 +2,41 @@
 
 Une interface permettant d'évaluer le bot de l'ANSSI, basé sur Albert [Albert](https://github.com/betagouv/anssi-recommandations-cyber), et d'y indexer de nouveaux documents RAG.
 
+## 🗺️ Diagramme des interactions entre les composants de l'application
+
+```mermaid
+flowchart LR
+  %% === Projet local ===
+  subgraph Projet["anssi-recommandations-cyber-data"]
+    DataSrc["donnees/QA-labelisé-Question_par_guide.csv"]
+    Lecteur[LecteurCSV]
+    Remplisseur[RemplisseurReponses]
+    Ecrivain[EcrivainSortie]
+    ClientMQC[ClientMQCHTTP]
+    Sortie["donnees/sortie/&lt;prefixe&gt;_&lt;horodatage&gt;.csv"]
+  end
+
+  %% === Système externe (mise en évidence) ===
+  subgraph Externe["anssi-recommendations-cyber (externe)"]
+    MQC[/Route HTTP POST /pose_question/]
+  end
+
+  %% Flux conforme au code
+  Lecteur -->| lit | DataSrc
+  Lecteur -->| utilise pour chaque question| Remplisseur
+  Remplisseur -->|"remplit 'Réponse Bot'"| Lecteur
+
+  Remplisseur -->|pose_question| ClientMQC
+  ClientMQC -->|POST JSON| MQC
+  MQC -->|réponse JSON| ClientMQC
+  ClientMQC -->|renvoie texte| Remplisseur
+
+  Lecteur -->|DataFrame| Ecrivain
+  Ecrivain -->|écrit CSV horodaté| Sortie
+
+  style Externe fill:#fff3cd,stroke:#f0ad4e,stroke-width:2.5px,color:#333
+```
+
 ## 📦 Comment installer ?
 
 ### Directement sur l'hôte
