@@ -85,8 +85,8 @@ class EcrivainSortie:
         return re.sub(r"[^A-Za-z0-9_-]", "_", prefixe)
 
     def _nom_fichier(self, prefixe: str) -> str:
-        safe = self._desinfecte_prefixe(prefixe)
-        return f"{safe}_{self._horloge.aujourd_hui()}.csv"
+        nettoye = self._desinfecte_prefixe(prefixe)
+        return f"{nettoye}_{self._horloge.aujourd_hui()}.csv"
 
     def ecrit_fichier_depuis_lecteur_csv(
         self, lecteur: LecteurCSV, prefixe: str
