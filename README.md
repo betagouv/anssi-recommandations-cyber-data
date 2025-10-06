@@ -4,6 +4,7 @@ Une interface permettant d'évaluer le bot de l'ANSSI, basé sur Albert [Albert]
 
 ## 🗺️ Diagramme des interactions entre les composants de l'application
 
+### Interactions pour générer des réponses
 ```mermaid
 flowchart LR
   %% === Projet local ===
@@ -35,6 +36,22 @@ flowchart LR
   Ecrivain -->|écrit CSV horodaté| Sortie
 
   style Externe fill:#fff3cd,stroke:#f0ad4e,stroke-width:2.5px,color:#333
+```
+
+### Interactions pour évaluer le dataset
+```mermaid
+sequenceDiagram
+    participant Main as main_evalap.py
+    participant Client as ClientEvalap
+    participant API as Evalap API
+
+    Main->>Client: nouveau ClientEvalap(base_url, session)
+    Client-->>Main: instance ClientEvalap
+    Main->>Client: ajoute_dataset(payload)
+    Note over Client: payload inclut <prefixe>_<horodatage>.csv 
+    Client->>API: POST /dataset
+    API-->>Client: {id, name, ...}
+    Client-->>Main: DatasetReponse
 ```
 
 ## 📦 Comment installer ?
