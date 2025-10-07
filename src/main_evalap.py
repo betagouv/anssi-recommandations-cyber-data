@@ -14,7 +14,7 @@ def main():
     p.add_argument("--nom", required=True, type=str, help="Nom du dataset")
     args = p.parse_args()
 
-    conf = recupere_configuration().evalap
+    conf = recupere_configuration()
     df = pd.read_csv(args.csv)
 
     columns_map = {
@@ -32,9 +32,8 @@ def main():
         df=df_mapped.astype(object).where(pd.notnull(df_mapped), None).to_json(),
     )
     session = requests.Session()
-    cfg = Evalap(url=conf.url)
 
-    client = EvalapClient(cfg, session=session)
+    client = EvalapClient(conf, session=session)
     _resultat = client.dataset.ajoute(payload)
 
     print("Dataset ajouté :")
