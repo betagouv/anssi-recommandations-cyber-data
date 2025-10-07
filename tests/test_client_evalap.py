@@ -5,7 +5,7 @@ from src.evalap.evalap_dataset_http import (
     DatasetPayload,
     DatasetReponse,
 )
-from src.configuration import Evalap
+from src.configuration import Evalap, Configuration, MQC, Albert
 import pytest
 import requests
 import pandas as pd
@@ -16,6 +16,21 @@ from src.evalap.evalap_base_http import EvalapBaseHTTP
 @pytest.fixture()
 def configuration_evalap() -> Evalap:
     return Evalap(url="http://localhost:8000/v1")
+
+
+@pytest.fixture()
+def configuration() -> Configuration:
+    configuration_mqc = MQC(
+        port=8002,
+        hote="localhost",
+        api_prefixe_route="",
+        route_pose_question="pose_question",
+    )
+    evalap: Evalap = Evalap(
+        url="http://localhost:8000",
+    )
+    albert = Albert(url="https://albert.api.etalab.gouv.fr/v1", cle_api="fausse_cle")
+    return Configuration(mqc=configuration_mqc, evalap=evalap, albert=albert)
 
 
 @pytest.fixture
@@ -47,7 +62,7 @@ def donnees_dataset() -> DatasetReponse:
 
 
 def test_liste_datasets_retourne_la_liste_attendue(
-    configuration_evalap: Evalap, fabrique_reponse: Mock
+    configuration: Configuration, fabrique_reponse: Mock
 ):
     session = Mock()
     session.get.return_value = fabrique_reponse(
@@ -67,44 +82,42 @@ def test_liste_datasets_retourne_la_liste_attendue(
         ]
     )
 
-    cfg = Evalap(url=configuration_evalap.url)
-    client = EvalapClient(cfg, session=session)
+    client = EvalapClient(configuration, session=session)
 
     jeux = client.dataset.liste()
 
     assert jeux[0].id == 1
     assert jeux[0].name == "ds"
     session.get.assert_called_once_with(
-        f"{configuration_evalap.url}/datasets", timeout=20
+        f"{configuration.evalap.url}/datasets", timeout=20
     )
 
 
 def test_liste_datasets_timeout_retourne_liste_vide(
-    configuration_evalap: Evalap,
+    configuration: Configuration,
 ):
     session = Mock()
     session.get.side_effect = requests.Timeout("timeout simulé")
 
-    client = EvalapClient(configuration_evalap, session=session)
+    client = EvalapClient(configuration, session=session)
     resultat = client.dataset.liste()
-
     assert resultat == []
 
 
 def test_liste_datasets_reponse_non_liste_retourne_liste_vide(
-    configuration_evalap: Evalap, fabrique_reponse: Mock
+    configuration: Configuration, fabrique_reponse: Mock
 ):
     session = Mock()
     session.get.return_value = fabrique_reponse({"message": "erreur"})
 
-    client = EvalapClient(configuration_evalap, session=session)
+    client = EvalapClient(configuration, session=session)
     resultat = client.dataset.liste()
 
     assert resultat == []
 
 
 def test_ajoute_dataset_retourne_resultat_attendu(
-    configuration_evalap: Evalap,
+    configuration: Configuration,
 ):
     session = Mock()
     reponse_dict = {
@@ -134,9 +147,7 @@ def test_ajoute_dataset_retourne_resultat_attendu(
         df=df.astype(object).where(pd.notnull(df), None).to_json(),
     )
 
-    cfg = Evalap(url=configuration_evalap.url)
-
-    client = EvalapClient(cfg, session=session)
+    client = EvalapClient(configuration, session=session)
     resultat_ajoute_dataset = client.dataset.ajoute(payload)
 
     assert resultat_ajoute_dataset is not None
@@ -146,7 +157,7 @@ def test_ajoute_dataset_retourne_resultat_attendu(
 
 
 def test_ajoute_dataset_timeout_retourne_modele_par_defaut(
-    configuration_evalap: Evalap,
+    configuration: Configuration,
 ):
     session = Mock()
     session.post.side_effect = requests.Timeout("timeout simulé")
@@ -160,9 +171,7 @@ def test_ajoute_dataset_timeout_retourne_modele_par_defaut(
         df=df.astype(object).where(pd.notnull(df), None).to_json(),
     )
 
-    cfg = Evalap(url=configuration_evalap.url)
-
-    client = EvalapClient(cfg, session=session)
+    client = EvalapClient(configuration, session=session)
     resultat = client.dataset.ajoute(payload)
 
     assert resultat == None
@@ -171,12 +180,12 @@ def test_ajoute_dataset_timeout_retourne_modele_par_defaut(
 def test_facade_propage_session_aux_datasets(
     donnees_dataset: DatasetReponse,
     fabrique_reponse: Mock,
+    configuration: Configuration,
 ) -> None:
-    cfg = Evalap(url="http://localhost")
     session = Mock(spec=requests.Session)
     session.post.return_value = fabrique_reponse(donnees_dataset._asdict())
 
-    client = EvalapClient(cfg, session=cast(requests.Session, session))
+    client = EvalapClient(configuration, session=cast(requests.Session, session))
 
     assert client.dataset.session is session
 
@@ -185,13 +194,13 @@ def test_facade_propage_session_aux_datasets(
     )
 
     session.post.assert_called_once_with(
-        "http://localhost/dataset",
+        "http://localhost:8000/dataset",
         json={"name": "QA", "readme": "", "default_metric": "m", "df": "{}"},
         timeout=20,
     )
 
 
-def test_base_http_get_post_appellent_session(configuration_evalap: Evalap) -> None:
+def test_base_http_get_post_appellent_session(configuration: Configuration) -> None:
     def _ok(json_obj: object) -> Response:
         r = Mock(spec=Response)
         r.json.return_value = json_obj
@@ -202,7 +211,7 @@ def test_base_http_get_post_appellent_session(configuration_evalap: Evalap) -> N
     s.get.return_value = _ok({"ok": 1})
     s.post.return_value = _ok({"ok": 2})
 
-    b = EvalapBaseHTTP(configuration_evalap, s)
+    b = EvalapBaseHTTP(configuration, s)
     assert b._get("/ping", timeout=1) == {"ok": 1}
     assert b._post("/dataset", json={"x": 1}, timeout=2) == {"ok": 2}
     s.get.assert_called_once()
