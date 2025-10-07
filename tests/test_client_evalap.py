@@ -31,7 +31,7 @@ def configuration() -> Configuration:
         route_pose_question="pose_question",
     )
     evalap: Evalap = Evalap(
-        url="http://localhost:8000",
+        url="http://localhost:8000/v1",
     )
     albert = Albert(url="https://albert.api.etalab.gouv.fr/v1", cle_api="fausse_cle")
     return Configuration(mqc=configuration_mqc, evalap=evalap, albert=albert)
@@ -230,7 +230,7 @@ def test_facade_propage_session_aux_datasets(
     )
 
     session.post.assert_called_once_with(
-        "http://localhost:8000/dataset",
+        "http://localhost:8000/v1/dataset",
         json={"name": "QA", "readme": "", "default_metric": "m", "df": "{}"},
         timeout=20,
     )
