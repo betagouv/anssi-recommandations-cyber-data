@@ -6,6 +6,7 @@ from src.evalap.evalap_experience_http import ExperiencePayload
 from src.evalap import EvalapClient
 from src.configuration import recupere_configuration, Configuration
 from src.metriques import Metriques
+from src.chargeur_metriques import ChargeurMetriques
 import requests
 import logging
 from typing import Optional

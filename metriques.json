@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "metriques": [
     "answer_relevancy",
     "faithfulness",
@@ -10,3 +11,9 @@
     "output_length"
   ]
 }
+=======
+  "metriques": [ "answer_relevancy", "faithfulness", "toxicity", "hallucination",  "judge_precision", "judge_notator", "judge_rambling", "output_length"
+]
+}
+
+>>>>>>> 2929503 (Permet de fournir une liste de métriques)
