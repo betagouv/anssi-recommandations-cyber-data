@@ -1,4 +1,5 @@
 from src.evalap.evalap_dataset_http import EvalapDatasetHttp
+from src.evalap.evalap_experience_http import EvalapExperienceHttp
 from src.evalap.evalap_base_http import EvalapBaseHTTP
 import requests
 from src.configuration import Configuration
@@ -11,3 +12,4 @@ class EvalapClient:
         session: requests.Session,
     ):
         self.dataset = EvalapDatasetHttp(configuration, session)
+        self.experience = EvalapExperienceHttp(configuration, session)

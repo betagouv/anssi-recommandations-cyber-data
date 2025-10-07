@@ -6,6 +6,10 @@ from src.evalap.evalap_dataset_http import (
     DatasetReponse,
 )
 from src.configuration import Evalap, Configuration, MQC, Albert
+from src.evalap.evalap_experience_http import (
+    ExperiencePayload,
+    ExperienceReponse,
+)
 import pytest
 import requests
 import pandas as pd
@@ -58,6 +62,38 @@ def donnees_dataset() -> DatasetReponse:
         columns=[],
         parquet_size=42,
         parquet_columns=[""],
+    )
+
+
+@pytest.fixture
+def experience_payload() -> ExperiencePayload:
+    return ExperiencePayload(
+        name="Experience Test",
+        metrics=["judge_precision"],
+        dataset="dataset de test",
+        model={"name": "albert-large"},
+        judge_model={"model": "albert"},
+    )
+
+
+@pytest.fixture
+def experience_reponse() -> ExperienceReponse:
+    return ExperienceReponse(
+        id=42,
+        name="Experience Test",
+        created_at="2025-10-06T15:45:00Z",
+        experiment_status="running_metrics",
+        experiment_set_id=1,
+        num_try=8,
+        num_success=7,
+        num_observation_try=40,
+        num_observation_success=38,
+        num_metrics=3,
+        readme="Test readme",
+        judge_model={"model": "albert"},
+        model={"name": "albert-large"},
+        dataset={"id": 10},
+        with_vision=False,
     )
 
 
@@ -216,3 +252,50 @@ def test_base_http_get_post_appellent_session(configuration: Configuration) -> N
     assert b._post("/dataset", json={"x": 1}, timeout=2) == {"ok": 2}
     s.get.assert_called_once()
     s.post.assert_called_once()
+
+
+def test_cree_experience_retourne_200(
+    configuration: Configuration,
+    experience_payload: ExperiencePayload,
+    experience_reponse: ExperienceReponse,
+):
+    session = Mock()
+    reponse_mockee = Mock(spec=Response)
+    reponse_mockee.status_code = 200
+    reponse_mockee.json.return_value = experience_reponse._asdict()
+    reponse_mockee.raise_for_status = Mock()
+    session.post.return_value = reponse_mockee
+
+    client = EvalapClient(configuration, session=session)
+    resultat = client.experience.cree(experience_payload)
+
+    assert resultat is not None
+    assert resultat.id == 42
+    assert resultat.name == "Experience Test"
+    session.post.assert_called_once()
+
+
+def test_cree_experience_timeout_retourne_none(
+    configuration: Configuration,
+    experience_payload: ExperiencePayload,
+):
+    session = Mock()
+    session.post.side_effect = requests.Timeout("timeout simulé")
+
+    client = EvalapClient(configuration, session=session)
+    resultat = client.experience.cree(experience_payload)
+
+    assert resultat is None
+
+
+def test_cree_experience_requete_exception_retourne_none(
+    configuration: Configuration,
+    experience_payload: ExperiencePayload,
+):
+    session = Mock()
+    session.post.side_effect = requests.RequestException("erreur réseau")
+
+    client = EvalapClient(configuration, session=session)
+    resultat = client.experience.cree(experience_payload)
+
+    assert resultat is None
