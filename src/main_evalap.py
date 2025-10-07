@@ -6,7 +6,10 @@ from src.evalap.evalap_experience_http import ExperiencePayload
 from src.evalap import EvalapClient
 from src.configuration import recupere_configuration, Configuration
 import requests
+import logging
 from typing import Optional
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
 def ajoute_dataset(
@@ -22,11 +25,11 @@ def ajoute_dataset(
     resultat = client.dataset.ajoute(payload)
 
     if resultat is None:
-        print("Le dataset n'a pas pu être ajouté")
+        logging.error("Le dataset n'a pas pu être ajouté")
         return None
 
-    print("Dataset ajouté :")
-    print(client.dataset.liste())
+    logging.info("Dataset ajouté")
+    logging.info(f"Datasets disponibles: {len(client.dataset.liste())}")
     return resultat
 
 
@@ -36,9 +39,11 @@ def cree_experience(
     df_mapped: pd.DataFrame,
     conf: Configuration,
 ):
+    metriques = ["judge_precision"]
+
     payload_experience = ExperiencePayload(
         name="Experience Test",
-        metrics=["judge_precision"],
+        metrics=metriques,
         dataset=dataset.name,
         model={
             "output": df_mapped["output"].astype(str).tolist(),
@@ -51,8 +56,13 @@ def cree_experience(
         },
     )
 
-    resultat_experience = client.experience.ajoute(payload_experience)
-    print(resultat_experience)
+    resultat_experience = client.experience.cree(payload_experience)
+    if resultat_experience:
+        logging.info(
+            f"Expérience créée: {resultat_experience.name} (ID: {resultat_experience.id})"
+        )
+    else:
+        logging.error("L'expérience n'a pas pu être créée")
 
 
 def main():
@@ -62,7 +72,7 @@ def main():
     args = p.parse_args()
 
     if not args.csv.exists():
-        print(f"Le fichier {args.csv} n'existe pas")
+        logging.error(f"Le fichier {args.csv} n'existe pas")
         return
 
     conf = recupere_configuration()

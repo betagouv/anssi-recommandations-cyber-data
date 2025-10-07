@@ -8,6 +8,10 @@ from .remplisseur_reponses import (
     HorlogeSysteme,
 )
 
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
 
 def main() -> None:
     p = ArgumentParser(description="Remplir 'Réponse Bot' depuis 'Question'")
@@ -27,7 +31,7 @@ def main() -> None:
         racine=Path.cwd(), sous_dossier=Path(args.sortie), horloge=HorlogeSysteme()
     )
     chemin = ecrivain.ecrit_fichier_depuis_lecteur_csv(lecteur, prefixe=args.prefixe)
-    print(f"Nouveau fichier créé : {str(chemin)}")
+    logging.info(f"Nouveau fichier créé : {str(chemin)}")
 
 
 if __name__ == "__main__":
