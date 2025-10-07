@@ -1,11 +1,11 @@
 import requests
 from typing import Any, Mapping
-from src.configuration import Evalap
+from src.configuration import Configuration
 
 
 class EvalapBaseHTTP:
-    def __init__(self, configuration_evalap: Evalap, session: requests.Session) -> None:
-        self.evalap_url = configuration_evalap.url
+    def __init__(self, configuration: Configuration, session: requests.Session) -> None:
+        self.evalap_url = configuration.evalap.url
         self.session: requests.Session = session
 
     def _get(self, path: str, *, timeout: float) -> Any:
