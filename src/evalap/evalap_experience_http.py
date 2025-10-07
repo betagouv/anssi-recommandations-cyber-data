@@ -1,5 +1,6 @@
 import requests
 from typing import NamedTuple, Optional, Dict, Union
+
 from src.evalap.evalap_base_http import EvalapBaseHTTP
 
 
