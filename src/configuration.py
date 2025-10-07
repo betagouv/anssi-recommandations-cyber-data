@@ -13,9 +13,15 @@ class Evalap(NamedTuple):
     url: str
 
 
+class Albert(NamedTuple):
+    url: str
+    cle_api: str
+
+
 class Configuration(NamedTuple):
     mqc: MQC
     evalap: Evalap
+    albert: Albert
 
 
 def recupere_configuration() -> Configuration:
@@ -30,4 +36,9 @@ def recupere_configuration() -> Configuration:
         url=os.getenv("EVALAP_URL", "http://localhost:8000/v1"),
     )
 
-    return Configuration(mqc=configuration_mqc, evalap=evalap)
+    albert: Albert = Albert(
+        url=os.getenv("ALBERT_URL", "https://albert.api.etalab.gouv.fr/v1"),
+        cle_api=os.getenv("ALBERT_CLE_API", "cle_api"),
+    )
+
+    return Configuration(mqc=configuration_mqc, evalap=evalap, albert=albert)
