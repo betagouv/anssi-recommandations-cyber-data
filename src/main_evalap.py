@@ -5,6 +5,7 @@ from src.evalap.evalap_dataset_http import DatasetPayload, DatasetReponse
 from src.evalap.evalap_experience_http import ExperiencePayload
 from src.evalap import EvalapClient
 from src.configuration import recupere_configuration, Configuration
+from src.metriques import Metriques
 import requests
 import logging
 from typing import Optional
@@ -39,7 +40,17 @@ def cree_experience(
     df_mapped: pd.DataFrame,
     conf: Configuration,
 ):
-    metriques = ["judge_precision"]
+    chargeur = Metriques()
+    fichier_metriques = Path("metriques.json")
+
+    try:
+        metriques_enum = chargeur.recupere_depuis_fichier(fichier_metriques)
+        metriques = [m.value for m in metriques_enum]
+    except (FileNotFoundError, ValueError) as e:
+        logging.warning(
+            f"Erreur chargement métriques: {e}. Utilisation de la métrique par défaut"
+        )
+        metriques = ["judge_precision"]
 
     payload_experience = ExperiencePayload(
         name="Experience Test",
