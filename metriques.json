@@ -1,0 +1,12 @@
+{
+  "metriques": [
+    "answer_relevancy",
+    "faithfulness",
+    "toxicity",
+    "hallucination",
+    "judge_precision",
+    "judge_notator",
+    "judge_rambling",
+    "output_length"
+  ]
+}
