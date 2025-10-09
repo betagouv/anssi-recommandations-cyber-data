@@ -6,8 +6,10 @@ from src.evalap.evalap_experience_http import ExperiencePayload
 from src.evalap import EvalapClient
 from src.configuration import recupere_configuration, Configuration
 from src.metriques import Metriques
+from src.formateur_resultats_experiences import FormateurResultatsExperiences
 import requests
 import logging
+from datetime import datetime
 from typing import Optional
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -110,6 +112,30 @@ def main():
     experience_id_cree = cree_experience(client, dataset, df_mapped, conf)
     experience_listee = client.experience.lit(experience_id_cree)
     logging.info(f"Expérience affichée: {experience_listee} ")
+
+    formateur_de_resultats = FormateurResultatsExperiences(client.experience)
+    experience_terminee = formateur_de_resultats.attend_fin_experience(
+        experience_id_cree
+    )
+
+    if experience_terminee:
+        df_resultats = formateur_de_resultats.cree_dataframe_formate(
+            experience_terminee
+        )
+        logging.info(f"DataFrame créé avec {len(df_resultats)} lignes")
+        logging.info(f"Colonnes: {list(df_resultats.columns)}")
+
+        dossier_sortie = Path("./donnees/resultats_evaluations")
+        dossier_sortie.mkdir(parents=True, exist_ok=True)
+
+        horodatage = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        nom_fichier = f"resultats_experience_{experience_id_cree}_{horodatage}.csv"
+        chemin_fichier = dossier_sortie / nom_fichier
+
+        df_resultats.to_csv(chemin_fichier, index=False)
+        logging.info(f"Résultats sauvegardés dans: {chemin_fichier}")
+    else:
+        logging.error("Impossible d'obtenir les résultats de l'expérience")
 
 
 if __name__ == "__main__":
