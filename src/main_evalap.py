@@ -15,6 +15,27 @@ from typing import Optional
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
+def sauvegarde_resultats(
+    formateur: FormateurResultatsExperiences, experience_terminee, experience_id: int
+) -> None:
+    if experience_terminee:
+        df_resultats = formateur.cree_dataframe_formate(experience_terminee)
+        logging.info(f"DataFrame créé avec {len(df_resultats)} lignes")
+        logging.info(f"Colonnes: {list(df_resultats.columns)}")
+
+        dossier_sortie = Path("./donnees/resultats_evaluations")
+        dossier_sortie.mkdir(parents=True, exist_ok=True)
+
+        horodatage = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        nom_fichier = f"resultats_experience_{experience_id}_{horodatage}.csv"
+        chemin_fichier = dossier_sortie / nom_fichier
+
+        df_resultats.to_csv(chemin_fichier, index=False)
+        logging.info(f"Résultats sauvegardés dans: {chemin_fichier}")
+    else:
+        logging.error("Impossible d'obtenir les résultats de l'expérience")
+
+
 def ajoute_dataset(
     client: EvalapClient, nom: str, df_mapped: pd.DataFrame
 ) -> Optional[DatasetReponse]:
@@ -118,24 +139,9 @@ def main():
         experience_id_cree
     )
 
-    if experience_terminee:
-        df_resultats = formateur_de_resultats.cree_dataframe_formate(
-            experience_terminee
-        )
-        logging.info(f"DataFrame créé avec {len(df_resultats)} lignes")
-        logging.info(f"Colonnes: {list(df_resultats.columns)}")
-
-        dossier_sortie = Path("./donnees/resultats_evaluations")
-        dossier_sortie.mkdir(parents=True, exist_ok=True)
-
-        horodatage = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        nom_fichier = f"resultats_experience_{experience_id_cree}_{horodatage}.csv"
-        chemin_fichier = dossier_sortie / nom_fichier
-
-        df_resultats.to_csv(chemin_fichier, index=False)
-        logging.info(f"Résultats sauvegardés dans: {chemin_fichier}")
-    else:
-        logging.error("Impossible d'obtenir les résultats de l'expérience")
+    sauvegarde_resultats(
+        formateur_de_resultats, experience_terminee, experience_id_cree
+    )
 
 
 if __name__ == "__main__":
