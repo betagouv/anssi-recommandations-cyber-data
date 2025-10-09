@@ -39,7 +39,7 @@ def cree_experience(
     dataset: DatasetReponse,
     df_mapped: pd.DataFrame,
     conf: Configuration,
-):
+) -> int:
     chargeur = Metriques()
     fichier_metriques = Path("metriques.json")
 
@@ -74,6 +74,10 @@ def cree_experience(
         )
     else:
         logging.error("L'expérience n'a pas pu être créée")
+    if resultat_experience is not None:
+        return resultat_experience.id
+    else:
+        return -1
 
 
 def main():
@@ -103,7 +107,9 @@ def main():
     if dataset is None:
         return
 
-    cree_experience(client, dataset, df_mapped, conf)
+    experience_id_cree = cree_experience(client, dataset, df_mapped, conf)
+    experience_listee = client.experience.lit(experience_id_cree)
+    logging.info(f"Expérience affichée: {experience_listee} ")
 
 
 if __name__ == "__main__":
