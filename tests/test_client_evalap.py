@@ -5,10 +5,12 @@ from src.evalap.evalap_dataset_http import (
     DatasetPayload,
     DatasetReponse,
 )
-from src.configuration import Evalap, Configuration, MQC, Albert
+from src.configuration import Albert
 from src.evalap.evalap_experience_http import (
     ExperiencePayload,
     ExperienceReponse,
+    ExperienceAvecResultats,
+    MetriqueResultat,
 )
 from src.configuration import Configuration, Evalap, MQC
 import pytest
@@ -298,5 +300,84 @@ def test_cree_experience_requete_exception_retourne_none(
 
     client = EvalapClient(configuration, session=session)
     resultat = client.experience.ajoute(experience_payload)
+
+    assert resultat is None
+
+
+def test_lit_experience_retourne_experience_avec_resultats(
+    configuration: Configuration,
+):
+    session = Mock()
+
+    donnees_json = {
+        "id": 42,
+        "name": "Experience Test",
+        "created_at": "2025-10-06T15:45:00Z",
+        "experiment_status": "running_metrics",
+        "experiment_set_id": 1,
+        "num_try": 8,
+        "num_success": 7,
+        "num_observation_try": 40,
+        "num_observation_success": 38,
+        "num_metrics": 3,
+        "readme": "Test readme",
+        "judge_model": {"model": "albert"},
+        "model": {"name": "albert-large"},
+        "dataset": {"id": 10},
+        "with_vision": False,
+        "results": [
+            {
+                "created_at": "2025-10-09T14:48:35.428847",
+                "experiment_id": 42,
+                "id": 125,
+                "metric_name": "judge_precision",
+                "metric_status": "running",
+                "num_success": 0,
+                "num_try": 0,
+                "observation_table": [{"score": 0.8, "observation": "test"}],
+            }
+        ],
+    }
+
+    reponse_mockee = Mock(spec=Response)
+    reponse_mockee.status_code = 200
+    reponse_mockee.json.return_value = donnees_json
+    reponse_mockee.raise_for_status = Mock()
+    session.get.return_value = reponse_mockee
+
+    client = EvalapClient(configuration, session=session)
+    resultat = client.experience.lit(42)
+
+    assert resultat is not None
+    assert isinstance(resultat, ExperienceAvecResultats)
+    assert len(resultat.results) == 1
+    assert resultat.results[0].metric_name == "judge_precision"
+    assert len(resultat.results[0].observation_table) == 1
+    assert resultat.results[0].observation_table[0].score == 0.8
+    session.get.assert_called_once_with(
+        f"{configuration.evalap.url}/experiment/42?with_results=true", timeout=20
+    )
+
+
+def test_lit_experience_timeout_retourne_none(
+    configuration: Configuration,
+):
+    session = Mock()
+    session.get.side_effect = requests.Timeout("timeout simulé")
+
+    client = EvalapClient(configuration, session=session)
+    resultat = client.experience.lit(42)
+
+    assert resultat is None
+
+
+def test_lit_experience_inexistante_retourne_none(
+    configuration: Configuration,
+):
+    session = Mock()
+    session.get.side_effect = requests.RequestException("404")
+
+    client = EvalapClient(configuration, session=session)
+    resultat = client.experience.lit(999)
 
     assert resultat is None
