@@ -2,9 +2,25 @@ from pathlib import Path
 from typing import Any, Mapping, Protocol, Final
 import datetime as dt
 import httpx
+from pydantic import BaseModel
 from .configuration import MQC
 from .lecteur_csv import LecteurCSV
 import re
+
+
+class Paragraphe(BaseModel):
+    score_similarite: float
+    numero_page: int
+    url: str
+    nom_document: str
+    contenu: str
+
+
+class ReponseQuestion(BaseModel):
+    reponse: str
+    paragraphes: list[Paragraphe]
+    question: str
+
 
 HTTP_SCHEMA: Final[str] = "http"
 
@@ -25,7 +41,7 @@ def formate_route_pose_question(cfg: MQC) -> str:
 
 
 class InterfaceQuestions(Protocol):
-    def pose_question(self, question: str) -> str: ...
+    def pose_question(self, question: str) -> ReponseQuestion: ...
 
 
 class HorlogeSysteme:
@@ -40,7 +56,7 @@ class ClientMQCHTTP:
         self._client = client or httpx.Client()
         self.delai_attente_maximum = cfg.delai_attente_maximum
 
-    def pose_question(self, question: str) -> str:
+    def pose_question(self, question: str) -> ReponseQuestion:
         try:
             r = self._client.post(
                 f"{self._base}{self._route}",
@@ -51,12 +67,7 @@ class ClientMQCHTTP:
             raise RuntimeError(f"Serveur MQC injoignable: {e}") from e
         r.raise_for_status()
         donnees = r.json()
-        reponse = donnees.get("reponse")
-        if not isinstance(reponse, str):
-            raise ValueError(
-                "Réponse HTTP invalide: champ 'reponse' manquant ou non str"
-            )
-        return reponse
+        return ReponseQuestion(**donnees)
 
 
 class RemplisseurReponses:
@@ -67,7 +78,8 @@ class RemplisseurReponses:
         lecteur = LecteurCSV(chemin_csv)
 
         def genere_reponse_bot(d: Mapping[str, Any]) -> str:
-            return self._client.pose_question(str(d["Question type"]))
+            reponse_question = self._client.pose_question(str(d["Question type"]))
+            return reponse_question.reponse
 
         lecteur.appliquer_calcul_colonne("Réponse Bot", genere_reponse_bot)
         return lecteur
