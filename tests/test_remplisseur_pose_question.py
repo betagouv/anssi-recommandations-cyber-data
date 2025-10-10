@@ -15,6 +15,12 @@ from src.remplisseur_reponses import (
 )
 
 
+def cree_reponse_mock(reponse: str, question: str) -> httpx.Response:
+    return httpx.Response(
+        200, json={"reponse": reponse, "paragraphes": [], "question": question}
+    )
+
+
 @pytest.fixture()
 def configuration() -> MQC:
     return recupere_configuration().mqc
@@ -31,9 +37,7 @@ def test_remplissage_appelle_api_pour_chaque_question(
     chemin = formate_route_pose_question(configuration)
 
     route = respx.post(f"{base}{chemin}").mock(
-        return_value=httpx.Response(
-            200, json={"reponse": "X", "paragraphes": [], "question": "Q1?"}
-        )
+        return_value=cree_reponse_mock("X", "Q1?")
     )
 
     client = ClientMQCHTTP(cfg=configuration)
@@ -86,11 +90,7 @@ def test_remplissage_insere_reponses_dans_colonne(tmp_path: Path, configuration:
     base = construit_base_url(configuration)
     chemin = formate_route_pose_question(configuration)
 
-    respx.post(f"{base}{chemin}").mock(
-        return_value=httpx.Response(
-            200, json={"reponse": "mocked", "paragraphes": [], "question": "Q1?"}
-        )
-    )
+    respx.post(f"{base}{chemin}").mock(return_value=cree_reponse_mock("mocked", "Q1?"))
 
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
@@ -109,11 +109,7 @@ def test_ecriture_cree_fichier_dans_bon_dossier(tmp_path: Path, configuration: M
 
     base = construit_base_url(configuration)
     chemin = formate_route_pose_question(configuration)
-    respx.post(f"{base}{chemin}").mock(
-        return_value=httpx.Response(
-            200, json={"reponse": "OK", "paragraphes": [], "question": "A?"}
-        )
-    )
+    respx.post(f"{base}{chemin}").mock(return_value=cree_reponse_mock("OK", "A?"))
 
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
@@ -137,11 +133,7 @@ def test_ecriture_nom_fichier_contient_date(tmp_path: Path, configuration: MQC):
 
     base = construit_base_url(configuration)
     chemin = formate_route_pose_question(configuration)
-    respx.post(f"{base}{chemin}").mock(
-        return_value=httpx.Response(
-            200, json={"reponse": "OK", "paragraphes": [], "question": "A?"}
-        )
-    )
+    respx.post(f"{base}{chemin}").mock(return_value=cree_reponse_mock("OK", "A?"))
 
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
@@ -165,11 +157,7 @@ def test_ecriture_contenu_csv_complet(tmp_path: Path, configuration: MQC):
 
     base = construit_base_url(configuration)
     chemin = formate_route_pose_question(configuration)
-    respx.post(f"{base}{chemin}").mock(
-        return_value=httpx.Response(
-            200, json={"reponse": "OK", "paragraphes": [], "question": "A?"}
-        )
-    )
+    respx.post(f"{base}{chemin}").mock(return_value=cree_reponse_mock("OK", "A?"))
 
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
