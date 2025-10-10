@@ -7,6 +7,7 @@ class MQC(NamedTuple):
     hote: str
     api_prefixe_route: str
     route_pose_question: str
+    delai_attente_maximum: float
 
 
 class Evalap(NamedTuple):
@@ -30,6 +31,7 @@ def recupere_configuration() -> Configuration:
         hote=os.getenv("MQC_HOTE", "localhost"),
         api_prefixe_route=os.getenv("MQC_API_PREFIXE_ROUTE", ""),
         route_pose_question=os.getenv("MQC_ROUTE_POSE_QUESTION", "pose_question"),
+        delai_attente_maximum=float(os.getenv("MQC_DELAI_ATTENTE_MAXIMUM", 0.5)),
     )
 
     evalap: Evalap = Evalap(
