@@ -31,6 +31,7 @@ def configuration() -> Configuration:
         hote="localhost",
         api_prefixe_route="",
         route_pose_question="pose_question",
+        delai_attente_maximum=10.0,
     )
     evalap: Evalap = Evalap(
         url="http://localhost:8000",
