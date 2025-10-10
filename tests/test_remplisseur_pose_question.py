@@ -31,7 +31,9 @@ def test_remplissage_appelle_api_pour_chaque_question(
     chemin = formate_route_pose_question(configuration)
 
     route = respx.post(f"{base}{chemin}").mock(
-        return_value=httpx.Response(200, json={"reponse": "X"})
+        return_value=httpx.Response(
+            200, json={"reponse": "X", "paragraphes": [], "question": "Q1?"}
+        )
     )
 
     client = ClientMQCHTTP(cfg=configuration)
@@ -44,6 +46,39 @@ def test_remplissage_appelle_api_pour_chaque_question(
 
 
 @respx.mock
+def test_pose_question_retourne_reponse_question_structuree(configuration: MQC):
+    base = construit_base_url(configuration)
+    chemin = formate_route_pose_question(configuration)
+
+    reponse_json = {
+        "reponse": "Voici la réponse",
+        "paragraphes": [
+            {
+                "score_similarite": 0.85,
+                "numero_page": 1,
+                "url": "https://example.com/doc1",
+                "nom_document": "Guide sécurité",
+                "contenu": "Contenu du paragraphe",
+            }
+        ],
+        "question": "Ma question?",
+    }
+
+    respx.post(f"{base}{chemin}").mock(
+        return_value=httpx.Response(200, json=reponse_json)
+    )
+
+    client = ClientMQCHTTP(cfg=configuration)
+    resultat = client.pose_question("Ma question?")
+
+    assert resultat.reponse == "Voici la réponse"
+    assert resultat.question == "Ma question?"
+    assert len(resultat.paragraphes) == 1
+    assert resultat.paragraphes[0].score_similarite == 0.85
+    assert resultat.paragraphes[0].nom_document == "Guide sécurité"
+
+
+@respx.mock
 def test_remplissage_insere_reponses_dans_colonne(tmp_path: Path, configuration: MQC):
     fichier = tmp_path / "eval.csv"
     fichier.write_text("Question type\nQ1?\nQ2?\n", encoding="utf-8")
@@ -52,7 +87,9 @@ def test_remplissage_insere_reponses_dans_colonne(tmp_path: Path, configuration:
     chemin = formate_route_pose_question(configuration)
 
     respx.post(f"{base}{chemin}").mock(
-        return_value=httpx.Response(200, json={"reponse": "mocked"})
+        return_value=httpx.Response(
+            200, json={"reponse": "mocked", "paragraphes": [], "question": "Q1?"}
+        )
     )
 
     client = ClientMQCHTTP(cfg=configuration)
@@ -73,7 +110,9 @@ def test_ecriture_cree_fichier_dans_bon_dossier(tmp_path: Path, configuration: M
     base = construit_base_url(configuration)
     chemin = formate_route_pose_question(configuration)
     respx.post(f"{base}{chemin}").mock(
-        return_value=httpx.Response(200, json={"reponse": "OK"})
+        return_value=httpx.Response(
+            200, json={"reponse": "OK", "paragraphes": [], "question": "A?"}
+        )
     )
 
     client = ClientMQCHTTP(cfg=configuration)
@@ -99,7 +138,9 @@ def test_ecriture_nom_fichier_contient_date(tmp_path: Path, configuration: MQC):
     base = construit_base_url(configuration)
     chemin = formate_route_pose_question(configuration)
     respx.post(f"{base}{chemin}").mock(
-        return_value=httpx.Response(200, json={"reponse": "OK"})
+        return_value=httpx.Response(
+            200, json={"reponse": "OK", "paragraphes": [], "question": "A?"}
+        )
     )
 
     client = ClientMQCHTTP(cfg=configuration)
@@ -125,7 +166,9 @@ def test_ecriture_contenu_csv_complet(tmp_path: Path, configuration: MQC):
     base = construit_base_url(configuration)
     chemin = formate_route_pose_question(configuration)
     respx.post(f"{base}{chemin}").mock(
-        return_value=httpx.Response(200, json={"reponse": "OK"})
+        return_value=httpx.Response(
+            200, json={"reponse": "OK", "paragraphes": [], "question": "A?"}
+        )
     )
 
     client = ClientMQCHTTP(cfg=configuration)
