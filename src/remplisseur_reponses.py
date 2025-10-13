@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Mapping, Protocol, Final
+from typing import Any, Mapping, Protocol, Final, Union, Callable
 import datetime as dt
 import httpx
 from pydantic import BaseModel
@@ -76,12 +76,34 @@ class RemplisseurReponses:
 
     def remplit_fichier(self, chemin_csv: Path) -> LecteurCSV:
         lecteur = LecteurCSV(chemin_csv)
+        cache_reponses = {}
 
-        def genere_reponse_bot(d: Mapping[str, Any]) -> str:
-            reponse_question = self._client.pose_question(str(d["Question type"]))
-            return reponse_question.reponse
+        def obtient_reponse_question(question: str) -> ReponseQuestion:
+            if question not in cache_reponses:
+                cache_reponses[question] = self._client.pose_question(question)
+            return cache_reponses[question]
 
-        lecteur.appliquer_calcul_colonne("Réponse Bot", genere_reponse_bot)
+        def genere_reponse(
+            extracteur: Callable[[ReponseQuestion], str],
+        ) -> Callable[[Mapping[str, Union[str, int, float]]], str]:
+            def _genere(d: Mapping[str, Union[str, int, float]]) -> str:
+                reponse_question = obtient_reponse_question(str(d["Question type"]))
+                return extracteur(reponse_question)
+
+            return _genere
+
+        def extrait_reponse(rq: ReponseQuestion) -> str:
+            return rq.reponse
+
+        def extrait_paragraphes(rq: ReponseQuestion) -> str:
+            if not rq.paragraphes:
+                return ""
+            return "${SEPARATEUR_DOCUMENT}".join([p.contenu for p in rq.paragraphes])
+
+        lecteur.appliquer_calcul_colonne("Réponse Bot", genere_reponse(extrait_reponse))
+        lecteur.appliquer_calcul_colonne(
+            "Contexte", genere_reponse(extrait_paragraphes)
+        )
         return lecteur
 
 

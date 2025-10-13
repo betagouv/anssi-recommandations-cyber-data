@@ -99,6 +99,88 @@ def test_remplissage_insere_reponses_dans_colonne(tmp_path: Path, configuration:
     df: pd.DataFrame = lecteur.dataframe
 
     assert list(df["Réponse Bot"]) == ["mocked", "mocked"]
+    assert "Contexte" in df.columns
+    assert list(df["Contexte"]) == ["", ""]
+
+
+@respx.mock
+def test_remplissage_ajoute_colonne_context_avec_paragraphes(
+    tmp_path: Path, configuration: MQC
+):
+    fichier = tmp_path / "eval.csv"
+    fichier.write_text("Question type\nQ1?\n", encoding="utf-8")
+
+    base = construit_base_url(configuration)
+    chemin = formate_route_pose_question(configuration)
+
+    reponse_avec_paragraphes = {
+        "reponse": "Réponse test",
+        "paragraphes": [
+            {
+                "score_similarite": 0.9,
+                "numero_page": 5,
+                "url": "https://test.com",
+                "nom_document": "Doc test",
+                "contenu": "Contenu test",
+            }
+        ],
+        "question": "Q1?",
+    }
+
+    respx.post(f"{base}{chemin}").mock(
+        return_value=httpx.Response(200, json=reponse_avec_paragraphes)
+    )
+
+    client = ClientMQCHTTP(cfg=configuration)
+    remplisseur = RemplisseurReponses(client=client)
+    lecteur = remplisseur.remplit_fichier(fichier)
+    df = lecteur.dataframe
+
+    assert "Contexte" in df.columns
+    context_str = df["Contexte"].iloc[0]
+    assert "Contenu test" in context_str
+
+
+@respx.mock
+def test_remplissage_ajoute_colonne_context_avec_deux_paragraphes_separes_par_marqueur(
+    tmp_path: Path, configuration: MQC
+):
+    fichier = tmp_path / "eval.csv"
+    fichier.write_text("Question type\nQ1?\n", encoding="utf-8")
+
+    base = construit_base_url(configuration)
+    chemin = formate_route_pose_question(configuration)
+
+    reponse_avec_paragraphes_multiples = {
+        "reponse": "Réponse test",
+        "paragraphes": [
+            {
+                "score_similarite": 0.9,
+                "numero_page": 5,
+                "url": "https://test.com",
+                "nom_document": "Doc test",
+                "contenu": "Premier paragraphe",
+            },
+            {
+                "score_similarite": 0.8,
+                "numero_page": 6,
+                "url": "https://test2.com",
+                "nom_document": "Doc test 2",
+                "contenu": "Deuxième paragraphe",
+            },
+        ],
+        "question": "Q1?",
+    }
+
+    respx.post(f"{base}{chemin}").mock(
+        return_value=httpx.Response(200, json=reponse_avec_paragraphes_multiples)
+    )
+
+    client = ClientMQCHTTP(cfg=configuration)
+    remplisseur = RemplisseurReponses(client=client)
+    lignes = remplisseur.remplit_fichier(fichier)
+    context_str = lignes.dataframe["Contexte"].iloc[0]
+    assert "Premier paragraphe${SEPARATEUR_DOCUMENT}Deuxième paragraphe" == context_str
 
 
 @respx.mock

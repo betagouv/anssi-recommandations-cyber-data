@@ -15,6 +15,24 @@ from typing import Optional
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
+def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    if "Contexte" in df.columns:
+        df["Contexte"] = df["Contexte"].apply(
+            lambda x: x.split("${SEPARATEUR_DOCUMENT}")
+            if isinstance(x, str) and x.strip()
+            else []
+        )
+
+    columns_map = {
+        "Question type": "query",
+        "Réponse Bot": "output",
+        "Réponse envisagée": "output_true",
+        "Contexte": "context",
+    }
+
+    return df.rename(columns=columns_map)
+
+
 def sauvegarde_resultats(
     formateur: FormateurResultatsExperiences, experience_terminee, experience_id: int
 ) -> None:
@@ -115,14 +133,7 @@ def main():
 
     conf = recupere_configuration()
     df = pd.read_csv(args.csv)
-
-    columns_map = {
-        "Question type": "query",
-        "Réponse Bot": "output",
-        "Réponse envisagée": "output_true",
-    }
-
-    df_mapped = df.rename(columns=columns_map)
+    df_mapped = prepare_dataframe(df)
     session = requests.Session()
     client = EvalapClient(conf, session=session)
 
