@@ -26,11 +26,11 @@ def main() -> None:
     client = ClientMQCHTTP(cfg=cfg)
     remplisseur = RemplisseurReponses(client=client)
 
-    lecteur = remplisseur.remplit_fichier(args.csv)
+    generateur = remplisseur.remplit_fichier_flux(args.csv)
     ecrivain = EcrivainSortie(
         racine=Path.cwd(), sous_dossier=Path(args.sortie), horloge=HorlogeSysteme()
     )
-    chemin = ecrivain.ecrit_fichier_depuis_lecteur_csv(lecteur, prefixe=args.prefixe)
+    chemin = ecrivain.ecrit_fichier_depuis_generateur(generateur, prefixe=args.prefixe)
     logging.info(f"Nouveau fichier créé : {str(chemin)}")
 
 

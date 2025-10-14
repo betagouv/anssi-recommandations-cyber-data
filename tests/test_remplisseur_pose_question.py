@@ -1,5 +1,4 @@
 from pathlib import Path
-import pandas as pd
 import httpx
 import respx
 import pytest
@@ -13,6 +12,7 @@ from src.remplisseur_reponses import (
     construit_base_url,
     formate_route_pose_question,
 )
+from unittest.mock import patch, Mock
 
 
 def cree_reponse_mock(reponse: str, question: str) -> httpx.Response:
@@ -43,7 +43,7 @@ def test_remplissage_appelle_api_pour_chaque_question(
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
 
-    remplisseur.remplit_fichier(fichier)
+    list(remplisseur.remplit_fichier_flux(fichier))
 
     assert route.called
     assert route.call_count == 2
@@ -95,12 +95,10 @@ def test_remplissage_insere_reponses_dans_colonne(tmp_path: Path, configuration:
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
 
-    lecteur = remplisseur.remplit_fichier(fichier)
-    df: pd.DataFrame = lecteur.dataframe
+    lignes = list(remplisseur.remplit_fichier_flux(fichier))
 
-    assert list(df["Réponse Bot"]) == ["mocked", "mocked"]
-    assert "Contexte" in df.columns
-    assert list(df["Contexte"]) == ["", ""]
+    assert list(map(lambda x: x["Réponse Bot"], lignes)) == ["mocked", "mocked"]
+    assert list(map(lambda x: x["Contexte"], lignes)) == ["", ""]
 
 
 @respx.mock
@@ -133,11 +131,10 @@ def test_remplissage_ajoute_colonne_context_avec_paragraphes(
 
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
-    lecteur = remplisseur.remplit_fichier(fichier)
-    df = lecteur.dataframe
+    lignes = list(remplisseur.remplit_fichier_flux(fichier))
 
-    assert "Contexte" in df.columns
-    context_str = df["Contexte"].iloc[0]
+    assert "Contexte" in lignes[0].keys()
+    context_str = str(lignes[0]["Contexte"])
     assert "Contenu test" in context_str
 
 
@@ -178,8 +175,10 @@ def test_remplissage_ajoute_colonne_context_avec_deux_paragraphes_separes_par_ma
 
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
-    lignes = remplisseur.remplit_fichier(fichier)
-    context_str = lignes.dataframe["Contexte"].iloc[0]
+    lignes = list(remplisseur.remplit_fichier_flux(fichier))
+
+    assert len(lignes) == 1
+    context_str = str(lignes[0]["Contexte"])
     assert "Premier paragraphe${SEPARATEUR_DOCUMENT}Deuxième paragraphe" == context_str
 
 
@@ -195,14 +194,14 @@ def test_ecriture_cree_fichier_dans_bon_dossier(tmp_path: Path, configuration: M
 
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
-    lecteur = remplisseur.remplit_fichier(fichier)
+    generateur = remplisseur.remplit_fichier_flux(fichier)
 
     horloge = HorlogeSysteme()
     ecrivain = EcrivainSortie(
         racine=tmp_path, sous_dossier=Path("donnees/sortie"), horloge=horloge
     )
-    chemin_csv = ecrivain.ecrit_fichier_depuis_lecteur_csv(
-        lecteur, prefixe="evaluation"
+    chemin_csv = ecrivain.ecrit_fichier_depuis_generateur(
+        generateur, prefixe="evaluation"
     )
 
     assert chemin_csv.parent == tmp_path / "donnees" / "sortie"
@@ -219,14 +218,14 @@ def test_ecriture_nom_fichier_contient_date(tmp_path: Path, configuration: MQC):
 
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
-    lecteur = remplisseur.remplit_fichier(fichier)
+    generateur = remplisseur.remplit_fichier_flux(fichier)
 
     horloge = HorlogeSysteme()
     ecrivain = EcrivainSortie(
         racine=tmp_path, sous_dossier=Path("donnees/sortie"), horloge=horloge
     )
-    chemin_csv = ecrivain.ecrit_fichier_depuis_lecteur_csv(
-        lecteur, prefixe="evaluation"
+    chemin_csv = ecrivain.ecrit_fichier_depuis_generateur(
+        generateur, prefixe="evaluation"
     )
 
     assert "evaluation_" in chemin_csv.name
@@ -243,14 +242,14 @@ def test_ecriture_contenu_csv_complet(tmp_path: Path, configuration: MQC):
 
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
-    lecteur = remplisseur.remplit_fichier(fichier)
+    generateur = remplisseur.remplit_fichier_flux(fichier)
 
     horloge = HorlogeSysteme()
     ecrivain = EcrivainSortie(
         racine=tmp_path, sous_dossier=Path("donnees/sortie"), horloge=horloge
     )
-    chemin_csv = ecrivain.ecrit_fichier_depuis_lecteur_csv(
-        lecteur, prefixe="evaluation"
+    chemin_csv = ecrivain.ecrit_fichier_depuis_generateur(
+        generateur, prefixe="evaluation"
     )
 
     contenu = chemin_csv.read_text(encoding="utf-8").splitlines()
@@ -289,3 +288,42 @@ def test_methode_desinfecte_prefixe_nettoie_le_contenu_non_alphanumerique(
 ):
     valeur_desinfectee = EcrivainSortie._desinfecte_prefixe(valeur_infectee)
     assert valeur_desinfectee == valeur_desinfectee_attendue
+
+
+def test_remplit_fichier_flux_genere_lignes_une_par_une():
+    client_mock = Mock()
+    client_mock.pose_question.return_value.reponse = "test"
+    client_mock.pose_question.return_value.paragraphes = []
+
+    lecteur_mock = Mock()
+    lecteur_mock.iterer_lignes.return_value = iter(
+        [{"Question type": "Q1?"}, {"Question type": "Q2?"}]
+    )
+
+    remplisseur = RemplisseurReponses(client_mock)
+
+    with patch("src.remplisseur_reponses.LecteurCSV", return_value=lecteur_mock):
+        generateur = remplisseur.remplit_fichier_flux(Path("/fake"))
+        premiere_ligne = next(generateur)
+        assert client_mock.pose_question.call_count == 1
+        assert premiere_ligne["Question type"] == "Q1?"
+        deuxieme_ligne = next(generateur)
+        assert client_mock.pose_question.call_count == 2
+        assert deuxieme_ligne["Question type"] == "Q2?"
+
+
+def test_ecrit_fichier_flux_ecrit_au_fur_et_mesure():
+    def generateur_simule():
+        yield {"Question type": "Q1?", "Réponse Bot": "R1"}
+        yield {"Question type": "Q2?", "Réponse Bot": "R2"}
+
+    horloge_mock = Mock()
+    horloge_mock.aujourd_hui.return_value = "2025-01-01_12-00-00"
+
+    ecrivain_mock = Mock(spec=EcrivainSortie)
+    ecrivain_mock.ecrit_fichier_depuis_generateur.return_value = Path("/faux/test.csv")
+
+    generateur = generateur_simule()
+    ecrivain_mock.ecrit_fichier_depuis_generateur(generateur, prefixe="test")
+
+    ecrivain_mock.ecrit_fichier_depuis_generateur.assert_called_once()
