@@ -439,3 +439,53 @@ def test_metrique_depuis_donnees_malformees_leve_erreur_de_cle():
 
     with pytest.raises(KeyError):
         EvalapExperienceHttp._metrique_depuis(donnees_malformees)
+
+
+def test_ajoute_dataset_erreur_409_leve_valueerror(
+    configuration: Configuration,
+):
+    session = Mock()
+    reponse_mockee = Mock(spec=Response)
+    reponse_mockee.status_code = 409
+
+    erreur_http = requests.HTTPError("409 Conflict")
+    erreur_http.response = reponse_mockee
+    reponse_mockee.raise_for_status.side_effect = erreur_http
+    session.post.return_value = reponse_mockee
+
+    session.get.return_value = Mock(
+        spec=Response,
+        status_code=200,
+        json=Mock(
+            return_value=[
+                {
+                    "id": 1,
+                    "name": "dataset_existant",
+                    "readme": "test",
+                    "default_metric": "judge_precision",
+                    "columns_map": {},
+                    "created_at": "2024-01-01",
+                    "size": 0,
+                    "columns": [],
+                    "parquet_size": 0,
+                    "parquet_columns": [],
+                }
+            ]
+        ),
+        raise_for_status=Mock(),
+    )
+
+    df = pd.DataFrame([{"query": "Q", "output": "A", "output_true": "A"}])
+    payload = DatasetPayload(
+        name="dataset_existant",
+        readme="JEU QA",
+        default_metric="judge_precision",
+        df=df.astype(object).where(pd.notnull(df), None).to_json(),
+    )
+
+    client = EvalapClient(configuration, session=session)
+
+    with pytest.raises(
+        ValueError, match="Dataset avec ce nom existe déjà: dataset_existant"
+    ):
+        client.dataset.ajoute(payload)
