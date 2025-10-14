@@ -1,5 +1,11 @@
+import logging
+from datetime import datetime
 from pathlib import Path
-from typing import Protocol, Final, Union
+from typing import (
+    Protocol,
+    Final,
+    Union,
+)
 import datetime as dt
 import httpx
 from pydantic import BaseModel
@@ -7,6 +13,8 @@ from configuration import MQC
 from lecteur_csv import LecteurCSV
 import re
 import csv
+import pandas as pd
+from formateur_resultats_experiences import GenerateurMetriques
 
 
 class Paragraphe(BaseModel):
@@ -137,3 +145,40 @@ class EcrivainSortie:
             ecrivain.writerow(ligne.values())
 
         return self._chemin_courant
+
+
+class EcrivainResultatsFlux:
+    def __init__(self, racine_dossier, prefixe_nom: str):
+        self.racine_dossier = racine_dossier
+        self.prefixe_nom = prefixe_nom
+
+    def ecrit_resultats_flux(
+        self,
+        generateur_resultats: GenerateurMetriques,
+        experience_id: int,
+    ):
+        horodatage = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        nom_fichier = f"{self.prefixe_nom}_{experience_id}_{horodatage}.csv"
+        chemin_fichier = Path(self.racine_dossier) / nom_fichier
+
+        for nom_metrique, observations in generateur_resultats:
+            logging.info(f"Métrique {nom_metrique} terminée, écriture en cours...")
+
+            donnees_metrique = {
+                "numero_ligne": [obs["numero_ligne"] for obs in observations],
+                nom_metrique: [obs["score"] for obs in observations],
+            }
+            df_metrique = pd.DataFrame(donnees_metrique)
+
+            try:
+                df_existant = pd.read_csv(chemin_fichier, index_col="numero_ligne")
+                df_existant[nom_metrique] = df_metrique.set_index("numero_ligne")[
+                    nom_metrique
+                ]
+            except (FileNotFoundError, pd.errors.EmptyDataError):
+                df_existant = df_metrique.set_index("numero_ligne")
+
+            df_existant.to_csv(chemin_fichier)
+            logging.info(f"Métrique {nom_metrique} écrite dans {chemin_fichier}")
+
+        return chemin_fichier
