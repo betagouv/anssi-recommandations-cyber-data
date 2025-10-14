@@ -2,7 +2,7 @@ import pandas as pd
 from pathlib import Path
 from argparse import ArgumentParser
 from src.evalap.evalap_dataset_http import DatasetPayload, DatasetReponse
-from src.evalap.evalap_experience_http import ExperiencePayload
+from src.evalap.evalap_experience_http import ExperiencePayload, ExperienceAvecResultats
 from src.evalap import EvalapClient
 from src.configuration import recupere_configuration, Configuration
 from src.metriques import Metriques
@@ -34,7 +34,9 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def sauvegarde_resultats(
-    formateur: FormateurResultatsExperiences, experience_terminee, experience_id: int
+    formateur: FormateurResultatsExperiences,
+    experience_terminee: ExperienceAvecResultats,
+    experience_id: int,
 ) -> None:
     if experience_terminee:
         df_resultats = formateur.cree_dataframe_formate(experience_terminee)
