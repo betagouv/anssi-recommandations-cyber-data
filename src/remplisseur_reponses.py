@@ -138,6 +138,7 @@ class EcrivainSortie:
         self._racine = racine
         self._sous_dossier = sous_dossier
         self._horloge: HorlogeSysteme = horloge if horloge else HorlogeSysteme()
+        self._chemin_courant: Path | None = None
 
     @staticmethod
     def _desinfecte_prefixe(prefixe: str) -> str:
@@ -161,17 +162,18 @@ class EcrivainSortie:
     def ecrit_ligne_depuis_lecteur_csv(
         self, ligne: dict[str, Union[str, int, float]], prefixe: str
     ) -> Path:
-        dossier = self._racine / self._sous_dossier
-        dossier.mkdir(parents=True, exist_ok=True)
-        chemin = (dossier / self._nom_fichier(prefixe)).resolve()
-        if dossier not in chemin.parents:
-            raise ValueError("Chemin de sortie en dehors du dossier autorisé")
+        if self._chemin_courant is None:
+            dossier = self._racine / self._sous_dossier
+            dossier.mkdir(parents=True, exist_ok=True)
+            self._chemin_courant = (dossier / self._nom_fichier(prefixe)).resolve()
+            if dossier not in self._chemin_courant.parents:
+                raise ValueError("Chemin de sortie en dehors du dossier autorisé")
 
-        if not chemin.exists():
-            with open(chemin, "w", encoding="utf-8") as f:
+        if not self._chemin_courant.exists():
+            with open(self._chemin_courant, "w", encoding="utf-8") as f:
                 f.write(",".join(ligne.keys()) + "\n")
 
-        with open(chemin, "a", encoding="utf-8") as f:
+        with open(self._chemin_courant, "a", encoding="utf-8") as f:
             f.write(",".join(str(v) for v in ligne.values()) + "\n")
 
-        return chemin
+        return self._chemin_courant
