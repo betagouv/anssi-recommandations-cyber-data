@@ -157,3 +157,21 @@ class EcrivainSortie:
             raise ValueError("Chemin de sortie en dehors du dossier autorisé")
         lecteur.ecrire_vers(chemin)
         return chemin
+
+    def ecrit_ligne_depuis_lecteur_csv(
+        self, ligne: dict[str, Union[str, int, float]], prefixe: str
+    ) -> Path:
+        dossier = self._racine / self._sous_dossier
+        dossier.mkdir(parents=True, exist_ok=True)
+        chemin = (dossier / self._nom_fichier(prefixe)).resolve()
+        if dossier not in chemin.parents:
+            raise ValueError("Chemin de sortie en dehors du dossier autorisé")
+
+        if not chemin.exists():
+            with open(chemin, "w", encoding="utf-8") as f:
+                f.write(",".join(ligne.keys()) + "\n")
+
+        with open(chemin, "a", encoding="utf-8") as f:
+            f.write(",".join(str(v) for v in ligne.values()) + "\n")
+
+        return chemin
