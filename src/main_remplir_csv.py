@@ -7,6 +7,7 @@ from .remplisseur_reponses import (
     EcrivainSortie,
     HorlogeSysteme,
 )
+from .lecteur_csv import LecteurCSV
 
 import logging
 
@@ -26,12 +27,28 @@ def main() -> None:
     client = ClientMQCHTTP(cfg=cfg)
     remplisseur = RemplisseurReponses(client=client)
 
-    lecteur = remplisseur.remplit_fichier(args.csv)
+    lecteur = LecteurCSV(args.csv)
+
     ecrivain = EcrivainSortie(
         racine=Path.cwd(), sous_dossier=Path(args.sortie), horloge=HorlogeSysteme()
     )
-    chemin = ecrivain.ecrit_fichier_depuis_lecteur_csv(lecteur, prefixe=args.prefixe)
-    logging.info(f"Nouveau fichier créé : {str(chemin)}")
+
+    chemin = None
+    try:
+        while True:
+            ligne_enrichie = remplisseur.remplit_ligne(lecteur)
+            if chemin is None:
+                chemin = ecrivain.ecrit_ligne_depuis_lecteur_csv(
+                    ligne_enrichie, args.prefixe
+                )
+            else:
+                ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne_enrichie, args.prefixe)
+            logging.info(f"Ligne traitée et écrite")
+    except StopIteration:
+        pass
+
+    if chemin:
+        logging.info(f"Nouveau fichier créé : {str(chemin)}")
 
 
 if __name__ == "__main__":
