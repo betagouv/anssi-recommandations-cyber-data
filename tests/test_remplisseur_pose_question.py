@@ -4,6 +4,7 @@ import httpx
 import respx
 import pytest
 
+from src.lecteur_csv import LecteurCSV
 from src.configuration import recupere_configuration, MQC
 from src.remplisseur_reponses import (
     RemplisseurReponses,
@@ -308,7 +309,7 @@ def test_remplit_ligne_enrichit_ligne_avec_reponse_bot(
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
 
-    ligne_enrichie = remplisseur.remplit_ligne(fichier)
+    ligne_enrichie = remplisseur.remplit_ligne(LecteurCSV(fichier))
 
     assert ligne_enrichie["Question type"] == "Q1?"
     assert ligne_enrichie["Réponse Bot"] == "reponse_test"
@@ -350,10 +351,39 @@ def test_remplit_ligne_ecrit_bien_le_contexte(tmp_path: Path, configuration: MQC
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
 
-    ligne_enrichie = remplisseur.remplit_ligne(fichier)
+    ligne_enrichie = remplisseur.remplit_ligne(LecteurCSV(fichier))
 
     assert (
         ligne_enrichie["Contexte"]
         == "Premier paragraphe${SEPARATEUR_DOCUMENT}Deuxième paragraphe"
     )
     assert ligne_enrichie["Réponse Bot"] == "reponse_test"
+
+
+@respx.mock
+def test_remplit_ligne_avec_lecteur_traite_lignes_sequentiellement(
+    tmp_path: Path, configuration: MQC
+):
+    fichier = tmp_path / "test.csv"
+    fichier.write_text("Question type\nQ1?\nQ2?\n", encoding="utf-8")
+
+    base = construit_base_url(configuration)
+    chemin = formate_route_pose_question(configuration)
+
+    respx.post(f"{base}{chemin}").mock(
+        return_value=cree_reponse_mock("reponse_test", "Q1?")
+    )
+
+    client = ClientMQCHTTP(cfg=configuration)
+    remplisseur = RemplisseurReponses(client=client)
+
+    lecteur = LecteurCSV(fichier)
+
+    ligne1_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne2_enrichie = remplisseur.remplit_ligne(lecteur)
+
+    assert ligne1_enrichie["Question type"] == "Q1?"
+    assert ligne1_enrichie["Réponse Bot"] == "reponse_test"
+
+    assert ligne2_enrichie["Question type"] == "Q2?"
+    assert ligne2_enrichie["Réponse Bot"] == "reponse_test"

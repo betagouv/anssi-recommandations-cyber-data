@@ -106,9 +106,8 @@ class RemplisseurReponses:
         )
         return lecteur
 
-    def remplit_ligne(self, chemin_csv: Path) -> dict[str, Union[str, int, float]]:
-        lecteur = LecteurCSV(chemin_csv)
-        ligne = next(lecteur.iterer_lignes())
+    def remplit_ligne(self, lecteur: LecteurCSV) -> dict[str, Union[str, int, float]]:
+        ligne = lecteur.ligne_suivante()
 
         reponse_question = self._client.pose_question(str(ligne["Question type"]))
 
