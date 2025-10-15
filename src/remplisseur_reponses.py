@@ -116,6 +116,17 @@ class RemplisseurReponses:
             "Réponse Bot", lambda d: reponse_question.reponse, ligne
         )
 
+        contexte = (
+            ""
+            if not reponse_question.paragraphes
+            else "${SEPARATEUR_DOCUMENT}".join(
+                [p.contenu for p in reponse_question.paragraphes]
+            )
+        )
+        ligne_enrichie = lecteur.appliquer_calcul_ligne(
+            "Contexte", lambda d: contexte, ligne_enrichie
+        )
+
         return ligne_enrichie
 
 

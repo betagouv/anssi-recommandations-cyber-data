@@ -312,3 +312,48 @@ def test_remplit_ligne_enrichit_ligne_avec_reponse_bot(
 
     assert ligne_enrichie["Question type"] == "Q1?"
     assert ligne_enrichie["Réponse Bot"] == "reponse_test"
+
+
+@respx.mock
+def test_remplit_ligne_ecrit_bien_le_contexte(tmp_path: Path, configuration: MQC):
+    fichier = tmp_path / "test.csv"
+    fichier.write_text("Question type,Contexte\nQ1?,contexte\n", encoding="utf-8")
+
+    base = construit_base_url(configuration)
+    chemin = formate_route_pose_question(configuration)
+
+    reponse_mock_avec_paragraphe = httpx.Response(
+        200,
+        json={
+            "reponse": "reponse_test",
+            "paragraphes": [
+                {
+                    "score_similarite": 0.9,
+                    "numero_page": 5,
+                    "url": "https://test.com",
+                    "nom_document": "Doc test",
+                    "contenu": "Premier paragraphe",
+                },
+                {
+                    "score_similarite": 0.8,
+                    "numero_page": 6,
+                    "url": "https://test2.com",
+                    "nom_document": "Doc test 2",
+                    "contenu": "Deuxième paragraphe",
+                },
+            ],
+            "question": "Q1?",
+        },
+    )
+    respx.post(f"{base}{chemin}").mock(return_value=reponse_mock_avec_paragraphe)
+
+    client = ClientMQCHTTP(cfg=configuration)
+    remplisseur = RemplisseurReponses(client=client)
+
+    ligne_enrichie = remplisseur.remplit_ligne(fichier)
+
+    assert (
+        ligne_enrichie["Contexte"]
+        == "Premier paragraphe${SEPARATEUR_DOCUMENT}Deuxième paragraphe"
+    )
+    assert ligne_enrichie["Réponse Bot"] == "reponse_test"
