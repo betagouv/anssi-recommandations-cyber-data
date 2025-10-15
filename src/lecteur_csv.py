@@ -12,11 +12,17 @@ class LecteurCSV:
         self._df: pd.DataFrame = pd.read_csv(
             self._chemin, sep=separateur, encoding=encodage
         )
+        self._iterateur: Iterator[Mapping[str, Any]] | None = None
 
     def iterer_lignes(self) -> Iterator[Mapping[str, Any]]:
         lignes = cast(list[dict[str, Any]], self._df.to_dict(orient="records"))
         for ligne in lignes:
             yield ligne
+
+    def ligne_suivante(self) -> Mapping[str, Any]:
+        if self._iterateur is None:
+            self._iterateur = self.iterer_lignes()
+        return next(self._iterateur)
 
     def _log_progression(self, index: int, total: int, nom_colonne: str) -> None:
         if index == 1:
