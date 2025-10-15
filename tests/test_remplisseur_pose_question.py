@@ -387,3 +387,45 @@ def test_remplit_ligne_avec_lecteur_traite_lignes_sequentiellement(
 
     assert ligne2_enrichie["Question type"] == "Q2?"
     assert ligne2_enrichie["Réponse Bot"] == "reponse_test"
+
+
+@respx.mock
+def test_ecrit_ligne_depuis_lecteur_csv_ecrit_ligne_par_ligne(
+    tmp_path: Path, configuration: MQC
+):
+    fichier = tmp_path / "test.csv"
+    fichier.write_text("Question type\nQ1?\nQ2?\n", encoding="utf-8")
+
+    base = construit_base_url(configuration)
+    chemin = formate_route_pose_question(configuration)
+
+    respx.post(f"{base}{chemin}").mock(
+        return_value=cree_reponse_mock("reponse_test", "Q1?")
+    )
+
+    client = ClientMQCHTTP(cfg=configuration)
+    remplisseur = RemplisseurReponses(client=client)
+
+    lecteur = LecteurCSV(fichier)
+
+    horloge = HorlogeSysteme()
+    ecrivain = EcrivainSortie(
+        racine=tmp_path, sous_dossier=Path("sortie"), horloge=horloge
+    )
+
+    ligne1_enrichie = remplisseur.remplit_ligne(lecteur)
+
+    chemin_sortie = ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne1_enrichie, "test")
+
+    contenu = chemin_sortie.read_text(encoding="utf-8").strip().split("\n")
+    assert len(contenu) == 2
+    assert "Question type,Réponse Bot" in contenu[0]
+    assert "Q1?,reponse_test" in contenu[1]
+
+    ligne2_enrichie = remplisseur.remplit_ligne(lecteur)
+
+    ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne2_enrichie, "test")
+
+    contenu = chemin_sortie.read_text(encoding="utf-8").strip().split("\n")
+    assert len(contenu) == 3
+    assert "Q2?,reponse_test" in contenu[2]
