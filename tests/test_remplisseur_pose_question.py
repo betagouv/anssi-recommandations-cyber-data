@@ -289,3 +289,26 @@ def test_methode_desinfecte_prefixe_nettoie_le_contenu_non_alphanumerique(
 ):
     valeur_desinfectee = EcrivainSortie._desinfecte_prefixe(valeur_infectee)
     assert valeur_desinfectee == valeur_desinfectee_attendue
+
+
+@respx.mock
+def test_remplit_ligne_enrichit_ligne_avec_reponse_bot(
+    tmp_path: Path, configuration: MQC
+):
+    fichier = tmp_path / "test.csv"
+    fichier.write_text("Question type,Contexte\nQ1?,contexte\n", encoding="utf-8")
+
+    base = construit_base_url(configuration)
+    chemin = formate_route_pose_question(configuration)
+
+    respx.post(f"{base}{chemin}").mock(
+        return_value=cree_reponse_mock("reponse_test", "Q1?")
+    )
+
+    client = ClientMQCHTTP(cfg=configuration)
+    remplisseur = RemplisseurReponses(client=client)
+
+    ligne_enrichie = remplisseur.remplit_ligne(fichier)
+
+    assert ligne_enrichie["Question type"] == "Q1?"
+    assert ligne_enrichie["Réponse Bot"] == "reponse_test"

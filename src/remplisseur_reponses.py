@@ -106,6 +106,18 @@ class RemplisseurReponses:
         )
         return lecteur
 
+    def remplit_ligne(self, chemin_csv: Path) -> dict[str, Union[str, int, float]]:
+        lecteur = LecteurCSV(chemin_csv)
+        ligne = next(lecteur.iterer_lignes())
+
+        reponse_question = self._client.pose_question(str(ligne["Question type"]))
+
+        ligne_enrichie = lecteur.appliquer_calcul_ligne(
+            "Réponse Bot", lambda d: reponse_question.reponse, ligne
+        )
+
+        return ligne_enrichie
+
 
 class EcrivainSortie:
     """Écrit un CSV horodaté dans un sous-dossier de sortie."""

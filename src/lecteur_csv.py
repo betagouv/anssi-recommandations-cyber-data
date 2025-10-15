@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Iterator, Mapping, Callable, cast
+from typing import Any, Iterator, Mapping, Callable, cast, Union
 import pandas as pd
 import logging
 
@@ -45,6 +45,16 @@ class LecteurCSV:
     ) -> None:
         Path(chemin_sortie).parent.mkdir(parents=True, exist_ok=True)
         self._df.to_csv(chemin_sortie, index=False, sep=separateur, encoding=encodage)
+
+    def appliquer_calcul_ligne(
+        self,
+        nom_colonne: str,
+        calcul: Callable[[Mapping[str, Union[str, int, float]]], Any],
+        ligne: Mapping[str, Union[str, int, float]],
+    ) -> dict[str, Union[str, int, float]]:
+        ligne_enrichie = dict(ligne)
+        ligne_enrichie[nom_colonne] = calcul(ligne)
+        return ligne_enrichie
 
     @property
     def dataframe(self) -> pd.DataFrame:
