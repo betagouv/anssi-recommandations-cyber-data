@@ -1,5 +1,6 @@
 from pathlib import Path
 from src.lecteur_csv import LecteurCSV
+from typing import Mapping, Union
 
 
 def test_peut_lire_un_fichier_csv_et_compter_les_lignes(tmp_path: Path):
@@ -73,3 +74,24 @@ def test_iterer_lignes_sur_csv_sans_donnees_retourne_vide(tmp_path: Path):
     lecteur = LecteurCSV(fichier)
     lignes = list(lecteur.iterer_lignes())
     assert lignes == []
+
+
+def test_lecteur_appliquer_calcul_ligne_enrichit_une_ligne(tmp_path: Path):
+    """Test que le lecteur peut appliquer un calcul sur une ligne spécifique"""
+    fichier = tmp_path / "test.csv"
+    fichier.write_text("Question type,autre\nQ1?,valeur\n", encoding="utf-8")
+
+    lecteur = LecteurCSV(fichier)
+
+    def calcul_test(ligne: Mapping[str, Union[str, int, float]]) -> str:
+        return f"calculé_{ligne['Question type']}"
+
+    ligne_originale = {"Question type": "Q1?", "autre": "valeur"}
+
+    ligne_enrichie = lecteur.appliquer_calcul_ligne(
+        "Nouvelle Colonne", calcul_test, ligne_originale
+    )
+
+    assert ligne_enrichie["Question type"] == "Q1?"
+    assert ligne_enrichie["autre"] == "valeur"
+    assert ligne_enrichie["Nouvelle Colonne"] == "calculé_Q1?"

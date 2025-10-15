@@ -1,9 +1,8 @@
 from pathlib import Path
-from typing import Mapping, Protocol, Final, Iterator, Union
+from typing import Any, Mapping, Protocol, Final, Union, Callable
 import datetime as dt
 import httpx
 from pydantic import BaseModel
-import csv
 from .configuration import MQC
 from .lecteur_csv import LecteurCSV
 import re
@@ -75,22 +74,49 @@ class RemplisseurReponses:
     def __init__(self, client: InterfaceQuestions) -> None:
         self._client = client
 
-    def remplit_fichier_flux(
-        self, chemin_csv: Path
-    ) -> Iterator[Mapping[str, Union[str, int, float]]]:
+    def remplit_fichier(self, chemin_csv: Path) -> LecteurCSV:
         lecteur = LecteurCSV(chemin_csv)
-        for ligne in lecteur.iterer_lignes():
-            reponse_question = self._client.pose_question(str(ligne["Question type"]))
-            ligne_enrichie = dict(ligne)
-            ligne_enrichie["Réponse Bot"] = reponse_question.reponse
-            ligne_enrichie["Contexte"] = (
-                "${SEPARATEUR_DOCUMENT}".join(
-                    [p.contenu for p in reponse_question.paragraphes]
-                )
-                if reponse_question.paragraphes
-                else ""
-            )
-            yield ligne_enrichie
+        cache_reponses = {}
+
+        def obtient_reponse_question(question: str) -> ReponseQuestion:
+            if question not in cache_reponses:
+                cache_reponses[question] = self._client.pose_question(question)
+            return cache_reponses[question]
+
+        def genere_reponse(
+            extracteur: Callable[[ReponseQuestion], str],
+        ) -> Callable[[Mapping[str, Union[str, int, float]]], str]:
+            def _genere(d: Mapping[str, Union[str, int, float]]) -> str:
+                reponse_question = obtient_reponse_question(str(d["Question type"]))
+                return extracteur(reponse_question)
+
+            return _genere
+
+        def extrait_reponse(rq: ReponseQuestion) -> str:
+            return rq.reponse
+
+        def extrait_paragraphes(rq: ReponseQuestion) -> str:
+            if not rq.paragraphes:
+                return ""
+            return "${SEPARATEUR_DOCUMENT}".join([p.contenu for p in rq.paragraphes])
+
+        lecteur.appliquer_calcul_colonne("Réponse Bot", genere_reponse(extrait_reponse))
+        lecteur.appliquer_calcul_colonne(
+            "Contexte", genere_reponse(extrait_paragraphes)
+        )
+        return lecteur
+
+    def remplit_ligne(self, chemin_csv: Path) -> dict[str, Union[str, int, float]]:
+        lecteur = LecteurCSV(chemin_csv)
+        ligne = next(lecteur.iterer_lignes())
+
+        reponse_question = self._client.pose_question(str(ligne["Question type"]))
+
+        ligne_enrichie = lecteur.appliquer_calcul_ligne(
+            "Réponse Bot", lambda d: reponse_question.reponse, ligne
+        )
+
+        return ligne_enrichie
 
 
 class EcrivainSortie:
@@ -111,21 +137,13 @@ class EcrivainSortie:
         nettoye = self._desinfecte_prefixe(prefixe)
         return f"{nettoye}_{self._horloge.aujourd_hui()}.csv"
 
-    def ecrit_fichier_depuis_generateur(
-        self, generateur: Iterator[Mapping[str, Union[str, int, float]]], prefixe: str
+    def ecrit_fichier_depuis_lecteur_csv(
+        self, lecteur: LecteurCSV, prefixe: str
     ) -> Path:
         dossier = self._racine / self._sous_dossier
         dossier.mkdir(parents=True, exist_ok=True)
         chemin = (dossier / self._nom_fichier(prefixe)).resolve()
         if dossier not in chemin.parents:
             raise ValueError("Chemin de sortie en dehors du dossier autorisé")
-
-        with open(chemin, "w", newline="", encoding="utf-8") as fichier:
-            writer = None
-            for ligne in generateur:
-                if writer is None:
-                    writer = csv.DictWriter(fichier, fieldnames=ligne.keys())
-                    writer.writeheader()
-                writer.writerow(ligne)
-
+        lecteur.ecrire_vers(chemin)
         return chemin
