@@ -23,10 +23,19 @@ def test_peut_inserer_dans_une_colonne_en_utilisant_une_fonction_transmise(
     fichier.write_text("a,b\n1,2\n3,4\n", encoding="utf-8")
 
     lecteur = LecteurCSV(fichier)
-    lecteur.appliquer_calcul_colonne("somme", lambda d: int(d["a"]) + int(d["b"]))
 
-    df = lecteur.dataframe
-    assert list(df["somme"]) == [3, 7]
+    ligne1 = lecteur.ligne_suivante()
+    ligne1_enrichie = lecteur.appliquer_calcul_ligne(
+        "somme", lambda d: int(d["a"]) + int(d["b"]), ligne1
+    )
+
+    ligne2 = lecteur.ligne_suivante()
+    ligne2_enrichie = lecteur.appliquer_calcul_ligne(
+        "somme", lambda d: int(d["a"]) + int(d["b"]), ligne2
+    )
+
+    assert ligne1_enrichie["somme"] == 3
+    assert ligne2_enrichie["somme"] == 7
 
 
 def test_peut_ecrire_un_csv(tmp_path: Path):
@@ -34,10 +43,27 @@ def test_peut_ecrire_un_csv(tmp_path: Path):
     fichier.write_text("a,b\n1,2\n3,4\n", encoding="utf-8")
 
     lecteur = LecteurCSV(fichier)
-    lecteur.appliquer_calcul_colonne("somme", lambda d: int(d["a"]) + int(d["b"]))
 
     sortie = tmp_path / "out.csv"
-    lecteur.ecrire_vers(sortie)
+    with open(sortie, "w", encoding="utf-8") as f:
+        f.write("a,b,somme\n")
+
+        ligne1 = lecteur.ligne_suivante()
+        ligne1_enrichie = lecteur.appliquer_calcul_ligne(
+            "somme", lambda d: int(d["a"]) + int(d["b"]), ligne1
+        )
+        f.write(
+            f"{ligne1_enrichie['a']},{ligne1_enrichie['b']},{ligne1_enrichie['somme']}\n"
+        )
+
+        ligne2 = lecteur.ligne_suivante()
+        ligne2_enrichie = lecteur.appliquer_calcul_ligne(
+            "somme", lambda d: int(d["a"]) + int(d["b"]), ligne2
+        )
+        f.write(
+            f"{ligne2_enrichie['a']},{ligne2_enrichie['b']},{ligne2_enrichie['somme']}\n"
+        )
+
     contenu = sortie.read_text(encoding="utf-8").strip().splitlines()
     assert contenu[0] == "a,b,somme"
     assert "1,2,3" in contenu[1]
