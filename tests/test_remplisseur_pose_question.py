@@ -44,7 +44,9 @@ def test_remplissage_appelle_api_pour_chaque_question(
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
 
-    remplisseur.remplit_fichier(fichier)
+    lecteur = LecteurCSV(fichier)
+    remplisseur.remplit_ligne(lecteur)
+    remplisseur.remplit_ligne(lecteur)
 
     assert route.called
     assert route.call_count == 2
@@ -96,12 +98,15 @@ def test_remplissage_insere_reponses_dans_colonne(tmp_path: Path, configuration:
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
 
-    lecteur = remplisseur.remplit_fichier(fichier)
-    df: pd.DataFrame = lecteur.dataframe
+    lecteur = LecteurCSV(fichier)
+    ligne1_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne2_enrichie = remplisseur.remplit_ligne(lecteur)
 
-    assert list(df["Réponse Bot"]) == ["mocked", "mocked"]
-    assert "Contexte" in df.columns
-    assert list(df["Contexte"]) == ["", ""]
+    assert ligne1_enrichie["Réponse Bot"] == "mocked"
+    assert ligne2_enrichie["Réponse Bot"] == "mocked"
+    assert "Contexte" in ligne1_enrichie
+    assert ligne1_enrichie["Contexte"] == ""
+    assert ligne2_enrichie["Contexte"] == ""
 
 
 @respx.mock
@@ -134,12 +139,12 @@ def test_remplissage_ajoute_colonne_context_avec_paragraphes(
 
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
-    lecteur = remplisseur.remplit_fichier(fichier)
-    df = lecteur.dataframe
 
-    assert "Contexte" in df.columns
-    context_str = df["Contexte"].iloc[0]
-    assert "Contenu test" in context_str
+    lecteur = LecteurCSV(fichier)
+    ligne_enrichie = remplisseur.remplit_ligne(lecteur)
+
+    assert "Contexte" in ligne_enrichie
+    assert "Contenu test" in str(ligne_enrichie["Contexte"])
 
 
 @respx.mock
@@ -179,9 +184,14 @@ def test_remplissage_ajoute_colonne_context_avec_deux_paragraphes_separes_par_ma
 
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
-    lignes = remplisseur.remplit_fichier(fichier)
-    context_str = lignes.dataframe["Contexte"].iloc[0]
-    assert "Premier paragraphe${SEPARATEUR_DOCUMENT}Deuxième paragraphe" == context_str
+
+    lecteur = LecteurCSV(fichier)
+    ligne_enrichie = remplisseur.remplit_ligne(lecteur)
+
+    assert (
+        "Premier paragraphe${SEPARATEUR_DOCUMENT}Deuxième paragraphe"
+        == ligne_enrichie["Contexte"]
+    )
 
 
 @respx.mock
@@ -196,14 +206,16 @@ def test_ecriture_cree_fichier_dans_bon_dossier(tmp_path: Path, configuration: M
 
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
-    lecteur = remplisseur.remplit_fichier(fichier)
+
+    lecteur = LecteurCSV(fichier)
+    ligne_enrichie = remplisseur.remplit_ligne(lecteur)
 
     horloge = HorlogeSysteme()
     ecrivain = EcrivainSortie(
         racine=tmp_path, sous_dossier=Path("donnees/sortie"), horloge=horloge
     )
-    chemin_csv = ecrivain.ecrit_fichier_depuis_lecteur_csv(
-        lecteur, prefixe="evaluation"
+    chemin_csv = ecrivain.ecrit_ligne_depuis_lecteur_csv(
+        ligne_enrichie, prefixe="evaluation"
     )
 
     assert chemin_csv.parent == tmp_path / "donnees" / "sortie"
@@ -220,14 +232,16 @@ def test_ecriture_nom_fichier_contient_date(tmp_path: Path, configuration: MQC):
 
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
-    lecteur = remplisseur.remplit_fichier(fichier)
+
+    lecteur = LecteurCSV(fichier)
+    ligne_enrichie = remplisseur.remplit_ligne(lecteur)
 
     horloge = HorlogeSysteme()
     ecrivain = EcrivainSortie(
         racine=tmp_path, sous_dossier=Path("donnees/sortie"), horloge=horloge
     )
-    chemin_csv = ecrivain.ecrit_fichier_depuis_lecteur_csv(
-        lecteur, prefixe="evaluation"
+    chemin_csv = ecrivain.ecrit_ligne_depuis_lecteur_csv(
+        ligne_enrichie, prefixe="evaluation"
     )
 
     assert "evaluation_" in chemin_csv.name
@@ -244,15 +258,19 @@ def test_ecriture_contenu_csv_complet(tmp_path: Path, configuration: MQC):
 
     client = ClientMQCHTTP(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
-    lecteur = remplisseur.remplit_fichier(fichier)
+
+    lecteur = LecteurCSV(fichier)
 
     horloge = HorlogeSysteme()
     ecrivain = EcrivainSortie(
         racine=tmp_path, sous_dossier=Path("donnees/sortie"), horloge=horloge
     )
-    chemin_csv = ecrivain.ecrit_fichier_depuis_lecteur_csv(
-        lecteur, prefixe="evaluation"
-    )
+
+    ligne1_enrichie = remplisseur.remplit_ligne(lecteur)
+    chemin_csv = ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne1_enrichie, "evaluation")
+
+    ligne2_enrichie = remplisseur.remplit_ligne(lecteur)
+    ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne2_enrichie, "evaluation")
 
     contenu = chemin_csv.read_text(encoding="utf-8").splitlines()
     assert contenu[0].startswith("Question type")
