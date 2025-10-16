@@ -31,21 +31,6 @@ class LecteurCSV:
             )
         logging.info(f"Ligne {index}/{total} traitée")
 
-    def appliquer_calcul_colonne(
-        self,
-        nom_colonne: str,
-        calcul: Callable[[Mapping[str, Any]], Any],
-    ) -> None:
-        lignes = cast(list[dict[str, Any]], self._df.to_dict(orient="records"))
-        total_lignes = len(lignes)
-
-        resultats = []
-        for i, ligne in enumerate(lignes, 1):
-            resultats.append(calcul(ligne))
-            self._log_progression(i, total_lignes, nom_colonne)
-
-        self._df[nom_colonne] = resultats
-
     def ecrire_vers(
         self, chemin_sortie: Path, separateur: str = ",", encodage: str = "utf-8"
     ) -> None:
