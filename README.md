@@ -139,3 +139,23 @@ Une fois l'application lancée, pour évaluer un jeu de données :
 uv run --env-file .env python -m src.main_evalap --csv donnees/sortie/evaluation_2025-09-30_17-20-16.csv --nom nom_dataset 
 ```
 Le chemin passé à `--csv` est celui généré à l’étape [« ▶️ Génération des réponses »](#%EF%B8%8F-g%C3%A9n%C3%A9ration-des-r%C3%A9ponses).
+## 🔧 Ajouter une nouvelle métrique personnalisée Evalap
+
+### 📝 Créer une nouvelle métrique
+
+1. Créer le fichier de métrique dans `metriques/ma_metrique.py` :
+
+### 🚀 Déployer la métrique
+
+```bash
+docker compose -f evalap-compose.yml build evalap
+docker compose -f evalap-compose.yml up -d
+```
+
+### ✅ Vérifier que la métrique est disponible
+
+```bash
+curl -X GET "http://localhost:8000/v1/metrics"   -H "accept: application/json" |   grep -o '"name":"ma_metrique"[^}]*}'
+```
+
+Remplacez `ma_metrique` par le nom de votre métrique (ex: `exact_match`).

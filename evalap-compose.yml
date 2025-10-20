@@ -20,7 +20,9 @@ services:
       start_period: 60s
 
   evalap:
-    image: ghcr.io/etalab-ia/evalap/evalap:main-latest
+    build:
+      context: .
+      dockerfile: Dockerfile.evalap-personnalise
     restart: always
     environment:
       - TZ=Europe/Paris

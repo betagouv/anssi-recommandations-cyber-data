@@ -1,0 +1,3 @@
+FROM ghcr.io/etalab-ia/evalap/evalap:main-latest
+COPY ./src/metriques_personnalisees_evalap/*.py /app/evalap/api/metrics/
+RUN chmod +r /app/evalap/api/metrics/*.py
