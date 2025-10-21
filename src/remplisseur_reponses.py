@@ -103,6 +103,15 @@ class RemplisseurReponses:
             "Contexte", lambda d: contexte, ligne_enrichie
         )
 
+        def extrait_noms_documents(rq: ReponseQuestion) -> list[str]:
+            return [p.nom_document for p in rq.paragraphes]
+
+        ligne_enrichie = lecteur.appliquer_calcul_ligne(
+            "Noms Documents",
+            lambda d: extrait_noms_documents(reponse_question),
+            ligne_enrichie,
+        )
+
         return ligne_enrichie
 
 

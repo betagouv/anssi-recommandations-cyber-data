@@ -194,6 +194,74 @@ def test_remplissage_ajoute_colonne_context_avec_deux_paragraphes_separes_par_ma
 
 
 @respx.mock
+def test_remplissage_ajoute_colonne_contenant_nom_document_qui_liste_origine_des_paragraphes(
+    tmp_path: Path, configuration: MQC
+):
+    fichier = tmp_path / "eval.csv"
+    fichier.write_text("Question type\nQ1?\n", encoding="utf-8")
+
+    base = construit_base_url(configuration)
+    chemin = formate_route_pose_question(configuration)
+
+    reponse_avec_paragraphes_multiples = {
+        "reponse": "Réponse test",
+        "paragraphes": [
+            {
+                "score_similarite": 0.9,
+                "numero_page": 5,
+                "url": "https://test.com",
+                "nom_document": "Guide de sécurité",
+                "contenu": "Premier paragraphe",
+            },
+            {
+                "score_similarite": 0.8,
+                "numero_page": 6,
+                "url": "https://test2.com",
+                "nom_document": "Manuel utilisateur",
+                "contenu": "Deuxième paragraphe",
+            },
+        ],
+        "question": "Q1?",
+    }
+
+    respx.post(f"{base}{chemin}").mock(
+        return_value=httpx.Response(200, json=reponse_avec_paragraphes_multiples)
+    )
+
+    client = ClientMQCHTTP(cfg=configuration)
+    remplisseur = RemplisseurReponses(client=client)
+    lecteur = LecteurCSV(fichier)
+    ligne_enrichie = remplisseur.remplit_ligne(lecteur)
+
+    assert "Noms Documents" in ligne_enrichie
+    assert ligne_enrichie["Noms Documents"] == [
+        "Guide de sécurité",
+        "Manuel utilisateur",
+    ]
+
+
+@respx.mock
+def test_remplissage_ajoute_colonne_nom_document_liste_vide_si_aucun_paragraphe(
+    tmp_path: Path, configuration: MQC
+):
+    fichier = tmp_path / "eval.csv"
+    fichier.write_text("Question type\nQ1?\n", encoding="utf-8")
+
+    base = construit_base_url(configuration)
+    chemin = formate_route_pose_question(configuration)
+
+    respx.post(f"{base}{chemin}").mock(return_value=cree_reponse_mock("Réponse", "Q1?"))
+
+    client = ClientMQCHTTP(cfg=configuration)
+    remplisseur = RemplisseurReponses(client=client)
+    lecteur = LecteurCSV(fichier)
+    ligne_enrichie = remplisseur.remplit_ligne(lecteur)
+
+    assert "Noms Documents" in ligne_enrichie
+    assert ligne_enrichie["Noms Documents"] == []
+
+
+@respx.mock
 def test_ecriture_cree_fichier_dans_bon_dossier(tmp_path: Path, configuration: MQC):
     (tmp_path / "donnees" / "sortie").mkdir(parents=True, exist_ok=True)
     fichier = tmp_path / "eval.csv"
