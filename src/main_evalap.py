@@ -31,10 +31,13 @@ def applique_mapping_noms_documents(
             )
         return pd.Series(resultats)
 
-    def _traite_et_extrait_noms(valeur: str):
+    def _convertit_liste_str_en_liste(valeur):
         # La valeur est de type str mais contient la représentation d'une liste
         # que l'on souhaite manipuler en tant que tel.
-        liste_noms = ast.literal_eval(valeur)
+        return ast.literal_eval(valeur)
+
+    def _traite_et_extrait_noms(valeur: str):
+        liste_noms = _convertit_liste_str_en_liste(valeur)
         return _extrait_cinq_premieres_valeurs(liste_noms)
 
     nouvelles_colonnes = df_resultat["Noms Documents"].apply(_traite_et_extrait_noms)
@@ -53,6 +56,23 @@ def applique_mapping_noms_documents(
     df_resultat["nom_document_verite_terrain"] = df_resultat["REF Guide"].apply(
         obtient_nom_depuis_ref
     )
+
+    def _extrait_premier_numero_page(valeur):
+        liste_pages = _convertit_liste_str_en_liste(valeur)
+        return liste_pages[0] if len(liste_pages) > 0 else None
+
+    if "Numéros Page" not in df_resultat.columns:
+        raise ValueError("La colonne 'Numéros Page' est requise")
+
+    df_resultat["numero_page_reponse_bot"] = df_resultat["Numéros Page"].apply(
+        _extrait_premier_numero_page
+    )
+
+    if "Numéro page (lecteur)" not in df_resultat.columns:
+        raise ValueError("La colonne 'Numéro page (lecteur)' est requise")
+
+    df_resultat["numero_page_verite_terrain"] = df_resultat["Numéro page (lecteur)"]
+
     return df_resultat
 
 
@@ -69,6 +89,12 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         df = applique_mapping_noms_documents(df, chemin_mapping)
     else:
         raise ValueError("Les colonnes 'Noms Documents' et 'REF Guide' sont requises")
+
+    if "numero_page_reponse_bot" in df.columns:
+        df["numero_page_reponse_bot"] = df["numero_page_reponse_bot"].fillna(0)
+
+    if "numero_page_verite_terrain" in df.columns:
+        df["numero_page_verite_terrain"] = df["numero_page_verite_terrain"].fillna(0)
 
     columns_map = {
         "Question type": "query",
