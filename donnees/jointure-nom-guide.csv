@@ -1,0 +1,14 @@
+REF,Nom,URL,Inclu ?,Explication RETENU,Fait
+GAUT,"RECOMMANDATIONS RELATIVES À
+L'AUTHENTIFICATION MULTIFACTEUR ET
+AUX MOTS DE PASSE",https://cyber.gouv.fr/sites/default/files/2021/10/anssi-guide-authentification_multifacteur_et_mots_de_passe.pdf,OUI,Impact important,true
+GCRI,CRISE D’ORIGINE CYBER - LES CLÉS D’UNE GESTION OPÉRATIONNELLE ET STRATÉGIQUE,https://cyber.gouv.fr/sites/default/files/2021/12/anssi-guide-gestion_crise_cyber.pdf,OUI,Impact important,true
+GHYG,GUIDE D’HYGIÈNE INFORMATIQUE,https://cyber.gouv.fr/sites/default/files/2017/01/guide_hygiene_informatique_anssi.pdf,OUI,Bases de la SSI,true
+GNOM,RECOMMANDATIONS SUR LE NOMADISME NUMÉRIQUE,https://cyber.gouv.fr/sites/default/files/document/guide_nomadisme_anssi_pa_054_v2.pdf,OUI,Impact important,true
+GADM,RECOMMANDATIONS RELATIVES À L'ADMINISTRATION SÉCURISÉE DES SYSTÈMES D'INFORMATION,https://cyber.gouv.fr/sites/default/files/2018/04/anssi-guide-admin_securisee_si_v3-0.pdf,OUI,Impact important,true
+GINT,RECOMMANDATIONS RELATIVES À L'INTERCONNEXION D'UN SYSTÈME D'INFORMATION À INTERNET,https://cyber.gouv.fr/sites/default/files/2020/06/anssi-guide-passerelle_internet_securisee-v3.pdf,OUI,Impact important,true
+GSAU,SAUVEGARDE DES SYSTÈMES D’INFORMATION,https://cyber.gouv.fr/sites/default/files/document/anssi-fondamentaux-sauvegarde_systemes_dinformation_v1-0.pdf,OUI,Impact important,true
+GESS,RECOMMANDATIONS POUR LA PROTECTION DES SYSTÈMES D'INFORMATION ESSENTIELS,https://cyber.gouv.fr/sites/default/files/2020/12/guide_protection_des_systemes_essentiels.pdf,OUI,Impact important,true
+GHOM,LE GUIDE DE L’HOMOLOGATION DE SÉCURITÉ DES SYSTÈMES D’INFORMATION,https://cyber.gouv.fr/sites/default/files/document/guide-homologation-securite-web-04-2025.pdf,OUI,Impact important,true
+GWEB,RECOMMANDATIONS POUR LA MISE EN ŒUVRE D'UN SITE WEB : MAÎTRISER LES STANDARDS DE SÉCURITÉ CÔTÉ NAVIGATEUR,https://cyber.gouv.fr/sites/default/files/2013/05/anssi-guide-recommandations_mise_en_oeuvre_site_web_maitriser_standards_securite_cote_navigateur-v2.0.pdf,OUI,Impact important,true
+GSNC,Prestataires de services d’informatique en nuage (SecNumCloud) - Référentiel d'exigences,https://cyber.gouv.fr/sites/default/files/document/secnumcloud-referentiel-exigences-v3.2.pdf,OUI,Impact important - Sujet poussé !,true

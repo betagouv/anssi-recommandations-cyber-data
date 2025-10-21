@@ -97,7 +97,7 @@ Pour cela, nous vous recommandons de démarrer l'application dans le **conteneur
 Exécuter la commande suivante :
 
 ```bash
-uv run --env-file .env python -m /main_remplir_csv.py   --csv donnees/QA-labelisé-Question_par_guide.csv   --prefixe evaluation   --sortie donnees/sortie
+uv run --env-file .env python -m /main_remplir_csv.py   --csv donnees/jointure-nom-guide.csv   --prefixe evaluation   --sortie donnees/sortie
 ```
 
 - `--csv` : chemin vers le fichier CSV contenant les questions à évaluer.  
