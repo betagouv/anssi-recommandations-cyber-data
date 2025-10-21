@@ -7,6 +7,7 @@
     "judge_precision",
     "judge_notator",
     "judge_rambling",
-    "output_length"
+    "output_length",
+    "bon_nom_document_en_contexte"
   ]
 }

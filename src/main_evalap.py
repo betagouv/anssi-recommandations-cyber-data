@@ -1,3 +1,4 @@
+import ast
 import pandas as pd
 from pathlib import Path
 from argparse import ArgumentParser
@@ -15,6 +16,36 @@ from typing import Optional
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
+def applique_mapping_noms_documents(
+    df: pd.DataFrame, chemin_mapping: Path
+) -> pd.DataFrame:
+    df_resultat = df.copy()
+    df_mapping = pd.read_csv(chemin_mapping)
+
+    df_resultat["Noms Documents"] = df_resultat["Noms Documents"].apply(
+        lambda x: ast.literal_eval(x) if isinstance(x, str) else x
+    )
+
+    df_resultat["nom_document_reponse_bot"] = df_resultat["Noms Documents"].apply(
+        lambda x: x[0] if isinstance(x, list) and len(x) > 0 else ""
+    )
+
+    def obtient_nom_depuis_ref(ref: str) -> str:
+        if not isinstance(ref, str) or not ref.strip():
+            return ""
+
+        ligne_mapping = df_mapping[df_mapping["REF"] == ref]
+        if not ligne_mapping.empty:
+            url = ligne_mapping["URL"].iloc[0]
+            return url.split("/")[-1]
+        return ""
+
+    df_resultat["nom_document_verite_terrain"] = df_resultat["REF Guide"].apply(
+        obtient_nom_depuis_ref
+    )
+    return df_resultat
+
+
 def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     if "Contexte" in df.columns:
         df["Contexte"] = df["Contexte"].apply(
@@ -22,6 +53,12 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
             if isinstance(x, str) and x.strip()
             else []
         )
+
+    chemin_mapping = Path("donnees/QA-labelisé-Mapping_Nom.csv")
+    if "Noms Documents" in df.columns and "REF Guide" in df.columns:
+        df = applique_mapping_noms_documents(df, chemin_mapping)
+    else:
+        raise ValueError("Les colonnes 'Noms Documents' et 'REF Guide' sont requises")
 
     columns_map = {
         "Question type": "query",
@@ -134,6 +171,7 @@ def main():
     conf = recupere_configuration()
     df = pd.read_csv(args.csv)
     df_mapped = prepare_dataframe(df)
+
     session = requests.Session()
     client = EvalapClient(conf, session=session)
 
