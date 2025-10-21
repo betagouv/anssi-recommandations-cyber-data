@@ -17,6 +17,7 @@ class MetriqueEnum(Enum):
     BON_NOM_DOCUMENT_EN_CONTEXTE_2 = "bon_nom_document_en_contexte_2"
     BON_NOM_DOCUMENT_EN_CONTEXTE_3 = "bon_nom_document_en_contexte_3"
     BON_NOM_DOCUMENT_EN_CONTEXTE_4 = "bon_nom_document_en_contexte_4"
+    SCORE_NUMERO_PAGE_EN_CONTEXTE = "score_numero_page_en_contexte"
 
 
 class Metriques:
