@@ -84,11 +84,13 @@ class RemplisseurReponses:
             return cache_reponses[question]
 
         def genere_reponse(
-            extracteur: Callable[[ReponseQuestion], Union[str, list[str]]],
-        ) -> Callable[[Mapping[str, Union[str, int, float]]], Union[str, list[str]]]:
+            extracteur: Callable[[ReponseQuestion], Union[str, list[str], list[int]]],
+        ) -> Callable[
+            [Mapping[str, Union[str, int, float]]], Union[str, list[str], list[int]]
+        ]:
             def _genere(
                 d: Mapping[str, Union[str, int, float]],
-            ) -> Union[str, list[str]]:
+            ) -> Union[str, list[str], list[int]]:
                 reponse_question = obtient_reponse_question(str(d["Question type"]))
                 return extracteur(reponse_question)
 
@@ -102,15 +104,22 @@ class RemplisseurReponses:
                 return ""
             return "${SEPARATEUR_DOCUMENT}".join([p.contenu for p in rq.paragraphes])
 
-        def extrait_noms_documents(rq: ReponseQuestion) -> list[str]:
-            return [p.nom_document for p in rq.paragraphes]
+        def extrait_attribut_paragraphes(attribut: str):
+            def _extrait(rq: ReponseQuestion):
+                return [getattr(p, attribut) for p in rq.paragraphes]
+
+            return _extrait
 
         lecteur.appliquer_calcul_colonne("Réponse Bot", genere_reponse(extrait_reponse))
         lecteur.appliquer_calcul_colonne(
             "Contexte", genere_reponse(extrait_contenus_des_paragraphes)
         )
         lecteur.appliquer_calcul_colonne(
-            "Noms Documents", genere_reponse(extrait_noms_documents)
+            "Noms Documents",
+            genere_reponse(extrait_attribut_paragraphes("nom_document")),
+        )
+        lecteur.appliquer_calcul_colonne(
+            "Numéros Page", genere_reponse(extrait_attribut_paragraphes("numero_page"))
         )
         return lecteur
 
