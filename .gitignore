@@ -28,5 +28,5 @@ scripts/notebooks/.ipynb_checkpoints/
 .env.local
 
 # Donnees
-donnees/QA-labelisé-Question_par_guide.csv
+donnees/jointure-nom-guide.csv
 donnees/sortie
