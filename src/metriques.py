@@ -13,6 +13,7 @@ class MetriqueEnum(Enum):
     JUDGE_RAMBLING = "judge_rambling"
     OUTPUT_LENGTH = "output_length"
     BON_NOM_DOCUMENT_EN_CONTEXTE = "bon_nom_document_en_contexte"
+    BON_NUMERO_PAGE_EN_CONTEXTE = "bon_numero_page_en_contexte"
 
 
 class Metriques:

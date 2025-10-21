@@ -43,6 +43,18 @@ def applique_mapping_noms_documents(
     df_resultat["nom_document_verite_terrain"] = df_resultat["REF Guide"].apply(
         obtient_nom_depuis_ref
     )
+
+    if "Numéros Page" in df_resultat.columns:
+        df_resultat["Numéros Page"] = df_resultat["Numéros Page"].apply(
+            lambda x: ast.literal_eval(x) if isinstance(x, str) else x
+        )
+        df_resultat["numero_page_reponse_bot"] = df_resultat["Numéros Page"].apply(
+            lambda x: x[0] if isinstance(x, list) and len(x) > 0 else None
+        )
+
+    if "Numéro page (lecteur)" in df_resultat.columns:
+        df_resultat["numero_page_verite_terrain"] = df_resultat["Numéro page (lecteur)"]
+
     return df_resultat
 
 
@@ -59,6 +71,12 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         df = applique_mapping_noms_documents(df, chemin_mapping)
     else:
         raise ValueError("Les colonnes 'Noms Documents' et 'REF Guide' sont requises")
+
+    if "numero_page_reponse_bot" in df.columns:
+        df["numero_page_reponse_bot"] = df["numero_page_reponse_bot"].fillna(0)
+
+    if "numero_page_verite_terrain" in df.columns:
+        df["numero_page_verite_terrain"] = df["numero_page_verite_terrain"].fillna(0)
 
     columns_map = {
         "Question type": "query",
