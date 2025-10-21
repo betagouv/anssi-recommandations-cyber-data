@@ -62,7 +62,7 @@ def test_metrique_bon_nom_document_en_contexte(
     score, observation, _ = metrique_bon_nom_document_en_contexte(
         "output",
         "output_true",
-        nom_document_reponse_bot=nom_document_reponse_bot,
+        nom_document_reponse_bot_0=nom_document_reponse_bot,
         nom_document_verite_terrain=nom_document_verite_terrain,
     )
     assert score == score_attendu
