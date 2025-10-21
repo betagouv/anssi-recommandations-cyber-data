@@ -1,6 +1,7 @@
 from . import metric_registry  # type: ignore[attr-defined]
 from evalap.api.metrics.metriques_personnalisees import (  # type: ignore[import-not-found, import-untyped]
     _metrique_bon_nom_document_en_contexte,
+    _metrique_score_numero_page_en_contexte,
 )
 
 
@@ -31,3 +32,17 @@ for position, ordinal in enumerate(positions):
         metric_type="llm",
         require=[f"nom_document_reponse_bot_{position}", "nom_document_verite_terrain"],
     )(_creer_fonction_metrique(position))
+
+
+@metric_registry.register(
+    name="score_numero_page_en_contexte",
+    description="Calcule un score entre le numéro de page attendu et le numéro de page retourné par le système RAG.",
+    metric_type="llm",
+    require=["numero_page_reponse_bot", "numero_page_verite_terrain"],
+)
+def metrique_score_numero_page_en_contexte(
+    output, output_true, numero_page_reponse_bot, numero_page_verite_terrain, **kwargs
+):
+    return _metrique_score_numero_page_en_contexte(
+        numero_page_reponse_bot, numero_page_verite_terrain
+    )
