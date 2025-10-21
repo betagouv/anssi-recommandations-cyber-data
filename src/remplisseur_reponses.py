@@ -95,14 +95,14 @@ class RemplisseurReponses:
         def extrait_reponse(rq: ReponseQuestion) -> str:
             return rq.reponse
 
-        def extrait_paragraphes(rq: ReponseQuestion) -> str:
+        def extrait_contenus_des_paragraphes(rq: ReponseQuestion) -> str:
             if not rq.paragraphes:
                 return ""
             return "${SEPARATEUR_DOCUMENT}".join([p.contenu for p in rq.paragraphes])
 
         lecteur.appliquer_calcul_colonne("Réponse Bot", genere_reponse(extrait_reponse))
         lecteur.appliquer_calcul_colonne(
-            "Contexte", genere_reponse(extrait_paragraphes)
+            "Contexte", genere_reponse(extrait_contenus_des_paragraphes)
         )
         return lecteur
 
