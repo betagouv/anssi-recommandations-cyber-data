@@ -84,9 +84,11 @@ class RemplisseurReponses:
             return cache_reponses[question]
 
         def genere_reponse(
-            extracteur: Callable[[ReponseQuestion], str],
-        ) -> Callable[[Mapping[str, Union[str, int, float]]], str]:
-            def _genere(d: Mapping[str, Union[str, int, float]]) -> str:
+            extracteur: Callable[[ReponseQuestion], Union[str, list[str]]],
+        ) -> Callable[[Mapping[str, Union[str, int, float]]], Union[str, list[str]]]:
+            def _genere(
+                d: Mapping[str, Union[str, int, float]],
+            ) -> Union[str, list[str]]:
                 reponse_question = obtient_reponse_question(str(d["Question type"]))
                 return extracteur(reponse_question)
 
@@ -100,9 +102,15 @@ class RemplisseurReponses:
                 return ""
             return "${SEPARATEUR_DOCUMENT}".join([p.contenu for p in rq.paragraphes])
 
+        def extrait_noms_documents(rq: ReponseQuestion) -> list[str]:
+            return [p.nom_document for p in rq.paragraphes]
+
         lecteur.appliquer_calcul_colonne("Réponse Bot", genere_reponse(extrait_reponse))
         lecteur.appliquer_calcul_colonne(
             "Contexte", genere_reponse(extrait_contenus_des_paragraphes)
+        )
+        lecteur.appliquer_calcul_colonne(
+            "Noms Documents", genere_reponse(extrait_noms_documents)
         )
         return lecteur
 
