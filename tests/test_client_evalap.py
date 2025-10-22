@@ -213,7 +213,7 @@ def test_ajoute_dataset_timeout_retourne_modele_par_defaut(
     client = EvalapClient(configuration, session=session)
     resultat = client.dataset.ajoute(payload)
 
-    assert resultat == None
+    assert resultat is None
 
 
 def test_facade_propage_session_aux_datasets(

@@ -1,5 +1,4 @@
 from pathlib import Path
-import pandas as pd
 import httpx
 import respx
 import pytest
