@@ -1,12 +1,12 @@
 import pandas as pd
 from pathlib import Path
 from argparse import ArgumentParser
-from src.evalap.evalap_dataset_http import DatasetPayload, DatasetReponse
-from src.evalap.evalap_experience_http import ExperiencePayload, ExperienceAvecResultats
-from src.evalap import EvalapClient
-from src.configuration import recupere_configuration, Configuration
-from src.metriques import Metriques
-from src.formateur_resultats_experiences import FormateurResultatsExperiences
+from evalap.evalap_dataset_http import DatasetPayload, DatasetReponse
+from evalap.evalap_experience_http import ExperiencePayload, ExperienceAvecResultats
+from evalap import EvalapClient
+from configuration import recupere_configuration, Configuration
+from metriques import Metriques
+from formateur_resultats_experiences import FormateurResultatsExperiences
 import requests
 import logging
 from datetime import datetime

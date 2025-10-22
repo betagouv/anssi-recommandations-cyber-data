@@ -1,7 +1,7 @@
-from src.evalap.evalap_dataset_http import EvalapDatasetHttp
-from src.evalap.evalap_experience_http import EvalapExperienceHttp
+from evalap.evalap_dataset_http import EvalapDatasetHttp
+from evalap.evalap_experience_http import EvalapExperienceHttp
 import requests
-from src.configuration import Configuration
+from configuration import Configuration
 
 
 class EvalapClient:

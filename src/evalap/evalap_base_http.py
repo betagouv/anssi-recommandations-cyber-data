@@ -1,6 +1,6 @@
 import requests
 from typing import Any, Mapping
-from src.configuration import Configuration
+from configuration import Configuration
 
 
 class EvalapBaseHTTP:
