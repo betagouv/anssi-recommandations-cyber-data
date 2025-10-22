@@ -13,9 +13,6 @@ dependencies = [
     "respx"
 ]
 
-[project.scripts]
-remplir-csv = "src.main_remplir_csv:main"
-
 [dependency-groups]
 dev = [
     "mypy",
