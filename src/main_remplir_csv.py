@@ -43,7 +43,7 @@ def main() -> None:
                 )
             else:
                 ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne_enrichie, args.prefixe)
-            logging.info(f"Ligne traitée et écrite")
+            logging.info("Ligne traitée et écrite")
     except StopIteration:
         pass
 
