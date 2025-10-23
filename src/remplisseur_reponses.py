@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from .configuration import MQC
 from .lecteur_csv import LecteurCSV
 import re
+import csv
 
 
 class Paragraphe(BaseModel):
@@ -127,10 +128,12 @@ class EcrivainSortie:
                 raise ValueError("Chemin de sortie en dehors du dossier autorisé")
 
         if not self._chemin_courant.exists():
-            with open(self._chemin_courant, "w", encoding="utf-8") as f:
-                f.write(",".join(ligne.keys()) + "\n")
+            with open(self._chemin_courant, "w", encoding="utf-8", newline="") as f:
+                ecrivain = csv.writer(f)
+                ecrivain.writerow(ligne.keys())
 
-        with open(self._chemin_courant, "a", encoding="utf-8") as f:
-            f.write(",".join(str(v) for v in ligne.values()) + "\n")
+        with open(self._chemin_courant, "a", encoding="utf-8", newline="") as f:
+            ecrivain = csv.writer(f)
+            ecrivain.writerow(ligne.values())
 
         return self._chemin_courant
