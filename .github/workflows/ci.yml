@@ -8,7 +8,6 @@ on:
     branches: [main]
 
 jobs:
-  build-ui:
   build:
     name: Construction du projet de test de MesQuestionsCyber
     runs-on: ubuntu-latest
