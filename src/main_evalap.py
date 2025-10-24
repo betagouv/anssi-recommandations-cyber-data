@@ -23,13 +23,22 @@ def applique_mapping_noms_documents(
     df_resultat = df.copy()
     df_mapping = pd.read_csv(chemin_mapping)
 
-    df_resultat["Noms Documents"] = df_resultat["Noms Documents"].apply(
-        lambda x: ast.literal_eval(x) if isinstance(x, str) else x
-    )
+    def _extrait_cinq_premieres_valeurs(liste_noms: list[str]) -> pd.Series:
+        resultats = {}
+        for i in range(5):
+            resultats[f"nom_document_reponse_bot_{i}"] = (
+                liste_noms[i] if len(liste_noms) > i else ""
+            )
+        return pd.Series(resultats)
 
-    df_resultat[f"nom_document_reponse_bot_0"] = df_resultat["Noms Documents"].apply(
-        lambda x: x[0] if isinstance(x, list) and len(x) > 0 else ""
-    )
+    def _traite_et_extrait_noms(valeur: str):
+        # La valeur est de type str mais contient la représentation d'une liste
+        # que l'on souhaite manipuler en tant que tel.
+        liste_noms = ast.literal_eval(valeur)
+        return _extrait_cinq_premieres_valeurs(liste_noms)
+
+    nouvelles_colonnes = df_resultat["Noms Documents"].apply(_traite_et_extrait_noms)
+    df_resultat = pd.concat([df_resultat, nouvelles_colonnes], axis=1)
 
     def obtient_nom_depuis_ref(ref: str) -> str:
         if not isinstance(ref, str) or not ref.strip():
