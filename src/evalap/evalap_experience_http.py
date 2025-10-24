@@ -1,6 +1,6 @@
 import requests
 from typing import NamedTuple, Optional, Dict, Union
-from .evalap_base_http import EvalapBaseHTTP
+from evalap.evalap_base_http import EvalapBaseHTTP
 
 
 class ExperienceReponse(NamedTuple):
