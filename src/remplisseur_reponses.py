@@ -3,8 +3,8 @@ from typing import Protocol, Final, Union
 import datetime as dt
 import httpx
 from pydantic import BaseModel
-from configuration import MQC
-from lecteur_csv import LecteurCSV
+from .configuration import MQC
+from .lecteur_csv import LecteurCSV
 import re
 import csv
 

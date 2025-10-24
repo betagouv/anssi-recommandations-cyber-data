@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock
-from formateur_resultats_experiences import FormateurResultatsExperiences
-from evalap.evalap_experience_http import (
+from src.formateur_resultats_experiences import FormateurResultatsExperiences
+from src.evalap.evalap_experience_http import (
     ExperienceAvecResultats,
     MetriqueResultat,
     ObservationResultat,

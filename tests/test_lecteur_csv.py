@@ -1,5 +1,5 @@
 from pathlib import Path
-from lecteur_csv import LecteurCSV
+from src.lecteur_csv import LecteurCSV
 from typing import Mapping, Union
 
 

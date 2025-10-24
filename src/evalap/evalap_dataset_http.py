@@ -1,7 +1,7 @@
 import requests
 from typing import List, NamedTuple, Dict, Optional
 
-from evalap.evalap_base_http import EvalapBaseHTTP
+from .evalap_base_http import EvalapBaseHTTP
 
 
 class DatasetReponse(NamedTuple):
