@@ -13,23 +13,27 @@ def test_applique_mapping_noms_documents_avec_ref_valide(tmp_path: Path):
 
     df = pd.DataFrame(
         {
-            "Noms Documents": [["Doc1", "Doc2"], ["Doc3"]],
+            "Noms Documents": ["['Doc1', 'Doc2']", "['Doc3']"],
             "REF Guide": ["GAUT", "GCRI"],
         }
     )
 
     df_resultat = applique_mapping_noms_documents(df, mapping_csv)
 
-    assert "nom_document_reponse_bot_0" in df_resultat.columns
+    for i in range(5):
+        assert f"nom_document_reponse_bot_{i}" in df_resultat.columns
     assert "nom_document_verite_terrain" in df_resultat.columns
-    assert df_resultat["nom_document_reponse_bot_0"].iloc[0] == "Doc1"
     assert df_resultat["nom_document_verite_terrain"].iloc[0] == "guide-auth.pdf"
-    assert df_resultat["nom_document_reponse_bot_0"].iloc[1] == "Doc3"
     assert df_resultat["nom_document_verite_terrain"].iloc[1] == "guide-crise.pdf"
+
+    assert df_resultat["nom_document_reponse_bot_0"].iloc[0] == "Doc1"
+    assert df_resultat["nom_document_reponse_bot_0"].iloc[1] == "Doc3"
+
+    assert df_resultat["nom_document_reponse_bot_1"].iloc[0] == "Doc2"
 
 
 def test_applique_mapping_noms_documents_avec_liste_vide():
-    df = pd.DataFrame({"Noms Documents": [[]], "REF Guide": ["GAUT"]})
+    df = pd.DataFrame({"Noms Documents": ["[]"], "REF Guide": ["GAUT"]})
 
     mapping_csv = Path("./donnees/jointure-nom-guide.csv")
     df_resultat = applique_mapping_noms_documents(df, mapping_csv)
@@ -38,7 +42,7 @@ def test_applique_mapping_noms_documents_avec_liste_vide():
 
 
 def test_applique_mapping_noms_documents_avec_ref_inexistante():
-    df = pd.DataFrame({"Noms Documents": [["Doc1"]], "REF Guide": ["INEXISTANT"]})
+    df = pd.DataFrame({"Noms Documents": ["['Doc1']"], "REF Guide": ["INEXISTANT"]})
 
     mapping_csv = Path("./donnees/jointure-nom-guide.csv")
     df_resultat = applique_mapping_noms_documents(df, mapping_csv)
