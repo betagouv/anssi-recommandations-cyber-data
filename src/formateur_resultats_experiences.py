@@ -2,11 +2,14 @@ import pandas as pd
 import time
 import logging
 from collections import defaultdict
-from typing import Optional, Dict, Tuple, Any, DefaultDict
+from typing import Dict, Tuple, Any, DefaultDict, Union, Iterator
 from evalap.evalap_experience_http import (
     ExperienceAvecResultats,
     EvalapExperienceHttp,
 )
+
+ResultatMetrique = list[Dict[str, Union[int, float, None]]]
+GenerateurMetriques = Iterator[Tuple[str, ResultatMetrique]]
 
 
 class FormateurResultatsExperiences:
@@ -19,21 +22,34 @@ class FormateurResultatsExperiences:
             metrique.metric_status != "running" for metrique in experience.results
         )
 
-    def attend_fin_experience(
-        self, experiment_id: int, delai_attente: int = 10, timeout_max: int = 1000
-    ) -> Optional[ExperienceAvecResultats]:
-        temps_ecoule = 0
+    def surveille_experience_flux(
+        self, experiment_id: int, delai_attente: float = 10.0, timeout_max: int = 1000
+    ) -> GenerateurMetriques:
+        temps_ecoule = 0.0
+        metriques_terminees = set()
 
         while temps_ecoule < timeout_max:
             experience = self.client_experience.lit(experiment_id)
 
             if experience is None:
                 logging.error(f"Impossible de récupérer l'expérience {experiment_id}")
-                return None
+                return
+
+            for metrique in experience.results:
+                if (
+                    metrique.metric_status != "running"
+                    and metrique.metric_name not in metriques_terminees
+                ):
+                    metriques_terminees.add(metrique.metric_name)
+                    observations = [
+                        {"numero_ligne": obs.num_line, "score": obs.score}
+                        for obs in metrique.observation_table
+                    ]
+                    yield metrique.metric_name, observations
 
             if self._experience_terminee(experience):
                 logging.info(f"Expérience {experiment_id} terminée")
-                return experience
+                return
 
             logging.info(
                 f"Expérience {experiment_id} en cours, attente {delai_attente}s..."
@@ -42,7 +58,6 @@ class FormateurResultatsExperiences:
             temps_ecoule += delai_attente
 
         logging.warning(f"Timeout atteint pour l'expérience {experiment_id}")
-        return None
 
     @staticmethod
     def _ligne_depuis_observation_avec_contexte(args) -> dict:

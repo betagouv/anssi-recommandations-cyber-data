@@ -2,15 +2,16 @@ import pandas as pd
 from pathlib import Path
 from argparse import ArgumentParser
 from evalap.evalap_dataset_http import DatasetPayload, DatasetReponse
-from evalap.evalap_experience_http import ExperiencePayload, ExperienceAvecResultats
+from evalap.evalap_experience_http import ExperiencePayload
 from evalap import EvalapClient
 from configuration import recupere_configuration, Configuration
 from metriques import Metriques
 from formateur_resultats_experiences import FormateurResultatsExperiences
+from remplisseur_reponses import EcrivainResultatsFlux
 import requests
 import logging
-from datetime import datetime
 from typing import Optional
+from formateur_resultats_experiences import GenerateurMetriques
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -34,26 +35,18 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def sauvegarde_resultats(
-    formateur: FormateurResultatsExperiences,
-    experience_terminee: ExperienceAvecResultats,
-    experience_id: int,
+    formateur_de_resultats: FormateurResultatsExperiences, experience_id: int
 ) -> None:
-    if experience_terminee:
-        df_resultats = formateur.cree_dataframe_formate(experience_terminee)
-        logging.info(f"DataFrame créé avec {len(df_resultats)} lignes")
-        logging.info(f"Colonnes: {list(df_resultats.columns)}")
+    dossier_sortie = Path("./donnees/resultats_evaluations")
+    dossier_sortie.mkdir(parents=True, exist_ok=True)
 
-        dossier_sortie = Path("./donnees/resultats_evaluations")
-        dossier_sortie.mkdir(parents=True, exist_ok=True)
+    ecrivain = EcrivainResultatsFlux(dossier_sortie, "resultats_experience")
+    generateur_resultats: GenerateurMetriques = (
+        formateur_de_resultats.surveille_experience_flux(experience_id)
+    )
 
-        horodatage = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        nom_fichier = f"resultats_experience_{experience_id}_{horodatage}.csv"
-        chemin_fichier = dossier_sortie / nom_fichier
-
-        df_resultats.to_csv(chemin_fichier, index=False)
-        logging.info(f"Résultats sauvegardés dans: {chemin_fichier}")
-    else:
-        logging.error("Impossible d'obtenir les résultats de l'expérience")
+    chemin_fichier = ecrivain.ecrit_resultats_flux(generateur_resultats, experience_id)
+    logging.info(f"Résultats sauvegardés dans: {chemin_fichier}")
 
 
 def ajoute_dataset(
@@ -148,13 +141,7 @@ def main():
     logging.info(f"Expérience affichée: {experience_listee} ")
 
     formateur_de_resultats = FormateurResultatsExperiences(client.experience)
-    experience_terminee = formateur_de_resultats.attend_fin_experience(
-        experience_id_cree
-    )
-
-    sauvegarde_resultats(
-        formateur_de_resultats, experience_terminee, experience_id_cree
-    )
+    sauvegarde_resultats(formateur_de_resultats, experience_id_cree)
 
 
 if __name__ == "__main__":
