@@ -21,8 +21,8 @@ code = code.replace(
 )
 namespace = {"metric_registry": MockMetricRegistry()}
 exec(code, namespace)
-metrique_bon_nom_document_en_contexte = namespace[
-    "metrique_bon_nom_document_en_contexte"
+metrique_bon_nom_document_en_contexte_0 = namespace[
+    "metrique_bon_nom_document_en_contexte_0"
 ]
 
 
@@ -59,7 +59,7 @@ def test_metrique_bon_nom_document_en_contexte(
     score_attendu,
     observation_attendue,
 ):
-    score, observation, _ = metrique_bon_nom_document_en_contexte(
+    score, observation, _ = metrique_bon_nom_document_en_contexte_0(
         "output",
         "output_true",
         nom_document_reponse_bot_0=nom_document_reponse_bot,

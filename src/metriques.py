@@ -12,7 +12,11 @@ class MetriqueEnum(Enum):
     JUDGE_NOTATOR = "judge_notator"
     JUDGE_RAMBLING = "judge_rambling"
     OUTPUT_LENGTH = "output_length"
-    BON_NOM_DOCUMENT_EN_CONTEXTE = "bon_nom_document_en_contexte"
+    BON_NOM_DOCUMENT_EN_CONTEXTE_0 = "bon_nom_document_en_contexte_0"
+    BON_NOM_DOCUMENT_EN_CONTEXTE_1 = "bon_nom_document_en_contexte_1"
+    BON_NOM_DOCUMENT_EN_CONTEXTE_2 = "bon_nom_document_en_contexte_2"
+    BON_NOM_DOCUMENT_EN_CONTEXTE_3 = "bon_nom_document_en_contexte_3"
+    BON_NOM_DOCUMENT_EN_CONTEXTE_4 = "bon_nom_document_en_contexte_4"
 
 
 class Metriques:
