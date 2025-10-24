@@ -1,13 +1,13 @@
 from pathlib import Path
 from argparse import ArgumentParser
-from .configuration import recupere_configuration
-from .remplisseur_reponses import (
+from configuration import recupere_configuration
+from remplisseur_reponses import (
     ClientMQCHTTP,
     RemplisseurReponses,
     EcrivainSortie,
     HorlogeSysteme,
 )
-from .lecteur_csv import LecteurCSV
+from lecteur_csv import LecteurCSV
 
 import logging
 
