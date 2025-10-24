@@ -1,12 +1,12 @@
 from unittest.mock import Mock
 from requests import Response
-from evalap import EvalapClient
-from evalap.evalap_dataset_http import (
+from src.evalap import EvalapClient
+from src.evalap.evalap_dataset_http import (
     DatasetPayload,
     DatasetReponse,
 )
-from configuration import Evalap, Configuration, MQC, Albert
-from evalap.evalap_experience_http import (
+from src.configuration import Evalap, Configuration, MQC, Albert
+from src.evalap.evalap_experience_http import (
     ExperiencePayload,
     ExperienceReponse,
     ExperienceAvecResultats,
@@ -16,7 +16,7 @@ import pytest
 import requests
 import pandas as pd
 from typing import Callable, cast
-from evalap.evalap_base_http import EvalapBaseHTTP
+from src.evalap.evalap_base_http import EvalapBaseHTTP
 
 
 @pytest.fixture()

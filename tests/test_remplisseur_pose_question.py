@@ -3,9 +3,9 @@ import httpx
 import respx
 import pytest
 
-from lecteur_csv import LecteurCSV
-from configuration import recupere_configuration, MQC
-from remplisseur_reponses import (
+from src.lecteur_csv import LecteurCSV
+from src.configuration import recupere_configuration, MQC
+from src.remplisseur_reponses import (
     RemplisseurReponses,
     EcrivainSortie,
     ClientMQCHTTP,

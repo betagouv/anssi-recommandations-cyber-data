@@ -3,7 +3,7 @@ import time
 import logging
 from collections import defaultdict
 from typing import Optional, Dict, Tuple, Any, DefaultDict
-from evalap.evalap_experience_http import (
+from .evalap.evalap_experience_http import (
     ExperienceAvecResultats,
     EvalapExperienceHttp,
 )
