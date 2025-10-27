@@ -136,7 +136,7 @@ Une fois l'application lancée, pour évaluer un jeu de données :
 
 1) Ajouter un dataset. Exécutez :
 ```bash
-uv run --env-file .env python -m src/main_evalap.py --csv donnees/sortie/evaluation_2025-09-30_17-20-16.csv --nom nom_dataset
+uv run --env-file .env python src/main_evalap.py --csv donnees/sortie/evaluation_2025-09-30_17-20-16.csv --nom nom_dataset
 ```
 Le chemin passé à `--csv` est celui généré à l’étape [« ▶️ Génération des réponses »](#%EF%B8%8F-g%C3%A9n%C3%A9ration-des-r%C3%A9ponses).
 
