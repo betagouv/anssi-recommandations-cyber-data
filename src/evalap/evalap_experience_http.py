@@ -1,4 +1,5 @@
 import requests
+import logging
 from typing import NamedTuple, Optional, Dict, Union
 from evalap.evalap_base_http import EvalapBaseHTTP
 
@@ -74,8 +75,15 @@ class EvalapExperienceHttp(EvalapBaseHTTP):
         try:
             donnees = self._post("/experiment", json=payload._asdict(), timeout=20)
             return ExperienceReponse(**donnees)
-        except (requests.Timeout, requests.RequestException):
+        except requests.Timeout as e:
+            logging.error(f"Timeout lors de la création de l'expérience: {e}")
             return None
+        except requests.RequestException as e:
+            logging.error(f"Erreur de requête lors de la création de l'expérience: {e}")
+            if hasattr(e, "response") and e.response is not None:
+                logging.error(f"Code de statut: {e.response.status_code}")
+                logging.error(f"Réponse du serveur: {e.response.text}")
+        return None
 
     @staticmethod
     def _observation_depuis(donnees_obs: Dict) -> ObservationResultat:
@@ -134,5 +142,13 @@ class EvalapExperienceHttp(EvalapBaseHTTP):
                 with_vision=donnees.get("with_vision", False),
                 results=resultats,
             )
-        except (requests.Timeout, requests.RequestException):
+        except requests.Timeout as e:
+            logging.error(
+                f"Timeout lors de la lecture de l'expérience {experiment_id}: {e}"
+            )
+            return None
+        except requests.RequestException as e:
+            logging.error(
+                f"Erreur de requête lors de la lecture de l'expérience {experiment_id}: {e}"
+            )
             return None
