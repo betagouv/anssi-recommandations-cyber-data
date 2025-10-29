@@ -2,6 +2,7 @@ import pytest
 from metriques_personnalisees_evalap.metriques_personnalisees import (
     _metrique_bon_nom_document_en_contexte,
     _metrique_score_numero_page_en_contexte,
+    _metrique_bon_numero_page_en_contexte,
 )
 
 
@@ -79,3 +80,29 @@ def test_metrique_score_numero_page_score_symetrie():
     )
 
     assert score1 == score2
+
+
+@pytest.mark.parametrize(
+    "page_estimee,page_verite,score_attendu,observation_attendue",
+    [
+        (4, 4, 1.0, "correct"),
+        (4, 5, 0.0, "incorrect"),
+        (4.0, 4.0, 1.0, "correct"),
+    ],
+)
+def test_metrique_bon_numero_page_en_contexte(
+    page_estimee, page_verite, score_attendu, observation_attendue
+):
+    resultat, observation, _ = _metrique_bon_numero_page_en_contexte(
+        page_estimee, page_verite
+    )
+
+    assert resultat == score_attendu
+    assert observation_attendue in observation.lower()
+
+
+def test_metrique_bon_numero_page_en_contexte_string_invalide():
+    resultat, observation, _ = _metrique_bon_numero_page_en_contexte("abc", 4)
+
+    assert resultat == 0.0
+    assert "invalide" in observation.lower()
