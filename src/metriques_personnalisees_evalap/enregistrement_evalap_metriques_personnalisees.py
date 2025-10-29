@@ -1,6 +1,7 @@
 from . import metric_registry  # type: ignore[attr-defined]
 from evalap.api.metrics.metriques_personnalisees import (  # type: ignore[import-not-found, import-untyped]
     _metrique_bon_nom_document_en_contexte,
+    _metrique_bon_numero_page_en_contexte,
     _metrique_score_numero_page_en_contexte,
 )
 
@@ -53,3 +54,17 @@ for position, ordinal in enumerate(positions):
         metric_type="llm",
         require=[f"numero_page_reponse_bot_{position}", "numero_page_verite_terrain"],
     )(_creer_fonction_metrique_score_page(position))
+
+
+@metric_registry.register(
+    name="bon_numero_page_en_contexte",
+    description="Vérifie si le numéro de page attendu est identique au numéro de page retourné par le système RAG.",
+    metric_type="llm",
+    require=["numero_page_reponse_bot", "numero_page_verite_terrain"],
+)
+def metrique_bon_numero_page_en_contexte(
+    output, output_true, numero_page_reponse_bot, numero_page_verite_terrain, **kwargs
+):
+    return _metrique_bon_numero_page_en_contexte(
+        numero_page_reponse_bot, numero_page_verite_terrain
+    )

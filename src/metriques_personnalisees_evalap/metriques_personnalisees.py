@@ -18,6 +18,22 @@ def _metrique_bon_nom_document_en_contexte(
     return score, observation, {}
 
 
+def _metrique_bon_numero_page_en_contexte(
+    numero_page_reponse_bot,
+    numero_page_verite_terrain,
+):
+    try:
+        page_estimee = int(numero_page_reponse_bot)
+        page_verite = int(numero_page_verite_terrain)
+    except (ValueError, TypeError):
+        return 0.0, "Numéro de page invalide", {}
+
+    if page_estimee == page_verite:
+        return 1.0, "Numéro de page correct", {}
+    else:
+        return 0.0, "Numéro de page incorrect", {}
+
+
 def _metrique_score_numero_page_en_contexte(
     numero_page_reponse_bot=int,
     numero_page_verite_terrain=int,
