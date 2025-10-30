@@ -22,6 +22,11 @@ class MetriqueEnum(Enum):
     SCORE_NUMERO_PAGE_EN_CONTEXTE_2 = "score_numero_page_en_contexte_2"
     SCORE_NUMERO_PAGE_EN_CONTEXTE_3 = "score_numero_page_en_contexte_3"
     SCORE_NUMERO_PAGE_EN_CONTEXTE_4 = "score_numero_page_en_contexte_4"
+    BON_NUMERO_PAGE_EN_CONTEXTE_0 = "bon_numero_page_en_contexte_0"
+    BON_NUMERO_PAGE_EN_CONTEXTE_1 = "bon_numero_page_en_contexte_1"
+    BON_NUMERO_PAGE_EN_CONTEXTE_2 = "bon_numero_page_en_contexte_2"
+    BON_NUMERO_PAGE_EN_CONTEXTE_3 = "bon_numero_page_en_contexte_3"
+    BON_NUMERO_PAGE_EN_CONTEXTE_4 = "bon_numero_page_en_contexte_4"
 
 
 class Metriques:
