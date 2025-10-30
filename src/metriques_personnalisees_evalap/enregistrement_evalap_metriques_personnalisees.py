@@ -27,7 +27,8 @@ def _enregistre_metriques_par_position(
         def metrique(output, output_true, **kwargs):
             param_verite_value = kwargs.get(param_verite, valeur_defaut)
             param_bot_value = kwargs.get(f"{param_bot}_{position}", valeur_defaut)
-            return fonction_metrique(param_bot_value, param_verite_value)
+            score, observation = fonction_metrique(param_bot_value, param_verite_value)
+            return score, observation, {}
 
         return metrique
 
