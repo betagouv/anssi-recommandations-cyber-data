@@ -1,11 +1,10 @@
 import numpy as np
-from typing import Tuple
 
 
 def _metrique_bon_nom_document_en_contexte(
     nom_document_reponse_bot: str = "",
     nom_document_verite_terrain: str = "",
-):
+) -> tuple[float, str]:
     score = 1.0 if nom_document_reponse_bot == nom_document_verite_terrain else 0.0
 
     if nom_document_verite_terrain == "":
@@ -16,40 +15,40 @@ def _metrique_bon_nom_document_en_contexte(
     else:
         observation = f"Nom de document incorrect: attendu '{nom_document_verite_terrain}' mais obtenu '{nom_document_reponse_bot}'"
 
-    return score, observation, {}
+    return score, observation
 
 
 def _metrique_bon_numero_page_en_contexte(
     numero_page_reponse_bot: int,
     numero_page_verite_terrain: int,
-) -> Tuple[float, str, dict[str, None]]:
+) -> tuple[float, str]:
     try:
         page_estimee = int(numero_page_reponse_bot)
         page_verite = int(numero_page_verite_terrain)
     except (ValueError, TypeError):
-        return 0.0, "Numéro de page invalide", {}
+        return 0.0, "Numéro de page invalide"
 
     if page_estimee == page_verite:
-        return 1.0, "Numéro de page correct", {}
+        return 1.0, "Numéro de page correct"
     else:
-        return 0.0, "Numéro de page incorrect", {}
+        return 0.0, "Numéro de page incorrect"
 
 
 def _metrique_score_numero_page_en_contexte(
     numero_page_reponse_bot=int,
     numero_page_verite_terrain=int,
-):
+) -> tuple[float, str]:
     if numero_page_reponse_bot is None or numero_page_verite_terrain is None:
-        return 0.0, "Numéro de page manquant", {}
+        return 0.0, "Numéro de page manquant"
 
     try:
         page_estimee = int(numero_page_reponse_bot)
         page_verite = int(numero_page_verite_terrain)
     except (ValueError, TypeError):
-        return 0.0, "Numéro de page invalide", {}
+        return 0.0, "Numéro de page invalide"
 
     if page_estimee == page_verite:
-        return 1.0, "Numéro de page correct", {}
+        return 1.0, "Numéro de page correct"
 
     distance = abs(page_estimee - page_verite)
     max_distance = 10
@@ -68,4 +67,4 @@ def _metrique_score_numero_page_en_contexte(
     else:
         observation = f"Numéro de page proche: {page_estimee} vs {page_verite} (score: {score:.2f})"
 
-    return score, observation, {}
+    return score, observation
