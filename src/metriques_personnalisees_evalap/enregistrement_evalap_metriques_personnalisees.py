@@ -56,15 +56,22 @@ for position, ordinal in enumerate(positions):
     )(_creer_fonction_metrique_score_page(position))
 
 
-@metric_registry.register(
-    name="bon_numero_page_en_contexte",
-    description="Vérifie si le numéro de page attendu est identique au numéro de page retourné par le système RAG.",
-    metric_type="llm",
-    require=["numero_page_reponse_bot", "numero_page_verite_terrain"],
-)
-def metrique_bon_numero_page_en_contexte(
-    output, output_true, numero_page_reponse_bot, numero_page_verite_terrain, **kwargs
-):
-    return _metrique_bon_numero_page_en_contexte(
-        numero_page_reponse_bot, numero_page_verite_terrain
-    )
+def _creer_fonction_metrique_bon_numero_de_page(position: int):
+    def metrique(output, output_true, numero_page_verite_terrain, **kwargs):
+        numero_page_reponse_bot = kwargs.get(
+            f"numero_page_reponse_bot_{position}", None
+        )
+        return _metrique_bon_numero_page_en_contexte(
+            numero_page_reponse_bot, numero_page_verite_terrain
+        )
+
+    return metrique
+
+
+for position, ordinal in enumerate(positions):
+    metric_registry.register(
+        name=f"bon_numero_page_en_contexte_{position}",
+        description=f"Vérifie si le numéro de page attendu est identique au numéro de page du {ordinal} paragraphe retourné par le système RAG.",
+        metric_type="llm",
+        require=[f"numero_page_reponse_bot_{position}", "numero_page_verite_terrain"],
+    )(_creer_fonction_metrique_bon_numero_de_page(position))
