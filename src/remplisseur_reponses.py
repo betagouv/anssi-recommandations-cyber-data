@@ -112,6 +112,15 @@ class RemplisseurReponses:
             ligne_enrichie,
         )
 
+        def extrait_numeros_pages(rq: ReponseQuestion) -> list[int]:
+            return [p.numero_page for p in rq.paragraphes]
+
+        ligne_enrichie = lecteur.appliquer_calcul_ligne(
+            "Numéros Page",
+            lambda d: extrait_numeros_pages(reponse_question),
+            ligne_enrichie,
+        )
+
         return ligne_enrichie
 
 

@@ -15,6 +15,8 @@ def test_applique_mapping_noms_documents_avec_ref_valide(tmp_path: Path):
         {
             "Noms Documents": ["['Doc1', 'Doc2']", "['Doc3']"],
             "REF Guide": ["GAUT", "GCRI"],
+            "Numéros Page": ["[1, 2]", "[3]"],
+            "Numéro page (lecteur)": [1, 3],
         }
     )
 
@@ -33,7 +35,14 @@ def test_applique_mapping_noms_documents_avec_ref_valide(tmp_path: Path):
 
 
 def test_applique_mapping_noms_documents_avec_liste_vide():
-    df = pd.DataFrame({"Noms Documents": ["[]"], "REF Guide": ["GAUT"]})
+    df = pd.DataFrame(
+        {
+            "Noms Documents": ["[]"],
+            "REF Guide": ["GAUT"],
+            "Numéros Page": ["[]"],
+            "Numéro page (lecteur)": [1],
+        }
+    )
 
     mapping_csv = Path("./donnees/jointure-nom-guide.csv")
     df_resultat = applique_mapping_noms_documents(df, mapping_csv)
@@ -42,7 +51,14 @@ def test_applique_mapping_noms_documents_avec_liste_vide():
 
 
 def test_applique_mapping_noms_documents_avec_ref_inexistante():
-    df = pd.DataFrame({"Noms Documents": ["['Doc1']"], "REF Guide": ["INEXISTANT"]})
+    df = pd.DataFrame(
+        {
+            "Noms Documents": ["['Doc1']"],
+            "REF Guide": ["INEXISTANT"],
+            "Numéros Page": ["[5]"],
+            "Numéro page (lecteur)": [5],
+        }
+    )
 
     mapping_csv = Path("./donnees/jointure-nom-guide.csv")
     df_resultat = applique_mapping_noms_documents(df, mapping_csv)
@@ -65,3 +81,18 @@ def test_prepare_dataframe_leve_erreur_si_colonnes_manquantes(colonnes_df):
         ValueError, match="Les colonnes 'Noms Documents' et 'REF Guide' sont requises"
     ):
         prepare_dataframe(df)
+
+
+def test_applique_mapping_leve_erreur_si_colonne_numeros_page_manquant():
+    df = pd.DataFrame(
+        {
+            "Noms Documents": ["['Doc1']"],
+            "REF Guide": ["GAUT"],
+            # Pas de colonne "Numéros Page"
+        }
+    )
+
+    mapping_csv = Path("./donnees/jointure-nom-guide.csv")
+
+    with pytest.raises(ValueError, match="La colonne 'Numéros Page' est requise"):
+        applique_mapping_noms_documents(df, mapping_csv)

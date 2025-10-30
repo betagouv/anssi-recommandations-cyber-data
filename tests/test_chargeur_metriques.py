@@ -30,3 +30,15 @@ def test_charge_metriques_invalides(tmp_path):
         ValueError, match="'metrique_inexistante' is not a valid MetriqueEnum"
     ):
         chargeur.recupere_depuis_fichier(fichier_config)
+
+
+def test_charge_metriques_invalides_leve_une_erreur(tmp_path):
+    fichier_config = tmp_path / "metriques.json"
+    fichier_config.write_text('{"metriques": ["nouvelle_metrique_inconnue"]}')
+
+    chargeur = Metriques()
+
+    with pytest.raises(
+        ValueError, match="'nouvelle_metrique_inconnue' is not a valid MetriqueEnum"
+    ):
+        chargeur.recupere_depuis_fichier(fichier_config)
