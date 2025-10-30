@@ -163,14 +163,8 @@ def cree_experience(
     chargeur = Metriques()
     fichier_metriques = Path("metriques.json")
 
-    try:
-        metriques_enum = chargeur.recupere_depuis_fichier(fichier_metriques)
-        metriques = [m.value for m in metriques_enum]
-    except (FileNotFoundError, ValueError) as e:
-        logging.warning(
-            f"Erreur chargement métriques: {e}. Utilisation de la métrique par défaut"
-        )
-        metriques = ["judge_precision"]
+    metriques_enum = chargeur.recupere_depuis_fichier(fichier_metriques)
+    metriques = [m.value for m in metriques_enum]
 
     payload_experience = ExperiencePayload(
         name="Experience Test",
