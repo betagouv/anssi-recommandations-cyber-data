@@ -40,7 +40,7 @@ def test_metrique_bon_nom_document_en_contexte(
     score_attendu,
     observation_attendue,
 ):
-    score, observation, _ = _metrique_bon_nom_document_en_contexte(
+    score, observation = _metrique_bon_nom_document_en_contexte(
         nom_document_reponse_bot=nom_document_reponse_bot,
         nom_document_verite_terrain=nom_document_verite_terrain,
     )
@@ -61,7 +61,7 @@ def test_metrique_bon_nom_document_en_contexte(
 def test_metrique_score_numero_page(
     page_estimee, page_verite, score_min, score_max, mot_cle_observation
 ):
-    score, observation, _ = _metrique_score_numero_page_en_contexte(
+    score, observation = _metrique_score_numero_page_en_contexte(
         page_estimee, page_verite
     )
 
@@ -71,11 +71,10 @@ def test_metrique_score_numero_page(
 
 
 def test_metrique_score_numero_page_score_symetrie():
-    score1, _, _ = _metrique_score_numero_page_en_contexte(
+    score1, _ = _metrique_score_numero_page_en_contexte(
         numero_page_reponse_bot=3, numero_page_verite_terrain=2
     )
-
-    score2, _, _ = _metrique_score_numero_page_en_contexte(
+    score2, _ = _metrique_score_numero_page_en_contexte(
         numero_page_reponse_bot=2, numero_page_verite_terrain=3
     )
 
@@ -93,7 +92,7 @@ def test_metrique_score_numero_page_score_symetrie():
 def test_metrique_bon_numero_page_en_contexte(
     page_estimee, page_verite, score_attendu, observation_attendue
 ):
-    resultat, observation, _ = _metrique_bon_numero_page_en_contexte(
+    resultat, observation = _metrique_bon_numero_page_en_contexte(
         page_estimee, page_verite
     )
 
@@ -102,7 +101,7 @@ def test_metrique_bon_numero_page_en_contexte(
 
 
 def test_metrique_bon_numero_page_en_contexte_string_invalide():
-    resultat, observation, _ = _metrique_bon_numero_page_en_contexte("abc", 4)
+    resultat, observation = _metrique_bon_numero_page_en_contexte("abc", 4)
 
     assert resultat == 0.0
     assert "invalide" in observation.lower()
