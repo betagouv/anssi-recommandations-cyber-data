@@ -57,16 +57,25 @@ def applique_mapping_noms_documents(
         obtient_nom_depuis_ref
     )
 
-    def _extrait_premier_numero_page(valeur):
+    def _extrait_cinq_premiers_numeros_page(liste_pages: list) -> pd.Series:
+        resultats = {}
+        for i in range(5):
+            resultats[f"numero_page_reponse_bot_{i}"] = (
+                liste_pages[i] if len(liste_pages) > i else None
+            )
+        return pd.Series(resultats)
+
+    def _traite_et_extrait_pages(valeur: str):
         liste_pages = _convertit_liste_str_en_liste(valeur)
-        return liste_pages[0] if len(liste_pages) > 0 else None
+        return _extrait_cinq_premiers_numeros_page(liste_pages)
 
     if "Numéros Page" not in df_resultat.columns:
         raise ValueError("La colonne 'Numéros Page' est requise")
 
-    df_resultat["numero_page_reponse_bot"] = df_resultat["Numéros Page"].apply(
-        _extrait_premier_numero_page
+    nouvelles_colonnes_pages = df_resultat["Numéros Page"].apply(
+        _traite_et_extrait_pages
     )
+    df_resultat = pd.concat([df_resultat, nouvelles_colonnes_pages], axis=1)
 
     if "Numéro page (lecteur)" not in df_resultat.columns:
         raise ValueError("La colonne 'Numéro page (lecteur)' est requise")
@@ -90,8 +99,11 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     else:
         raise ValueError("Les colonnes 'Noms Documents' et 'REF Guide' sont requises")
 
-    if "numero_page_reponse_bot" in df.columns:
-        df["numero_page_reponse_bot"] = df["numero_page_reponse_bot"].fillna(0)
+    for i in range(5):
+        if f"numero_page_reponse_bot_{i}" in df.columns:
+            df[f"numero_page_reponse_bot_{i}"] = df[
+                f"numero_page_reponse_bot_{i}"
+            ].fillna(0)
 
     if "numero_page_verite_terrain" in df.columns:
         df["numero_page_verite_terrain"] = df["numero_page_verite_terrain"].fillna(0)
