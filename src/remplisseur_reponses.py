@@ -31,7 +31,7 @@ class ReponseQuestion(BaseModel):
     question: str
 
 
-HTTP_SCHEMA: Final[str] = "http"
+HTTP_SCHEMA: Final[str] = "https"
 
 
 def construit_base_url(cfg: MQC) -> str:
