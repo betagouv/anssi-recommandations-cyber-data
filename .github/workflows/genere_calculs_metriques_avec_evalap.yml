@@ -1,0 +1,40 @@
+name: Automatisation des calculs de métrique avec Evalap
+permissions: {}
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  collecte_reponses:
+    name: Collecte les réponses aux questions données auprès de l'API MQC
+    runs-on: ubuntu-latest
+
+    env:
+      MQC_HOTE: demo-mes-questions-cyber.cleverapps.io
+      MQC_API_PREFIXE_ROUTE: "api"
+      MQC_ROUTE_POSE_QUESTION: "pose_question"
+      MQC_DELAI_ATTENTE_MAXIMUM: 19.0
+      MQC_PORT: 443
+
+    steps:
+      - name: Cloner le dépôt Git
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Installer uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Installer les dépendances
+        run: uv sync
+
+      - name: Appelle MQC pour générer les réponses pour les questions posées
+        run: |
+          uv run python src/main_remplir_csv.py \
+            --csv donnees/questions_avec_verite_terrain.csv \
+            --prefixe test_github_actions \
+            --sortie donnees/sortie

@@ -1,0 +1,67 @@
+REF Guide,REF Question,Question type,Tags,REF Réponse,Réponse envisagée,Numéro page (lecteur),Localisation paragraphe,Réponse Bot,
+GAUT,GAUT.Q.1,Qu'est-ce que l'authentification ?,Usuelle,GAUT.R.1,"La fonction d’authentification en tant que telle a pour objectif de permettre au prouveur de démontrer son identité (souvent annoncée lors de la phase d’identification).
+
+L’authentification est un mécanisme faisant intervenir deux entités distinctes : un prouveur et un
+vérifieur.
+Le prouveur cherche à prouver son identité au vérifieur. Il s’agit par exemple pour le prouveur
+de démontrer sa connaissance d’une donnée secrète comme un mot de passe.
+Le vérifieur doit être capable de s’assurer de la validité de l’identité du prouveur. Il s’agit par
+exemple pour le vérifieur de contrôler l’exactitude du mot de passe fourni par le prouveur.
+
+Un prouveur est un utilisateur du système d’information cherchant à s’authentifier. Le vérifieur est
+quant à lui classiquement un serveur du système d’information qui a la charge de vérifier l’identité
+d’un utilisateur.",10,Deuxième à cinquième paragraphe,,
+GADM,GADM.Q.18,Les journaux d'événements peuvent-ils être stockés sur les postes de travail des administrateurs ?,Complexe,GADM.R.18,"Cela est déconseillé. L’architecture doit prévoir la transmission des journaux d’événements de manière centralisée, depuis les équipements vers les services de journalisation.",44,Deuxième paragraphe,,
+GAUT,GAUT.Q.26,Comment mettre en place un processus de recouvrement de mots de passe ?,Usuelle,GAUT.R.26,"Pour pallier l’oubli ou l’expiration d’un mot de passe, un mécanisme de recouvrement d’accès (au compte, au service, à la ressource, etc) doit être mis en place. De nombreuses méthodes existent et sont dépendantes du contexte d’utilisation. Parmi les plus courantes, on peut citer : la réception d’un mot de passe temporaire autogénéré (qui doit alors être changé sans tarder), la réception d’un lien temporaire à usage unique de réinitialisation, le contact du support informatique, etc.
+Ces méthodes viennent avec leurs problématiques propres : le choix du mode de réception (par courriel, SMS, envoi postal, téléphone, etc), le choix du temps de validité de liens temporaires, la complexité de ces méthodes pour l’utilisateur, l’ajout ou non de vérificateur humain, etc. Cela rend très difficile la recommandation d’une méthode en particulier. En revanche, la transmission du mot de passe originel en clair est à éviter.",36,Premier paragraphe,"Pour mettre en place un processus de recouvrement de mots de passe, les documents officiels de l'ANSSI recommandent les approches suivantes :
+
+1. **Méthodes adaptées au contexte** : Choisir une méthode adaptée à l'environnement d'utilisation (ex. : mot de passe temporaire autogénéré, lien de réinitialisation à usage unique, contact du support) en évitant la transmission du mot de passe originel en clair (*Document : ""4.7 Recouvrement d'un accès""*).
+2. **Sécurisation du processus** : Protéger le mécanisme de renouvellement pour éviter que l'attaquant n'accède au nouveau mot de passe (*Document : ""4.7 Recouvrement d'un accès""*).
+3. **Complémentarité avec d'autres mesures** : Associer le recouvrement à des contrôles de robustesse (ex. : vérification contre des dictionnaires de mots de passe compromis) et une politique de réinitialisation stricte (*Documents : ""4.5 Contrôle de la robustesse des mots de passe"", ""R27""*).
+
+**Références** :
+- *Guide ANSSI ""5.8 Recouvrement d'un accès""*
+- *Recommandations R30 et R27*",10
+GCRI,GCRI.Q.19,Quels sont les outils généraux de crise à utiliser lors d'une crise cyber ?,Usuelle,GCRI.R.19,"Les outils généraux à l'ensemble des crises pouvant être utilisés lors d'une crise cyber sont : 
+- Salle de crise physique ou virtuelle
+- Annuaire de crise (personnes internes et externes) accessible en cas de black-out
+- Outil de suivi des actions
+- Outil de main courante
+- Outils de communication résilients / hors réseau : adresses mails génériques, tchat, visioconférence, téléphone fixes ou mobiles, etc.
+- Fiches-rôle
+- Fiches réflexes
+- Contrats d’assurance",67,TOUT (tableau),,
+GHYG,GHYG.Q.21,"A minima, que dois-je journaliser sur le système d'information ?",Usuelle,GHYG.R.21,"Une étude contextuelle du système d’information doit être effectuée et les éléments suivants doivent être journalisés :
+- pare-feu : paquets bloqués ;
+- systèmes et applications : authentifications et autorisations (échecs et succès), arrêts inopinés ;
+- services : erreurs de protocoles (par exemples les erreurs 403, 404 et 500 pour les services HTTP), traçabilité des flux applicatifs aux interconnexions (URL sur un relai HTTP, en-têtes des messages sur un relai SMTP, etc.).",51,Quatrième paragraphe,,
+GNOM,GNOM.Q.9,Les ordinateurs personnels peuvent-ils être utilisés pour le nomadisme ? ,Usuelle,GNOM.R.9,"Cela est déconseillé. En effet, il est recommandé que seuls les postes nomades gérés et configurés par les équipes informatiques de l’entité, ou un prestataire mandaté, puissent être utilisés par les utilisateurs nomades. Ainsi, l’utilisation d’équipements personnels (BYOD) est déconseillée .",18,Troisième paragraphe,,
+GNOM,GNOM.Q.20,Quelles sont les mesures complémentaires nécessaires afin de réduire les risques liées au split-tunneling ? ,Usuelle,GNOM.R.20,"Si le split-tunneling est nécessaire et autorisé, les mesures complémentaires suivantes sont nécessaires afin d'en atténuer les risques : 
+- Les services hors-tunnel sont identifiés formellement et validés par les responsables de la sécurité de l’entité. 
+- Les flux hors-tunnel sont protégés en confidentialité et sont authentifiés par des protocoles configurés à l’état de l’art (p. ex. en suivant le guide TLS pour des flux HTTPS). 
+- Les flux hors-tunnel doivent être filtrés en sortie sur le pare-feu local avec une liste d’adresses IP publiques restreinte au strict besoin opérationnel. 
+- Le filtrage des flux hors-tunnel doit être fait par adresses IP (ou éventuellement par noms de domaine DNS) plutôt que par plages d’adresses IP (en fonction des préconisations de l’éditeur). 
+- Le suivi des règles de filtrage local sur le poste nomade doit être le plus régulier possible et tenir compte des modifications des adresses IP publiques et des ports réseaux des services hors-tunnel. 
+- Si le fournisseur d’un service hors-tunnel permet la configuration d’un proxy, cette fonction doit être activée afin de restreindre les adresses IP publiques de destination autorisées en sortie à ce seul proxy. 
+- Si le fournisseur le propose, la phase d’authentification des utilisateurs aux services hors-tunnel doit transiter au travers du tunnel VPN et seuls les flux de données applicatives doivent transiter hors-tunnel une fois l’utilisateur authentifié.
+- Les fournisseurs des services hors-tunnel doivent proposer un niveau de journalisation aligné avec celui requis par la politique de sécurité de l’entité. 
+- Toute modification non prévue de la configuration du split-tunneling (règles de filtrage, table de routage, client VPN) sur un poste nomade doit systématiquement déclencher la remontée d’une alerte aux administrateurs de sécurité de l’entité. 
+- La route par défaut de la table de routage du poste nomade est l’adresse IP du concentrateur VPN. Les routes spécifiques des services hors-tunnel sont déclarées explicitement dans la table de routage.",36,Quatrième paragraphe (tableau),,
+GINT,GINT.Q.4,Qu'est-ce qu'une rupture protocolaire ? ,Usuelle,GINT.R.4,"Une rupture protocolaire consiste à casser en entrée et reconstruire en sortie la communication entre deux ressources (généralement un client et un serveur) au niveau d’une des couches du modèle OSI.
+Les protocoles en entrée et en sortie peuvent être distincts suivant les contraintes techniques de l’environnement et les objectifs de sécurité.",15,Troisième paragraphe,,
+GESS,GESS.Q.6,Que doit inclure le hardening ?,Usuelle,GESS.R.6,"Le durcissement doit inclure : 
+- la limitation et une configuration adaptée des fonctions présentes sur le SIE;
+- la maîtrise des éléments matériels du SIE;
+- la gestion des supports amovibles, vecteurs d’ingestion de données vers le SIE.",18,Troisième paragraphe,,
+GHOM,GHOM.Q.5,Quelles sont les 8 lignes de défense ?,Complexe,GHOM.R.5,"Il n'existe que 3 lignes de défense : 
+- La première ligne de maîtrise est composée des équipes opérationnelles. Elle est responsable de mettre en œuvre et de maintenir les mesures issues des politiques de sécurité, des réglementations et du plan d’action;
+- La seconde ligne de maîtrise a un rôle de support. Elle regroupe les spécialistes des risques et apporte à la première ligne le soutien nécessaire à l’amélioration de la sécurité du système d’information;
+- Enfin la troisième ligne de maîtrise doit contrôler que les systèmes d’information sont suffisamment sécurisés pour être employés. Elle doit, en étroite relation avec les autres lignes de maîtrise, collecter les informations permettant une homologation, les évaluer et proposer un avis d’homologation à son autorité. Elle organise la commission d’homologation. Il est à noter que la troisième ligne de maîtrise peut être portée par la direction des risques de l’organisation.",19,"Premier, troisième et septième paragraphe",,
+GWEB,GWEB.Q.10,Comment sécuriser l'ouverture de nouvelle fenêtres ?,Usuelle,GWEB.R.10,"Il est recommandé de sécuriser systématiquement l’ouverture de nouvelles fenêtres : 
+- en HTML par l’utilisation de l’attribut rel=""noopener"" dès lors que l’attribut target est utilisé pour un lien ; 
+- en JavaScript par l’utilisation de l’option noopener dès lors que le second paramètre target est utilisé dans la commande window.open.
+
+De plus, il est recommandé de définir une stratégie Cross-Origin-Opener-Policy stricte afin de garantir l’isolation du contexte de navigation lors de l’ouverture de fenêtres : Cross-Origin-Opener-Policy : same-origin",55,Premier et cinquième paragraphes,,
+GSNC,GSNC.Q.14,Comment un prestataire SCN doit-il protéger les données de test ?,Usuelle,GSNC.R.14,"Le prestataire doit : 
+- Documenter et mettre en œuvre une procédure permettant d’assurer l’intégrité des données de tests utilisés en pré-production ; 
+- S'il souhaite utilisé des données du commanditaire issues de la production, le prestataire doit préalablement obtenir l’accord du commanditaire et les anonymiser en s'assurant de leur confidentialité.",40,Premier et deuxième paragraphes,,
