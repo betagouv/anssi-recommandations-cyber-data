@@ -17,6 +17,9 @@ jobs:
       MQC_DELAI_ATTENTE_MAXIMUM: 19.0
       MQC_PORT: 443
 
+    outputs:
+      questions_avec_reponses: ${{steps.collecte_reponses_mqc.outputs.fichier_genere}}
+
     steps:
       - name: Cloner le dépôt Git
         uses: actions/checkout@v4
@@ -33,8 +36,53 @@ jobs:
         run: uv sync
 
       - name: Appelle MQC pour générer les réponses pour les questions posées
+        id: collecte_reponses_mqc
         run: |
           uv run python src/main_remplir_csv.py \
             --csv donnees/questions_avec_verite_terrain.csv \
             --prefixe test_github_actions \
             --sortie donnees/sortie
+          echo "fichier_genere=$(ls donnees/sortie)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload du résultat
+        uses: actions/upload-artifact@v4
+        with:
+          name: sortie
+          path: donnees/sortie/${{steps.collecte_reponses_mqc.outputs.fichier_genere}}
+
+  evalue_reponses:
+    name: Evalue les réponses de MQC aux questions.
+    runs-on: ubuntu-latest
+    needs: collecte_reponses
+
+    env:
+      ALBERT_CLE_API: une-fausse-clef
+      ALBERT_URL: https://albert.api.etalab.gouv.fr/v1
+      EVALAP_URL: http://localhost:8000/v1
+
+    outputs:
+      questions_avec_reponses: ${{steps.collecte_reponses_mqc.outputs.fichier_genere}}
+
+    steps:
+      - name: Cloner le dépôt Git
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Installer uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Installer les dépendances
+        run: uv sync
+
+      - name: Télécharge l'artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sortie
+          path: donnees/sortie
+
+      - name: Test les var d'envs
+        run: cat donnees/sortie/${{needs.collecte_reponses.outputs.questions_avec_reponses}}
