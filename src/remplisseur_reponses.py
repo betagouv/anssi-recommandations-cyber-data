@@ -89,7 +89,7 @@ class RemplisseurReponses:
         reponse_question = self._client.pose_question(str(ligne["Question type"]))
 
         ligne_enrichie = lecteur.appliquer_calcul_ligne(
-            "Réponse Bot", lambda d: reponse_question.reponse, ligne
+            "Réponse Bot", lambda _: reponse_question.reponse, ligne
         )
 
         contexte = (
@@ -100,7 +100,7 @@ class RemplisseurReponses:
             )
         )
         ligne_enrichie = lecteur.appliquer_calcul_ligne(
-            "Contexte", lambda d: contexte, ligne_enrichie
+            "Contexte", lambda _: contexte, ligne_enrichie
         )
 
         def extrait_noms_documents(rq: ReponseQuestion) -> list[str]:
@@ -108,7 +108,7 @@ class RemplisseurReponses:
 
         ligne_enrichie = lecteur.appliquer_calcul_ligne(
             "Noms Documents",
-            lambda d: extrait_noms_documents(reponse_question),
+            lambda _: extrait_noms_documents(reponse_question),
             ligne_enrichie,
         )
 
@@ -117,7 +117,7 @@ class RemplisseurReponses:
 
         ligne_enrichie = lecteur.appliquer_calcul_ligne(
             "Numéros Page",
-            lambda d: extrait_numeros_pages(reponse_question),
+            lambda _: extrait_numeros_pages(reponse_question),
             ligne_enrichie,
         )
 
