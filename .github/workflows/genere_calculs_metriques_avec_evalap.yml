@@ -83,6 +83,3 @@ jobs:
         with:
           name: sortie
           path: donnees/sortie
-
-      - name: Test les var d'envs
-        run: cat donnees/sortie/${{needs.collecte_reponses.outputs.questions_avec_reponses}}
