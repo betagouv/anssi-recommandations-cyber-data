@@ -1,0 +1,45 @@
+name: Construction et publication de l'image Docker Evalap
+
+on:
+  push:
+    branches: [ main, develop, deploiement_clever_cloud ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: lab-anssi-evalap
+
+jobs:
+  construire-et-publier:
+    runs-on: ubuntu-latest
+    #checkov:skip=CKV2_GHA_1:Est une erreur côté checkov, les permissions ne sont pas ouvertes en écriture pour tout
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Cloner le dépôt
+        uses: actions/checkout@v4
+
+      - name: Se connecter au registry GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extraire les métadonnées
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha
+            type=raw,value=latest
+
+      - name: Construire et publier l'image Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.evalap-personnalise
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
