@@ -4,6 +4,9 @@ on:
   push:
     branches: [ main, develop, deploiement_clever_cloud ]
 
+permissions:
+  contents: read
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: lab-anssi-evalap
@@ -11,7 +14,6 @@ env:
 jobs:
   construire-et-publier:
     runs-on: ubuntu-latest
-    #checkov:skip=CKV2_GHA_1:Est une erreur côté checkov, les permissions ne sont pas ouvertes en écriture pour tout
     permissions:
       contents: read
       packages: write
@@ -28,6 +30,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extraire les métadonnées
+        id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
