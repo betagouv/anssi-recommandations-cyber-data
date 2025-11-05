@@ -1,4 +1,14 @@
 #checkov:skip=CKV_DOCKER_2:Uniquement utilisé en local pour le dev
 #checkov:skip=CKV_DOCKER_3:Uniquement utilisé en local pour le dev
-FROM ghcr.io/etalab-ia/evalap/evalap:main-latest
+FROM ghcr.io/etalab-ia/evalap/evalap@sha256:55620e47584454057c1d4da13961b125555054d76a4b935525dad90110372520
+
+# Patcher le bug Pydantic 2.11.9 avec Literal[*empty_list]
+RUN sed -i 's/Literal\[\*LlmApiModels\._all_models()\]/str/g' /app/evalap/api/schemas.py
+
+# Patcher db.py pour désactiver create_database sur Clever Cloud
+RUN sed -i 's/create_database(engine.url)/pass  # Disabled for Clever Cloud/g' /app/evalap/api/db.py
+
+# Patcher config.py pour utiliser directement POSTGRES_URL sans ajouter DB_NAME
+RUN sed -i 's|DATABASE_URI = DATABASE_URL.rstrip("/") + "/" + DB_NAME|DATABASE_URI = DATABASE_URL|g' /app/evalap/api/config.py
+
 COPY ./src/metriques_personnalisees_evalap/[^_]*  /app/evalap/api/metrics/
