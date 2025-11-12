@@ -1,13 +1,29 @@
+# AVERTISSEMENT: Ce jeu de données est en cours de construction et d'amélioration.
+# Il ne doit pas engager la responsabilité de l'ANSSI et est fourni à des fins de développement uniquement.
+# 
 REF Guide,REF Question,Tags,REF Réponse,Réponse envisagée,Numéro page (lecteur),Localisation paragraphe,Réponse Bot,,Question type
-GAUT,GAUT.Q.1,Usuelle,GAUT.R.1,"La fonction d’authentification en tant que telle a pour objectif de permettre au prouveur de démontrer son identité (souvent annoncée lors de la phase d’identification).
+GAUT,GAUT.Q.1,Usuelle,GAUT.R.1,"La fonction d'authentification en tant que telle a pour objectif de permettre au prouveur de démontrer son identité (souvent annoncée lors de la phase d'identification).
 
-L’authentification est un mécanisme faisant intervenir deux entités distinctes : un prouveur et un
+L'authentification est un mécanisme faisant intervenir deux entités distinctes : un prouveur et un
 vérifieur.
-Le prouveur cherche à prouver son identité au vérifieur. Il s’agit par exemple pour le prouveur
-de démontrer sa connaissance d’une donnée secrète comme un mot de passe.
-Le vérifieur doit être capable de s’assurer de la validité de l’identité du prouveur. Il s’agit par
-exemple pour le vérifieur de contrôler l’exactitude du mot de passe fourni par le prouveur.
+Le prouveur cherche à prouver son identité au vérifieur. Il s'agit par exemple pour le prouveur
+de démontrer sa connaissance d'une donnée secrète comme un mot de passe.
+Le vérifieur doit être capable de s'assurer de la validité de l'identité du prouveur. Il s'agit par
+exemple pour le vérifieur de contrôler l'exactitude du mot de passe fourni par le prouveur.
 
-Un prouveur est un utilisateur du système d’information cherchant à s’authentifier. Le vérifieur est
-quant à lui classiquement un serveur du système d’information qui a la charge de vérifier l’identité
-d’un utilisateur.",10,Deuxième à cinquième paragraphe,,,Qu'est-ce que l'authentification ?
+Un prouveur est un utilisateur du système d'information cherchant à s'authentifier. Le vérifieur est
+quant à lui classiquement un serveur du système d'information qui a la charge de vérifier l'identité
+d'un utilisateur.",10,Deuxième à cinquième paragraphe,,,Qu'est-ce que l'authentification ?
+
+GAUT,GAUT.Q.1,Usuelle,GAUT.R.1,"La fonction d'authentification en tant que telle a pour objectif de permettre au prouveur de démontrer son identité (souvent annoncée lors de la phase d'identification).
+
+L'authentification est un mécanisme faisant intervenir deux entités distinctes : un prouveur et un
+vérifieur.
+Le prouveur cherche à prouver son identité au vérifieur. Il s'agit par exemple pour le prouveur
+de démontrer sa connaissance d'une donnée secrète comme un mot de passe.
+Le vérifieur doit être capable de s'assurer de la validité de l'identité du prouveur. Il s'agit par
+exemple pour le vérifieur de contrôler l'exactitude du mot de passe fourni par le prouveur.
+
+Un prouveur est un utilisateur du système d'information cherchant à s'authentifier. Le vérifieur est
+quant à lui classiquement un serveur du système d'information qui a la charge de vérifier l'identité
+d'un utilisateur.",10,Deuxième à cinquième paragraphe,,,Qu'est-ce que l'authentification ?

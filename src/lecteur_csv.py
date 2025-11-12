@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Any, Iterator, Mapping, Callable, cast, Union
 import pandas as pd
 import logging
+from itertools import takewhile
 
 
 class LecteurCSV:
@@ -9,10 +10,19 @@ class LecteurCSV:
         self, chemin: Path, separateur: str = ",", encodage: str = "utf-8"
     ) -> None:
         self._chemin = Path(chemin)
+
+        nb_lignes_header = self._detecte_lignes_header()
+
         self._df: pd.DataFrame = pd.read_csv(
-            self._chemin, sep=separateur, encoding=encodage
+            self._chemin, sep=separateur, encoding=encodage, skiprows=nb_lignes_header
         )
         self._iterateur: Iterator[Mapping[str, Any]] | None = None
+
+    def _detecte_lignes_header(self) -> int:
+        with open(self._chemin, "r", encoding="utf-8") as f:
+            return sum(
+                1 for _ in takewhile(lambda ligne: ligne.strip().startswith("#"), f)
+            )
 
     def iterer_lignes(self) -> Iterator[Mapping[str, Any]]:
         lignes = cast(list[dict[str, Any]], self._df.to_dict(orient="records"))

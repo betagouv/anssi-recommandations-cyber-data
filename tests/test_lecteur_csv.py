@@ -1,6 +1,7 @@
 from pathlib import Path
 from lecteur_csv import LecteurCSV
 from typing import Mapping, Union
+import pytest
 
 
 def test_peut_lire_un_fichier_csv_et_compter_les_lignes(tmp_path: Path):
@@ -121,3 +122,42 @@ def test_lecteur_appliquer_calcul_ligne_enrichit_une_ligne(tmp_path: Path):
     assert ligne_enrichie["Question type"] == "Q1?"
     assert ligne_enrichie["autre"] == "valeur"
     assert ligne_enrichie["Nouvelle Colonne"] == "calculé_Q1?"
+
+
+@pytest.mark.parametrize(
+    "nb_lignes_header,contenu_header",
+    [
+        (0, ""),
+        (1, "# Une ligne de header\n"),
+        (2, "# Première ligne\n# Deuxième ligne\n"),
+        (
+            3,
+            "# AVERTISSEMENT: Ce jeu de données est en cours de construction\n# Il ne doit pas engager l'ANSSI\n# \n",
+        ),
+    ],
+)
+def test_lecture_csv_avec_header_avertissement(
+    tmp_path, nb_lignes_header, contenu_header
+):
+    contenu_csv = contenu_header + "nom,age,ville\nAlice,25,Paris\nBob,30,Lyon"
+    fichier_test = tmp_path / "test_avec_header.csv"
+    fichier_test.write_text(contenu_csv, encoding="utf-8")
+
+    lecteur = LecteurCSV(fichier_test)
+    df = lecteur.dataframe
+
+    assert len(df) == 2
+    assert list(df.columns) == ["nom", "age", "ville"]
+    assert df.iloc[0]["nom"] == "Alice"
+    assert df.iloc[1]["nom"] == "Bob"
+
+
+def test_lecture_fichier_questions_avec_verite_terrain():
+    chemin_fichier = Path("donnees/questions_avec_verite_terrain.csv")
+    lecteur = LecteurCSV(chemin_fichier)
+    df = lecteur.dataframe
+    assert len(df) > 0
+    assert "REF Guide" in df.columns
+    assert "Question type" in df.columns
+    premiere_ligne = next(lecteur.iterer_lignes())
+    assert "REF Guide" in premiere_ligne
