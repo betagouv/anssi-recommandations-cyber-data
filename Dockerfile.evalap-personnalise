@@ -2,6 +2,14 @@
 #checkov:skip=CKV_DOCKER_3:Uniquement utilisé en local pour le dev
 FROM ghcr.io/etalab-ia/evalap/evalap@sha256:55620e47584454057c1d4da13961b125555054d76a4b935525dad90110372520
 
+# Cloner la branche fix/close-open-transactions d'evalap
+RUN apt-get update && apt-get install -y git && \
+    git clone --branch fix/close-open-transactions https://github.com/etalab-ia/evalap.git /tmp/evalap && \
+    rm -rf /app/evalap/* && \
+    cp -R /tmp/evalap/evalap/* /app/evalap/ && \
+    rm -rf /tmp/evalap && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Patcher le bug Pydantic 2.11.9 avec Literal[*empty_list]
 RUN sed -i 's/Literal\[\*LlmApiModels\._all_models()\]/str/g' /app/evalap/api/schemas.py
 
