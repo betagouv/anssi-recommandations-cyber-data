@@ -1,6 +1,6 @@
 #checkov:skip=CKV_DOCKER_2:Healthcheck géré par l'orchestrateur
 #checkov:skip=CKV_DOCKER_3:Utilisateur défini dans l'image de base
-FROM ghcr.io/betagouv/lab-anssi-evalap@sha256:a918b96b4b8d48814d485e67b6f96a265530c63928f5adbe2f901d2f718508dc
+FROM ghcr.io/betagouv/lab-anssi-evalap@sha256:e181e634ebbf0620c31c8b059226f216cf128f9938c23eea44973d6ab82cf835
 
 ENV TZ=Europe/Paris
 ENV ENV=prod

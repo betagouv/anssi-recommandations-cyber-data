@@ -23,7 +23,7 @@ class FormateurResultatsExperiences:
         )
 
     def surveille_experience_flux(
-        self, experiment_id: int, delai_attente: float = 10.0, timeout_max: int = 1000
+        self, experiment_id: int, delai_attente: float = 10.0, timeout_max: int = 100000
     ) -> GenerateurMetriques:
         temps_ecoule = 0.0
         metriques_terminees = set()
