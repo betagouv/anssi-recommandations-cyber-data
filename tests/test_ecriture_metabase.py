@@ -1,29 +1,6 @@
 import pandas as pd
-from adaptateurs.journal import AdaptateurJournal, TypeEvenement, Donnees
-
-
-class AdaptateurJournalMemoire(AdaptateurJournal):
-    def consigne_evenement(self, type: TypeEvenement, donnees: Donnees) -> None:
-        self._evenements.append({"type": type, "donnees": donnees.model_dump()})
-
-    def __init__(self):
-        self._evenements = []
-
-    def enregistrer(self, evenement):
-        self._evenements.append(evenement)
-
-    def les_evenements(self):
-        return self._evenements
-
-
-def consigne_evaluation(df: pd.DataFrame, adaptateur_journal: AdaptateurJournal):
-    contenu_evaluation = df.to_dict("records")
-    for evaluation in contenu_evaluation:
-        donnees_evaluation = Donnees.model_validate(evaluation)
-        adaptateur_journal.consigne_evenement(
-            TypeEvenement.EVALUATION_CALCULEE,
-            donnees_evaluation,
-        )
+from adaptateurs.journal import TypeEvenement, AdaptateurJournalMemoire
+from consignateur_evaluation import consigne_evaluation
 
 
 def test_consigne_evenement_suite_recuperation_fichier_sortie_evaluation_evalap():
