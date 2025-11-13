@@ -4,7 +4,7 @@ from adaptateurs.journal import AdaptateurJournal, TypeEvenement, Donnees
 
 class AdaptateurJournalMemoire(AdaptateurJournal):
     def consigne_evenement(self, type: TypeEvenement, donnees: Donnees) -> None:
-        self._evenements.append({"type": type, "donnees": donnees.__dict__})
+        self._evenements.append({"type": type, "donnees": donnees.model_dump()})
 
     def __init__(self):
         self._evenements = []
@@ -16,26 +16,13 @@ class AdaptateurJournalMemoire(AdaptateurJournal):
         return self._evenements
 
 
-class DonneesEvaluation(Donnees):
-    id_experimentation: int
-    score_numero_page_en_contexte_4: float
-    bon_nom_document_en_contexte_2: int
-
-
 def consigne_evaluation(df: pd.DataFrame, adaptateur_journal: AdaptateurJournal):
     contenu_evaluation = df.to_dict("records")
     for evaluation in contenu_evaluation:
+        donnees_evaluation = Donnees.model_validate(evaluation)
         adaptateur_journal.consigne_evenement(
             TypeEvenement.EVALUATION_CALCULEE,
-            DonneesEvaluation(
-                id_experimentation=1,
-                score_numero_page_en_contexte_4=evaluation[
-                    "score_numero_page_en_contexte_4"
-                ],
-                bon_nom_document_en_contexte_2=evaluation[
-                    "bon_nom_document_en_contexte_2"
-                ],
-            ),
+            donnees_evaluation,
         )
 
 
@@ -94,4 +81,26 @@ def test_consigne_les_evenements_suite_recuperation_fichier_sortie_evaluation_ev
         "id_experimentation": 1,
         "score_numero_page_en_contexte_4": 0.7,
         "bon_nom_document_en_contexte_2": 0,
+    }
+
+
+def test_consigne_les_evenements_extrait_dynamiquement_le_nom_des_colonnes():
+    adaptateur_journal: AdaptateurJournalMemoire = AdaptateurJournalMemoire()
+    df_different = pd.DataFrame(
+        [
+            {
+                "id_experimentation": 1,
+                "score_numero_page_en_contexte_4": 0.7,
+                "nouvelle_metrique": 0,
+            }
+        ]
+    )
+
+    consigne_evaluation(df_different, adaptateur_journal)
+
+    les_evenements = adaptateur_journal.les_evenements()
+    assert les_evenements[0]["donnees"] == {
+        "id_experimentation": 1,
+        "score_numero_page_en_contexte_4": 0.7,
+        "nouvelle_metrique": 0,
     }

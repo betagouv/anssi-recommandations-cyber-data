@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from enum import StrEnum
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class Donnees(BaseModel):
-    pass
+    model_config = ConfigDict(extra="allow")
 
 
 class TypeEvenement(StrEnum):
