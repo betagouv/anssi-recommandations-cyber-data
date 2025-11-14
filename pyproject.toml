@@ -9,6 +9,7 @@ dependencies = [
     "pandas-stubs",
     "pydantic",
     "pytest",
+    "pytest-asyncio",
     "requests",
     "respx"
 ]
