@@ -12,6 +12,7 @@ class MQC(NamedTuple):
 
 class Evalap(NamedTuple):
     url: str
+    token_authentification: str
 
 
 class Albert(NamedTuple):
@@ -36,6 +37,7 @@ def recupere_configuration() -> Configuration:
 
     evalap: Evalap = Evalap(
         url=os.getenv("EVALAP_URL", "http://localhost:8000/v1"),
+        token_authentification=os.getenv("EVALAP_TOKEN", ""),
     )
 
     albert: Albert = Albert(

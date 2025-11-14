@@ -1,5 +1,6 @@
 import requests
 from typing import List, NamedTuple, Dict, Optional
+from configuration import Configuration
 
 from evalap.evalap_base_http import EvalapBaseHTTP
 
@@ -25,6 +26,9 @@ class DatasetPayload(NamedTuple):
 
 
 class EvalapDatasetHttp(EvalapBaseHTTP):
+    def __init__(self, configuration: Configuration, session: requests.Session) -> None:
+        super().__init__(configuration, session)
+
     def liste(self) -> List[DatasetReponse]:
         try:
             donnees = self._get("/datasets", timeout=20)

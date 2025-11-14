@@ -205,6 +205,9 @@ def main():
         return
 
     conf = recupere_configuration()
+    logging.info(
+        f"Token authentification configuré: {'Oui' if conf.evalap.token_authentification else 'Non'}"
+    )
     df = pd.read_csv(args.csv)
     df_mapped = prepare_dataframe(df)
 
