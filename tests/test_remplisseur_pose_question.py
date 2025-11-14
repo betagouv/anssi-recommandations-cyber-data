@@ -1,5 +1,6 @@
 from pathlib import Path
 import httpx
+import asyncio
 import respx
 import pytest
 
@@ -44,8 +45,8 @@ def test_remplissage_appelle_api_pour_chaque_question(
     remplisseur = RemplisseurReponses(client=client)
 
     lecteur = LecteurCSV(fichier)
-    remplisseur.remplit_ligne(lecteur)
-    remplisseur.remplit_ligne(lecteur)
+    asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
+    asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
 
     assert route.called
     assert route.call_count == 2
@@ -75,7 +76,7 @@ def test_pose_question_retourne_reponse_question_structuree(configuration: MQC):
     )
 
     client = ClientMQCHTTPAsync(cfg=configuration)
-    resultat = client.pose_question("Ma question?")
+    resultat = asyncio.run(client.pose_question_async("Ma question?"))
 
     assert resultat.reponse == "Voici la réponse"
     assert resultat.question == "Ma question?"
@@ -98,8 +99,8 @@ def test_remplissage_insere_reponses_dans_colonne(tmp_path: Path, configuration:
     remplisseur = RemplisseurReponses(client=client)
 
     lecteur = LecteurCSV(fichier)
-    ligne1_enrichie = remplisseur.remplit_ligne(lecteur)
-    ligne2_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne1_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
+    ligne2_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
 
     assert ligne1_enrichie["Réponse Bot"] == "mocked"
     assert ligne2_enrichie["Réponse Bot"] == "mocked"
@@ -140,7 +141,7 @@ def test_remplissage_ajoute_colonne_context_avec_paragraphes(
     remplisseur = RemplisseurReponses(client=client)
 
     lecteur = LecteurCSV(fichier)
-    ligne_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
 
     assert "Contexte" in ligne_enrichie
     assert "Contenu test" in str(ligne_enrichie["Contexte"])
@@ -185,7 +186,7 @@ def test_remplissage_ajoute_colonne_context_avec_deux_paragraphes_separes_par_ma
     remplisseur = RemplisseurReponses(client=client)
 
     lecteur = LecteurCSV(fichier)
-    ligne_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
 
     assert (
         "Premier paragraphe${SEPARATEUR_DOCUMENT}Deuxième paragraphe"
@@ -231,7 +232,7 @@ def test_remplissage_ajoute_colonne_contenant_nom_document_qui_liste_origine_des
     client = ClientMQCHTTPAsync(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
     lecteur = LecteurCSV(fichier)
-    ligne_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
 
     assert "Noms Documents" in ligne_enrichie
     assert ligne_enrichie["Noms Documents"] == [
@@ -255,7 +256,7 @@ def test_remplissage_ajoute_colonne_nom_document_liste_vide_si_aucun_paragraphe(
     client = ClientMQCHTTPAsync(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
     lecteur = LecteurCSV(fichier)
-    ligne_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
 
     assert "Noms Documents" in ligne_enrichie
     assert ligne_enrichie["Noms Documents"] == []
@@ -299,7 +300,7 @@ def test_remplissage_ajoute_colonne_numeros_page_de_tous_les_paragraphes(
     client = ClientMQCHTTPAsync(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
     lecteur = LecteurCSV(fichier)
-    ligne_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
 
     assert "Numéros Page" in ligne_enrichie
     assert ligne_enrichie["Numéros Page"] == [5, 12]
@@ -320,7 +321,7 @@ def test_remplissage_ajoute_colonne_numeros_page_retourne_liste_vide_si_aucun_pa
     client = ClientMQCHTTPAsync(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
     lecteur = LecteurCSV(fichier)
-    ligne_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
 
     assert "Numéros Page" in ligne_enrichie
     assert ligne_enrichie["Numéros Page"] == []
@@ -340,7 +341,7 @@ def test_ecriture_cree_fichier_dans_bon_dossier(tmp_path: Path, configuration: M
     remplisseur = RemplisseurReponses(client=client)
 
     lecteur = LecteurCSV(fichier)
-    ligne_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
 
     horloge = HorlogeSysteme()
     ecrivain = EcrivainSortie(
@@ -366,7 +367,7 @@ def test_ecriture_nom_fichier_contient_date(tmp_path: Path, configuration: MQC):
     remplisseur = RemplisseurReponses(client=client)
 
     lecteur = LecteurCSV(fichier)
-    ligne_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
 
     horloge = HorlogeSysteme()
     ecrivain = EcrivainSortie(
@@ -398,10 +399,10 @@ def test_ecriture_contenu_csv_complet(tmp_path: Path, configuration: MQC):
         racine=tmp_path, sous_dossier=Path("donnees/sortie"), horloge=horloge
     )
 
-    ligne1_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne1_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
     chemin_csv = ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne1_enrichie, "evaluation")
 
-    ligne2_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne2_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
     ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne2_enrichie, "evaluation")
 
     contenu = chemin_csv.read_text(encoding="utf-8").splitlines()
@@ -418,7 +419,7 @@ def test_pose_question_declenche_exception_si_serveur_injoignable(configuration)
             side_effect=httpx.ConnectError("connexion refusée")
         )
         with pytest.raises(RuntimeError) as exc:
-            client.pose_question("Test ?")
+            asyncio.run(client.pose_question_async("Test ?"))
 
     assert "Serveur MQC injoignable" in str(exc.value)
 
@@ -459,7 +460,9 @@ def test_remplit_ligne_enrichit_ligne_avec_reponse_bot(
     client = ClientMQCHTTPAsync(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
 
-    ligne_enrichie = remplisseur.remplit_ligne(LecteurCSV(fichier))
+    ligne_enrichie = asyncio.run(
+        remplisseur.remplit_lot_lignes(LecteurCSV(fichier), 1)
+    )[0]
 
     assert ligne_enrichie["Question type"] == "Q1?"
     assert ligne_enrichie["Réponse Bot"] == "reponse_test"
@@ -501,7 +504,9 @@ def test_remplit_ligne_ecrit_bien_le_contexte(tmp_path: Path, configuration: MQC
     client = ClientMQCHTTPAsync(cfg=configuration)
     remplisseur = RemplisseurReponses(client=client)
 
-    ligne_enrichie = remplisseur.remplit_ligne(LecteurCSV(fichier))
+    ligne_enrichie = asyncio.run(
+        remplisseur.remplit_lot_lignes(LecteurCSV(fichier), 1)
+    )[0]
 
     assert (
         ligne_enrichie["Contexte"]
@@ -529,8 +534,8 @@ def test_remplit_ligne_avec_lecteur_traite_lignes_sequentiellement(
 
     lecteur = LecteurCSV(fichier)
 
-    ligne1_enrichie = remplisseur.remplit_ligne(lecteur)
-    ligne2_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne1_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
+    ligne2_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
 
     assert ligne1_enrichie["Question type"] == "Q1?"
     assert ligne1_enrichie["Réponse Bot"] == "reponse_test"
@@ -563,7 +568,7 @@ def test_ecrit_ligne_depuis_lecteur_csv_ecrit_ligne_par_ligne(
         racine=tmp_path, sous_dossier=Path("sortie"), horloge=horloge
     )
 
-    ligne1_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne1_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
 
     chemin_sortie = ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne1_enrichie, "test")
 
@@ -572,7 +577,7 @@ def test_ecrit_ligne_depuis_lecteur_csv_ecrit_ligne_par_ligne(
     assert "Question type,Réponse Bot" in contenu[0]
     assert "Q1?,reponse_test" in contenu[1]
 
-    ligne2_enrichie = remplisseur.remplit_ligne(lecteur)
+    ligne2_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
 
     ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne2_enrichie, "test")
 
