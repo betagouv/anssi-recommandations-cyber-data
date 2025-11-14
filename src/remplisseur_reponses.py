@@ -107,6 +107,59 @@ class RemplisseurReponses:
         resultats = await asyncio.gather(*taches)
         return resultats
 
+    async def remplit_lot_lignes(
+        self, lecteur: LecteurCSV, taille_lot: int
+    ) -> list[dict[str, Union[str, int, float]]]:
+        lignes = []
+        questions = []
+        for _ in range(taille_lot):
+            try:
+                ligne = lecteur.ligne_suivante()
+                lignes.append(ligne)
+                questions.append(str(ligne["Question type"]))
+            except StopIteration:
+                break
+
+        if not lignes:
+            return []
+
+        reponses = await asyncio.gather(
+            *[self._client.pose_question_async(q) for q in questions]
+        )
+
+        lignes_enrichies = []
+        for ligne, reponse_question in zip(lignes, reponses):
+            ligne_enrichie = lecteur.appliquer_calcul_ligne(
+                "Réponse Bot", lambda _: reponse_question.reponse, ligne
+            )
+
+            contexte = (
+                ""
+                if not reponse_question.paragraphes
+                else "${SEPARATEUR_DOCUMENT}".join(
+                    [p.contenu for p in reponse_question.paragraphes]
+                )
+            )
+            ligne_enrichie = lecteur.appliquer_calcul_ligne(
+                "Contexte", lambda _: contexte, ligne_enrichie
+            )
+
+            ligne_enrichie = lecteur.appliquer_calcul_ligne(
+                "Noms Documents",
+                lambda _: [p.nom_document for p in reponse_question.paragraphes],
+                ligne_enrichie,
+            )
+
+            ligne_enrichie = lecteur.appliquer_calcul_ligne(
+                "Numéros Page",
+                lambda _: [p.numero_page for p in reponse_question.paragraphes],
+                ligne_enrichie,
+            )
+
+            lignes_enrichies.append(ligne_enrichie)
+
+        return lignes_enrichies
+
     def remplit_ligne(self, lecteur: LecteurCSV) -> dict[str, Union[str, int, float]]:
         ligne = lecteur.ligne_suivante()
 
