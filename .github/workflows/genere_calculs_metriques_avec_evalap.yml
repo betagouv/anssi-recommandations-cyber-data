@@ -3,7 +3,7 @@ permissions: {}
 
 on:
   push:
-    branches: [main]
+    branches: [main,  ecrit-evaluation-metabase]
 
 jobs:
   collecte_reponses:
@@ -63,7 +63,7 @@ jobs:
       EVALAP_TOKEN: ${{ secrets.EVALAP_TOKEN }}
 
     outputs:
-      questions_avec_reponses: ${{steps.collecte_reponses_mqc.outputs.fichier_genere}}
+      fichier_evaluation: ${{steps.evaluation_metriques.outputs.fichier_genere}}
 
     steps:
       - name: Cloner le dépôt Git
@@ -100,3 +100,42 @@ jobs:
         with:
           name: resultats_evaluation
           path: donnees/resultats_evaluations/${{steps.evaluation_metriques.outputs.fichier_genere}}
+
+  consigne_evaluation:
+    name: Consigne l'évaluation
+    environment: DEMO
+    runs-on: ubuntu-latest
+    needs: evalue_reponses
+
+    env:
+      DB_HOST: ${{ secrets.DB_HOST}}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_USER: ${{ secrets.DB_USER }}
+
+    steps:
+      - name: Cloner le dépôt Git
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Installer uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Installer les dépendances
+        run: uv sync
+
+      - name: Télécharge l'artifact des résultats d'évaluation
+        uses: actions/download-artifact@v4
+        with:
+          name: resultats_evaluation
+          path: donnees/resultats_evaluations
+
+      - name: Consigne l'évaluation
+        run: |
+          uv run python src/consignateur_evaluation.py \
+            --csv donnees/resultats_evaluations/${{needs.evalue_reponses.outputs.fichier_evaluation}}
