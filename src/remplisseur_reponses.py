@@ -1,7 +1,7 @@
+from pathlib import Path
 import csv
 import datetime as dt
 import re
-from pathlib import Path
 from typing import (
     Protocol,
     Final,
@@ -11,6 +11,7 @@ import httpx
 from pydantic import BaseModel
 from configuration import MQC
 from lecteur_csv import LecteurCSV
+import asyncio
 
 
 class Paragraphe(BaseModel):
@@ -47,6 +48,7 @@ def formate_route_pose_question(cfg: MQC) -> str:
 
 class InterfaceQuestions(Protocol):
     def pose_question(self, question: str) -> ReponseQuestion: ...
+    async def pose_question_async(self, question: str) -> ReponseQuestion: ...
 
 
 class HorlogeSysteme:
@@ -74,10 +76,26 @@ class ClientMQCHTTP:
         donnees = r.json()
         return ReponseQuestion(**donnees)
 
+    async def pose_question_async(self, question: str) -> ReponseQuestion:
+        # Pour l'instant, délègue à la version synchrone
+        # TODO: implémenter avec httpx.AsyncClient
+        return self.pose_question(question)
+
 
 class RemplisseurReponses:
     def __init__(self, client: InterfaceQuestions) -> None:
         self._client = client
+
+    async def traite_lot_parallele(
+        self, questions: list[str], max_workers: int
+    ) -> list[dict[str, Union[str, int, float]]]:
+        async def traite_question(question: str) -> dict[str, Union[str, int, float]]:
+            reponse_question = await self._client.pose_question_async(question)
+            return {"Réponse Bot": reponse_question.reponse}
+
+        taches = [traite_question(q) for q in questions]
+        resultats = await asyncio.gather(*taches)
+        return resultats
 
     def remplit_ligne(self, lecteur: LecteurCSV) -> dict[str, Union[str, int, float]]:
         ligne = lecteur.ligne_suivante()
