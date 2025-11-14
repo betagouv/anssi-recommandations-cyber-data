@@ -47,7 +47,6 @@ def formate_route_pose_question(cfg: MQC) -> str:
 
 
 class InterfaceQuestions(Protocol):
-    def pose_question(self, question: str) -> ReponseQuestion: ...
     async def pose_question_async(self, question: str) -> ReponseQuestion: ...
 
 
@@ -62,21 +61,6 @@ class ClientMQCHTTPAsync:
         self._route = formate_route_pose_question(cfg)
         self._client = client or httpx.AsyncClient()
         self.delai_attente_maximum = cfg.delai_attente_maximum
-
-    def pose_question(self, question: str) -> ReponseQuestion:
-        # Version synchrone utilisant httpx.Client temporaire
-        with httpx.Client() as sync_client:
-            try:
-                r = sync_client.post(
-                    f"{self._base}{self._route}",
-                    json={"question": question},
-                    timeout=self.delai_attente_maximum,
-                )
-            except httpx.RequestError as e:
-                raise RuntimeError(f"Serveur MQC injoignable: {e}") from e
-            r.raise_for_status()
-            donnees = r.json()
-            return ReponseQuestion(**donnees)
 
     async def pose_question_async(self, question: str) -> ReponseQuestion:
         try:
@@ -159,46 +143,6 @@ class RemplisseurReponses:
             lignes_enrichies.append(ligne_enrichie)
 
         return lignes_enrichies
-
-    def remplit_ligne(self, lecteur: LecteurCSV) -> dict[str, Union[str, int, float]]:
-        ligne = lecteur.ligne_suivante()
-
-        reponse_question = self._client.pose_question(str(ligne["Question type"]))
-
-        ligne_enrichie = lecteur.appliquer_calcul_ligne(
-            "Réponse Bot", lambda _: reponse_question.reponse, ligne
-        )
-
-        contexte = (
-            ""
-            if not reponse_question.paragraphes
-            else "${SEPARATEUR_DOCUMENT}".join(
-                [p.contenu for p in reponse_question.paragraphes]
-            )
-        )
-        ligne_enrichie = lecteur.appliquer_calcul_ligne(
-            "Contexte", lambda _: contexte, ligne_enrichie
-        )
-
-        def extrait_noms_documents(rq: ReponseQuestion) -> list[str]:
-            return [p.nom_document for p in rq.paragraphes]
-
-        ligne_enrichie = lecteur.appliquer_calcul_ligne(
-            "Noms Documents",
-            lambda _: extrait_noms_documents(reponse_question),
-            ligne_enrichie,
-        )
-
-        def extrait_numeros_pages(rq: ReponseQuestion) -> list[int]:
-            return [p.numero_page for p in rq.paragraphes]
-
-        ligne_enrichie = lecteur.appliquer_calcul_ligne(
-            "Numéros Page",
-            lambda _: extrait_numeros_pages(reponse_question),
-            ligne_enrichie,
-        )
-
-        return ligne_enrichie
 
 
 class EcrivainSortie:
