@@ -6,10 +6,9 @@ requires-python = ">=3.13"
 dependencies = [
     "httpx",
     "pandas",
-    "pandas-stubs",
-    "psycopg2-binary",
     "pydantic",
     "pytest",
+    "pytest-asyncio",
     "requests",
     "respx"
 ]
@@ -17,6 +16,8 @@ dependencies = [
 [dependency-groups]
 dev = [
     "mypy",
+    "pandas-stubs",
+    "psycopg2-binary",
     "ruff",
     "types-psycopg2",
     "types-requests",
