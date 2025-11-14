@@ -75,6 +75,14 @@ Dans un environnement virtuel :
 Il faut créer à la racine du projet un fichier `.env`.
 A minima, ce fichier devra définir les variables déclarées dans le fichier `.env.template`.
 
+### Authentification Evalap
+
+Pour utiliser l'API Evalap, ajoutez votre token d'authentification au fichier `.env` :
+```
+EVALAP_TOKEN=votre_token_ici
+```
+⚠️ Utilisez directement la valeur du token, sans guillemets ni formatage JSON.
+
 ## 🧪 Générer les réponses du bot pour le jeu de validation
 
 ### 🎒 Prérequis

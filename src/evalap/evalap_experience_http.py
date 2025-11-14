@@ -1,6 +1,7 @@
 import requests
 import logging
 from typing import NamedTuple, Optional, Dict, Union
+from configuration import Configuration
 from evalap.evalap_base_http import EvalapBaseHTTP
 
 
@@ -71,6 +72,9 @@ class ExperienceAvecResultats(NamedTuple):
 
 
 class EvalapExperienceHttp(EvalapBaseHTTP):
+    def __init__(self, configuration: Configuration, session: requests.Session) -> None:
+        super().__init__(configuration, session)
+
     def cree(self, payload: ExperiencePayload) -> Optional[ExperienceReponse]:
         try:
             donnees = self._post("/experiment", json=payload._asdict(), timeout=20)

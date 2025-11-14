@@ -21,7 +21,7 @@ from evalap.evalap_base_http import EvalapBaseHTTP
 
 @pytest.fixture()
 def configuration_evalap() -> Evalap:
-    return Evalap(url="http://localhost:8000/v1")
+    return Evalap(url="http://localhost:8000/v1", token_authentification="")
 
 
 @pytest.fixture()
@@ -35,6 +35,7 @@ def configuration() -> Configuration:
     )
     evalap: Evalap = Evalap(
         url="http://localhost:8000",
+        token_authentification="",
     )
     albert = Albert(url="https://albert.api.etalab.gouv.fr/v1", cle_api="fausse_cle")
     return Configuration(mqc=configuration_mqc, evalap=evalap, albert=albert)

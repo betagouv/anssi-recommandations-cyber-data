@@ -10,5 +10,11 @@ class EvalapClient:
         configuration: Configuration,
         session: requests.Session,
     ):
+        token_authentification = (
+            configuration.evalap.token_authentification
+            if configuration.evalap.token_authentification
+            else None
+        )
+
         self.dataset = EvalapDatasetHttp(configuration, session)
         self.experience = EvalapExperienceHttp(configuration, session)
