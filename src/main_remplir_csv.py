@@ -8,10 +8,44 @@ from remplisseur_reponses import (
     HorlogeSysteme,
 )
 from lecteur_csv import LecteurCSV
-
 import logging
+import asyncio
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
+
+async def traite_csv_par_lots_paralleles(
+    csv_path: Path, prefixe: str, sortie: Path, taille_lot: int
+) -> None:
+    cfg = recupere_configuration().mqc
+    client = ClientMQCHTTPAsync(cfg=cfg)
+    remplisseur = RemplisseurReponses(client=client)
+
+    lecteur = LecteurCSV(csv_path)
+
+    ecrivain = EcrivainSortie(
+        racine=Path.cwd(), sous_dossier=sortie, horloge=HorlogeSysteme()
+    )
+
+    chemin = None
+    try:
+        while True:
+            lignes_enrichies = await remplisseur.remplit_lot_lignes(lecteur, taille_lot)
+
+            if not lignes_enrichies:
+                raise StopIteration("Fin du fichier CSV atteinte")
+
+            for ligne_enrichie in lignes_enrichies:
+                if chemin is None:
+                    chemin = ecrivain.ecrit_ligne_depuis_lecteur_csv(
+                        ligne_enrichie, prefixe
+                    )
+                else:
+                    ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne_enrichie, prefixe)
+
+            logging.info(f"Lot de {len(lignes_enrichies)} lignes traité et écrit")
+    except StopIteration:
+        pass
 
 
 def main() -> None:
@@ -21,31 +55,22 @@ def main() -> None:
         "--prefixe", default="evaluation", help="Préfixe du fichier de sortie"
     )
     p.add_argument("--sortie", default="donnees/sortie", help="Sous-dossier de sortie")
+    p.add_argument(
+        "--taille-lot",
+        default=10,
+        type=int,
+        help="Taille du lot pour traitement parallèle",
+    )
     args = p.parse_args()
 
-    cfg = recupere_configuration().mqc
-    client = ClientMQCHTTPAsync(cfg=cfg)
-    remplisseur = RemplisseurReponses(client=client)
-
-    lecteur = LecteurCSV(args.csv)
-
-    ecrivain = EcrivainSortie(
-        racine=Path.cwd(), sous_dossier=Path(args.sortie), horloge=HorlogeSysteme()
+    chemin = asyncio.run(
+        traite_csv_par_lots_paralleles(
+            csv_path=args.csv,
+            prefixe=args.prefixe,
+            sortie=Path(args.sortie),
+            taille_lot=args.taille_lot,
+        )
     )
-
-    chemin = None
-    try:
-        while True:
-            ligne_enrichie = remplisseur.remplit_ligne(lecteur)
-            if chemin is None:
-                chemin = ecrivain.ecrit_ligne_depuis_lecteur_csv(
-                    ligne_enrichie, args.prefixe
-                )
-            else:
-                ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne_enrichie, args.prefixe)
-            logging.info("Ligne traitée et écrite")
-    except StopIteration:
-        pass
 
     if chemin:
         logging.info(f"Nouveau fichier créé : {str(chemin)}")
