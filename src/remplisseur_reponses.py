@@ -56,38 +56,27 @@ class HorlogeSysteme:
         return str(dt.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
 
 
-class ClientMQCHTTP:
-    def __init__(self, cfg: MQC, client: httpx.Client | None = None) -> None:
-        self._base = construit_base_url(cfg)
-        self._route = formate_route_pose_question(cfg)
-        self._client = client or httpx.Client()
-        self.delai_attente_maximum = cfg.delai_attente_maximum
-
-    def pose_question(self, question: str) -> ReponseQuestion:
-        try:
-            r = self._client.post(
-                f"{self._base}{self._route}",
-                json={"question": question},
-                timeout=self.delai_attente_maximum,
-            )
-        except httpx.RequestError as e:
-            raise RuntimeError(f"Serveur MQC injoignable: {e}") from e
-        r.raise_for_status()
-        donnees = r.json()
-        return ReponseQuestion(**donnees)
-
-    async def pose_question_async(self, question: str) -> ReponseQuestion:
-        # Pour l'instant, délègue à la version synchrone
-        # TODO: implémenter avec httpx.AsyncClient
-        return self.pose_question(question)
-
-
 class ClientMQCHTTPAsync:
     def __init__(self, cfg: MQC, client: httpx.AsyncClient | None = None) -> None:
         self._base = construit_base_url(cfg)
         self._route = formate_route_pose_question(cfg)
         self._client = client or httpx.AsyncClient()
         self.delai_attente_maximum = cfg.delai_attente_maximum
+
+    def pose_question(self, question: str) -> ReponseQuestion:
+        # Version synchrone utilisant httpx.Client temporaire
+        with httpx.Client() as sync_client:
+            try:
+                r = sync_client.post(
+                    f"{self._base}{self._route}",
+                    json={"question": question},
+                    timeout=self.delai_attente_maximum,
+                )
+            except httpx.RequestError as e:
+                raise RuntimeError(f"Serveur MQC injoignable: {e}") from e
+            r.raise_for_status()
+            donnees = r.json()
+            return ReponseQuestion(**donnees)
 
     async def pose_question_async(self, question: str) -> ReponseQuestion:
         try:
