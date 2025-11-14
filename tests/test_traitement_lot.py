@@ -8,7 +8,9 @@ from remplisseur_reponses import (
     ClientMQCHTTPAsync,
 )
 from configuration import MQC
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
+from main_remplir_csv import traite_csv_par_lots_paralleles
+from pathlib import Path
 
 
 class MockClientQuestions:
@@ -68,3 +70,72 @@ async def test_client_mqc_async_pose_question():
 
     assert isinstance(reponse, ReponseQuestion)
     assert reponse.question == "Test question"
+
+
+@pytest.mark.asyncio
+async def test_main_lot_11_lignes_avec_taille_lot_5_ecrit_11_lignes():
+    mock_lecteur = AsyncMock()
+
+    mock_remplisseur = AsyncMock()
+    mock_remplisseur.remplit_lot_lignes.side_effect = [
+        [
+            {"Réponse Bot": "R1"},
+            {"Réponse Bot": "R2"},
+            {"Réponse Bot": "R3"},
+            {"Réponse Bot": "R4"},
+            {"Réponse Bot": "R5"},
+        ],  # Batch 1
+        [
+            {"Réponse Bot": "R6"},
+            {"Réponse Bot": "R7"},
+            {"Réponse Bot": "R8"},
+            {"Réponse Bot": "R9"},
+            {"Réponse Bot": "R10"},
+        ],  # Batch 2
+        [{"Réponse Bot": "R11"}],
+        [],  # Fin
+    ]
+
+    mock_ecrivain = AsyncMock()
+    mock_ecrivain.ecrit_ligne_depuis_lecteur_csv.return_value = Path("test_output.csv")
+
+    with (
+        patch("main_remplir_csv.LecteurCSV", return_value=mock_lecteur),
+        patch("main_remplir_csv.RemplisseurReponses", return_value=mock_remplisseur),
+        patch("main_remplir_csv.EcrivainSortie", return_value=mock_ecrivain),
+        patch("main_remplir_csv.recupere_configuration"),
+        patch("main_remplir_csv.ClientMQCHTTPAsync"),
+    ):
+        await traite_csv_par_lots_paralleles(
+            Path("test.csv"), "test", Path("sortie"), taille_lot=5
+        )
+
+    assert mock_remplisseur.remplit_lot_lignes.call_count == 4
+    assert mock_ecrivain.ecrit_ligne_depuis_lecteur_csv.call_count == 11
+
+
+@pytest.mark.asyncio
+async def test_main_lot_1_ligne_avec_taille_lot_5_ecrit_1_ligne():
+    mock_lecteur = AsyncMock()
+    mock_remplisseur = AsyncMock()
+    mock_remplisseur.remplit_lot_lignes.side_effect = [
+        [{"Réponse Bot": "R1"}],  # Batch 1
+        [],
+    ]
+
+    mock_ecrivain = AsyncMock()
+    mock_ecrivain.ecrit_ligne_depuis_lecteur_csv.return_value = Path("test_output.csv")
+
+    with (
+        patch("main_remplir_csv.LecteurCSV", return_value=mock_lecteur),
+        patch("main_remplir_csv.RemplisseurReponses", return_value=mock_remplisseur),
+        patch("main_remplir_csv.EcrivainSortie", return_value=mock_ecrivain),
+        patch("main_remplir_csv.recupere_configuration"),
+        patch("main_remplir_csv.ClientMQCHTTPAsync"),
+    ):
+        await traite_csv_par_lots_paralleles(
+            Path("test.csv"), "test", Path("sortie"), taille_lot=5
+        )
+
+    assert mock_remplisseur.remplit_lot_lignes.call_count == 2
+    assert mock_ecrivain.ecrit_ligne_depuis_lecteur_csv.call_count == 1
