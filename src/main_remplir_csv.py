@@ -2,7 +2,7 @@ from pathlib import Path
 from argparse import ArgumentParser
 from configuration import recupere_configuration
 from remplisseur_reponses import (
-    ClientMQCHTTP,
+    ClientMQCHTTPAsync,
     RemplisseurReponses,
     EcrivainSortie,
     HorlogeSysteme,
@@ -24,7 +24,7 @@ def main() -> None:
     args = p.parse_args()
 
     cfg = recupere_configuration().mqc
-    client = ClientMQCHTTP(cfg=cfg)
+    client = ClientMQCHTTPAsync(cfg=cfg)
     remplisseur = RemplisseurReponses(client=client)
 
     lecteur = LecteurCSV(args.csv)
