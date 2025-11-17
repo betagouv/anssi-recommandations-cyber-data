@@ -35,9 +35,7 @@ class Configuration(NamedTuple):
     base_de_donnees_journal: BaseDeDonnees | None
 
 
-def recupere_configuration_postgres(
-    database: str = "postgres",
-) -> BaseDeDonnees | None:
+def recupere_configuration_postgres() -> BaseDeDonnees | None:
     db_host = os.getenv("DB_HOST")
     if db_host is None:
         return None
@@ -46,7 +44,7 @@ def recupere_configuration_postgres(
         port=int(os.getenv("DB_PORT", "5432")),
         utilisateur=os.getenv("DB_USER", "postgres"),
         mot_de_passe=os.getenv("DB_PASSWORD", "postgres"),
-        nom=database,
+        nom=os.getenv("DB_NAME", "postgres"),
     )
 
 

@@ -93,6 +93,11 @@ jobs:
           id_experience=$(uv run python src/main_evalap.py \
             --csv donnees/sortie/${{needs.collecte_reponses.outputs.questions_avec_reponses}} \
             --nom github_actions_$(date +%Y%m%d_%H%M%S) | tail -1)
+          echo "ID d'expérience récupéré: '$id_experience'"
+          if [ -z "$id_experience" ]; then
+            echo "Erreur: ID d'expérience vide"
+            exit 1
+          fi
           echo "id_experience=$id_experience" >> "$GITHUB_OUTPUT"
 
   consigne_evaluation:
@@ -104,19 +109,27 @@ jobs:
     steps:
       - name: Cloner le dépôt Git
         uses: actions/checkout@v4
-
-      - name: Installer Python
-        uses: actions/setup-python@v5
         with:
-          python-version-file: "pyproject.toml"
+          fetch-depth: 0 # Cloner l'intégralité du dépôt, pour ne pas avoir de « shallow repo » rejeté par Clever
 
-      - name: Installer uv
-        uses: astral-sh/setup-uv@v6
+      - name: Installer la CLI Clever Cloud
+        shell: bash
+        run: npm install -g clever-tools
 
-      - name: Installer les dépendances
-        run: uv sync
-
-      - name: Consigne l'évaluation
+      - name: Déployer en DÉMO
+        env:
+          CLEVER_SECRET: ${{ secrets.CLEVER_CLOUD_SECRET }}
+          CLEVER_TOKEN: ${{ secrets.CLEVER_CLOUD_TOKEN }}
+          ID_APP: ${{ secrets.CLEVER_CLOUD_ID_APP }}
+          ID_ORGANISATION: ${{ secrets.CLEVER_CLOUD_ID_ORGANISATION }}
         run: |
-          uv run python src/consignateur_evaluation.py \
-            --id-experience ${{needs.evalue_reponses.outputs.id_experience}}
+          ID_EXP="${{needs.evalue_reponses.outputs.id_experience}}"
+          if [ -z "$ID_EXP" ]; then
+            echo "Erreur: ID d'expérience non défini depuis l'étape précédente"
+            exit 1
+          fi
+          RUN_COMMAND="uv run python src/consignateur_evaluation.py --id-experience $ID_EXP"
+          echo "Commande à exécuter: $RUN_COMMAND"
+          clever link -o="$ID_ORGANISATION" "$ID_APP"
+          clever env set CC_RUN_COMMAND "$RUN_COMMAND"
+          clever deploy --force --same-commit-policy=rebuild
