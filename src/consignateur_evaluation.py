@@ -35,12 +35,20 @@ def consigne_evaluation(
 
 def main() -> None:
     p = ArgumentParser(description="Remplir 'Réponse Bot' depuis 'Question'")
-    p.add_argument("--csv", required=True, type=Path, help="Chemin du CSV d'entrée")
+    groupe = p.add_mutually_exclusive_group(required=True)
+    groupe.add_argument("--csv", type=Path, help="Chemin du fichier CSV d'entrée")
+    groupe.add_argument(
+        "--bytes", type=Path, help="Contenu du fichier binaire d'entrée"
+    )
+
     args = p.parse_args()
-    df_evaluation = pd.read_csv(args.csv)
+    if args.csv:
+        contenu = pd.read_csv(args.csv)
+    else:
+        contenu = args.bytes.read_bytes()
 
     consigne_evaluation(
-        resultats_metriques=df_evaluation,
+        resultats_metriques=contenu,
         adaptateur_journal=fabrique_adaptateur_journal(),
     )
 
