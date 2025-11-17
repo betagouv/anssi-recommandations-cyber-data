@@ -20,10 +20,34 @@ class Albert(NamedTuple):
     cle_api: str
 
 
+class BaseDeDonnees(NamedTuple):
+    hote: str
+    port: int
+    utilisateur: str
+    mot_de_passe: str
+    nom: str
+
+
 class Configuration(NamedTuple):
     mqc: MQC
     evalap: Evalap
     albert: Albert
+    base_de_donnees_journal: BaseDeDonnees | None
+
+
+def recupere_configuration_postgres(
+    database: str = "postgres",
+) -> BaseDeDonnees | None:
+    db_host = os.getenv("DB_HOST")
+    if db_host is None:
+        return None
+    return BaseDeDonnees(
+        hote=os.getenv("DB_HOST", "localhost"),
+        port=int(os.getenv("DB_PORT", "5432")),
+        utilisateur=os.getenv("DB_USER", "postgres"),
+        mot_de_passe=os.getenv("DB_PASSWORD", "postgres"),
+        nom=database,
+    )
 
 
 def recupere_configuration() -> Configuration:
@@ -45,4 +69,11 @@ def recupere_configuration() -> Configuration:
         cle_api=os.getenv("ALBERT_CLE_API", "cle_api"),
     )
 
-    return Configuration(mqc=configuration_mqc, evalap=evalap, albert=albert)
+    base_de_donnees_journal: BaseDeDonnees | None = recupere_configuration_postgres()
+
+    return Configuration(
+        mqc=configuration_mqc,
+        evalap=evalap,
+        albert=albert,
+        base_de_donnees_journal=base_de_donnees_journal,
+    )

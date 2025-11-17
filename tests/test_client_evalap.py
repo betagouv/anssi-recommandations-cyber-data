@@ -1,3 +1,4 @@
+import os
 from unittest.mock import Mock
 from requests import Response
 from evalap import EvalapClient
@@ -5,7 +6,7 @@ from evalap.evalap_dataset_http import (
     DatasetPayload,
     DatasetReponse,
 )
-from configuration import Evalap, Configuration, MQC, Albert
+from configuration import Evalap, Configuration, MQC, Albert, BaseDeDonnees
 from evalap.evalap_experience_http import (
     ExperiencePayload,
     ExperienceReponse,
@@ -38,7 +39,19 @@ def configuration() -> Configuration:
         token_authentification="",
     )
     albert = Albert(url="https://albert.api.etalab.gouv.fr/v1", cle_api="fausse_cle")
-    return Configuration(mqc=configuration_mqc, evalap=evalap, albert=albert)
+    base_de_donnees = BaseDeDonnees(
+        hote=os.getenv("DB_HOST", "localhost"),
+        port=int(os.getenv("DB_PORT", "5432")),
+        utilisateur=os.getenv("DB_USER", "postgres"),
+        mot_de_passe=os.getenv("DB_PASSWORD", "postgres"),
+        nom="database",
+    )
+    return Configuration(
+        mqc=configuration_mqc,
+        evalap=evalap,
+        albert=albert,
+        base_de_donnees_journal=base_de_donnees,
+    )
 
 
 @pytest.fixture
