@@ -1,5 +1,5 @@
 import requests
-from typing import Any, Mapping, Optional
+from typing import Any, Mapping
 from configuration import Configuration
 
 
