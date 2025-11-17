@@ -56,14 +56,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: collecte_reponses
 
+    outputs:
+      id_experience: ${{steps.evaluation_metriques.outputs.id_experience}}
+
     env:
       ALBERT_CLE_API: ${{ secrets.ALBERT_CLE_API }}
       ALBERT_URL: https://albert.api.etalab.gouv.fr/v1
       EVALAP_URL: https://app-1a24ae36-a96f-4f6d-9cf1-f1af734405fc.cleverapps.io/v1
       EVALAP_TOKEN: ${{ secrets.EVALAP_TOKEN }}
-
-    outputs:
-      questions_avec_reponses: ${{steps.collecte_reponses_mqc.outputs.fichier_genere}}
 
     steps:
       - name: Cloner le dépôt Git
@@ -90,13 +90,33 @@ jobs:
       - name: Adapte le fichier des réponses et le soumet à Evalap
         id: evaluation_metriques
         run: |
-          uv run python src/main_evalap.py \
+          id_experience=$(uv run python src/main_evalap.py \
             --csv donnees/sortie/${{needs.collecte_reponses.outputs.questions_avec_reponses}} \
-            --nom github_actions_$(date +%Y%m%d_%H%M%S)
-          echo "fichier_genere=$(ls donnees/resultats_evaluations | tail -1)" >> "$GITHUB_OUTPUT"
+            --nom github_actions_$(date +%Y%m%d_%H%M%S) | tail -1)
+          echo "id_experience=$id_experience" >> "$GITHUB_OUTPUT"
 
-      - name: Upload des résultats d'évaluation
-        uses: actions/upload-artifact@v4
+  consigne_evaluation:
+    name: Consigne l'évaluation
+    environment: DEMO
+    runs-on: ubuntu-latest
+    needs: evalue_reponses
+
+    steps:
+      - name: Cloner le dépôt Git
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
         with:
-          name: resultats_evaluation
-          path: donnees/resultats_evaluations/${{steps.evaluation_metriques.outputs.fichier_genere}}
+          python-version-file: "pyproject.toml"
+
+      - name: Installer uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Installer les dépendances
+        run: uv sync
+
+      - name: Consigne l'évaluation
+        run: |
+          uv run python src/consignateur_evaluation.py \
+            --id-experience ${{needs.evalue_reponses.outputs.id_experience}}

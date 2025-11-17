@@ -224,6 +224,11 @@ def main():
 
     formateur_de_resultats = FormateurResultatsExperiences(client.experience)
     sauvegarde_resultats(formateur_de_resultats, experience_id_cree)
+    persiste_id_experience_dans_la_github_action(experience_id_cree)
+
+
+def persiste_id_experience_dans_la_github_action(experience_id_cree: int) -> None:
+    print(experience_id_cree)
 
 
 if __name__ == "__main__":
