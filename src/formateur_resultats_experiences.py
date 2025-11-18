@@ -22,34 +22,21 @@ class FormateurResultatsExperiences:
             metrique.metric_status != "running" for metrique in experience.results
         )
 
-    def surveille_experience_flux(
+    def verifie_experience_terminee(
         self, experiment_id: int, delai_attente: float = 10.0, timeout_max: int = 1000
-    ) -> GenerateurMetriques:
+    ) -> bool:
         temps_ecoule = 0.0
-        metriques_terminees = set()
 
         while temps_ecoule < timeout_max:
             experience = self.client_experience.lit(experiment_id)
 
             if experience is None:
                 logging.error(f"Impossible de récupérer l'expérience {experiment_id}")
-                return
-
-            for metrique in experience.results:
-                if (
-                    metrique.metric_status != "running"
-                    and metrique.metric_name not in metriques_terminees
-                ):
-                    metriques_terminees.add(metrique.metric_name)
-                    observations = [
-                        {"numero_ligne": obs.num_line, "score": obs.score}
-                        for obs in metrique.observation_table
-                    ]
-                    yield metrique.metric_name, observations
+                return False
 
             if self._experience_terminee(experience):
                 logging.info(f"Expérience {experiment_id} terminée")
-                return
+                return True
 
             logging.info(
                 f"Expérience {experiment_id} en cours, attente {delai_attente}s..."
@@ -58,6 +45,7 @@ class FormateurResultatsExperiences:
             temps_ecoule += delai_attente
 
         logging.warning(f"Timeout atteint pour l'expérience {experiment_id}")
+        return False
 
     @staticmethod
     def _ligne_depuis_observation_avec_contexte(args) -> dict:

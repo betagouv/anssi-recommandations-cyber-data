@@ -1,18 +1,18 @@
 import ast
-import pandas as pd
-from pathlib import Path
+import logging
 from argparse import ArgumentParser
+from pathlib import Path
+from typing import Optional
+
+import pandas as pd
+import requests
+
+from configuration import recupere_configuration, Configuration
+from evalap import EvalapClient
 from evalap.evalap_dataset_http import DatasetPayload, DatasetReponse
 from evalap.evalap_experience_http import ExperiencePayload
-from evalap import EvalapClient
-from configuration import recupere_configuration, Configuration
-from metriques import Metriques
 from formateur_resultats_experiences import FormateurResultatsExperiences
-from remplisseur_reponses import EcrivainResultatsFlux
-import requests
-import logging
-from typing import Optional
-from formateur_resultats_experiences import GenerateurMetriques
+from metriques import Metriques
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -117,22 +117,6 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
     return df.rename(columns=columns_map)
 
-
-def sauvegarde_resultats(
-    formateur_de_resultats: FormateurResultatsExperiences, experience_id: int
-) -> None:
-    dossier_sortie = Path("./donnees/resultats_evaluations")
-    dossier_sortie.mkdir(parents=True, exist_ok=True)
-
-    ecrivain = EcrivainResultatsFlux(dossier_sortie, "resultats_experience")
-    generateur_resultats: GenerateurMetriques = (
-        formateur_de_resultats.surveille_experience_flux(experience_id)
-    )
-
-    chemin_fichier = ecrivain.ecrit_resultats_flux(generateur_resultats, experience_id)
-    logging.info(f"Résultats sauvegardés dans: {chemin_fichier}")
-
-
 def ajoute_dataset(
     client: EvalapClient, nom: str, df_mapped: pd.DataFrame
 ) -> Optional[DatasetReponse]:
@@ -223,7 +207,7 @@ def main():
     logging.info(f"Expérience affichée: {experience_listee} ")
 
     formateur_de_resultats = FormateurResultatsExperiences(client.experience)
-    sauvegarde_resultats(formateur_de_resultats, experience_id_cree)
+    formateur_de_resultats.verifie_experience_terminee(experience_id_cree)
     persiste_id_experience_dans_la_github_action(experience_id_cree)
 
 
