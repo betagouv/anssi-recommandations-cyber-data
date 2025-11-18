@@ -152,34 +152,6 @@ def test_convertit_en_dataframe_structure_correcte(
     assert df.iloc[0]["score"] == 0.8
     assert df.iloc[1]["score"] == 0.9
 
-
-def test_surveille_experience_flux_retourne_metriques_terminees_une_par_une(
-    client_experience_mock, experience_terminee
-):
-    experience_partielle = experience_terminee._replace(
-        results=[
-            experience_terminee.results[0],
-            experience_terminee.results[1]._replace(metric_status="running"),
-        ]
-    )
-
-    client_experience_mock.lit.side_effect = [experience_partielle, experience_terminee]
-
-    formateur = FormateurResultatsExperiences(client_experience_mock)
-
-    generateur_de_resultats = formateur.surveille_experience_flux(
-        42, delai_attente=0.01, timeout_max=1
-    )
-
-    premier_resultat = next(generateur_de_resultats)
-    assert premier_resultat[0] == "judge_precision"
-    assert len(premier_resultat[1]) == 2
-
-    deuxieme_resultat = next(generateur_de_resultats)
-    assert deuxieme_resultat[0] == "hallucination"
-    assert len(deuxieme_resultat[1]) == 2
-
-
 def test_surveille_experience_flux_gere_timeout(client_experience_mock):
     experience_en_cours = ExperienceAvecResultats(
         id=42,
@@ -214,11 +186,9 @@ def test_surveille_experience_flux_gere_timeout(client_experience_mock):
     client_experience_mock.lit.return_value = experience_en_cours
     formateur = FormateurResultatsExperiences(client_experience_mock)
 
-    resultats = list(
-        formateur.surveille_experience_flux(42, delai_attente=0.01, timeout_max=0.05)
-    )
+    resultats = formateur.verifie_experience_terminee(42, delai_attente=0.01, timeout_max=0.05)
 
-    assert len(resultats) == 0
+    assert resultats == False
 
 
 @pytest.mark.parametrize(
