@@ -1,15 +1,13 @@
+from unittest.mock import Mock
+
 import pytest
-from unittest.mock import Mock, patch
-import pandas as pd
-from formateur_resultats_experiences import (
-    FormateurResultatsExperiences,
-)
-from remplisseur_reponses import EcrivainResultatsFlux
+
 from evalap.evalap_experience_http import (
     ExperienceAvecResultats,
     MetriqueResultat,
     ObservationResultat,
 )
+from verificateur_experience_terminee import VerificateurExperienceTerminee
 
 
 @pytest.fixture
@@ -101,7 +99,7 @@ def experience_terminee():
 def test_experience_terminee_retourne_vrai_si_toutes_metriques_finies(
     client_experience_mock, experience_terminee
 ):
-    formateur = FormateurResultatsExperiences(client_experience_mock)
+    formateur = VerificateurExperienceTerminee(client_experience_mock)
 
     assert formateur._experience_terminee(experience_terminee) is True
 
@@ -113,7 +111,7 @@ def test_experience_terminee_retourne_faux_si_au_moins_une_metrique_en_cours(
         results=[experience_terminee.results[0]._replace(metric_status="running")]
     )
 
-    formateur = FormateurResultatsExperiences(client_experience_mock)
+    formateur = VerificateurExperienceTerminee(client_experience_mock)
 
     assert formateur._experience_terminee(experience_en_cours) is False
 
@@ -127,30 +125,9 @@ def test_experience_terminee_retourne_faux_si_deux_metriques_en_cours(
     ]
     experience_en_cours = experience_terminee._replace(results=results_en_cours)
 
-    formateur = FormateurResultatsExperiences(client_experience_mock)
+    formateur = VerificateurExperienceTerminee(client_experience_mock)
 
     assert formateur._experience_terminee(experience_en_cours) is False
-
-
-def test_convertit_en_dataframe_structure_correcte(
-    client_experience_mock, experience_terminee
-):
-    formateur = FormateurResultatsExperiences(client_experience_mock)
-
-    df = formateur.convertit_en_dataframe(experience_terminee)
-
-    assert len(df) == 4
-    assert list(df.columns) == [
-        "experiment_id",
-        "experiment_name",
-        "metric_name",
-        "metric_status",
-        "numero_ligne",
-        "score",
-        "observation",
-    ]
-    assert df.iloc[0]["score"] == 0.8
-    assert df.iloc[1]["score"] == 0.9
 
 def test_surveille_experience_flux_gere_timeout(client_experience_mock):
     experience_en_cours = ExperienceAvecResultats(
@@ -184,38 +161,8 @@ def test_surveille_experience_flux_gere_timeout(client_experience_mock):
     )
 
     client_experience_mock.lit.return_value = experience_en_cours
-    formateur = FormateurResultatsExperiences(client_experience_mock)
+    formateur = VerificateurExperienceTerminee(client_experience_mock)
 
-    resultats = formateur.verifie_experience_terminee(42, delai_attente=0.01, timeout_max=0.05)
+    resultats = formateur.verifie(42, delai_attente=0.01, timeout_max=0.05)
 
-    assert resultats == False
-
-
-@pytest.mark.parametrize(
-    "fichier_existant,mock_read_csv_config",
-    [
-        (False, FileNotFoundError()),
-        (True, pd.DataFrame({"judge_precision": [0.8, 0.9]}, index=[0, 1])),
-    ],
-)
-def test_ecrivain_resultats_flux_sauvegarde_toujours(
-    fichier_existant, mock_read_csv_config
-):
-    def generateur_resultats():
-        yield (
-            "judge_precision",
-            [{"numero_ligne": 0, "score": 0.8}, {"numero_ligne": 1, "score": 0.9}],
-        )
-
-    ecrivain = EcrivainResultatsFlux("/fake/path", "test_experience")
-
-    with patch("pandas.DataFrame.to_csv") as mock_to_csv:
-        with patch("pandas.read_csv") as mock_read_csv:
-            if fichier_existant:
-                mock_read_csv.return_value = mock_read_csv_config
-            else:
-                mock_read_csv.side_effect = mock_read_csv_config
-
-            ecrivain.ecrit_resultats_flux(generateur_resultats(), 123)
-
-            mock_to_csv.assert_called_once()
+    assert not resultats

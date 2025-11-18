@@ -3,19 +3,16 @@ import logging
 from argparse import ArgumentParser
 from pathlib import Path
 from typing import Optional
-
 import pandas as pd
 import requests
-
 from configuration import recupere_configuration, Configuration
 from evalap import EvalapClient
 from evalap.evalap_dataset_http import DatasetPayload, DatasetReponse
 from evalap.evalap_experience_http import ExperiencePayload
-from formateur_resultats_experiences import FormateurResultatsExperiences
 from metriques import Metriques
+from verificateur_experience_terminee import VerificateurExperienceTerminee
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-
 
 def applique_mapping_noms_documents(
     df: pd.DataFrame, chemin_mapping: Path
@@ -206,8 +203,8 @@ def main():
     experience_listee = client.experience.lit(experience_id_cree)
     logging.info(f"Expérience affichée: {experience_listee} ")
 
-    formateur_de_resultats = FormateurResultatsExperiences(client.experience)
-    formateur_de_resultats.verifie_experience_terminee(experience_id_cree)
+    verificateur = VerificateurExperienceTerminee(client.experience)
+    verificateur.verifie(experience_id_cree)
     persiste_id_experience_dans_la_github_action(experience_id_cree)
 
 
