@@ -1,6 +1,8 @@
 from typing import Union
 import logging
-from evalap import EvalapExperienceHttp
+import requests
+from configuration import recupere_configuration
+from evalap import EvalapExperienceHttp, EvalapClient
 
 
 class Experience:
@@ -59,3 +61,11 @@ class EntrepotExperienceHttp(EntrepotExperience):
             id_experimentation=id_experience,
             metriques=list(metriques_collectees.values()),
         )
+
+
+def fabrique_entrepot_experience() -> EntrepotExperience:
+    configuration = recupere_configuration()
+    session = requests.session()
+    return EntrepotExperienceHttp(
+        client_experience=EvalapClient(configuration, session=session).experience
+    )

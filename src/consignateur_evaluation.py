@@ -1,3 +1,4 @@
+import logging
 from argparse import ArgumentParser
 
 from adaptateurs.journal import (
@@ -6,7 +7,7 @@ from adaptateurs.journal import (
     TypeEvenement,
     fabrique_adaptateur_journal,
 )
-from journalisation.experience import EntrepotExperience
+from journalisation.experience import EntrepotExperience, fabrique_entrepot_experience
 
 
 def consigne_evaluation(
@@ -40,11 +41,23 @@ def main() -> None:
     args = p.parse_args()
     id_experience = args.id_experience
 
-    consigne_evaluation(
-        id_experience=id_experience,
-        entrepot_experience=EntrepotExperience(),
-        adaptateur_journal=fabrique_adaptateur_journal(),
-    )
+    logging.info(f"Début de la consignation pour l'expérience {id_experience}")
+
+    try:
+        consigne_evaluation(
+            id_experience=id_experience,
+            entrepot_experience=fabrique_entrepot_experience(),
+            adaptateur_journal=fabrique_adaptateur_journal(),
+        )
+        logging.info(
+            f"Consignation terminée avec succès pour l'expérience {id_experience}"
+        )
+    except Exception as e:
+        logging.info(f"Erreur lors de la consignation: {e}")
+        raise
+
+    logging.info("Script terminé - arrêt normal")
+    exit(0)
 
 
 if __name__ == "__main__":
