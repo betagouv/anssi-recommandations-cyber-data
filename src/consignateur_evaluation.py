@@ -13,7 +13,7 @@ def consigne_evaluation(
     id_experience: int,
     entrepot_experience: EntrepotExperience,
     adaptateur_journal: AdaptateurJournal,
-):
+) -> None:
     resultat_evaluation = entrepot_experience.lit(id_experience)
 
     if resultat_evaluation is not None:

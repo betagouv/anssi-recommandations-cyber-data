@@ -11,18 +11,18 @@ class Experience:
 
 
 class EntrepotExperience:
-    def lit(self, id_experience) -> Union[Experience, None]:
+    def lit(self, id_experience: int) -> Union[Experience, None]:
         pass
 
 
 class EntrepotExperienceMemoire(EntrepotExperience):
     experiences: list[Experience] = []
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.experiences: list[Experience] = []
 
-    def persiste(self, experience: Experience):
+    def persiste(self, experience: Experience) -> None:
         self.experiences.append(experience)
 
     def lit(self, id_experience) -> Experience | None:
