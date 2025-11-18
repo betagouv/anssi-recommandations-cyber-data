@@ -7,7 +7,7 @@ from evalap.evalap_experience_http import (
     MetriqueResultat,
     ObservationResultat,
 )
-from verificateur_experience_terminee import VerificateurExperienceTerminee
+from verificateur_experience_terminee import VerificateurExperienceTerminee, ExperienceInconnue
 
 
 @pytest.fixture
@@ -96,40 +96,15 @@ def experience_terminee():
     )
 
 
-def test_experience_terminee_retourne_vrai_si_toutes_metriques_finies(
+def test_verifie_que_toutes_les_metriques_sont_finies(
     client_experience_mock, experience_terminee
 ):
-    formateur = VerificateurExperienceTerminee(client_experience_mock)
+    client_experience_mock.lit.return_value = experience_terminee
+    verificateur = VerificateurExperienceTerminee(client_experience_mock)
 
-    assert formateur._experience_terminee(experience_terminee) is True
+    assert verificateur.verifie(experience_terminee.id) is None
 
-
-def test_experience_terminee_retourne_faux_si_au_moins_une_metrique_en_cours(
-    client_experience_mock, experience_terminee
-):
-    experience_en_cours = experience_terminee._replace(
-        results=[experience_terminee.results[0]._replace(metric_status="running")]
-    )
-
-    formateur = VerificateurExperienceTerminee(client_experience_mock)
-
-    assert formateur._experience_terminee(experience_en_cours) is False
-
-
-def test_experience_terminee_retourne_faux_si_deux_metriques_en_cours(
-    client_experience_mock, experience_terminee
-):
-    results_en_cours = [
-        experience_terminee.results[0]._replace(metric_status="running"),
-        experience_terminee.results[1]._replace(metric_status="running"),
-    ]
-    experience_en_cours = experience_terminee._replace(results=results_en_cours)
-
-    formateur = VerificateurExperienceTerminee(client_experience_mock)
-
-    assert formateur._experience_terminee(experience_en_cours) is False
-
-def test_surveille_experience_flux_gere_timeout(client_experience_mock):
+def test_verificateur_leve_une_erreur_en_cas_de_timeout(client_experience_mock):
     experience_en_cours = ExperienceAvecResultats(
         id=42,
         name="Test",
@@ -161,8 +136,18 @@ def test_surveille_experience_flux_gere_timeout(client_experience_mock):
     )
 
     client_experience_mock.lit.return_value = experience_en_cours
-    formateur = VerificateurExperienceTerminee(client_experience_mock)
+    verificateur = VerificateurExperienceTerminee(client_experience_mock)
 
-    resultats = formateur.verifie(42, delai_attente=0.01, timeout_max=0.05)
+    with pytest.raises(TimeoutError):
+        verificateur.verifie(42, delai_attente=0.01, timeout_max=0.05)
 
-    assert not resultats
+    assert client_experience_mock.lit.call_count == 5
+
+def test_verificateur_leve_une_erreur_si_experience_inconnue(
+    client_experience_mock
+):
+    client_experience_mock.lit.return_value = None
+    verificateur = VerificateurExperienceTerminee(client_experience_mock)
+
+    with pytest.raises(ExperienceInconnue):
+        verificateur.verifie(42, delai_attente=0.01, timeout_max=0.05)
