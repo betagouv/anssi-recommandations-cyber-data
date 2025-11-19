@@ -9,8 +9,8 @@ from evalap.evalap_experience_http import (
 ResultatMetrique = list[Dict[str, Union[int, float, None]]]
 GenerateurMetriques = Iterator[Tuple[str, ResultatMetrique]]
 
-class ExperienceInconnue(Exception):
 
+class ExperienceInconnue(Exception):
     def __init__(self, *args):
         super().__init__(*args)
 

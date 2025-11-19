@@ -13,26 +13,28 @@ def test_peut_lire_une_experience(
     session = Mock()
 
     donnees_json: dict = DONNEES_JSON
-    donnees_json["results"].append({
-        "created_at": "2025-10-09T14:48:35.428847",
-        "experiment_id": 42,
-        "id": 125,
-        "metric_name": "autre_metrique",
-        "metric_status": "running",
-        "num_success": 0,
-        "num_try": 0,
-        "observation_table": [
-            {
-                "id": 1002,
-                "created_at": "2025-10-09T14:48:35.428847",
-                "score": 0.4,
-                "observation": "test",
-                "num_line": 0,
-                "error_msg": None,
-                "execution_time": 5,
-            }
-        ],
-    },)
+    donnees_json["results"].append(
+        {
+            "created_at": "2025-10-09T14:48:35.428847",
+            "experiment_id": 42,
+            "id": 125,
+            "metric_name": "autre_metrique",
+            "metric_status": "running",
+            "num_success": 0,
+            "num_try": 0,
+            "observation_table": [
+                {
+                    "id": 1002,
+                    "created_at": "2025-10-09T14:48:35.428847",
+                    "score": 0.4,
+                    "observation": "test",
+                    "num_line": 0,
+                    "error_msg": None,
+                    "execution_time": 5,
+                }
+            ],
+        },
+    )
 
     reponse_mockee = Mock(spec=Response)
     reponse_mockee.status_code = 200

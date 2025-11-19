@@ -14,6 +14,7 @@ from verificateur_experience_terminee import VerificateurExperienceTerminee
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
+
 def applique_mapping_noms_documents(
     df: pd.DataFrame, chemin_mapping: Path
 ) -> pd.DataFrame:
@@ -113,6 +114,7 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     }
 
     return df.rename(columns=columns_map)
+
 
 def ajoute_dataset(
     client: EvalapClient, nom: str, df_mapped: pd.DataFrame
