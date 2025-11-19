@@ -12,9 +12,7 @@ flowchart LR
     DataSrc["donnees/QA-labelisé-Question_par_guide.csv"]
     Lecteur[LecteurCSV]
     Remplisseur[RemplisseurReponses]
-    Ecrivain[EcrivainSortie]
     ClientMQC[ClientMQCHTTP]
-    Sortie["donnees/sortie/&lt;prefixe&gt;_&lt;horodatage&gt;.csv"]
   end
 
   %% === Système externe (mise en évidence) ===
@@ -32,8 +30,6 @@ flowchart LR
   MQC -->|réponse JSON| ClientMQC
   ClientMQC -->|renvoie texte| Remplisseur
 
-  Lecteur -->|DataFrame| Ecrivain
-  Ecrivain -->|écrit CSV horodaté| Sortie
 
   style Externe fill:#fff3cd,stroke:#f0ad4e,stroke-width:2.5px,color:#333
 ```
