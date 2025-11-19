@@ -8,7 +8,6 @@ dependencies = [
     "pandas",
     "pydantic",
     "pytest",
-    "pytest-asyncio",
     "requests",
     "respx"
 ]
@@ -18,6 +17,7 @@ dev = [
     "mypy",
     "pandas-stubs",
     "psycopg2-binary",
+    "pytest-asyncio",
     "ruff",
     "types-psycopg2",
     "types-requests",

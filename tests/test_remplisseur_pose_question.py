@@ -76,7 +76,7 @@ def test_pose_question_retourne_reponse_question_structuree(configuration: MQC):
     )
 
     client = ClientMQCHTTPAsync(cfg=configuration)
-    resultat = asyncio.run(client.pose_question_async("Ma question?"))
+    resultat = asyncio.run(client.pose_question("Ma question?"))
 
     assert resultat.reponse == "Voici la réponse"
     assert resultat.question == "Ma question?"
@@ -419,7 +419,7 @@ def test_pose_question_declenche_exception_si_serveur_injoignable(configuration)
             side_effect=httpx.ConnectError("connexion refusée")
         )
         with pytest.raises(RuntimeError) as exc:
-            asyncio.run(client.pose_question_async("Test ?"))
+            asyncio.run(client.pose_question("Test ?"))
 
     assert "Serveur MQC injoignable" in str(exc.value)
 
@@ -516,11 +516,14 @@ def test_remplit_ligne_ecrit_bien_le_contexte(tmp_path: Path, configuration: MQC
 
 
 @respx.mock
-def test_remplit_ligne_avec_lecteur_traite_lignes_sequentiellement(
+@pytest.mark.asyncio
+async def test_remplit_ligne_avec_lecteur_traite_lignes_sequentiellement(
     tmp_path: Path, configuration: MQC
 ):
     fichier = tmp_path / "test.csv"
-    fichier.write_text("Question type\nQ1?\nQ2?\n", encoding="utf-8")
+    fichier.write_text(
+        "Question type\nQ1?\nQ2?\nQ3?\nQ4?\nQ5?\nQ6?\nQ7?", encoding="utf-8"
+    )
 
     base = construit_base_url(configuration)
     chemin = formate_route_pose_question(configuration)
@@ -534,14 +537,31 @@ def test_remplit_ligne_avec_lecteur_traite_lignes_sequentiellement(
 
     lecteur = LecteurCSV(fichier)
 
-    ligne1_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
-    ligne2_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
+    ligne1_enrichie = await remplisseur.remplit_lot_lignes(lecteur, 5)
+    ligne2_enrichie = await remplisseur.remplit_lot_lignes(lecteur, 2)
 
-    assert ligne1_enrichie["Question type"] == "Q1?"
-    assert ligne1_enrichie["Réponse Bot"] == "reponse_test"
-
-    assert ligne2_enrichie["Question type"] == "Q2?"
-    assert ligne2_enrichie["Réponse Bot"] == "reponse_test"
+    assert [ligne["Question type"] for ligne in ligne1_enrichie] == [
+        "Q1?",
+        "Q2?",
+        "Q3?",
+        "Q4?",
+        "Q5?",
+    ]
+    assert [ligne["Question type"] for ligne in ligne2_enrichie] == [
+        "Q6?",
+        "Q7?",
+    ]
+    assert [ligne["Réponse Bot"] for ligne in ligne1_enrichie] == [
+        "reponse_test",
+        "reponse_test",
+        "reponse_test",
+        "reponse_test",
+        "reponse_test",
+    ]
+    assert [ligne["Réponse Bot"] for ligne in ligne2_enrichie] == [
+        "reponse_test",
+        "reponse_test",
+    ]
 
 
 @respx.mock
