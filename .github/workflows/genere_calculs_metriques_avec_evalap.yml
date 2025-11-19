@@ -3,7 +3,7 @@ permissions: {}
 
 on:
   push:
-    branches: [main, interroge-MQC-parralele]
+    branches: [main]
 
 jobs:
   collecte_reponses:
@@ -93,7 +93,8 @@ jobs:
         run: |
           id_experience=$(uv run python src/main_evalap.py \
             --csv donnees/sortie/${{needs.collecte_reponses.outputs.questions_avec_reponses}} \
-            --nom github_actions_$(date +%Y%m%d_%H%M%S) | tail -1)
+            --nom github_actions_$(date +%Y%m%d_%H%M%S) \
+            --delai-limite 100000 | tail -1)
           echo "ID d'expérience récupéré: '$id_experience'"
           if [ -z "$id_experience" ]; then
             echo "Erreur: ID d'expérience vide"

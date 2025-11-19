@@ -181,6 +181,12 @@ def main():
     p = ArgumentParser(description="Remplir 'Réponse Bot' depuis 'Question'")
     p.add_argument("--csv", required=True, type=Path, help="Chemin du CSV d'entrée")
     p.add_argument("--nom", required=True, type=str, help="Nom du dataset")
+    p.add_argument(
+        "--delai-limite",
+        type=int,
+        default=300,
+        help="Délai limite en secondes pour la vérification",
+    )
     args = p.parse_args()
 
     if not args.csv.exists():
@@ -206,7 +212,7 @@ def main():
     logging.info(f"Expérience affichée: {experience_listee} ")
 
     verificateur = VerificateurExperienceTerminee(client.experience)
-    verificateur.verifie(experience_id_cree)
+    verificateur.verifie(experience_id_cree, timeout_max=args.delai_limite)
     persiste_id_experience_dans_la_github_action(experience_id_cree)
 
 
