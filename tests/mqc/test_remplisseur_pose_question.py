@@ -5,12 +5,10 @@ import respx
 import pytest
 
 from lecteur_csv import LecteurCSV
-from configuration import recupere_configuration, MQC
-from remplisseur_reponses import (
+from configuration import MQC
+from mqc.remplisseur_reponses import (
     RemplisseurReponses,
-    EcrivainSortie,
     ClientMQCHTTPAsync,
-    HorlogeSysteme,
     construit_base_url,
     formate_route_pose_question,
 )
@@ -22,26 +20,21 @@ def cree_reponse_mock(reponse: str, question: str) -> httpx.Response:
     )
 
 
-@pytest.fixture()
-def configuration() -> MQC:
-    return recupere_configuration().mqc
-
-
 @respx.mock
 def test_remplissage_appelle_api_pour_chaque_question(
-    tmp_path: Path, configuration: MQC
+    tmp_path: Path, configuration_mqc: MQC
 ):
     fichier = tmp_path / "eval.csv"
     fichier.write_text("Question type\nQ1?\nQ2?\n", encoding="utf-8")
 
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
+    base = construit_base_url(configuration_mqc)
+    chemin = formate_route_pose_question(configuration_mqc)
 
     route = respx.post(f"{base}{chemin}").mock(
         return_value=cree_reponse_mock("X", "Q1?")
     )
 
-    client = ClientMQCHTTPAsync(cfg=configuration)
+    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
 
     lecteur = LecteurCSV(fichier)
@@ -53,9 +46,9 @@ def test_remplissage_appelle_api_pour_chaque_question(
 
 
 @respx.mock
-def test_pose_question_retourne_reponse_question_structuree(configuration: MQC):
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
+def test_pose_question_retourne_reponse_question_structuree(configuration_mqc: MQC):
+    base = construit_base_url(configuration_mqc)
+    chemin = formate_route_pose_question(configuration_mqc)
 
     reponse_json = {
         "reponse": "Voici la réponse",
@@ -75,7 +68,7 @@ def test_pose_question_retourne_reponse_question_structuree(configuration: MQC):
         return_value=httpx.Response(200, json=reponse_json)
     )
 
-    client = ClientMQCHTTPAsync(cfg=configuration)
+    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     resultat = asyncio.run(client.pose_question("Ma question?"))
 
     assert resultat.reponse == "Voici la réponse"
@@ -86,16 +79,18 @@ def test_pose_question_retourne_reponse_question_structuree(configuration: MQC):
 
 
 @respx.mock
-def test_remplissage_insere_reponses_dans_colonne(tmp_path: Path, configuration: MQC):
+def test_remplissage_insere_reponses_dans_colonne(
+    tmp_path: Path, configuration_mqc: MQC
+):
     fichier = tmp_path / "eval.csv"
     fichier.write_text("Question type\nQ1?\nQ2?\n", encoding="utf-8")
 
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
+    base = construit_base_url(configuration_mqc)
+    chemin = formate_route_pose_question(configuration_mqc)
 
     respx.post(f"{base}{chemin}").mock(return_value=cree_reponse_mock("mocked", "Q1?"))
 
-    client = ClientMQCHTTPAsync(cfg=configuration)
+    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
 
     lecteur = LecteurCSV(fichier)
@@ -111,13 +106,13 @@ def test_remplissage_insere_reponses_dans_colonne(tmp_path: Path, configuration:
 
 @respx.mock
 def test_remplissage_ajoute_colonne_context_avec_paragraphes(
-    tmp_path: Path, configuration: MQC
+    tmp_path: Path, configuration_mqc: MQC
 ):
     fichier = tmp_path / "eval.csv"
     fichier.write_text("Question type\nQ1?\n", encoding="utf-8")
 
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
+    base = construit_base_url(configuration_mqc)
+    chemin = formate_route_pose_question(configuration_mqc)
 
     reponse_avec_paragraphes = {
         "reponse": "Réponse test",
@@ -137,7 +132,7 @@ def test_remplissage_ajoute_colonne_context_avec_paragraphes(
         return_value=httpx.Response(200, json=reponse_avec_paragraphes)
     )
 
-    client = ClientMQCHTTPAsync(cfg=configuration)
+    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
 
     lecteur = LecteurCSV(fichier)
@@ -149,13 +144,13 @@ def test_remplissage_ajoute_colonne_context_avec_paragraphes(
 
 @respx.mock
 def test_remplissage_ajoute_colonne_context_avec_deux_paragraphes_separes_par_marqueur(
-    tmp_path: Path, configuration: MQC
+    tmp_path: Path, configuration_mqc: MQC
 ):
     fichier = tmp_path / "eval.csv"
     fichier.write_text("Question type\nQ1?\n", encoding="utf-8")
 
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
+    base = construit_base_url(configuration_mqc)
+    chemin = formate_route_pose_question(configuration_mqc)
 
     reponse_avec_paragraphes_multiples = {
         "reponse": "Réponse test",
@@ -182,7 +177,7 @@ def test_remplissage_ajoute_colonne_context_avec_deux_paragraphes_separes_par_ma
         return_value=httpx.Response(200, json=reponse_avec_paragraphes_multiples)
     )
 
-    client = ClientMQCHTTPAsync(cfg=configuration)
+    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
 
     lecteur = LecteurCSV(fichier)
@@ -196,13 +191,13 @@ def test_remplissage_ajoute_colonne_context_avec_deux_paragraphes_separes_par_ma
 
 @respx.mock
 def test_remplissage_ajoute_colonne_contenant_nom_document_qui_liste_origine_des_paragraphes(
-    tmp_path: Path, configuration: MQC
+    tmp_path: Path, configuration_mqc: MQC
 ):
     fichier = tmp_path / "eval.csv"
     fichier.write_text("Question type\nQ1?\n", encoding="utf-8")
 
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
+    base = construit_base_url(configuration_mqc)
+    chemin = formate_route_pose_question(configuration_mqc)
 
     reponse_avec_paragraphes_multiples = {
         "reponse": "Réponse test",
@@ -229,7 +224,7 @@ def test_remplissage_ajoute_colonne_contenant_nom_document_qui_liste_origine_des
         return_value=httpx.Response(200, json=reponse_avec_paragraphes_multiples)
     )
 
-    client = ClientMQCHTTPAsync(cfg=configuration)
+    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
     lecteur = LecteurCSV(fichier)
     ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
@@ -243,17 +238,17 @@ def test_remplissage_ajoute_colonne_contenant_nom_document_qui_liste_origine_des
 
 @respx.mock
 def test_remplissage_ajoute_colonne_nom_document_liste_vide_si_aucun_paragraphe(
-    tmp_path: Path, configuration: MQC
+    tmp_path: Path, configuration_mqc: MQC
 ):
     fichier = tmp_path / "eval.csv"
     fichier.write_text("Question type\nQ1?\n", encoding="utf-8")
 
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
+    base = construit_base_url(configuration_mqc)
+    chemin = formate_route_pose_question(configuration_mqc)
 
     respx.post(f"{base}{chemin}").mock(return_value=cree_reponse_mock("Réponse", "Q1?"))
 
-    client = ClientMQCHTTPAsync(cfg=configuration)
+    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
     lecteur = LecteurCSV(fichier)
     ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
@@ -264,13 +259,13 @@ def test_remplissage_ajoute_colonne_nom_document_liste_vide_si_aucun_paragraphe(
 
 @respx.mock
 def test_remplissage_ajoute_colonne_numeros_page_de_tous_les_paragraphes(
-    tmp_path: Path, configuration: MQC
+    tmp_path: Path, configuration_mqc: MQC
 ):
     fichier = tmp_path / "eval.csv"
     fichier.write_text("Question type\nQ1?\n", encoding="utf-8")
 
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
+    base = construit_base_url(configuration_mqc)
+    chemin = formate_route_pose_question(configuration_mqc)
 
     reponse_avec_paragraphes_multiples = {
         "reponse": "Réponse test",
@@ -297,7 +292,7 @@ def test_remplissage_ajoute_colonne_numeros_page_de_tous_les_paragraphes(
         return_value=httpx.Response(200, json=reponse_avec_paragraphes_multiples)
     )
 
-    client = ClientMQCHTTPAsync(cfg=configuration)
+    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
     lecteur = LecteurCSV(fichier)
     ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
@@ -308,17 +303,17 @@ def test_remplissage_ajoute_colonne_numeros_page_de_tous_les_paragraphes(
 
 @respx.mock
 def test_remplissage_ajoute_colonne_numeros_page_retourne_liste_vide_si_aucun_paragraphe(
-    tmp_path: Path, configuration: MQC
+    tmp_path: Path, configuration_mqc: MQC
 ):
     fichier = tmp_path / "eval.csv"
     fichier.write_text("Question type\nQ1?\n", encoding="utf-8")
 
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
+    base = construit_base_url(configuration_mqc)
+    chemin = formate_route_pose_question(configuration_mqc)
 
     respx.post(f"{base}{chemin}").mock(return_value=cree_reponse_mock("Réponse", "Q1?"))
 
-    client = ClientMQCHTTPAsync(cfg=configuration)
+    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
     lecteur = LecteurCSV(fichier)
     ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
@@ -327,92 +322,8 @@ def test_remplissage_ajoute_colonne_numeros_page_retourne_liste_vide_si_aucun_pa
     assert ligne_enrichie["Numéros Page"] == []
 
 
-@respx.mock
-def test_ecriture_cree_fichier_dans_bon_dossier(tmp_path: Path, configuration: MQC):
-    (tmp_path / "donnees" / "sortie").mkdir(parents=True, exist_ok=True)
-    fichier = tmp_path / "eval.csv"
-    fichier.write_text("Question type\nA?\n", encoding="utf-8")
-
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
-    respx.post(f"{base}{chemin}").mock(return_value=cree_reponse_mock("OK", "A?"))
-
-    client = ClientMQCHTTPAsync(cfg=configuration)
-    remplisseur = RemplisseurReponses(client=client)
-
-    lecteur = LecteurCSV(fichier)
-    ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
-
-    horloge = HorlogeSysteme()
-    ecrivain = EcrivainSortie(
-        racine=tmp_path, sous_dossier=Path("donnees/sortie"), horloge=horloge
-    )
-    chemin_csv = ecrivain.ecrit_ligne_depuis_lecteur_csv(
-        ligne_enrichie, prefixe="evaluation"
-    )
-
-    assert chemin_csv.parent == tmp_path / "donnees" / "sortie"
-
-
-@respx.mock
-def test_ecriture_nom_fichier_contient_date(tmp_path: Path, configuration: MQC):
-    fichier = tmp_path / "eval.csv"
-    fichier.write_text("Question type\nA?\n", encoding="utf-8")
-
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
-    respx.post(f"{base}{chemin}").mock(return_value=cree_reponse_mock("OK", "A?"))
-
-    client = ClientMQCHTTPAsync(cfg=configuration)
-    remplisseur = RemplisseurReponses(client=client)
-
-    lecteur = LecteurCSV(fichier)
-    ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
-
-    horloge = HorlogeSysteme()
-    ecrivain = EcrivainSortie(
-        racine=tmp_path, sous_dossier=Path("donnees/sortie"), horloge=horloge
-    )
-    chemin_csv = ecrivain.ecrit_ligne_depuis_lecteur_csv(
-        ligne_enrichie, prefixe="evaluation"
-    )
-
-    assert "evaluation_" in chemin_csv.name
-
-
-@respx.mock
-def test_ecriture_contenu_csv_complet(tmp_path: Path, configuration: MQC):
-    fichier = tmp_path / "eval.csv"
-    fichier.write_text("Question type\nA?\nB?\n", encoding="utf-8")
-
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
-    respx.post(f"{base}{chemin}").mock(return_value=cree_reponse_mock("OK", "A?"))
-
-    client = ClientMQCHTTPAsync(cfg=configuration)
-    remplisseur = RemplisseurReponses(client=client)
-
-    lecteur = LecteurCSV(fichier)
-
-    horloge = HorlogeSysteme()
-    ecrivain = EcrivainSortie(
-        racine=tmp_path, sous_dossier=Path("donnees/sortie"), horloge=horloge
-    )
-
-    ligne1_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
-    chemin_csv = ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne1_enrichie, "evaluation")
-
-    ligne2_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
-    ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne2_enrichie, "evaluation")
-
-    contenu = chemin_csv.read_text(encoding="utf-8").splitlines()
-    assert contenu[0].startswith("Question type")
-    assert "A?,OK" in contenu[1]
-    assert "B?,OK" in contenu[2]
-
-
-def test_pose_question_declenche_exception_si_serveur_injoignable(configuration):
-    client = ClientMQCHTTPAsync(cfg=configuration)
+def test_pose_question_declenche_exception_si_serveur_injoignable(configuration_mqc):
+    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
 
     with respx.mock:
         respx.post(f"{client._base}{client._route}").mock(
@@ -424,40 +335,21 @@ def test_pose_question_declenche_exception_si_serveur_injoignable(configuration)
     assert "Serveur MQC injoignable" in str(exc.value)
 
 
-@pytest.mark.parametrize("valeur_donnee", ["foo", "bar", "fou42", "bar42"])
-def test_methode_desinfecte_prefixe_retourne_a_l_identique_contenu_alphanumerique(
-    valeur_donnee: str,
-):
-    valeur_desinfectee = EcrivainSortie._desinfecte_prefixe(valeur_donnee)
-    assert valeur_desinfectee == valeur_donnee
-
-
-@pytest.mark.parametrize(
-    "valeur_infectee, valeur_desinfectee_attendue",
-    [("foo/", "foo_"), ("bar*", "bar_"), ("bar.", "bar_"), ("bar./*", "bar___")],
-)
-def test_methode_desinfecte_prefixe_nettoie_le_contenu_non_alphanumerique(
-    valeur_infectee, valeur_desinfectee_attendue
-):
-    valeur_desinfectee = EcrivainSortie._desinfecte_prefixe(valeur_infectee)
-    assert valeur_desinfectee == valeur_desinfectee_attendue
-
-
 @respx.mock
 def test_remplit_ligne_enrichit_ligne_avec_reponse_bot(
-    tmp_path: Path, configuration: MQC
+    tmp_path: Path, configuration_mqc: MQC
 ):
     fichier = tmp_path / "test.csv"
     fichier.write_text("Question type,Contexte\nQ1?,contexte\n", encoding="utf-8")
 
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
+    base = construit_base_url(configuration_mqc)
+    chemin = formate_route_pose_question(configuration_mqc)
 
     respx.post(f"{base}{chemin}").mock(
         return_value=cree_reponse_mock("reponse_test", "Q1?")
     )
 
-    client = ClientMQCHTTPAsync(cfg=configuration)
+    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
 
     ligne_enrichie = asyncio.run(
@@ -469,12 +361,12 @@ def test_remplit_ligne_enrichit_ligne_avec_reponse_bot(
 
 
 @respx.mock
-def test_remplit_ligne_ecrit_bien_le_contexte(tmp_path: Path, configuration: MQC):
+def test_remplit_ligne_ecrit_bien_le_contexte(tmp_path: Path, configuration_mqc: MQC):
     fichier = tmp_path / "test.csv"
     fichier.write_text("Question type,Contexte\nQ1?,contexte\n", encoding="utf-8")
 
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
+    base = construit_base_url(configuration_mqc)
+    chemin = formate_route_pose_question(configuration_mqc)
 
     reponse_mock_avec_paragraphe = httpx.Response(
         200,
@@ -501,7 +393,7 @@ def test_remplit_ligne_ecrit_bien_le_contexte(tmp_path: Path, configuration: MQC
     )
     respx.post(f"{base}{chemin}").mock(return_value=reponse_mock_avec_paragraphe)
 
-    client = ClientMQCHTTPAsync(cfg=configuration)
+    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
 
     ligne_enrichie = asyncio.run(
@@ -518,21 +410,21 @@ def test_remplit_ligne_ecrit_bien_le_contexte(tmp_path: Path, configuration: MQC
 @respx.mock
 @pytest.mark.asyncio
 async def test_remplit_ligne_avec_lecteur_traite_lignes_sequentiellement(
-    tmp_path: Path, configuration: MQC
+    tmp_path: Path, configuration_mqc: MQC
 ):
     fichier = tmp_path / "test.csv"
     fichier.write_text(
         "Question type\nQ1?\nQ2?\nQ3?\nQ4?\nQ5?\nQ6?\nQ7?", encoding="utf-8"
     )
 
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
+    base = construit_base_url(configuration_mqc)
+    chemin = formate_route_pose_question(configuration_mqc)
 
     respx.post(f"{base}{chemin}").mock(
         return_value=cree_reponse_mock("reponse_test", "Q1?")
     )
 
-    client = ClientMQCHTTPAsync(cfg=configuration)
+    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
 
     lecteur = LecteurCSV(fichier)
@@ -562,45 +454,3 @@ async def test_remplit_ligne_avec_lecteur_traite_lignes_sequentiellement(
         "reponse_test",
         "reponse_test",
     ]
-
-
-@respx.mock
-def test_ecrit_ligne_depuis_lecteur_csv_ecrit_ligne_par_ligne(
-    tmp_path: Path, configuration: MQC
-):
-    fichier = tmp_path / "test.csv"
-    fichier.write_text("Question type\nQ1?\nQ2?\n", encoding="utf-8")
-
-    base = construit_base_url(configuration)
-    chemin = formate_route_pose_question(configuration)
-
-    respx.post(f"{base}{chemin}").mock(
-        return_value=cree_reponse_mock("reponse_test", "Q1?")
-    )
-
-    client = ClientMQCHTTPAsync(cfg=configuration)
-    remplisseur = RemplisseurReponses(client=client)
-
-    lecteur = LecteurCSV(fichier)
-
-    horloge = HorlogeSysteme()
-    ecrivain = EcrivainSortie(
-        racine=tmp_path, sous_dossier=Path("sortie"), horloge=horloge
-    )
-
-    ligne1_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
-
-    chemin_sortie = ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne1_enrichie, "test")
-
-    contenu = chemin_sortie.read_text(encoding="utf-8").strip().split("\n")
-    assert len(contenu) == 2
-    assert "Question type,Réponse Bot" in contenu[0]
-    assert "Q1?,reponse_test" in contenu[1]
-
-    ligne2_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
-
-    ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne2_enrichie, "test")
-
-    contenu = chemin_sortie.read_text(encoding="utf-8").strip().split("\n")
-    assert len(contenu) == 3
-    assert "Q2?,reponse_test" in contenu[2]

@@ -1,11 +1,23 @@
 import os
 import pytest
-from configuration import Evalap, Configuration, MQC, Albert, BaseDeDonnees
+from configuration import (
+    Evalap,
+    Configuration,
+    MQC,
+    Albert,
+    BaseDeDonnees,
+    recupere_configuration,
+)
 
 
 @pytest.fixture()
 def configuration_evalap() -> Evalap:
     return Evalap(url="http://localhost:8000/v1", token_authentification="")
+
+
+@pytest.fixture()
+def configuration_mqc() -> MQC:
+    return recupere_configuration().mqc
 
 
 @pytest.fixture()
