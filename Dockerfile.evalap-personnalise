@@ -11,4 +11,7 @@ RUN sed -i 's/create_database(engine.url)/pass  # Disabled for Clever Cloud/g' /
 # Patcher config.py pour utiliser directement POSTGRES_URL sans ajouter DB_NAME
 RUN sed -i 's|DATABASE_URI = DATABASE_URL.rstrip("/") + "/" + DB_NAME|DATABASE_URI = DATABASE_URL|g' /app/evalap/api/config.py
 
+# Modifier supervisord.conf pour passer LOG_LEVEL en DEBUG
+RUN sed -i 's/LOG_LEVEL="INFO"/LOG_LEVEL="DEBUG"/g' /app/supervisord.conf
+
 COPY ./src/metriques_personnalisees_evalap/[^_]*  /app/evalap/api/metrics/
