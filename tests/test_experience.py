@@ -4,7 +4,7 @@ from requests import Response
 from configuration import Configuration
 from evalap import EvalapClient
 from journalisation.experience import EntrepotExperienceHttp, Experience
-from test_client_evalap import DONNEES_JSON
+from tests.test_client_evalap import DONNEES_JSON
 
 
 def test_peut_lire_une_experience(
