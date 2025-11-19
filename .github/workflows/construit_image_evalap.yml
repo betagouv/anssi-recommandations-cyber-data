@@ -2,7 +2,7 @@ name: Construction et publication de l'image Docker Evalap
 
 on:
   push:
-    branches: [ main, develop, deploiement_clever_cloud ]
+    branches: [ main]
 
 permissions:
   contents: read
