@@ -47,7 +47,7 @@ def formate_route_pose_question(cfg: MQC) -> str:
 
 
 class InterfaceQuestions(Protocol):
-    async def pose_question_async(self, question: str) -> ReponseQuestion: ...
+    async def pose_question(self, question: str) -> ReponseQuestion: ...
 
 
 class HorlogeSysteme:
@@ -62,7 +62,7 @@ class ClientMQCHTTPAsync:
         self._client = client or httpx.AsyncClient()
         self.delai_attente_maximum = cfg.delai_attente_maximum
 
-    async def pose_question_async(self, question: str) -> ReponseQuestion:
+    async def pose_question(self, question: str) -> ReponseQuestion:
         try:
             reponse = await self._client.post(
                 f"{self._base}{self._route}",
@@ -84,7 +84,7 @@ class RemplisseurReponses:
         self, questions: list[str], max_workers: int
     ) -> list[dict[str, Union[str, int, float]]]:
         async def traite_question(question: str) -> dict[str, Union[str, int, float]]:
-            reponse_question = await self._client.pose_question_async(question)
+            reponse_question = await self._client.pose_question(question)
             return {"Réponse Bot": reponse_question.reponse}
 
         taches = [traite_question(q) for q in questions]
@@ -108,7 +108,7 @@ class RemplisseurReponses:
             return []
 
         reponses = await asyncio.gather(
-            *[self._client.pose_question_async(q) for q in questions]
+            *[self._client.pose_question(q) for q in questions]
         )
 
         lignes_enrichies = []
