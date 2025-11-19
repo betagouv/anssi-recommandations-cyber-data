@@ -3,7 +3,7 @@ permissions: {}
 
 on:
   push:
-    branches: [main]
+    branches: [main, interroge-MQC-parralele]
 
 jobs:
   collecte_reponses:
@@ -14,7 +14,7 @@ jobs:
       MQC_HOTE: demo-mes-questions-cyber.cleverapps.io
       MQC_API_PREFIXE_ROUTE: "api"
       MQC_ROUTE_POSE_QUESTION: "pose_question"
-      MQC_DELAI_ATTENTE_MAXIMUM: 19.0
+      MQC_DELAI_ATTENTE_MAXIMUM: 180.0
       MQC_PORT: 443
 
     outputs:
@@ -41,7 +41,8 @@ jobs:
           uv run python src/main_remplir_csv.py \
             --csv donnees/questions_avec_verite_terrain.csv \
             --prefixe test_github_actions \
-            --sortie donnees/sortie
+            --sortie donnees/sortie \
+            --taille-lot 10
           echo "fichier_genere=$(ls donnees/sortie)" >> "$GITHUB_OUTPUT"
 
       - name: Upload du résultat

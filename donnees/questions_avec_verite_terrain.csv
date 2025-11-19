@@ -1,29 +1,892 @@
 # AVERTISSEMENT: Ce jeu de données est en cours de construction et d'amélioration.
 # Il ne doit pas engager la responsabilité de l'ANSSI et est fourni à des fins de développement uniquement.
-# 
-REF Guide,REF Question,Tags,REF Réponse,Réponse envisagée,Numéro page (lecteur),Localisation paragraphe,Réponse Bot,,Question type
-GAUT,GAUT.Q.1,Usuelle,GAUT.R.1,"La fonction d'authentification en tant que telle a pour objectif de permettre au prouveur de démontrer son identité (souvent annoncée lors de la phase d'identification).
+#
+REF Guide,REF Question,Question type,Tags,REF Réponse,Réponse envisagée,Numéro page (lecteur),Localisation paragraphe,Réponse Bot,Note réponse (/10),Commentaire Note
+GAUT,GAUT.Q.1,Qu'est-ce que l'authentification ?,Usuelle,GAUT.R.1,"La fonction d’authentification en tant que telle a pour objectif de permettre au prouveur de démontrer son identité (souvent annoncée lors de la phase d’identification).
 
-L'authentification est un mécanisme faisant intervenir deux entités distinctes : un prouveur et un
+L’authentification est un mécanisme faisant intervenir deux entités distinctes : un prouveur et un
 vérifieur.
-Le prouveur cherche à prouver son identité au vérifieur. Il s'agit par exemple pour le prouveur
-de démontrer sa connaissance d'une donnée secrète comme un mot de passe.
-Le vérifieur doit être capable de s'assurer de la validité de l'identité du prouveur. Il s'agit par
-exemple pour le vérifieur de contrôler l'exactitude du mot de passe fourni par le prouveur.
+Le prouveur cherche à prouver son identité au vérifieur. Il s’agit par exemple pour le prouveur
+de démontrer sa connaissance d’une donnée secrète comme un mot de passe.
+Le vérifieur doit être capable de s’assurer de la validité de l’identité du prouveur. Il s’agit par
+exemple pour le vérifieur de contrôler l’exactitude du mot de passe fourni par le prouveur.
 
-Un prouveur est un utilisateur du système d'information cherchant à s'authentifier. Le vérifieur est
-quant à lui classiquement un serveur du système d'information qui a la charge de vérifier l'identité
-d'un utilisateur.",10,Deuxième à cinquième paragraphe,,,Qu'est-ce que l'authentification ?
+Un prouveur est un utilisateur du système d’information cherchant à s’authentifier. Le vérifieur est
+quant à lui classiquement un serveur du système d’information qui a la charge de vérifier l’identité
+d’un utilisateur.",10,Deuxième à cinquième paragraphe,"L'authentification est un processus visant à vérifier l'identité d'un utilisateur, d'une entité ou d'une machine. Elle repose sur la présentation d'un ou plusieurs facteurs d'authentification (comme un mot de passe, une donnée biométrique ou un certificat électronique) pour prouver cette identité. Ce processus fait suite à une phase d'identification, où l'utilisateur déclare son identité.
 
-GAUT,GAUT.Q.1,Usuelle,GAUT.R.1,"La fonction d'authentification en tant que telle a pour objectif de permettre au prouveur de démontrer son identité (souvent annoncée lors de la phase d'identification).
+L'authentification peut être simple (un seul facteur) ou multifacteur (plusieurs facteurs, idéalement indépendants), ce qui renforce la sécurité en rendant plus difficile la contrefaçon de l'identité.
 
-L'authentification est un mécanisme faisant intervenir deux entités distinctes : un prouveur et un
-vérifieur.
-Le prouveur cherche à prouver son identité au vérifieur. Il s'agit par exemple pour le prouveur
-de démontrer sa connaissance d'une donnée secrète comme un mot de passe.
-Le vérifieur doit être capable de s'assurer de la validité de l'identité du prouveur. Il s'agit par
-exemple pour le vérifieur de contrôler l'exactitude du mot de passe fourni par le prouveur.
+**Sources** :
+- Documents fournis (définitions de l'authentification et facteurs d'authentification).
+- Section ""Authentification"" et ""Authentification à double facteur"" des documents.",,Bonne réponse
+GAUT,GAUT.Q.2,Qu'est-ce que l'enregistrement ? ,Usuelle,GAUT.R.2,"L'enregistrement est une étape préalable à l'authentification consistant à enregistrer une entité (son identité, son moyen d’authentification, etc.) appelée prouveur auprès d’un vérifieur, c'est-à-dire l'entité en capacité de vérifier son identité.
+Cela correspond par exemple à la création d’un compte sur un site Web.",10,Sixième paragraphe,"L'enregistrement au sens de l'authentification est une étape préalable qui consiste à enregistrer un prouveur (son identité, son moyen d'authentification, etc.) auprès d'un vérifieur. Cela correspond par exemple à la création d'un compte sur un site Web. Cette phase est essentielle avant l'authentification proprement dite, car elle permet de définir les données ou éléments qui serviront à prouver l'identité lors de l'authentification.
 
-Un prouveur est un utilisateur du système d'information cherchant à s'authentifier. Le vérifieur est
-quant à lui classiquement un serveur du système d'information qui a la charge de vérifier l'identité
-d'un utilisateur.",10,Deuxième à cinquième paragraphe,,,Qu'est-ce que l'authentification ?
+**Source** : Guide de l'ANSSI (section ""Authentification et premières définitions"", notamment le paragraphe sur l'étape d'enregistrement).",,"Deux notions d'enregistrement, donc il ne parle que de la journalisation et pas de la partie enregistrement au sens authentification.
+Mais si je rajoute ""au sens authentification"", c'est bon"
+GAUT,GAUT.Q.3,Qu'est-ce que l'identification ? ,Usuelle,GAUT.R.3,"L'identification est une étape préalable à l'authentification consistant pour une entité (un prouveur) à annoncer son identité sans prouver cette dernière. Par exemple, il peut s’agir d’un
+nom d’utilisateur à renseigner.",10,Septième paragraphe,"L'identification est l'action d'un utilisateur ou d'un processus automatique consistant à communiquer une identité préalablement enregistrée sur le système d'information (SI). Elle permet d'associer explicitement une identité à une personne ou à un processus pour assurer l'imputabilité des actions effectuées.
+
+Cette étape précède l'authentification, qui a pour but de vérifier l'identité déclarée.
+
+**Sources :**
+- Document ""Gestion des identités et des accès (règles 13 à 15)"" (section 5.1 Identification)
+- Définition extraite du tableau fourni (""Identification"").",,
+GAUT,GAUT.Q.4,Qu'est-ce qu'une attaque par force brute ? ,Usuelle,GAUT.R.4,"Une attaque par force brute correspond à des tests automatisés de tous les mots de passe et de toutes les clés
+cryptographiques possibles.",12,Troisième paragraphe,"Une attaque par force brute est une méthode où un attaquant teste systématiquement toutes les combinaisons possibles (mots de passe, clés cryptographiques, etc.) jusqu'à trouver celle qui permet de déverrouiller le système visé. Cette attaque cible principalement les mots de passe, en utilisant des essais automatisés.",,Bonne réponse
+GAUT,GAUT.Q.5,Quels sont des exemples d'attaques sur le protocole d'authentification ? ,Complexe,GAUT.R.5,"Parmis les attaques sur le protocole d'authentification, on retrouve par exemple les attaques de l’homme-du-milieu, les attaques par rejeu ou encore l'exploitation de vulnérabilité de l’implémentation.",12,Quatrième paragraphe,"D'après les documents fournis, voici des exemples d'attaques ciblant les protocoles d'authentification :
+
+1. **Attaques par force brute** : Tests automatisés de mots de passe ou clés cryptographiques pour deviner les identifiants (*source : section 2.5*).
+
+2. **Attaques de l'homme-du-milieu** : Interception et modification des communications pendant l'authentification (*source : section 2.5 et R11*).
+
+3. **Attaques par rejeu** (*replay attacks*) : Réutilisation de données d'authentification interceptées (ex. *pass-the-hash*) (*source : section 2.5*).
+
+4. **Écoute clandestine** (*eavesdropping*) : Interception passive des échanges d'authentification (*source : section 2.5*).
+
+5. **Attaques sur les SMS** :
+   - Interception des codes OTP via les vulnérabilités des protocoles SS7.
+   - *SIM swapping* pour détourner les SMS d'authentification (*source : section sur la transmission par SMS*).
+
+6. **Attaques sur les mots de passe** :
+   - Dédoucement (par dictionnaire ou recherche exhaustive).
+   - Hameçonnage (phishing) pour voler les identifiants (*source : section 2.2*).
+
+7. **Exploitation de vulnérabilités d'implémentation** : Failles logicielles dans les protocoles d'authentification (*source : section 2.5*).
+
+Les documents citent également des recommandations pour atténuer ces risques (ex. R10 pour limiter les tentatives, R11 pour utiliser un canal sécurisé comme TLS/IPsec).",,
+GAUT,GAUT.Q.6,Qu'est-ce qu'une attaque par recherche exhaustive ? ,Usuelle,GAUT.R.6,"Cette attaque consiste à choisir un ensemble de caractèreset à tester automatiquement toutes les combinaisons possibles de ces caractères. Une variante de cette attaque, désignée par l’expression anglaise password spraying, consiste à effectuer des tests automatisés d’un nombre réduit de mots de passe (par exemple à partir d’une liste de mots de passe très utilisés) mais pour un grand nombre d’identifiants possibles (ou de comptes de différents service web par exemple).",12,Neuvième paragraphe,"Une attaque par recherche exhaustive consiste à tester automatiquement toutes les combinaisons possibles d'un ensemble de caractères (chiffres, lettres, symboles) pour deviner un mot de passe ou une clé. Une variante, le *password spraying*, utilise un nombre limité de mots de passe courants sur un grand nombre d'identifiants (source : documents fournis).
+
+**Contre-mesures** (référence : tableau 1 des documents) :
+- Limite temporelle entre chaque essai (pour contrer les attaques en ligne).
+- Fonctions de hachage itératives dédiées (pour résister aux attaques hors ligne).
+
+*Source : documents fournis (extrait sur les attaques par recherche exhaustive et tableau 1).*",,
+GAUT,GAUT.Q.7,Qu'est-ce qu'une attaque par dictionnaire ? ,Usuelle,GAUT.R.7,"Cette attaque consiste à faire l’hypothèse que le mot de passe recherché est un mot du dictionnaire d’une langue donnée et à tester automatiquement chacun de ces mots. Des dictionnaires plus aboutis intègrent également des variations courantes sur les mots du dictionnaire (transformation de a en @ par exemple), une liste des mots de passe ou des phrases de passe les plus utilisés ou bien encore une combinaison (concaténation, etc.) de mots connus.",12,Dixième paragraphe,"Une attaque par dictionnaire consiste à tester automatiquement un ensemble de mots issus d'un dictionnaire (ou de mots couramment utilisés) pour deviner un mot de passe. Elle peut inclure des variantes comme des substitutions de caractères (par exemple, ""a"" remplacé par ""@"") ou des combinaisons de mots connus.",,Moins de détail que le guide mais bonne réponse
+GAUT,GAUT.Q.8,Qu'est-ce qu'une attaque par table pré-calculée (ex. rainbow table) ? ,Usuelle,GAUT.R.8,"Cette attaque consiste à calculer à l’avance les empreintes cryptographiques d’un très vaste ensemble de mots de passe afin d’accélérer leur recherche, puis de comparer automatiquement chacune d’entre elles à une empreinte volée jusqu’à trouver une égalité qui prouvera que le mot de passe recherché a été trouvé.",12,Onzième paragraphe,"Une attaque par table pré-calculée (ex. *rainbow table*) consiste à calculer à l'avance les empreintes cryptographiques d'un très vaste ensemble de mots de passe. Cette méthode permet de contourner le besoin de calculer en temps réel les hachages pour chaque tentative de déduction d'un mot de passe, réduisant ainsi le temps d'attaque. Le calcul des empreintes est consommateur de ressources, surtout si le nombre de mots de passe est important.
+
+**Source :** Extrait du document fourni sur les attaques par tables pré-calculées.",,Il donne pas le comment contrairement au guide
+GAUT,GAUT.Q.9,Qu'est-ce qu'une attaque par ingénierie sociale ?,Usuelle,GAUT.R.9,Cette attaque consiste à récupérer un mot de passe par des moyens détournés comme l’hameçonnage ou bien l’usurpation d’identité.,13,Premier paragraphe,"Une attaque par ingénierie sociale consiste à récupérer un mot de passe ou d'autres informations sensibles par des moyens détournés, tels que l'hameçonnage ou l'usurpation d'identité.",,
+GAUT,GAUT.Q.10,Quelles sont les principales menaces sur les facteurs de connaissance ?,Usuelle,GAUT.R.10,"Les principales menaces pesant sur les facteurs de connaissance sont la déduction (au moyen d’attaques par recherche exhaustive ou par dictionnaire par exemple), l’hameçonnage, l’écoute (dans le cas où l’envoi du facteur de connaissance est effectué au travers d’un canal non protégé), etc. Les mots de passe, souvent choisis par les utilisateurs, font ainsi face à des attaques spécifiques.",12,Huitième paragraphe,"Les principales menaces pesant sur les facteurs de connaissance (comme les mots de passe) sont :
+
+1. **Déduction** : Attaques par recherche exhaustive (force brute) ou par dictionnaire.
+2. **Hameçonnage** : Vol de mots de passe via des techniques de phishing ou ingénierie sociale.
+3. **Écoute** : Interception du facteur de connaissance si transmis via un canal non sécurisé.
+
+Ces menaces sont détaillées dans les sections **2.2** et **2.5** des documents fournis, ainsi que dans le chapitre **4** dédié aux mots de passe.
+
+Source : Documents officiels de l'ANSSI (références aux sections 2.2, 2.5 et chapitre 4).",,
+GAUT,GAUT.Q.11,Quelles sont les principales menaces sur les facteurs de possession ?,Usuelle,GAUT.R.11,"Les principales menaces pesant sur les facteurs de possession sont le vol, la perte, la duplication, la falsification ou bien encore la compromission totale de l’équipement qui porte le facteur de possession. Afin de réaliser une usurpation d’identité, les attaquants vont chercher à récupérer les secrets cryptographiques contenus dans le facteur de possession via par exemple des attaques par canaux auxiliaires.",13,Quatrième paragraphe,"Les principales menaces sur les facteurs de possession, selon les documents fournis, sont :
+
+1. **Vol** : Perte de contrôle de l'équipement contenant le facteur de possession.
+2. **Perte** : Disparition involontaire de l'équipement.
+3. **Duplication** : Copie illicite des secrets cryptographiques (clés, codes, etc.).
+4. **Falsification** : Création d'un facteur frauduleux pour usurper l'identité.
+5. **Compromission totale** : Accès non autorisé aux données stockées.
+6. **Attaques par canaux auxiliaires** : Exploitation de fuites physiques (consommation électrique, émanations électromagnétiques, etc.) ou logicielles pour extraire les secrets.
+7. **Attaques par injection de fautes** : Perturbation du fonctionnement normal du composant pour en extraire des informations.
+
+Ces menaces sont détaillées dans la section **""Menaces et attaques sur les facteurs de possession""** du document fourni.
+
+**Source** : Extraits du document fourni (sections sur les facteurs de possession et les composants de sécurité).",,
+GAUT,GAUT.Q.12,Quelles sont les principales menaces sur les facteurs inhérents ?,Usuelle,GAUT.R.12,"Les principales menaces pesant sur les facteurs inhérents (couramment appelés facteurs biométriques) visent à leurrer le mécanisme de reconnaissance biométrique en usurpant l’identité de la personne physique, par exemple par la présentation d’une photographie ou d’une séquence vidéo préenregistrée ou altérée, ou d’un moulage de l’empreinte digitale.",13,Cinquième paragraphe,"Les principales menaces sur les facteurs inhérents (biométriques) visent à tromper les systèmes de reconnaissance en usurpant l'identité d'une personne. Cela peut se faire par la présentation d'une photographie, d'une vidéo préenregistrée ou altérée, ou d'un moulage d'empreinte digitale, par exemple.
+
+**Source :**
+- Document ""Les principales menaces pesant sur les facteurs inhérents (couramment appelés facteurs biométriques) visent à leurrer le mécanisme de reconnaissance biométrique en usurpant l'identité de la personne physique..."".",,Bonne réponse
+GAUT,GAUT.Q.13,Qu'est-ce que l'authentification multifacteur ?,Usuelle,GAUT.R.13,"L’authentification multifacteur découle de la nécessité de renforcer la sécurité apportée par l’utilisation d’un unique facteur d’authentification, particulièrement lorsqu’il s’agit d’un mot de passe utilisé seul. Ainsi même si ce dernier est compromis, un facteur supplémentaire d’un type différent est requis afin de s’authentifier.",15,Quatrième paragraphe,"L'authentification multifacteur (AMF) est un mécanisme qui permet de prouver l'identité d'un utilisateur en vérifiant plusieurs éléments d'authentification, chacun appartenant à une catégorie différente. Ces catégories sont les facteurs de **connaissance** (ex. mot de passe), de **possession** (ex. carte à puce ou téléphone) et **inhérents** (ex. empreinte digitale). Pour être considérée comme multifacteur, l'authentification doit obligatoirement combiner au moins deux catégories distinctes.
+
+Par exemple, une combinaison mot de passe + code SMS n'est pas une authentification multifacteur forte, car le SMS est un facteur de connaissance (code reçu par un canal non sécurisé) et non de possession. En revanche, un mot de passe associé à une clé FIDO U2F ou une biométrie répond aux critères de l'AMF.
+
+L'AMF ne doit pas être confondue avec l'authentification forte, qui repose sur un protocole cryptographique robuste (ex. défi-réponse) et peut n'utiliser qu'un seul facteur.",,"On ne dit pas AMF ni ""une biométrie"""
+GAUT,GAUT.Q.14,Quels sont les différents types de facteurs d'authentification existants ?,Usuelle,GAUT.R.14,"Un facteur d’authentification est un facteur lié à une personne, relevant de diverses catégories :
+- facteur de connaissance : « ce que je sais », il s’agit d’une connaissance devant être mémorisée telle qu’une phrase de passe, un mot de passe, un code, etc;
+- facteur de possession : « ce que je possède », il s’agit d’un élément secret non mémorisable contenu dans un objet physique qui idéalement protège cet élément de toute extraction, tel qu’une carte à puce, un token, un téléphone, etc;
+- facteur inhérent : « ce que je suis », il s’agit d’une caractéristique physique intrinsèquement liée à une personne et indissociable de la personne elle-même, telle qu’une caractéristique biologique (ADN), morphologique (empreinte digitale, empreinte rétinienne) ou comportementale (voix, frappe au clavier).",15,Cinquième à huitième paragraphe,"Les documents identifient trois catégories principales de facteurs d'authentification :
+
+1. **Facteur de connaissance** : éléments que l'utilisateur connaît (mot de passe, code PIN).
+2. **Facteur de possession** : éléments que l'utilisateur possède (carte à puce, jeton USB, certificat électronique x.509).
+3. **Facteur inhérent** : éléments liés à l'identité physique ou biologique de l'utilisateur (empreinte digitale, reconnaissance faciale).
+
+Ces catégories sont définies dans les sections sur l'authentification multifacteur et les mécanismes d'authentification.
+
+**Source** : Documents fournis (sections sur l'authentification multifacteur et les facteurs d'authentification).",,
+GAUT,GAUT.Q.15,Quelle est la différence entre authentification forte et authentification multifacteur ? ,Usuelle,GAUT.R.15,"En langue française, l’authentification multifacteur est souvent confondue avec l’appellation authentification forte (ou robuste), ce qui laisserait entendre qu’une authentification multifacteur est nécessairement plus robuste qu’une authentification avec un unique facteur.
+
+Il convient ainsi de différencier authentification multifacteur et authentification forte. D’une part, une authentification multifacteur est une authentification faisant intervenir plusieurs catégories de facteurs. Néanmoins, ces facteurs, pris indépendamment ou ensemble, ne sont pas forcément considérés comme étant forts (un exemple typique étant un mot de passe associé à un code temporaire reçu par SMS). D’autre part, une authentification forte (qui repose généralement sur un facteur unique) est une authentification reposant sur un mécanisme cryptographique dont les paramètres et la sécurité sont jugés robustes (l’élément secret est alors généralement une clé cryptographique).",17,Quatrième à cinquième paragraphe,"L'authentification multifacteur et l'authentification forte diffèrent par leur approche et leur niveau de sécurité :
+
+1. **Authentification multifacteur** :
+   Elle repose sur plusieurs facteurs d'authentification appartenant à des catégories distinctes (connaissance, possession, inhérent). Cependant, ces facteurs ne sont pas nécessairement robustes (ex. : mot de passe + SMS). Elle peut être considérée comme ""forte"" si au moins un facteur est fort (comme une clé cryptographique).
+   *Source : Extrait du document sur l'authentification multifacteur (pages 46-48, 92-93).*
+
+2. **Authentification forte** :
+   Elle utilise généralement un seul facteur, mais reposant sur un mécanisme cryptographique robuste (ex. : protocole défi-réponse avec clé secrète). Elle est jugée plus sécurisée que l'authentification multifacteur ""faible"".
+   *Source : Définition dans le chapitre 2 (pages 9-15) et recommandations R2.*
+
+🔗 **Documents sources** : Extraits des documents fournis (pages 9-15, 46-48, 92-93).",,
+GAUT,GAUT.Q.16,Quelles sont les phases du cycle de vie des facteurs d'authentification ? ,Usuelle,GAUT.R.16,"Le cycle de vie d’un facteur d’authentification peut se décomposer en trois phases : sa création (et sa remise à l’utilisateur), son utilisation et sa révocation.",21,Deuxième paragraphe,"D'après les documents fournis, le cycle de vie des facteurs d'authentification comprend trois phases principales :
+
+1. **Création et remise à l'utilisateur** : Phase critique où le facteur est généré et distribué de manière sécurisée (*Recommandations concernant le cycle de vie des facteurs d'authentification*).
+2. **Utilisation** : Pendant laquelle le facteur est employé pour l'authentification, sous réserve de conditions d'utilisation définies (*Recommandations concernant le cycle de vie des facteurs d'authentification*).
+3. **Révocation** : Mise hors service du facteur (par exemple après un départ de l'utilisateur ou une compromission) pour éviter son usage frauduleux (*Recommandations concernant le cycle de vie des facteurs d'authentification*).
+
+Sources : *Recommandations concernant le cycle de vie des facteurs d'authentification* (section 3).",,
+GAUT,GAUT.Q.17,Quelles sont les recommandations lors de la création d'un facteur d'authentification ? ,Usuelle,GAUT.R.17,"Il est recommandé de :
+- Créer les facteurs d'authentification dans un environnement maîtrisé;
+- Générer les éléments aléatoires avec un générateur de nombres aléatoires robuste;
+- Remettre les facteurs d'authentification au travers de canaux sécurisés;
+- Mettre en place un processus de renouvellement des facteurs d'authentification.","21
+22","21 - Quatrième paragraphe
+22 - Deuxième, troisième et sixième paragraphe","Voici les recommandations pour la création d'un facteur d'authentification, basées exclusivement sur les documents fournis :
+
+1. **Création dans un environnement maîtrisé** : Les facteurs d'authentification doivent être créés dans un environnement contrôlé par l'entité responsable, afin de limiter les risques de compromission (R4).
+2. **Utilisation d'un générateur robuste** : Les éléments aléatoires (comme les clés cryptographiques) doivent être générés avec un générateur de nombres aléatoires fiable (R4 et R5).
+3. **Transmission sécurisée** : Les facteurs d'authentification doivent être remis à l'utilisateur via des canaux sécurisés (R6).
+4. **Processus de renouvellement** : Un mécanisme de renouvellement périodique doit être mis en place pour limiter les risques liés à la compromission d'un facteur (R7).
+
+**Sources** :
+- ""Liste des recommandations"" (R4, R5, R6, R7).
+- ""Recommandations concernant le cycle de vie des facteurs d'authentification"" (Section 3.1).",,LE 4ème point est faux : le renouvellement ne doit pas être périodique (sauf pour les comptes à privilèges)
+GAUT,GAUT.Q.18,Quelles sont les recommandations lors de la transmission et l'utilisation d'un facteur d'authentification ? ,Usuelle,GAUT.R.18,"Il es recommandé de :
+- Ne pas utiliser le SMS comme moyen de réception d'un facteur d'authentification;
+- Conserver les historiques d'utilisation des facteurs d'authentification;
+- Limiter dans le temps le nombre de tentatives d'authentification;
+- Réaliser l'authentification au travers d'un canal sécurisé;
+- Limiter la durée de validité d'une session authentifiée;
+- Protéger les données d'authentification stockées par le vérifieur;
+- Ne pas donner d'information sur l'échec de l'authentification;
+- Définir un délai d'expiration des facteurs d'authentification;
+- Définir une politique d'utilisation des facteurs d'authentification;
+- Sensibiliser les utilisateurs à la sécurité de l'authentification.","23
+24
+25
+26","23 - Cinquième et septième paragraphes
+24 - Deuxième et quatrième paragraphes
+25 - Premier, troisième et cinquième paragraphes
+26 - Premier à troisième paragraphe","D'après les documents fournis, voici les recommandations lors de la transmission et l'utilisation d'un facteur d'authentification :
+
+1. **Transmission sécurisée** :
+   - Utiliser des canaux sécurisés pour la transmission des facteurs d'authentification (R6).
+   - Ne pas utiliser le SMS comme moyen de réception d'un facteur d'authentification (R8).
+
+2. **Protection des données** :
+   - Protéger les données d'authentification stockées par le vérifieur (R13).
+
+3. **Gestion des échecs d'authentification** :
+   - Ne pas fournir d'informations sur l'échec de l'authentification pour éviter de renseigner un attaquant (R14).
+
+4. **Durée de validité** :
+   - Définir un délai d'expiration des facteurs d'authentification pour limiter les risques en cas de compromission (R15).
+
+5. **Environnement maîtrisé** :
+   - Créer les facteurs d'authentification dans un environnement contrôlé et sécurisé (R4).
+
+*Sources : Liste des recommandations (R6, R8, R13, R14, R15, R4), et section 3.2 des documents fournis.*",,Il n'y a pas tout.
+GAUT,GAUT.Q.19,Quelles sont les recommandations lors de la révocation d'un facteur d'authentification ? ,Usuelle,GAUT.R.19,"Il est recommandé de :
+- Mettre en place un processus dédié permettant de révoquer des facteurs d’authentification et de diffuser l’information de révocation;
+- Définir des délais adaptés de prise en compte des révocations.","26
+27","26 - Septième paragraphe
+27 - Deuxième paragraphe","La révocation d'un facteur d'authentification doit s'appuyer sur un **processus dédié** permettant de bloquer son utilisation et de diffuser cette information. Ce processus est essentiel en cas de compromission, perte ou fermeture de compte, afin d'empêcher une usurpation d'identité (source : ""La révocation d'un facteur d'authentification"" dans les documents fournis).
+
+Pour les certificats électroniques, la révocation est diffusée via des **listes de révocation (CRL)** ou le protocole **OCSP**. Pour les autres facteurs (connaissance, possession), la révocation implique la désactivation du moyen révoqué et la génération de nouveaux éléments secrets. En revanche, la révocation d'un facteur biométrique (comme une empreinte digitale) est plus complexe car la caractéristique physique ne peut être remplacée (source : ""R18"").
+
+Enfin, il est recommandé de **sensibiliser les utilisateurs** sur les procédures à suivre en cas de perte ou de compromission (source : ""Sensibiliser les utilisateurs à la sécurité de l'authentification"").
+
+**Documents sources :**
+- ""La révocation d'un facteur d'authentification""
+- ""R18""
+- ""Sensibiliser les utilisateurs à la sécurité de l'authentification""",,Il manque les délais
+GAUT,GAUT.Q.20,Qu'est-ce qu'une politique de sécurité des mots de passe ? ,Usuelle,GAUT.R.20,"Une politique de sécurité des mots de passe doit a minima définir les éléments suivants :
+- catégorie de mots de passe;
+- longueur de mots de passe;
+- règles de complexité des mots de passe (types de caractères);
+- délai d'expiration des mots de passe;
+- mécanismes de limitation d’essais d’authentification;
+- mécanismes de contrôle de la robustesse des mots de passe;
+- méthode de conservation des mots de passe;
+- méthode de recouvrement d’accès en cas de perte ou de vol des mots de passe;
+- mise à disposition d’un coffre-fort de mots de passe.",29,Quatrième paragraphe,"Une **politique de sécurité des mots de passe** est un ensemble de règles définissant les exigences et les mécanismes pour la gestion sécurisée des mots de passe. Elle couvre notamment :
+- La **catégorisation** des mots de passe (ex. : mots de passe humains vs. générés automatiquement).
+- Les **exigences de longueur** et de **complexité** (types de caractères autorisés).
+- Les **délais d'expiration** (souvent imposés pour les comptes à privilèges).
+- Les **méthodes de conservation** (stockage chiffré, sans conservation en clair).
+- Les **mécanismes de limitation des essais d'authentification** (ex. : blocage après X tentatives).
+- Les **procédures de recouvrement** en cas de perte ou de vol.
+- La **mise à disposition d'un coffre-fort de mots de passe** si nécessaire.
+
+Cette politique vise à renforcer la robustesse des mots de passe (via l'entropie et d'autres mesures) et à réduire les risques liés à leur utilisation (ex. : réutilisation, motifs prévisibles).
+
+**Sources** :
+- Recommandation R20 du guide ANSSI (""Mettre en place une politique de sécurité des mots de passe"").
+- Extraits relatifs à la gestion des mots de passe (ex. : stockage chiffré, complexité, expiration).
+- Extrait sur l'entropie et ses limites (page 28).",,Il en manque.
+GAUT,GAUT.Q.21,Quelle doit être la longueur des mots de passe ?,Usuelle,GAUT.R.21,"La longueur minimum des mots de passe doit dépendre de la sensibilité des ressources ou actions :
+- Faible à moyen : Entre 9 et 11 caractères (taille de clé équivalente en bits : environ 65);
+- Moyen à fort : Entre 12 et 14 caractères (taille de clé équivalente en bits : environ 85);
+- Fort à très fort : Au moins 15 caractères (taille de clé équivalente en bits : égale ou plus de 100).",30,TABLE 3 – Recommandations concernant les longueurs minimales des mots de passe,"Selon les recommandations de l'ANSSI, la longueur minimale des mots de passe dépend du niveau de sensibilité du système d'information :
+
+- **Niveau faible à moyen** : entre **9 et 11 caractères** (entropie ≈ 65 bits) *(Guide de l'ANSSI, Tableau 3 – Longueurs minimales des mots de passe)*.
+- **Contexte sensible (fort/très fort)** : la longueur minimale doit être **adaptée à l'analyse des risques**, avec des valeurs supérieures à 20 caractères pour les mots de passe non mémorisés *(R23)*.
+- **Pratique recommandée** : ne pas imposer de longueur maximale pour favoriser les phrases de passe, tout en évitant des limites trop faibles (8-10 caractères) qui fragiliseraient la sécurité *(R22)*.
+
+**Sources** :
+- Guide de l'ANSSI (Tableau 3, R22, R23).
+- *cyber.gouv.fr* (principes de robustesse des mots de passe).",,Ce n'est pas la bonne réponse.
+GAUT,GAUT.Q.22,Quelle doit être la complexité (type de caractères) des mots de passe ?,Usuelle,GAUT.R.22,"Il est recommandé d'imposer des contraintes sur les types de caractères que les mots de passe doivent contenir (caractères numériques, alphanumériques, en minuscules, en majuscules, comprenant des caractères spéciaux, etc). Par exemple, il peut être imposé que les mots de passe contiennent au moins une majuscule, un chiffre et un caractère spécial.",31,Quatrième paragraphe,"Les documents recommandent d'imposer des règles de complexité pour les mots de passe, notamment en exigeant l'utilisation de différents types de caractères (minuscules, majuscules, chiffres et caractères spéciaux) afin de rendre les attaques en ligne plus difficiles. Ils soulignent aussi que la longueur est un facteur clé de sécurité, avec des longueurs minimales variables selon le niveau de sensibilité (entre 9 et 11 caractères pour un niveau faible à moyen).
+
+Cependant, ils critiquent les règles de complexité basiques (comme remplacer ""a"" par ""@"") qui sont souvent contournées par les utilisateurs et inefficaces contre les attaques hors ligne. Ils recommandent plutôt des phrases de passe ou des mots de passe très longs (sans limite maximale stricte) pour augmenter l'entropie et faciliter la mémorisation.
+
+**Sources :**
+- Guide ANSSI sur les mots de passe (mention des règles de complexité et des phrases de passe)
+- Recommandation R23 (""Mettre en œuvre des règles sur la complexité des mots de passe"")
+- Tableau 3 (longueurs minimales selon les niveaux de sensibilité)",10,
+GAUT,GAUT.Q.23,Quel doit être le délai d'expiration des mots de passe ?,Usuelle,GAUT.R.23,"Il est recommandé de pas imposer par défaut de délai d'expiration sur les mots de passe des comptes non sensibles.
+Par contre, pour les comptes à privilèges (ex. comptes administrateurs) il est recommandé d'imposer un délai d'expiration pouvant par exemple être fixé entre 1 et 3 ans.
+
+En cas de compromission suspectée ou avérée, il est toutefois recommandé de révoquer immédiatement les mots de passe.","32
+33","32 - Cinquième et septième paragraphe
+33 - Deuxième paragraphe","D'après les documents officiels de l'ANSSI, les délais d'expiration des mots de passe dépendent du niveau de sensibilité des comptes :
+
+- **Comptes non sensibles** (comptes utilisateur standard) : Il est recommandé de **ne pas imposer par défaut de délai d'expiration** si des mots de passe robustes sont garantis (ex : contrôle de robustesse, utilisation de coffres-forts de mots de passe) (*R24*).
+- **Comptes sensibles (à privilèges)** : Un délai d'expiration **compris entre 1 et 3 ans** est recommandé (*R25, section 4.4*).
+
+En cas de **compromission suspectée ou avérée**, les mots de passe doivent être renouvelés **immédiatement** (*R26*).
+
+**Sources** : Guide d'administration sécurisée (ANSSI), sections 4.4, R24, R25 et R26.",10,
+GAUT,GAUT.Q.24,Comment contrôler la robustesse des mots de passe ?,Usuelle,GAUT.R.24,"Il est recommandé de mettre en place un contrôle de la robustesse des mots de passe lors de leur création ou de leur renouvellement. Il existe de nombreux contrôles, comme par exemple :
+- mettre en place des mécanismes automatiques et systématiques permettant de vérifier que les mots de passe respectent bien les règles définies dans la politique de sécurité des mots de passe;
+- comparer les mots de passe lors de leur création à une base de données répertoriant les mots de passe les plus utilisés ou bien ceux qui ont été compromis;
+- repérer les mots de passe contenant des motifs (ou des répétitions de motifs) spécifiques;
+- repérer les mots de passe contenants des informations personnelles saisies lors de la création du compte;
+- interdire la réutilisation d’un mot de passe parmi les X derniers mots de passe déjà utilisés.",33,Quatrième à dixième paragraphes,"Pour contrôler la robustesse des mots de passe lors de leur création, les documents officiels de l'ANSSI recommandent les mesures suivantes :
+
+1. **Contrôle automatisé** : Mettre en place un contrôle systématique de la robustesse des mots de passe lors de leur création ou renouvellement (R27).
+2. **Règles de complexité** : Imposer des exigences de longévité et de complexité (majuscules, minuscules, chiffres, caractères spéciaux) tout en proposant un jeu de caractères large (R27).
+3. **Éviter les détournements** : Prévenir les pratiques courantes (comme remplacer ""a"" par ""@"") qui peuvent être contournées par des attaquants (R27).
+4. **Combinaison avec des limitations** : Coupler ces contrôles avec des limites temporelles en cas d'échecs d'authentification pour renforcer la protection contre les attaques en ligne (R10).
+
+**Source** : Référentiel ""R26"" et ""4.5 Contrôle de la robustesse des mots de passe"" (cyber.gouv.fr).",5,"Il faut ajouter ""au moment de la création"" à la question car sinon on a pas la bonne réponse, mais c'est logique.
+Réponse très incomplète"
+GAUT,GAUT.Q.25,Comment stocker de façon sécurisée les mots de passe ? ,Usuelle,GAUT.R.25,"Pour le stockage sécurisé des mots de passe, il est recommandé de :
+- Utiliser un sel aléatoire suffisamment long;
+- Utiliser une fonction de dérivation de mots de passe memory-hard pour conserver les mots de passe (ou si cela est impossible, utiliser une fonction de dérivation de mots de passe itérative).",35,"Premier, quatrième et cinquième paragraphes","Pour stocker de manière sécurisée les mots de passe, les documents officiels de l'ANSSI recommandent les pratiques suivantes :
+
+1. **Utiliser des coffres-forts de mots de passe** : Ces outils permettent de stocker les mots de passe de manière chiffrée, protégés par un mot de passe ""maître"" que l'utilisateur doit mémoriser. Ils évitent d'avoir à retenir plusieurs mots de passe complexes (*cyber.gouv.fr*).
+2. **Stocker uniquement des empreintes (hachés) cryptographiques** : Les mots de passe ne doivent jamais être stockés en clair. À la place, il faut utiliser des fonctions de hachage cryptographique (comme SHA2 ou SHA3) pour créer des empreintes à sens unique (*cyber.gouv.fr*).
+3. **Éviter les méthodes non sécurisées** : Les solutions comme le stockage sur papier, les fichiers non chiffrés ou l'envoi par e-mail sont déconseillées, car elles exposent les mots de passe aux attaques (*cyber.gouv.fr*).
+
+Ces recommandations visent à protéger les mots de passe contre les fuites et les compromis, tout en facilitant leur gestion pour les utilisateurs.",1,ATTENTION : Il mélange utilisateur et côté systèmes
+GAUT,GAUT.Q.26,Comment mettre en place un processus de recouvrement de mots de passe ?,Usuelle,GAUT.R.26,"Pour pallier l’oubli ou l’expiration d’un mot de passe, un mécanisme de recouvrement d’accès (au compte, au service, à la ressource, etc) doit être mis en place. De nombreuses méthodes existent et sont dépendantes du contexte d’utilisation. Parmi les plus courantes, on peut citer : la réception d’un mot de passe temporaire autogénéré (qui doit alors être changé sans tarder), la réception d’un lien temporaire à usage unique de réinitialisation, le contact du support informatique, etc.
+Ces méthodes viennent avec leurs problématiques propres : le choix du mode de réception (par courriel, SMS, envoi postal, téléphone, etc), le choix du temps de validité de liens temporaires, la complexité de ces méthodes pour l’utilisateur, l’ajout ou non de vérificateur humain, etc. Cela rend très difficile la recommandation d’une méthode en particulier. En revanche, la transmission du mot de passe originel en clair est à éviter.",36,Premier paragraphe,"Pour mettre en place un processus de recouvrement de mots de passe, les documents officiels de l'ANSSI recommandent les approches suivantes :
+
+1. **Méthodes adaptées au contexte** : Choisir une méthode adaptée à l'environnement d'utilisation (ex. : mot de passe temporaire autogénéré, lien de réinitialisation à usage unique, contact du support) en évitant la transmission du mot de passe originel en clair (*Document : ""4.7 Recouvrement d'un accès""*).
+2. **Sécurisation du processus** : Protéger le mécanisme de renouvellement pour éviter que l'attaquant n'accède au nouveau mot de passe (*Document : ""4.7 Recouvrement d'un accès""*).
+3. **Complémentarité avec d'autres mesures** : Associer le recouvrement à des contrôles de robustesse (ex. : vérification contre des dictionnaires de mots de passe compromis) et une politique de réinitialisation stricte (*Documents : ""4.5 Contrôle de la robustesse des mots de passe"", ""R27""*).
+
+**Références** :
+- *Guide ANSSI ""5.8 Recouvrement d'un accès""*
+- *Recommandations R30 et R27*",10,
+GAUT,GAUT.Q.27,Quel outil mettre à disposition des utilisateurs pour la gestion de leurs mots de passe ? ,Usuelle,GAUT.R.27,"Il est recommandé que les responsables du système d’information mettent à disposition des utilisateurs un coffre-fort de mots de passe et les forment à son utilisation.
+Le moyen d’authentification permettant de déverrouiller l’accès aux mots de passe contenus dans le coffre-fort a évidemment une importance majeure. Il prend souvent la forme d’un mot de passe, dit mot de passe « maître », qui doit être robuste et mémorisé par un humain. Ce mot de passe est très critique et sa compromission entraînerait la compromission de tous les mots de passe contenus dans le coffre-fort. De nombreuses solutions de coffres-forts de mots de passe proposent également l’ajout d’un second facteur d’authentification afin de mieux protéger l’accès au coffre-fort de mots de passe.",36,Cinquième paragraphe,"Pour la gestion des mots de passe, l'outil recommandé est un **coffre-fort de mots de passe**. Ce type d'outil permet de :
+- Stocker les mots de passe de manière sécurisée (dans une base de données chiffrée).
+- Générer des mots de passe robustes et uniques pour chaque service.
+- Ne nécessiter la mémorisation que d'un seul mot de passe maître.
+
+Cette solution est conforme aux recommandations **R31** et **R34** du document, qui encouragent la mise à disposition et l'utilisation de coffres-forts de mots de passe (comme *Keepass* par exemple) pour faciliter l'application des bonnes pratiques en matière de robustesse et de gestion des mots de passe.
+
+**Source :** Document mentionné (références R31, R34 et section 4.8).",10,
+GAUT,GAUT.Q.28,Quelles sont les recommandations à faire aux utilisateurs au sujet des mots de passe ? ,Usuelle,GAUT.Q.28,"Il est recommandé de faire les recommandations suivantes aux utilisateurs :
+-  Utiliser des mots de passe robustes;
+- Utiliser un mot de passe différent pour chaque service;
+- Utiliser un coffre-fort de mots de passe;
+- Protéger ses mots de passe;
+- Utiliser un mot de passe robuste pour l'accès à sa messagerie électronique;
+- Choisir un mot de passe sans information personnelle;
+- Modifier les mots de passe par défaut.","37
+38","37 - Troisième, quatrième, cinquième, sixième et huitième paragraphes
+38 - Deuxième et quatrième paragraphes",,,
+GAUT,GAUT.Q.29,Quelles sont les recommandations liées à l'utilisation d'un facteur de possession ? ,Usuelle,GAUT.R.29,"Pour l'utilisation d'un facteur de possession, il est recommandé d'utiliser si possible un facteur de possession intégrant un composant de sécurité (dont le composant de sécurité a reçu un visa de sécurité de l’ANSSI lorsque cela est possible).",40,Deuxième à quatrième paragraphes,,,
+GAUT,GAUT.Q.30,Quelles sont les recommandations liées à l'utilisation d'un facteur inhérent ? ,Usuelle,GAUT.R.30,"Pour l'utilisation d'un facteur inhérent, il est recommander de :
+- Ne pas utiliser un facteur inhérent comme unique facteur d'authentification;
+- Utiliser un facteur inhérent uniquement associé à un facteur d'authentification fort;
+- Favoriser une rencontre en présence lors de l'enregistrement d'un facteur inhérent.","43
+44","43 - Cinquième et sixième paragraphes
+44 - Premier paragraphe",,,
+GCRI,GCRI.Q.1,Qu’est-ce qu’une crise cyber ?,Usuelle,GCRI.R.1,"Une crise « d’origine cyber » se définit par la déstabilisation immédiate et majeure du fonctionnement courant d’une organisation (arrêt des activités, impossibilité de délivrer des services, pertes financières lourdes, perte d’intégrité majeure, etc.) en raison d’une ou de plusieurs actions malveillantes sur ses services et ses outils numériques (cyberattaques de type rançongiciel, déni de service, etc.). C’est donc un évènement à fort impact, qui ne saurait être traité par les processus habituels et dans le cadre du fonctionnement normal de l’organisation.",10,Premier parapgraphe,,,
+GCRI,GCRI.Q.2,Quelles sont les spécificités d'une crise cyber ?,Usuelle,GCRI.R.2,"En comparaison à d’autres scénarios de crise, les crises cyber ont des caractéristiques propres qu’il est important d’appréhender :
+- une double temporalité, avec des impacts immédiats et une remédiation longue pouvant s’étendre sur plusieurs semaines, voire plusieurs mois;
+- une absence d’unicité de lieu de réalisation, qui sous-entend une potentielle propagation à d’autres organisations en raison de l’interconnexion des SI;
+- une menace s’adaptant aux mesures d’endiguement et de remédiation;
+- une incertitude concernant le périmètre de la compromission;
+- une complexité pour comprendre les objectifs de l’attaquant et attribuer l’origine de l’attaque.","10
+11","10 - Troisième à cinquième paragraphe
+11 - Premier à troisième paragraphe","### Réponse :
+Les spécificités d'une crise cyber, selon le document *""Les enjeux de la préparation à la gestion d'une crise d'origine cyber""*, incluent :
+
+1. **Double temporalité** : impacts immédiats combinés à une remédiation longue (plusieurs semaines ou mois).
+2. **Propagation potentielle** : absence d'unicité de lieu en raison de l'interconnexion des systèmes d'information (SI), pouvant toucher d'autres organisations.
+3. **Nécessité d'une organisation dédiée** : mobilisation conjointe de profils métiers, cybersécurité (IT) et stratégique, avec des cellules spécifiques (stratégique, opérationnelle, communication, etc.).
+4. **Fonctionnement en mode dégradé** : adaptation des activités critiques en cas d'indisponibilité prolongée des outils numériques (PCA/PRA cyber, outils de communication hors réseau, etc.).
+
+🔗 **Source** : *""Les enjeux de la préparation à la gestion d'une crise d'origine cyber""* (ANSSI).",,"Pas la même réponse que dans le guide.
+
+Et quand j'essaye d'ajouter une question un peu loufoque après :
+### Réponse aux spécificités d'une crise cyber :
+Une crise cyber est définie par une déstabilisation majeure du fonctionnement d'une organisation en raison d'actions malveillantes ciblant ses systèmes numériques (ex. rançongiciels, dénis de service).
+Ses spécificités incluent :
+- **Double temporalité** : impacts immédiats et remédiation longue (semaines/mois) *(ANSSI-PA-089, ""Les spécificités des crises cyber"")*.
+- **Absence d'unicité de lieu** : risque de propagation via l'interconnexion des SI *(ANSSI-PA-089, ""Les spécificités des crises cyber"")*.
+- **Nécessité d'une préparation transversale** : impliquant directions métier et dirigeants pour maintenir l'activité *(ANSSI-PA-089, Éditorial et Partie 1)*.
+
+### Réponse à la recette de la tarte pomme :
+Les documents fournis ne permettent pas de répondre directement à cette question.
+--> Pas la même réponse les deux fois."
+GCRI,GCRI.Q.3,Comment se préparer à affronter une crise cyber ?,Complexe,GCRI.R.3,"Pour se préparer à affronter une crise cyber, il faut :
+- Connaître et maîtriser ses systèmes d'information;
+- Mettre en place un socle de capacités opérationnelles permettant de garantir un niveau adapté de résilience numérique;
+- Formaliser une stratégie de communication de crise cyber;
+- Adapter son organisation de crise au scénario cyber;
+- Préparer ses capacités de réponse à incident;
+- Mettre en place des polices d'assurance adaptées;
+- S'entraîner pour pratiquer et s'améliorer.","14
+16
+20
+22
+26
+28
+30","14 - Titre
+16 - Titre
+20 - Titre
+22 - Titre
+26 - Titre
+28 - Titre
+30 - Titre","Pour se préparer à affronter une crise cyber, les organisations doivent suivre des étapes clés issues du guide **ANSSI-PA-089** (ANSSI, 2021) :
+
+1. **Mettre en place une organisation résiliente** :
+   - Adapter les dispositifs de gestion de crise (cellule dédiée, moyens logistiques, plans de réaction) aux spécificités des incidents cyber.
+   - Identifier les experts à solliciter et définir des critères d’activation rapide des cellules de crise (*Fiche 4*).
+
+2. **Préparer des capacités de réaction** :
+   - Développer des réponses **stratégiques** (communication, gestion des impacts juridiques/financiers) et **techniques** (remédiation, continuité d’activité).
+   - Former les équipes (experts cyber, métiers, dirigeants) et organiser des exercices réguliers (*Fiche 4*).
+
+3. **Intégrer la communication de crise** :
+   - Anticiper les attentes des parties prenantes (clients, médias, autorités) et préparer des outils de communication adaptés (*Fiche 3*).
+
+4. **Maintenir les activités critiques** :
+   - Prioriser les services essentiels et assurer leur fonctionnement en mode dégradé.",,"La réponse semble prendre juste certains éléments
+
+Pour se préparer à affronter une crise cyber, les organisations doivent mettre en place des processus et outils éprouvés, comme le recommande l'ANSSI dans son guide **Gestion de crise cyber (ANSSI-PA-089)**. Voici les principales actions à entreprendre :
+
+1. **Adapter l'organisation de crise** :
+   - Mettre en place des critères et procédures d'activation des cellules de crise.
+   - Identifier les experts à solliciter (techniques, stratégiques, métiers).
+   - Définir un plan d'entraînement pour simuler des scénarios cyber.
+
+2. **Anticiper les impacts** :
+   - Prévoir des capacités de réaction techniques et stratégiques face aux menaces.
+   - Adapter l'assurance aux besoins spécifiques de l'organisation.
+
+3. **Associer les directions métiers** :
+   - Intégrer la gestion de crise dans la stratégie globale de résilience.
+   - Former les équipes (experts cyber et métiers) pour maintenir l'activité en cas d'attaque.
+
+Ces mesures visent à limiter les impacts, maintenir la confiance et prioriser les activités critiques en mode dégradé.
+
+**Sources** : Guide *Gestion de crise cyber* (ANSSI-PA-089, décembre 2021), notamment les parties éditoriale, introduction et fiche 4.
+
+--> Et ce n'est pas la même réponse"
+GCRI,GCRI.Q.4,"Lors de la préparation à la crise cyber, comment s'assurer de connaître et maîtriser ses systèmes d'information ?",Complexe,GCRI.R.4,"Pour se préparer à affronter une crise cyber, il est important de connaître et de maîtriser ses systèmes d'information. Pour cela, il est recommandé a minima de :
+- Lister les applications et services critiques rendus par l'organisation;
+- Cartographier les systèmes sur lesquels reposent les applications et services critiques;
+- Cartographier les périphériques des SI;
+- Lister les interdépendances des SI entre les métiers et les partenaires externes;
+- Cartographier les parties prenantes (et leurs points de contact);
+- Lister les moyens de supervision et de détection et leur périmètre;
+- Formaliser une politique de rétention des journaux/logs applicatifs et réseaux;
+- Formaliser une matrice des flux d'informations;
+- Formaliser les architectures des réseaux et des éléments fonctionnels, permettant de faire le lien entre les SI et les processus métiers.",14,TOUT,,,
+GCRI,GCRI.Q.5,"Lors de la préparation à la crise cyber, comment mettre en place un socle de capacités opérationnelles permettant de garantir un niveau adapté de résilience numérique ?",Usuelle,GCRI.R.5,"Pour se préparer à affronter une crise cyber, il est important de mettre en place un socle de capacités opérationnelles permettant de garantir un niveau adapté de résilience numérique. Pour cela, il est recommandé de :
+- Adapter le plan de continuité d’activité au scénario de crise cyber;
+- Réaliser un plan de reprise des activités pour le scénario cyber;
+- Mettre en place des outils de conduite de crise résilients (procédures, outils déconnectés, moyens de communication alternatifs, etc.).","17
+18
+19","17 - Premier paragraphe
+18 - Premier paragraphe
+19 - Premier paragraphe",,,
+GCRI,GCRI.Q.6,"Lors de la préparation à la crise cyber, comment formaliser une stratégie de communication de crise cyber ?",Usuelle,GCRI.R.6,"Pour se préparer à affronter une crise cyber, il convient de formaliser en amont une stratégie de communication de crise cyber. Pour cela, il est recommandé de :
+- Établir une liste des parties prenantes à contacter;
+- Anticiper la stratégie de communication de crise (anticipation des sujets médiatiques, contenu des messages, canaux de communication, etc.).","20
+21","20 - Quatrième paragraphe (tableau)
+21 - Premier paragraphe (tableau)",,,
+GCRI,GCRI.Q.7,"Lors de la préparation à la crise cyber, comment adapter son organisation de crise au scénario cyber ?",Usuelle,GCRI.R.7,"Pour se préparer à affronter une crise cyber, il convient d'adapter son organisation de crise au scénario cyber. Pour cela il est recommandé de :
+- Mettre en place des critères et des procédures d’activation des cellules de crise;
+- Organiser ses cellules de crise cyber (membres, expertises, ressources).","24
+25","24 - TOUT (tableau)
+25 - TOUT (tableau)",,,
+GCRI,GCRI.Q.8,"Lors de la préparation à la crise cyber, comment préparer ses capacités de réponse à incident ?",Usuelle,GCRI.R.8,"Pour se préparer à affronter une crise cyber, il convient de préparer ses capacités de réponse à incident. Pour cela il est recommandé de :
+- Identifier les experts à solliciter en temps de crise;
+- Mettre en place les capacités de réactions stratégiques  et techniques face aux différentes menaces (mémos, outils techniques et listes d'actions).",27,TOUT (tableau),,,
+GCRI,GCRI.Q.9,"Lors de la préparation à la crise cyber, comment mettre en place des polices d'assurance adaptées ?",Usuelle,GCRI.R.9,"Pour se préparer à affronter une crise cyber, il convient de mettre en place des polices d'assurances adaptées.
+En effet, Tout comme une assurance « classique », l’assurance cyber vise à compléter le niveau de protection du patrimoine d’une organisation. Ainsi, selon les conditions du contrat signé, l'assureur peut par exemple appuyer la stratégie de gestion des risques mise en place par l’organisation, assister la victime de l'attaque en lui faisant bénéficier d’expertises ou encore apporter un soutien financier à la victime.
+Pour cela, il est recommandé d'adapter l’assurance aux besoins de l’organisation en réalisant un état des lieux, identifiant les besoins en cas de crise cyber et en formalisant une fiche de bonnes pratiques pour faciliter l’utilisation de la police d’assurance en cas de crise (contacts de l’assureur, conservation des justificatifs, etc.)","28
+29","28 - Premier et deuxième paragraphe
+29 - TOUT (tableau)",,,
+GCRI,GCRI.Q.10,"Lors de la préparation à la crise cyber, comment s'entraîner pour pratiquer et s'améliorer ?",Usuelle,GCRI.R.10,"Pour se préparer à affronter une crise cyber, il convient de s'entraîner pour pratique et s'améliorer. En s’entraînant à affronter un enchaînement d’incidents dans des conditions réalistes, les équipes de gestion de crise impliquées développent en effet des réflexes, des méthodes et une confiance pour y faire face. Elles valident ou améliorent leurs dispositifs et leurs pratiques et prennent également l’habitude d’interagir ensemble, en dehors du cadre de travail quotidien.
+Pour cela, il est recommandé de définir un plan d’entraînement de crise cyber comprenant la réalisation régulière d'exercices testant des scénarios cyber impliquants des périmètres d'impacts et des menaces différents. Ces exercices doivent faire l'objet d'un plan d'action permettant l'amélioration des dispositifs et pratiques liés à la gestion de crise cyber.","30
+31","30 - Premier paragraphe
+31 - TOUT (tableau)",,,
+GCRI,GCRI.Q.11,Comment réagir efficacement à une crise cyber ? ,Complexe,GCRI.R.11,"Afin de réagir à une crise cyber, les actions des équipes s'articulent au sein de quatre grands phases :
+- Alerter, mobiliser le personnel et arrêter la propagation de l’attaque pour protéger les bénéficiaires et l’organisation;
+- Comprendre le schéma d’attaque, éjecter l’attaquant, déployer des mesures pour potentiellement travailler sans services et sans outils numériques et communiquer auprès de son écosystème pour maintenir la confiance;
+- Durcir les systèmes, restaurer les applications et les données critiques et surveiller l’attaquant pour reprendre le cœur des activités;
+- Revenir à la normale et faire le retour d’expérience.",34,Premier à cinquième paragraphes,,,
+GCRI,GCRI.Q.12,Quelle est la première phase lors de la réaction à une crise cyber ? ,Complexe,GCRI.R.12,"La première phase consiste à atteindre trois objectifs :
+- mobiliser et adapter le dispositif de crise aux enjeux et au rythme de la crise cyber;
+- mettre en place les premières mesures d’endiguement et de continuité d’activité;
+- alerter les réseaux de soutien.
+
+Pour cela il est recommandé de :
+- Activer son dispositif de crise cyber en fonction des critères préétablis et alerter les équipes de gestion de crise de la situation;
+- Mobiliser les équipes;
+- Comprendre l’attaque et l’étendue des impacts;
+- Endiguer l’attaque;
+- Assurer un support aux volets communication et juridique;
+- Créer des « équipes » cyber (groupes de travail ayant pour rôle de répondre à leurs objectifs dans un délai réduit);
+- Mettre en place un support RH adapté;
+- Organiser les aspects logistiques de la gestion de crise;
+- Activer son assurance cyber;
+- Mobiliser et centraliser les demandes de renfort;
+- Déclarer son incident auprès des autorités compétentes.","36
+37
+38
+39
+41
+42
+43
+44","36 - Troisième à cinquième paragraphes
+37 - Quatrième paragraphe (tableau)
+38 - Premier paragraphe (tableau)
+39 - Troisième paragraphe (tableau)
+41 - Deuxième paragraphe (tableau)
+42 - Premier paragraphe (tableau)
+43 - Deuxième paragraphe (tableau)
+44 - Premier paragraphe (tableau)",,,
+GCRI,GCRI.Q.13,Quelles sont les deux types de cellules au sein d'une organisation de crise cyber ?,Complexe,GCRI.R.13,"On retrouve au sein d'une organisation de crise cyber deux types de cellules :
+- Cellule de crise stratégique/décisionnelle;
+- Cellule de crise opérationnelle cyber et IT.",23,TOUT (tableau),,,
+GCRI,GCRI.Q.14,Quels sont les objectifs du pilotage du dispositif de crise ?,Usuelle,GCRI.R.14,"On retrouve au sein du pilotage du dispositif de crise un objectif par cellule :
+- Pour la cellule stratégique, l'objectif est de comprendre l'attaque et d'en mesurer les impacts;
+- Pour la cellule opérationnelle, l'objectif est d'endiguer l'attaque.",39,Troisième paragraphe (tableau),,,
+GCRI,GCRI.Q.15,Comment organiser ma sortie de crise ? ,Usuelle,GCRI.R.15,"Pour sortir d'une crise cyber, deux actions doivent être menées :
+- La cellule stratégique doit réévaluer les seuils de sortie de crise, définir le plan d'action sur les chantiers à mener après la crise, communiquer sur la sortie de crise, identifier et réaliser les obligations réglementaires post-crise, identifier les régularisation potentielles nécessaires liées à la gestion RH et enfin remercier les équipes pour leur travail et mobilisation;
+- La cellule opérationnelle doit évaluer les solutions de contournement pour les maintenir ou les supprimer en lien avec les équipes métiers, fiabiliser le registre des risques/des dérogations, revoir à la baisse le rythme de mobilisation des équipes, maintenir la surveillance du SI (notamment sur le chemin d'attaque ayant déclenché la crise) et enfin remercier les équipes pour leur travail et mobilisation.",63,TOUT (tableau),,,
+GCRI,GCRI.Q.16,Qu'est-ce qu'un RETEX suite à un déclenchement du dispositif de crise ? ,Usuelle,GCRI.R.16,"À la suite d’une crise, les équipes sont tentées de reprendre rapidement une activité normale. Pour autant, cette période de transition est le meilleur moment pour revenir sur la conduite de la crise et capitaliser sur ce qui a été vécu et ce qui pourrait être amélioré. Le retour d’expérience (RETEX) participe notamment à renforcer la résilience de l’organisation, en mettant en avant les points forts et les axes d’amélioration suite aux dysfonctionnements constatés. Il permet en particulier de pérenniser certains dispositifs de gestion de crise qui ont été jugés efficaces.",64,Premier paragraphe,,,
+GCRI,GCRI.Q.17,Qu'est-ce qu'un CSIRT ? ,Usuelle,GCRI.R.17,"Un CSIRT (Computer Security Incident Response Team) est un centre d’alerte, de traitement et de réaction aux cyberattaques
+destiné aux entreprises, aux administrations ou aux autorités.",72,Troisième paragraphe (colonne de gauche),,,
+GCRI,GCRI.Q.19,Quels sont les outils généraux de crise à utiliser lors d'une crise cyber ?,Usuelle,GCRI.R.19,"Les outils généraux à l'ensemble des crises pouvant être utilisés lors d'une crise cyber sont :
+- Salle de crise physique ou virtuelle
+- Annuaire de crise (personnes internes et externes) accessible en cas de black-out
+- Outil de suivi des actions
+- Outil de main courante
+- Outils de communication résilients / hors réseau : adresses mails génériques, tchat, visioconférence, téléphone fixes ou mobiles, etc.
+- Fiches-rôle
+- Fiches réflexes
+- Contrats d’assurance",67,TOUT (tableau),,,
+GHYG,GHYG.Q.1,Sur quels sujets les équipes opérationnelles doivent être formées ? Et à quelle fréquence ? ,Usuelle,GHYG.R.1,"Les équipes opérationnelles (administrateurs réseau, sécurité et système, chefs de projet, développeurs, RSSI) doivent, à leur prise de poste puis à intervalles réguliers - suivre des formations sur :
+- la législation en vigueur ;
+- les principaux risques et menaces ;
+- le maintien en condition de sécurité ;
+- l’authentification et le contrôle d’accès ;
+- le paramétrage fin et le durcissement des systèmes ;
+- le cloisonnement réseau ;
+- et la journalisation. ",7,Quatrième paragraphe,,,
+GHYG,GHYG.Q.2,Comment la sensibilisation peut être renforcée pour mes utilisateurs ?,Usuelle,GHYG.R.2,"Pour renforcer les mesures de sensibilisation en place, l'élaboration et la signature d'une charte des moyens informatiques précisant les règles et consignes que doivent respecter les utilisateurs peut être envisagée.",8,Troisième paragraphe,,,
+GHYG,GHYG.Q.3,Qu'est-ce qu'un PAS ? ,Usuelle,GHYG.R.3,Un PAS (Plan d'assurance sécurité) est un document contractuel décrivant l’ensemble des dispositions spécifiques que les prestataires s’engagent à mettre en œuvre pour garantir le respect des exigences de sécurité spécifiées par l’entité.,9,Troisième paragraphe,,,
+GHYG,GHYG.Q.4,Que peuvent être les données sensibles d'une entité ? ,Complexe,GHYG.R.4,"Chaque entité possède des données sensibles. Ces dernières peuvent porter sur son activité propre (propriété intellectuelle, savoir-faire, etc.) ou sur ses clients, administrés ou usagers (données personnelles, contrats, etc.). ",11,Premier paragraphe,,,
+GHYG,GHYG.Q.5,Qu'est-ce qu'un compte à privilège ? ,Usuelle,GHYG.R.5,Un compte à privilège est un compte bénéficiant de droits spécifiques .Ces comptes sont des cibles privilégiées par les attaquants qui souhaitent obtenir un accès le plus large possible au système d'information.,12,Premier paragraphe,,,
+GHYG,GHYG.Q.6,"Après avoir inventorié les comptes à privilège, si je maintien la liste à jour, existe-t-il d'autres actions à réaliser sur le sujet ? ",Complexe,GHYG.R.6,"Oui, il est fortement recommandé de procéder à une revue périodique de ces comptes afin de s’assurer que les accès aux éléments sensibles (notamment les répertoires de travail et la messagerie électronique des responsables) soient maitrisés. Ces revues permettront également de supprimer les accès devenus obsolètes suite au départ d’un utilisateur par exemple. ",12,Deuxième paragraphe,,,
+GHYG,GHYG.Q.7,"Que sont les procédures d'arrivée, de départ et de changement de fonction ?",Usuelle,GHYG.R.7,"Les effectifs d’une entité, qu’elle soit publique ou privée, évoluent sans cesse : arrivées, départs, mobilité interne. Il est par conséquent nécessaire que les droits et les accès au système d’information soient mis à jour en fonction de ces évolutions. Il est notamment essentiel que l’ensemble des droits affectés à une personne soient révoqués lors de son départ ou en cas de changement de fonction. Les procédures d’arrivée et de départ doivent donc être définies, en lien avec la fonction ressources humaines.",13,Premier paragraphe,,,
+GHYG,GHYG.Q.8,Pourquoi autoriser la connexion au réseau de l’entité aux seuls équipements maîtrisés ?,Complexe,GHYG.R.8,"Pour garantir la sécurité de son système d’information, l’entité doit maîtriser les équipements qui s’y connectent, chacun constituant un point d’entrée potentiellement vulnérable.",14,Premier paragraphe,,,
+GHYG,GHYG.Q.9,Que veut dire distinguer les rôles des utilisateur/administrateur ? ,Usuelle,GHYG.R.9,Distinguer les rôles des utilisateurs et des administrateur veut dire fournir à chaque administrateur un compte d'administration nominatif distinct du compte utilisateur (dont les identifiants et secrets d'authentification sont différents).,16,Quatrième paragraphe,,,
+GHYG,GHYG.Q.10,Quelles sont les mesures fondamentales à implémenter sur l'ensemble du parc informatique ? ,Usuelle,GHYG.R.10,"Il est recommandé de :
+- limiter les applications installées et modules optionnels des navigateurs web aux seuls nécessaires ;
+- doter les postes utilisateurs d’un pare-feu local et d’un anti-virus (ceux-ci sont parfois inclus dans le système d’exploitation) ;
+- chiffrer les partitions où sont stockées les données des utilisateurs ;
+- désactiver les exécutions automatiques (autorun).",23,Premier paragraphe,,,
+GHYG,GHYG.Q.11,Pourquoi activer le pare-feu local des postes de travail ? Et comment le faire ? ,Usuelle,GHYG.R.11,"Après avoir réussi à prendre le contrôle d’un poste de travail (à cause, par exemple, d’une vulnérabilité présente dans le navigateur Internet), un attaquant cherchera souvent à étendre son intrusion aux autres postes de travail pour, in fine, accéder aux documents des utilisateurs.
+Afin de rendre plus difficile ce déplacement latéral de l’attaquant, il est nécessaire d’activer le pare-feu local des postes de travail au moyen de logiciels intégrés (pare-feu local Windows) ou spécialisés.",26,Premier et deuxième paragraphes,,,
+GHYG,GHYG.Q.12,Comment transmettre le secret permettant de chiffrer les données transitant sur internet ? ,Usuelle,GHYG.R.12,"La transmission du secret (mot de passe, clé, etc.) permettant alors de déchiffrer les données, si elle est nécessaire, doit être effectuée via un canal de confiance ou, à défaut, un canal distinct du canal de transmission des données. Ainsi, si les données chiffrées sont transmises par courriel, une remise en main propre du mot de passe ou, à défaut, par téléphone doit être privilégiée",27,Troisième paragraphe,,,
+GHYG,GHYG.Q.13,Qu'est-ce que le cloisonnement par zone de sécurité ? ,Usuelle,GHYG.R.13,"Il est important, dès la conception de l’architecture réseau, de raisonner par segmentation en zones composées de systèmes ayant des besoins de sécurité homogènes. On pourra par exemple regrouper distinctement des serveurs d’infrastructure, des serveurs métiers, des postes de travail utilisateurs, des postes de travail administrateurs, des postes de téléphonie sur IP, etc.
+Une zone se caractérise alors par des VLAN et des sous-réseaux IP dédiés voire par des infrastructures dédiées selon sa criticité. Ainsi, des mesures de cloisonnement telles qu’un filtrage IP à l’aide d’un pare-feu peuvent être mises en place entre les différentes zones. On veillera en particulier à cloisonner autant que possible les équipements et flux associés aux tâches d’administration.",29,Deuxième et troisième paragraphe,,,
+GHYG,GHYG.Q.14,Est-ce que la protection du réseau Wi-Fi par un mot de passe unique est suffisante ?,Complexe,GHYG.R.14,"Non, cela n'est pas conseillé. Il est important d’avoir recours prioritairement à un chiffrement robuste (mode WPA2, algorithme AES CCMP) et à une authentification centralisée, si possible par certificats clients des machines.
+À défaut, le mot de passe doit être complexe et son renouvellement prévu mais il ne doit en aucun cas être diffusé à des tiers non autorisés.",30,Troisième et quatrième paragraphe,,,
+GHYG,GHYG.Q.15,Quels sont les protocoles réseaux sécurisés régulièrement utilisés ? ,Complexe,GHYG.R.15,"Les protocoles réseaux sécurisés les plus courants reposent sur l'utilsiation de TLS et sont souvent identifiables par l'ajout de la lettre ""s"" à l'acronyme du protocole. On retrouve par exemple HTTPS pour la navigation Web ou IMAPS, SMTPS ou POP3S pour la messagerie.",31,Troisième paragraphe,,,
+GHYG,GHYG.Q.16,Comment doivent être gérés les accès physiques à un datacenter ? ,Usuelle,GHYG.R.16,"Les accès aux salles serveurs et aux locaux techniques doivent être contrôlés à l’aide de serrures ou de mécanismes de contrôle d’accès par badge. Les accès non accompagnés des prestataires extérieurs aux salles serveurs et aux locaux techniques sont à proscrire, sauf s’il est possible de tracer strictement les accès et de limiter ces derniers en fonction des plages horaires. Une revue des droits d’accès doit être réalisée régulièrement afin d’identifier les accès non autorisés.",37,Deuxième paragraphe,,,
+GHYG,GHYG.Q.17,"J'ai un besoin de sécurité faible, quelles sont les recommandations de l'ANSSI sur le cloisonnement du réseau pour l'administration ? ",Complexe,GHYG.R.17,"Il est recommandé de mettre en œuvre un cloisonnement logique cryptographique reposant sur la mise en place de tunnels IPsec. Ceci permet d’assurer l’intégrité et la confidentialité des informations véhiculées sur le réseau d’administration vis-à-vis du réseau bureautique des utilisateurs. Au minimum, il est important  de mettre en oeuvre un cloisonnement logique par VLAN.",38,Deuxième paragraphe,,,
+GHYG,GHYG.Q.18,Comment gérer la délégation de privilèges sur un poste de travail ? ,Usuelle,GHYG.R.18,"La délégation de privilèges sur un poste de travail, si elle est réellement nécessaire pour répondre à un besoin ponctuel de l'utilisateur, doit être tracée, limitée dans le temps et retirée à échéance.",41,Troisième paragraphe,,,
+GHYG,GHYG.Q.19,Qu'est ce qui est recommandé pour sécuriser la connexion des postes nomades ? ,Usuelle,GHYG.R.19,"En situation de nomadisme, il n’est pas rare qu’un utilisateur ait besoin de se connecter au système d’information de l’entité. Il convient par conséquent de s’assurer du caractère sécurisé de cette connexion réseau à travers Internet. Même si la possibilité d’établir des tunnels VPN SSL/TLS est aujourd’hui courante, il est fortement recommandé d’établir un tunnel VPN IPsec entre le poste nomade et une passerelle VPN IPsec mise à disposition par l’entité.",45,Premier paragraphe,,,
+GHYG,GHYG.Q.20,Que doivent préciser les procédures opérationnelles de mise à jour des composants des systèmes d'information ?,Usuelle,GHYG.R.20,"Ces procédures doivent notamment préciser :
+- la manière dont l’inventaire des composants du système d’information est réalisé ;
+- les sources d’information relatives à la publication des mises à jour ;
+- les outils pour déployer les correctifs sur le parc (par exemple WSUS pour les mises à jour des composants Microsoft, des outils gratuits ou payants pour les composants tiers et autres systèmes d’exploitation) ;
+- l’éventuelle qualification des correctifs et leur déploiement progressif sur le parc.",48,Deuxième paragraphe,,,
+GHYG,GHYG.Q.21,"A minima, que dois-je journaliser sur le système d'information ?",Usuelle,GHYG.R.21,"Une étude contextuelle du système d’information doit être effectuée et les éléments suivants doivent être journalisés :
+- pare-feu : paquets bloqués ;
+- systèmes et applications : authentifications et autorisations (échecs et succès), arrêts inopinés ;
+- services : erreurs de protocoles (par exemples les erreurs 403, 404 et 500 pour les services HTTP), traçabilité des flux applicatifs aux interconnexions (URL sur un relai HTTP, en-têtes des messages sur un relai SMTP, etc.).",51,Quatrième paragraphe,,,
+GHYG,GHYG.Q.22,A quoi sert le protocole NTP pour la corrélation des évènements ? ,Usuelle,GHYG.R.22,"Afin de pouvoir corréler les évènements entre les différents composants, leur source de synchronisation de temps (grâce au protocole NTP) doit être identique.",51,Cinquième paragraphe,,,
+GHYG,GHYG.Q.23,Quelles sont les quatres différentes manières de réaliser les tests de restauration ? ,Complexe,GHYG.R.23,"Il n'existe que trois manières de réaliser les tests de restauration des sauvegardes :
+- systématique (par un ordonnanceur de tâches pour les applications importantes);
+- ponctuelle, en cas d'erreur sur les fichiers ;
+- générale, pour une sauvegarde et restauration entières du système d'information.",53,Troisième paragraphe,"Les documents fournis mentionnent trois manières de réaliser les tests de restauration, parmi les quatre attendues :
+
+1. **Systématique** : effectuée par un ordonnanceur de tâches pour les applications importantes.
+2. **Ponctuelle** : déclenchée en cas d'erreur sur les fichiers.
+3. **Générale** : pour une sauvegarde et restauration entières du système d'information.
+
+Les documents ne mentionnent pas explicitement la quatrième méthode. Cependant, d'autres sources officielles (comme le guide ANSSI sur la continuité d'activité) pourraient évoquer un test **aléatoire** ou **incidentiel** (en réponse à un événement non planifié). Mais selon les documents fournis, seules les trois premières méthodes sont citées.",,Effectivement
+GHYG,GHYG.Q.24,Est-ce qu'un audit de sécurité régulier qui ne remonte pas de vulnérabilité est une preuve de leur absence ? ,Complexe,GHYG.R.24,"Non, si les audits de sécurité participent à la sécurité du système d’information en permettant de mettre en évidence d’éventuelles vulnérabilités, ils ne constituent jamais une preuve de leur absence et ne dispensent donc pas d’autres mesures de contrôle. ",54,Quatrième paragraphe,,,
+GHYG,GHYG.Q.25,Quelles sont les six types approches pouvant être envisagées pour maîtriser les risques associées à un système d'information ? ,Complexe,GHYG.R.25,"Seules trois types d'approches sont présentés dans les guides ANSSI :
+- le recours aux bonnes pratiques de sécurité informatique ;
+- une analyse de risques systématique fondée sur les retours d'expérience des utilisateurs ;
+- une gestion structurée des risques formalisée par une méthodologie dédiée.",58,Quatrième paragraphe,,,
+GHYG,GHYG.Q.26,Quelle méthode d'analyse de risque est recommandée par l'ANSSI ? ,Usuelle,GHYG.R.26,La méthode EBIOS référencée par l'ANSSI est recommandée.,59,Premier paragraphe,,,
+GNOM,GNOM.Q.1,Qu'est-ce qu'est le nomadisme ?,Usuelle,GNOM.R.1,"Le nomadisme numérique désigne toute forme d’utilisation des technologies de l’information permettant à un utilisateur d’accéder au SI de son entité d’appartenance ou d’emploi, depuis des lieux distants, ces lieux n’étant pas maîtrisés par l’entité.",10,Premier paragraphe,,,
+GNOM,GNOM.Q.2,Qu'est-ce qui doit être intégré à la PSSI en cas de nomadisme ou de télétravail ?,Usuelle,GNOM.R.2,"L’entité doit mettre à jour sa PSSI, c’est-à-dire redéfinir les objectifs de sécurité, les acteurs concernés ainsi que les moyens mis en œuvre pour atteindre la cible de sécurité de son SI en situation de nomadisme.",13,Sixième paragraphe,,,
+GNOM,GNOM.Q.3,Quels sont les éléments qui composent le nomadisme ? ,Usuelle,GNOM.R.3,"Les éléments qui composent le nomadisme sont, de façon macroscopique, les suivants :
+- L'utilisateur nomade,
+- Le poste nomade,
+- Le canal d'interconnexion,
+- La passerelle d'interconnexion,
+- Les ressources accessibles par les postes nomades dans le SI interne de l'entité.",14,Premier paragraphe,,,
+GNOM,GNOM.Q.4,Dans quels cas le travail en dehors des locaux de l'entité peut il être interdit ?,Usuelle,GNOM.R.4,"Il est important d’identifier les métiers ainsi que les applications éligibles au nomadisme et au télétravail. Le travail en dehors des locaux de l’entité peut être interdit par exemple pour les raisons suivantes :
+- Le niveau de sensibilité des données ou de l’activité est trop élevé;
+- Des contraintes réglementaires;
+- Des restrictions liées au métier (p. ex. utilisation de matériel spécifique).",15,Deuxième paragraphe,,,
+GNOM,GNOM.Q.5,"Si un utilisateur change de fonction alors qu'il était autorisé à télétravailler, que dois-je vérifier ? ",Complexe,GNOM.R.5,"Il est important de bien tenir à jour la liste des utilisateurs nomades, comme cela doit être fait pour la gestion en général des utilisateurs de l’entité. Il faut notamment s’assurer que dans le cas d’un changement de fonction, ils n’exercent pas ensuite une activité incompatible avec le nomadisme numérique.",15,Troisième paragraphe,,,
+GNOM,GNOM.Q.6,"En cas de télétravail dans un pays avec lequel des tensions existent, qu'est-il possible de faire ? ",Complexe,GNOM.R.6,"Il est possible de catégoriser les utilisateurs nomades en fonction du niveau de risque auquel ils sont exposés et d’appliquer des règles spécifiques selon cette catégorisation (accès restreint, etc.).",15,Quatrième paragraphe,,,
+GNOM,GNOM.Q.7,"Mon entreprise va autoriser le télétravail, la charte informatique doit-elle évoluer ?",Complexe,GNOM.R.7,"Oui, la charte informatique doit également intégrer les règles d’usage liées au nomadisme (p. ex. verrouiller sa session lorsque l’on laisse le poste sans surveillance, ne pas exposer la saisie de secrets à la vue d’autres personnes, etc.).",16,Troisième paragraphe,,,
+GNOM,GNOM.Q.8,Que devrais-je choisir : imposer un poste nomade par utilisateur ou autoriser les postes nomades partagées ? ,Complexe,GNOM.R.8,"Il est recommandé de dédier le poste nomade à un utilisateur nomade identifié. En effet, chaque poste nomade doit être lié à un utilisateur nomade. L’utilisateur et le poste nomade doivent être identifiés dans le système de gestion d’équipements de l’entité.
+Si cela n'est pas possible, il est important mener une analyse de risque et de prendre des mesures complémentaires, pour éviter principalement qu’un utilisateur ne puisse accéder aux données d’un autre utilisateur en partageant le même poste (cloisonnement strict).","16
+17","16 - Sixième et septième paragraphe
+17 - Premier paragraphe",,,
+GNOM,GNOM.Q.9,Les ordinateurs personnels peuvent-ils être utilisés pour le nomadisme ? ,Usuelle,GNOM.R.9,"Cela est déconseillé. En effet, il est recommandé que seuls les postes nomades gérés et configurés par les équipes informatiques de l’entité, ou un prestataire mandaté, puissent être utilisés par les utilisateurs nomades. Ainsi, l’utilisation d’équipements personnels (BYOD) est déconseillée .",18,Troisième paragraphe,,,
+GNOM,GNOM.Q.10,Quels sont les 10 moyens de protection physique que l'entité doit mettre à disposition des utilisateurs nomades ? ,Complexe,GNOM.R.10,"L'entité doit mettre à disposition les moyens de protection physique des postes nomades suivants :
+- un filtre écran de confidentialité (pour les PC portables, mais aussi pour les tablettes et les téléphones mobiles);
+- des scellés pour identifier une éventuelle compromission matérielle;
+- des verrous de ports USB et RJ45 si nécessaire;
+- éventuellement un câble antivol.",19,Quatrième paragraphe,,,
+GNOM,GNOM.Q.11,Qu'est-ce que le Measured Boot ? ,Usuelle,GNOM.R.11,"Le Measured Boot est une technique complémentaire du Secure Boot UEFI. En effet, ce dernier assure que les binaires UEFI de la chaîne de démarrage sont tous signés, mais permet donc de démarrer plusieurs versions du système (ancienne version, version parallèle signée…). Par contraste, le Measured Boot s’appuie sur plus de paramètres et permet de s’assurer que le système actuellement démarré est dans un état précis attendu. Pour cela, le Measured Boot s’appuie sur le TPM 9 et ses PCR.",21,Premier paragraphe,,,
+GNOM,GNOM.Q.12,"J'ai installé Bitlocker pour chiffrer les disques des PC nomades, est-ce suffisant ?",Complexe,GNOM.R.12,"Non, cela n'est pas suffisant. Pour être efficace, l’outil doit être configuré de manière à ce que la fonction de déchiffrement du disque au démarrage du poste ne soit pas automatique mais nécessite la saisie préalable d’un mot de passe par l’utilisateur.",22,Cinquième paragraphe,"La mise en place de BitLocker est une première mesure importante pour chiffrer les disques des PC nomades, mais elle peut ne pas être suffisante dans tous les cas. Selon les recommandations de l'ANSSI (document ""cyber.gouv.fr""), l'efficacité du chiffrement dépend de plusieurs facteurs :
+
+1. **Protection des clés de chiffrement** : Si le poste est équipé d'un TPM, il est recommandé de l'utiliser pour protéger les clés de chiffrement et assurer l'intégrité de la chaîne de démarrage (*Measured Boot*). Sans TPM ou en cas d'incompatibilité, un mot de passe manuel doit être exigé au démarrage (section *3.3.4*).
+
+2. **Authentification multifacteur** : Pour une protection renforcée, l'ANSSI conseille d'associer le déchiffrement à une carte à puce avec code PIN (section *Mettre en œuvre une solution de chiffrement de disque avec un TPM et une carte à puce*).
+
+3. **Risque résiduel** : Le chiffrement protège uniquement les données en cas de vol ou de perte du poste **éteint**. Une fois démarré, d'autres protections (comme l'authentification utilisateur) sont nécessaires (section *3.3.4*).
+
+**Conclusion** : BitLocker est un bon point de départ, mais pour une conformité optimale, il doit être complété par :
+- Un TPM (si disponible) pour le *Measured Boot*.
+- Une carte à puce + PIN pour l'authentification au démarrage (solution ""R9+"").
+
+*Source : cyber.gouv.fr (sections 3.3.4 et recommandations associées).*",,"Bonne réponse mais la source ""cyber.gouv.fr"" est mauvaise"
+GNOM,GNOM.Q.13,Qu'est-ce que recommande l'ANSSI sur le chiffrement de disque ?,Usuelle,GNOM.R.13,"Si la solution de chiffrement et le poste nomade le permettent, il est recommandé de mettre en place le Measured Boot via le TPM, et de lier les opérations de descellement à une carte à puce. Un mot de passe ou code PIN lié à cette carte à puce doit être demandé à l’utilisateur au démarrage du poste nomade, afin de lancer le processus de déchiffrement du disque.",23,Sixième paragraphe,,,
+GNOM,GNOM.Q.14,Pourquoi un utilisateur nomade ne doit pas être administrateur local de son poste ?,Usuelle,GNOM.R.14,"L’utilisateur ne doit pas être en mesure de modifier le paramétrage des logiciels assurant la connexion du poste nomade au SI de l’entité. Il ne doit pas avoir les droits de désinstaller les moyens de connexion logiciels installés sur son poste nomade (client VPN, logiciel de gestion de carte à puce, etc.) ni de désactiver les fonctions de protection configurées sur son poste nomade (pare-feu, antivirus, etc.).
+Donc pour interdire à l'utilisateur la modification de la configuration des moyens de protection et de connexion au SI de l'entité, l'utilisateur ne doit pas être administrateur local de son poste.",25,Quatrième et cinquième paragraphes,,,
+GNOM,GNOM.Q.15,Quelles sont les bonnes pratiques à respecter pour réduire la surface d'attaque sur le système d'exploitation du poste nomade ? ,Usuelle,GNOM.R.15,"De manière générale, il est recommandé de respecter les bonnes pratiques suivantes :
+- utiliser uniquement des équipements initialisés à partir d’un standard d’installation propre à l’entité, c’est-à-dire une image de référence ou master;
+- n’installer que les logiciels et les modules strictement nécessaires;
+- réduire au strict besoin opérationnel le nombre de comptes locaux à privilèges;
+- désactiver les technologies non utilisées selon le contexte d’usage : Wi-Fi, réseau mobile (4G, 5G), Bluetooth, NFC, Thunderbolt, etc.",28,Troisième paragraphe,,,
+GNOM,GNOM.Q.16,"Si un poste nomade n'est pas à jour pour les correctifs de sécurité, que faire ?",Usuelle,GNOM.R.16,"Il faut mettre en œuvre des mesures techniques permettant de bloquer temporairement toutes les connexions au SI interne de postes nomades non conformes à la politique de sécurité de l’entité. Il faut alors procéder à la mise à jour des postes nomades non conformes au moyen d’un ou plusieurs serveurs de remédiation (correctifs de sécurité, anti-virus, etc.) situés dans une zone isolée, au sein de la passerelle d’interconnexion par exemple.",30,Quatrième paragraphe,,,
+GNOM,GNOM.Q.17,Que faut-il préférer : VPN TLS ou IPsec ? ,Complexe,GNOM.R.17,"En cas de besoin de sécurité faible, un VPN IPsec ou TLS configuré à l'état de l'art convient.
+A l'inverse, dans le cas où les besoins de sécurité sont importants, il est préférable de s’appuyer sur une technologie de VPN IPsec, ce dernier étant par nature plus résistant aux méthodes d’attaque les plus sophistiquées.",32,Sept!ème et huitième paragraphes,,,
+GNOM,GNOM.Q.18,Qu'est-ce que le split tunneling ? ,Usuelle,GNOM.R.18,"Un équipement dit en split-tunneling est un équipement qui dispose d’un accès simultané à deux réseaux différents : un accès au réseau de l’entité (VPN) et un accès au réseau local de l’utilisateur nomade (et généralement par extension à Internet). L’expression split-tunneling indique que seuls les flux à destination du SI de l’entité sont routés vers le tunnel VPN, les autres flux sont routés au travers du réseau local du poste (par exemple des flux vers Internet).",34,Premier paragraphe,,,
+GNOM,GNOM.Q.19,Le split tunneling est-il autorisé sur les postes nomades ? ,Usuelle,GNOM.R.19,"Il est recommandé que le split-tunneling soit proscrit sur le poste nomade de l’utilisateur. Une fois le tunnel monté entre le poste nomade et le SI de l’entité, tous les flux doivent être acheminés uniquement vers le SI interne de l’entité.
+Si le split-tunneling est nécessaire et autorisé, des mesures de sécurité complémentaires doivent être mises en place.","35
+36","35 - Deuxième paragraphe
+36 - Troisième paragraphe",,,
+GNOM,GNOM.Q.20,Quelles sont les mesures complémentaires nécessaires afin de réduire les risques liées au split-tunneling ? ,Usuelle,GNOM.R.20,"Si le split-tunneling est nécessaire et autorisé, les mesures complémentaires suivantes sont nécessaires afin d'en atténuer les risques :
+- Les services hors-tunnel sont identifiés formellement et validés par les responsables de la sécurité de l’entité.
+- Les flux hors-tunnel sont protégés en confidentialité et sont authentifiés par des protocoles configurés à l’état de l’art (p. ex. en suivant le guide TLS pour des flux HTTPS).
+- Les flux hors-tunnel doivent être filtrés en sortie sur le pare-feu local avec une liste d’adresses IP publiques restreinte au strict besoin opérationnel.
+- Le filtrage des flux hors-tunnel doit être fait par adresses IP (ou éventuellement par noms de domaine DNS) plutôt que par plages d’adresses IP (en fonction des préconisations de l’éditeur).
+- Le suivi des règles de filtrage local sur le poste nomade doit être le plus régulier possible et tenir compte des modifications des adresses IP publiques et des ports réseaux des services hors-tunnel.
+- Si le fournisseur d’un service hors-tunnel permet la configuration d’un proxy, cette fonction doit être activée afin de restreindre les adresses IP publiques de destination autorisées en sortie à ce seul proxy.
+- Si le fournisseur le propose, la phase d’authentification des utilisateurs aux services hors-tunnel doit transiter au travers du tunnel VPN et seuls les flux de données applicatives doivent transiter hors-tunnel une fois l’utilisateur authentifié.
+- Les fournisseurs des services hors-tunnel doivent proposer un niveau de journalisation aligné avec celui requis par la politique de sécurité de l’entité.
+- Toute modification non prévue de la configuration du split-tunneling (règles de filtrage, table de routage, client VPN) sur un poste nomade doit systématiquement déclencher la remontée d’une alerte aux administrateurs de sécurité de l’entité.
+- La route par défaut de la table de routage du poste nomade est l’adresse IP du concentrateur VPN. Les routes spécifiques des services hors-tunnel sont déclarées explicitement dans la table de routage.",36,Quatrième paragraphe (tableau),,,
+GNOM,GNOM.Q.21,Quels sont les quatre niveaux d'authentification considérés lors de l'authentification en situation de nomadisme ?,Complexe,GNOM.R.21,"Seuls trois niveaux d'authentification doivent être considérés :
+1. authentification de l'utilisateur sur le poste nomade;
+2. authentification du poste nomade sur le SI;
+3. authentification de l'utilisateur sur le SI.",50,Premier paragraphe,,,
+GNOM,GNOM.Q.22,Quels sont les moyens de MFA à éviter en cas de nomadisme ?,Usuelle,GNOM.R.22,"Il est recommandé d'éviter, dans la mesure du possible, les moyens d'authentification multifacteur suivants :
+- l’envoi d’un SMS sur le téléphone professionnel, le protocole de signalisation n’étant pas considéré comme sécurisé;
+- l’utilisation d’une carte à puce ou d’un token physique dépourvu d’un composant de sécurité (par exemple, une clé privée copiée sur une clé USB standard et dont l’accès est protégé par une passphrase ne saurait constituer une solution suffisamment robuste);
+- l’utilisation d’une solution technique multifacteur (application spécifique, code temporaireOTP) qui serait implémentée et présentée à l’utilisateur sur le même équipement que celui qui réalise l’authentification (le facteur de possession n’est alors pas indépendant du poste nomade à l’origine de la connexion).",53,Cinquième paragraphe,,,
+GNOM,GNOM.Q.23,Est-ce que je peux utiliser une IGC externe pour les certificats VPN ? ,Usuelle,GNOM.R.23,"Il est déconseillé de recourir à une IGC externe dans ce cas.
+L'ANSSI recommande la mise en place d'une IGC maîtrisée par l'entité et dédiée au nomadisme. Il est toutefois possible de déployer une ou plusieurs autorités intermédiaires dédiées au nomadisme et s’appuyant sur une IGC racine déjà existante au sein de l’entité.",63,Cinquième paragraphe,,,
+GNOM,GNOM.Q.24,Quelles sont les éléments à journaliser a minima en situation de nomadisme ?,Usuelle,GNOM.R.24,"Les éléments à journaliser a minima en situation de nomadisme sont :
+- ouvertures de sessions utilisateur (réussites, échecs, certificats expirés, etc.);
+- fermetures de sessions utilisateur;
+- établissement du tunnel VPN (réussites, échecs, certificats expirés, etc.);
+- fermetures du tunnel VPN;
+- démarrage d’applications métier accédées par l’utilisateur;
+- fermetures d’applications métier par l’utilisateur;
+- connexions de supports amovibles;
+- erreurs système;
+- résultat de l’analyse anti-virus;
+- modifications de configurations (changement de mot de passe, etc.).",79,Septième paragraphe,,,
+GADM,GADM.Q.1,Qu'est-ce qu'un administrateur ? ,Usuelle,GADM.R.1,"Un administrateur est non seulement un acteur essentiel du système d’information mais aussi un contributeur majeur pour sa sécurité. Il peut être un salarié de l’entité (on parle d’administrateur interne) ou un sous-traitant de l’entité (on parle d’administrateur externe), indépendamment du lieu d’activité. De plus, qu’il soit administrateur technique (réseau, système) ou administrateur métier, les besoins d’accès et de privilèges ne sont généralement pas uniformes ; les administrateurs peuvent être regroupés par catégories.
+Un administrateur est une ressource critique investie de capacités techniques d’accès aux informations métier de l’entité. En effet, il se distingue des autres utilisateurs par les privilèges qui lui sont accordés sur le système d’information. Il dispose de droits d’administration nécessaires à la bonne réalisation d’actions d’administration.",8,Deuxième et troisième paragraphes,,,
+GADM,GADM.Q.2,Qu'est-ce qu'une action d'administration ?,Usuelle,GADM.R.2,"Ensemble des actions d’installation, de suppression, de modification et de consultation de la configuration d’un système participant au SI et susceptibles de modifier le fonctionnement ou la sécurité de celui-ci.",8,Quatrième paragraphe,,,
+GADM,GADM.Q.3,Quelles sont les mesures RH liées aux administrateurs ?,Usuelle,GADM.R.3,"Il est recommandé :
+- d'informer les administrateurs de leurs droits et devoirs;
+- de former les administrateurs à l'état de l'art en matière SSI.",10,Troisième et cinquième paragraphes,,,
+GADM,GADM.Q.4,Qu'est-ce qu'une zone de confiance ?,Usuelle,GADM.R.4,Une zone de confiance comprend exclusivement des ressources homogènes ; elle est administrée par des administrateurs de même niveau de confiance.,13,Quatrième paragraphe,,,
+GADM,GADM.Q.5,Puis-je mutualiser les infrastructures physiques d'instances virtuelles d'administration avec d'autres instances virtuelles ?,Usuelle,GADM.R.5,"Cela est déconseillé. En cas de virtualisation d’infrastructures d’administration, les instances virtuelles correspondantes doivent être déployées sur des socles physiques dédiés, non mutualisés avec d’autres infrastructures virtualisées.",15,Huitième paragraphe,,,
+GADM,GADM.Q.6,Le BYOD est-il autorisé pour l'administration ?,Usuelle,GADM.R.6,Cela est déconseillé. Le poste d’administration doit être géré par l’entité – ou à défaut un prestataire mandaté. En aucun cas l’utilisation d’un équipement personnel ne doit être tolérée pour l’administration d’un SI.,17,Troisième paragraphe,,,
+GADM,GADM.Q.7,Qu'est-ce qu'un poste d'administration multi-niveaux ? ,Usuelle,GADM.R.7,"À défaut d’un poste d’administration physiquement dédié, l’emploi de technologies de virtualisation ou de conteneurisation pour obtenir un système multi-niveaux peut être envisagé, dans la mesure où le cloisonnement des environnements est réalisé par des mécanismes évalués comme étant de confiance au niveau système. ",18,Sixième paragraphe,,,
+GADM,GADM.Q.8,Mes administrateurs doivent faire des recherches sur internet pour travailler. L'accès à Internet depuis un poste d'administration est-il autorisé ? ,Complexe,GADM.R.8,"Cela est déconseillé. Le poste d’administration ne doit en aucun cas avoir accès à Internet. Cette recommandation inclut en particulier la navigation Web et l’usage de messageries électroniques connectées à Internet, même si ces services sont filtrés par des passerelles sécurisées d’accès Internet.",22,Quatrième paragraphe,,,
+GADM,GADM.Q.9,Les administrateurs peuvent-ils être administrateur local de leurs postes ?,Usuelle,GADM.R.9,"Par défaut, les administrateurs ne doivent pas disposer des droits d’administration sur leur poste d’administration. Ces droits doivent être attribués uniquement aux administrateurs en charge de l’administration des postes d’administration.",23,Quatrième paragraphe,,,
+GADM,GADM.Q.10,Dois-je mettre en place un filtrage local sur les postes administrateurs ?,Usuelle,GADM.R.10,"Oui, pour maîtriser les accès au plus près des ressources administrées, il est recommandé de leur appliquer un filtrage local correspondant au juste besoin opérationnel.",27,Deuxième paragraphe,,,
+GADM,GADM.Q.11,Dois-je dédier une interface réseau physique d'administration ou cette inferface peut-elle être virtuelle ?,Complexe,GADM.R.11,"Il est recommandé de dédier une interface réseau physique d’administration sur les ressources administrées en s’assurant des pré-requis suivants :
+- les services logiques permettant l’exécution des actions d’administration doivent être en écoute uniquement sur l’interface réseau d’administration prévue à cet effet ;
+- les fonctions internes du système d’exploitation ne doivent pas permettre le routage d’informations entre les interfaces réseau de production et l’interface réseau d’administration d’une même ressource. Elles doivent être désactivées (ex. : désactivation d’IPForwarding).
+
+À défaut d’une interface réseau physique d’administration, il est recommandé de dédier une interface réseau virtuelle d’administration sur les ressources administrées. Les mêmes pré-requis s’appliquent.",28,Premier et deuxième paragraphes,"**Réponse synthétique :**
+
+Si une interface réseau physique d'administration est recommandée pour un niveau de sécurité maximal, une interface virtuelle peut être utilisée à défaut. Les deux solutions doivent respecter les mêmes prérequis (ex. : désactivation du routage entre interfaces, services d'administration limités à l'interface dédiée).
+
+*Sources :*
+- **R18** et **R40** (documents fournis) pour les prérequis généraux.
+- **Guide ANSSI** (mentionné dans ""Dédier une interface réseau virtuelle d'administration"") pour la priorisation de l'interface physique, mais tolérance en cas d'impossibilité technique.
+- **R39** pour le contexte de l'administration sur réseaux dédiés ou sécurisés (VPN IPsec).
+
+*Exceptions :* Les interfaces de gestion à distance (ex. : Cisco IMC) doivent être traitées comme des interfaces d'administration physiques ou virtuelles, selon leur configuration et l'analyse de risques (documents fournis, section ""Dédier une interface réseau virtuelle d'administration"").",,"Quand je lui demande les prérequis en plus :
+D'après les documents fournis, une interface réseau d'administration peut être soit physique, soit virtuelle, sous réserve de respecter les prérequis suivants :
+
+1. **Services d'administration** : Ils doivent être en écoute uniquement sur l'interface dédiée (physique ou virtuelle).
+2. **Routage désactivé** : Les fonctions de routage (comme *IP Forwarding*) entre les interfaces de production et d'administration doivent être désactivées (*R18* et *R40*).
+
+### Options possibles :
+- **Interface physique** : Recommandée pour un niveau de sécurité maximal (*R19*).
+- **Interface virtuelle** : Alternative si l'interface physique n'est pas réalisable (*R40*).
+- **Interfaces de gestion matériel** : Si utilisées (ex. : Cisco IMC, HP iLO), elles doivent être considérées comme des interfaces d'administration spécifiques et raccordées au réseau dédié.
+
+### Prérequis supplémentaires :
+- **Filtrage des flux** : Seuls les flux initiés depuis les postes d'administration vers les ressources administrées sont autorisés (*R19*).
+- **Réseau physique dédié** : Les ressources d'administration doivent idéalement être déployées sur un réseau physiquement dédié (*R39*).
+
+**Sources** : *R18, R19, R39, R40* (documents fournis)."
+GADM,GADM.Q.12,Comment éviter un déplacement latéral à travers les interfaces réseaux d'administration ?,Complexe,GADM.R.12,Une mesure de blocage ou de filtrage réseau doit être mise en œuvre entre les ressources administrées afin d’interdire toute tentative de compromission par rebond à travers les interfaces réseaux d’administration.,29,Premier paragraphe,,,
+GADM,GADM.Q.13,Quels protocoles pour les flux d'administration ? ,Usuelle,GADM.R.13,"Il est recommandé d’utiliser systématiquement, dès lors qu’ils existent, des protocoles et des outils d’administration utilisant des mécanismes de chiffrement et d’authentification robustes, en privilégiant les protocoles sécurisés standardisés et éprouvés (ex. : TLS ou SSH). Le cas échéant, les protocoles non sécurisés doivent être explicitement désactivés ou bloqués.
+
+À défaut d’interfaces d’administration dédiées ou d’outils d’administration permettant le chiffrement et l’authentification de bout en bout, les flux d’administration doivent être protégés par la mise en œuvre d’un tunnel VPN IPsec, avec authentification mutuelle par certificats, depuis le serveur outils ou le poste d’administration vers les ressources administrées. Ce tunnel VPN IPsec doit être établi au plus près de la ressource d’administration et de la ressource administrée.
+",32,Troisième et sixième paragraphes,,,
+GADM,GADM.Q.14,"Un compte générique ""administrateur"" par défaut est-il autorisé ? ",Complexe,GADM.R.14,Cela est déconseillé. Des comptes d’administration individuels doivent être attribués à chaque administrateur. Les comptes natifs d’administration ne doivent pas être utilisés pour les actions courantes d’administration et les secrets associés ne doivent être accessibles qu’à un nombre très restreint de personnes.,36,Quatrième paragraphe,,,
+GADM,GADM.Q.15,Quels journaux pour les comptes d'administration ?,Usuelle,GADM.R.15,"Les mécanismes d’audit des événements concernant les comptes d’administration doivent être mis en œuvre. En particulier, les journaux suivants doivent être activés :
+- ouvertures et fermetures de session ;
+- échecs d’authentification et verrouillage des comptes ;
+- gestion des comptes ;
+- gestion des groupes de sécurité.",37,Premier paragraphe,,,
+GADM,GADM.Q.16,Je gère les droits de mes administrateurs un par un. Est-ce optimal ?,Complexe,GADM.R.16,"Non, il est recommandé d'attribuer les droits d'administrations à des groupes de comptes d’administration plutôt qu’unitairement à des comptes d’administration.",40,Premier paragraphe,,,
+GADM,GADM.Q.17,Qu'est-ce qui doit être fait avant implémentation d'un correctif de sécurité ?,Usuelle,GADM.R.17,Il est recommandé que les administrateurs procèdent à la qualification des correctifs de sécurité avant leur mise en production et leur généralisation. Une procédure d’urgence doit également être prévue pour réagir en cas de crise nécessitant l’application d’un correctif de sécurité au plus vite.,42,Premier paragraphe,,,
+GADM,GADM.Q.18,Les journaux d'événements peuvent-ils être stockés sur les postes de travail des administrateurs ?,Complexe,GADM.R.18,"Cela est déconseillé. L’architecture doit prévoir la transmission des journaux d’événements de manière centralisée, depuis les équipements vers les services de journalisation.",44,Deuxième paragraphe,,,
+GADM,GADM.Q.19,Qu'est-ce que la qualification PAMS ?,Usuelle,GADM.R.19,"Cette qualification, valorisée par un visa de sécurité ANSSI, permet d’identifier facilement les prestataires d’administration et de maintenance sécurisées fournissant une qualité de service à la hauteur des enjeux de sécurité actuels.",51,Cinquième paragraphe,,,
+GINT,GINT.Q.1,Qu'est-ce qu'une DMZ ? ,Usuelle,GINT.R.1,"En informatique, le concept militaire de zone démilitarisée (DMZ) est régulièrement réutilisé pour désigner un sous-réseau (concrètement, quelques équipements) séparant deux zones de confiance hétérogène notamment grâce à des pare-feux réalisant un filtrage périmétrique de part et d’autre.",10,Premier paragraphe,,,
+GINT,GINT.Q.2,Qu'est-ce qu'une passerelle Internet sécurisée ? ,Usuelle,GINT.R.2,La passerelle Internet sécurisée inclut la DMZ d’interconnexion entre le SI interne de l’entité et Internet ainsi que les pare-feux périmétriques qui la protègent. ,12,Troisième paragraphe,,,
+GINT,GINT.Q.3,"En cas d'accès à Internet pour essayer une application comme un utilisateur (et donc sans filtrage), quelles sont les recommandations ?",Complexe,GINT.R.3,Il est recommandé de réaliser cet accès depuis une infrastructure physique distincte de l'infrastructure de l'entité où la passerelle internet est incontournable.,12,Quatrième paragraphe,,,
+GINT,GINT.Q.4,Qu'est-ce qu'une rupture protocolaire ? ,Usuelle,GINT.R.4,"Une rupture protocolaire consiste à casser en entrée et reconstruire en sortie la communication entre deux ressources (généralement un client et un serveur) au niveau d’une des couches du modèle OSI.
+Les protocoles en entrée et en sortie peuvent être distincts suivant les contraintes techniques de l’environnement et les objectifs de sécurité.",15,Troisième paragraphe,,,
+GINT,GINT.Q.5,Puis-je mutualiser le pare-feu interne et externe de ma passerelle internet ?,Usuelle,GINT.R.5,"Cela est déconseillé. En raison de la forte exposition des zones d’accès interne et externe, toute mutualisation des pare-feux interne et externe, même à l’aide d’instances virtuelles distinctes déployées sur un socle physique commun, doit être proscrite.",22,Quatrième paragraphe,,,
+GINT,GINT.Q.6,Faut-il que les paquets refusés par mon pare-feu générent une réponse ? ,Usuelle,GINT.R.6,Cela est déconseillé. Il est recommandé que les connexions refusées par la politique d’un pare-feu externe ne génèrent pas de réponses (mode DROP et non REJECT).,31,Premier paragraphe,,,
+GINT,GINT.Q.7,Pourquoi anonymiser certains champs techniques vis-à-vis d'internet ? ,Usuelle,GINT.R.7,"Cela permet d’éviter toute fuite d’information technique permettant à un attaquant de reconstituer tout
+ou partie de l’infrastructure de l’entité.",31,Deuxième paragraphe,,,
+GINT,GINT.Q.8,Qu'est-ce qu'un serveur mandataire ? ,Usuelle,GINT.R.8,"Un serveur mandataire est un serveur assurant le rôle de relais et de mise en oeuvre des fonctions de sécurité (authentification, contrôle d'accès, analyse de contenus, journalisation, etc.).",32,Premier paragraphe,,,
+GINT,GINT.Q.9,Quels sont les composants d'un système de messagerie électronique ?,Usuelle,GINT.R.9,"De façon simplifiée, on distingue dans les systèmes de messagerie électronique :
+- les clients de messagerie (Mail User Agent) qui permettent de produire et consulter des courriels ;
+- les serveurs de boîtes aux lettres (mailboxes) qui stockent des courriels ;
+- les serveurs de transfert de courriels (Mail Transfer Agent) dits aussi serveurs relais, ou serveurs SMTP (Server Mail Transfer Protocol) – du nom du protocole qu’ils utilisent majoritairement pour la transmission des courriels à travers les réseaux. Le premier serveur relais, qui accepte les courriels des clients de messagerie, est appelé (Mail Submission Agent) et le dernier serveur relais, qui délivre les courriels dans les boîtes aux lettres, est appelé (Mail Delivery Agent).",41,Deuxième paragraphe,,,
+GINT,GINT.Q.10,Comment cloisonner les serveurs SMTP ?,Usuelle,GINT.R.10,"Il est recommandé de cloisonner les serveurs SMTP d’envoi et de réception (ex. : deux machines virtuelles distinctes) au sein de la passerelle Internet sécurisée. Ils doivent être configurés en conséquence ; par exemple :
+- un serveur SMTP d’envoi n’accepte les courriels que depuis une liste de serveurs autorisés (serveurs relais internes ou serveurs de boîtes aux lettres) et assure des fonctions de nettoyage des en-têtes ;
+- un serveur SMTP de réception applique les premières politiques de sécurité, assure des fonctions d’analyse protocolaire et de contenu, qualifie les courriels nécessitant une mise en quarantaine, transmet in fine les courriers à un autre serveur relais de l’entité ou à un serveur de boîtes aux lettres.",42,Cinquième paragraphe,,,
+GINT,GINT.Q.11,Quels exemples existent de mécanismes antispam que je peux mettre en place ?,Usuelle,GINT.R.11,"Afin de limiter la réception des courriels indésirables dans les boîtes aux lettres, des mécanismes antispam doivent être mis en œuvre en amont, par exemple :
+- l’utilisation de listes d’autorisations, d’interdictions ou d’interdictions provisoires d’adresses IP ou de noms de domaine ;
+- l’analyse heuristique du corps des courriels ;
+- le test de Turing pour les nouveaux expéditeurs.",44,Deuxième paragraphe,,,
+GINT,GINT.Q.12,Comment me protéger du contenu malveillant envoyé par mail ?,Usuelle,GINT.R.12,"Des mécanismes de détection de contenu malveillant spécifiques à la messagerie électronique doivent être mis en œuvre, comme l’analyse antivirus des pièces jointes ou l’analyse des liens Web présents dans le corps des courriels.",44,Cinquième paragraphe,,,
+GINT,GINT.Q.13,Quels protocoles utiliser pour le transport entre client de messagerie et serveurs de boîtes aux lettres ?,Usuelle,GINT.R.13,"Quel que soit le protocole utilisé, les flux de messagerie entre les clients de messagerie et les serveurs de boîtes aux lettres doivent être chiffrés et authentifiés. Cette authentification des flux est complémentaire à l’authentification applicative des utilisateurs. Ainsi, l’utilisation des protocoles sécurisés de messagerie, désormais standards (ex. : SMTPS, POPS, IMAPS ou HTTPS) est recommandée.",46,Troisième paragraphe,,,
+GINT,GINT.Q.14,Qu'est-ce que le protocole DMARC ? ,Usuelle,GINT.R.14,"Le protocole DMARC permet à une entité de définir une politique de traitement de ses courriels envoyés en fonction des résultats de conformité SPF et DKIM.
+Le protocole Sender Policy Framework (SPF) permet de spécifier les adresses IP des serveurs autorisés à émettre les courriels d’un domaine et le protocole DomainKeys Identified Mail (DKIM) permet l’authentification du domaine de messagerie d’un courriel à l’aide d’une signature cryptographique.",47,Cinquième paragraphe,,,
+GSAU,GSAU.Q.1,Quels critères prendre en compte lors de la conception de la stratégie de sauvegarde ?,Usuelle,GSAU.R.1,"Une stratégie de sauvegarde doit notamment tenir compte de la perte de données maximale admissible (PDMA) et de la durée maximale d’interruption admissible (DMIA) définies pour l’ensemble des valeurs métier du SI de l’entité (applications, données) ",6,Premier paragraphe,,,
+GSAU,GSAU.Q.2,Que dois-je faire en cas de PDMA de moins de 24h ? ,Complexe,GSAU.R.2,"En cas de perte de données maximale admissible, il est recommandé de privilégier d'autres solutions que les sauvegardes telle que la réplication (synchrone ou asynchrone).",6,Deuxième paragraphe,,,
+GSAU,GSAU.Q.3,Quels sont les composants essentiels d'une infrastructure de sauvegarde ?,Complexe,GSAU.R.3,"Les composants essentiels d'une infrastructure de sauvegarde sont :
+- le catalogue/index qui permet de savoir ce qui est sauvegardé;
+- l’agent logiciel de sauvegarde présent sur les serveurs sauvegardés;
+- le serveur de sauvegarde qui traite le flux de sauvegarde avant envoi sur un support;
+- le support de sauvegarde : disques, bandes magnétiques, disque externe USB, etc.",6,Troisième paragraphe,,,
+GSAU,GSAU.Q.4,Est-ce que les serveurs hébergeant l'infrastructure de sauvegarde doit faire partie du système d'authentification de production ?,Usuelle,GSAU.R.4,"Non, les serveurs hébergeant l’infrastructure de sauvegarde ne doivent pas faire partie d’un
+système d’authentification  de production mais d'un système  indépendant (comptes locaux, annuaire dédié à l’administration).",7,Cinquième paragraphe,,,
+GSAU,GSAU.Q.5,"Qu'est-ce que la règle ""5-4-2"" pour les sauvegardes ? ",Complexe,GSAU.R.5,"La règle ""5-4-2"" ne semble pas exister. Cependant, l'ANSSI recommande la règle ""3-2-1"" : 3 copies de la sauvegarde sur 2 supports différents dont 1 hors ligne.",8,Premier paragraphe,,,
+GSAU,GSAU.Q.6,Que doit inclure le contrôle des sauvegardes par les opérateurs de sauvegarde ? ,Usuelle,GSAU.R.6,"Ce contrôle doit inclure une liste de vérifications permettant de détecter un comportement inhabituel : volume de données ou de fichiers incohérent, lenteurs réseaux, modifications de la configuration des politiques de sauvegarde, etc.",8,Onzième paragraphe,,,
+GSAU,GSAU.Q.7,Faut-il sauvegarder l'infrastructure de sauvegarde ? ,Usuelle,GSAU.R.7,"Oui, la sauvegarde de l’infrastructure de sauvegarde doit être prise en compte. Elle doit contenir au moins : les binaires pour installer une infrastructure minimaliste (systèmes d’exploitation, logiciels et leurs correctifs), les procédures d’import des sauvegardes, le catalogue de sauvegarde, la liste du matériel pour un déploiement sur un site de secours et, si les données sont chiffrées par le logiciel de sauvegarde, les procédures d’import des clés de chiffrement.",9,Troisième paragraphe,,,
+GSAU,GSAU.Q.8,A quel point dois-je protéger mes sauvegardes ?,Usuelle,GSAU.R.8,"Le niveau de robustesse de la protection des sauvegardes (chiffrement, etc.) doit être aligné avec le niveau de protection de ces mêmes données dans le SI de production",9,Sixième paragraphe,,,
+GESS,GESS.Q.1,Qu'est-ce qu'un scénario d'attaque ?,Usuelle,GESS.R.1,C'est la description d’un contexte puis de vulnérabilités et de techniques grâce auxquelles un attaquant compromet un système d’information. ,10,Quatrième paragraphe,,,
+GESS,GESS.Q.2,Qu'est-ce que la directive NIS ?,Usuelle,GESS.R.2,"La directive NIS est une directive adoptée par l’Union européenne. À la différence d’un règlement communautaire qui s’applique directement et uniformément dans l’Union, une directive donne des objectifs à atteindre par les États membres, avec un délai de transposition. La directive NIS a donc été complétée par plusieurs textes européens et nationaux. Chaque texte national précise les secteurs et types d’opérateurs auxquels la directive s’applique dans l’État membre, ainsi que les règles de sécurité à mettre en œuvre.",11,Premier paragraphe,,,
+GESS,GESS.Q.3,A quel arrêté doivent se mettre en conformité les SIE des OSE ?,Usuelle,GESS.R.3,Les opérateurs de services essentiels (OSE) ont une obligation réglementaire de mettre leurs systèmes d’information essentiels (SIE) en conformité avec les règles de sécurité énoncées dans l’arrêté du 14 septembre 2018.,14,Deuxième paragraphe,,,
+GESS,GESS.Q.4,Quelle est la règle 3 de l'arrêté du 14 septembre 2018 ?,Usuelle,GESS.R.4,La règle 3 « homologation de sécurité » de l’arrêté du 14 septembre 2018 décrit la procédure qu’un OSE doit suivre pour attester « que les risques pesant sur la sécurité de ce système ont été identifiés et que les mesures nécessaires pour le protéger sont mises en œuvre. Elle atteste également que les éventuels risques résiduels ont été identifiés et acceptés par l’opérateur ».,15,Huitième paragraphe,,,
+GESS,GESS.Q.5,Qui est responsable de l'efficacité des mesures de sécurité mises en oeuvre pour protéger les SIE ?,Usuelle,GESS.R.5,L'opérateur ou le prestataire mandaté est responsable de l'efficacité des mesures de sécurité mises en oeuvre.,16,,,,
+GESS,GESS.Q.6,Que doit inclure le hardening ?,Usuelle,GESS.R.6,"Le durcissement doit inclure :
+- la limitation et une configuration adaptée des fonctions présentes sur le SIE;
+- la maîtrise des éléments matériels du SIE;
+- la gestion des supports amovibles, vecteurs d’ingestion de données vers le SIE.",18,Troisième paragraphe,,,
+GESS,GESS.Q.7,Qu'est ce qu'un vecteur d'attaque ? ,Usuelle,GESS.R.7,"Les vecteurs d’attaque sont les aspects d’un système qui peuvent être utilisés ou détournés pour réaliser une attaque sur ce système. Dans le contexte d’un système d’information, les vecteurs d’attaque peuvent être des éléments techniques, mais aussi humains ou organisationnels. Les vecteurs d’attaque techniques composent donc la surface d’attaque d’un SI.",18,Cinquième paragraphe,,,
+GESS,GESS.Q.8,Qu'est-ce qu'un outil de scan du réseau ?,Usuelle,GESS.R.8,"Les outils de découverte (scan) du réseau permettent d’obtenir la liste des systèmes et les services exécutés sur chacun de ces systèmes. Un attaquant obtient ainsi la liste des services présents dans un SI, qu’ils soient utilisés ou non",19,Quatrième paragraphe,,,
+GESS,GESS.Q.9,Quels sont les éléments de configuration par défaut à modifier ?,Usuelle,GESS.R.9,"Lors de l’installation ou de la réinstallation des services et équipements, il est fortement recommandé de modifier les éléments de configuration fixés par défaut dès lors qu’ils sont exploitables par un attaquant.
+En particulier, il est recommandé de modifier les éléments secrets d’authentification pour les comptes techniques ou les comptes d’administration.",20,Premier paragraphe,,,
+GESS,GESS.Q.10,Que faire si je ne peux pas désinstaller un service non indispensable ?,Usuelle,GESS.R.10,"Lorsqu’il n’est pas possible de désinstaller les services et fonctionnalités qui ne sont pas utilisés, il est recommandé de désactiver ces services et fonctionnalités ou empêcher leur accès.",21,Septième paragraphe,,,
+GESS,GESS.Q.11,Qu'est-ce qu'un SI maîtrisé ?,Usuelle,GESS.R.11,"SI dont les éléments constitutifs sont connus, configurés et maintenus par l’entité ou par un de ses prestataires, et permettent de garantir le niveau de sécurité du SI.",22,Sixième paragraphe,,,
+GESS,GESS.Q.12,Que peuvent intégrer une station blanche ?,Usuelle,GESS.R.12,"Une station blanche peut intégrer par exemple :
+- analyse antivirale à partir d’une base de connaissance ;
+- analyse comportementale par ouverture du document ou du code exécutable à analyser dans un environnement dédié ou bac à sable ;
+- transformation des documents, depuis un format de bureautique (texte, tableau, etc.) vers un format image, afin d’éviter qu’un éventuel code intégré puisse être exécuté (statification) ;
+- limitation des formats de fichier autorisés et validation de la structure des fichiers par rapport à des formats de référence ;
+- protection des équipements contre les attaques en surcharge électrique (dites USB killer) ;
+- protection des équipements contre les attaques par usurpation USB (dites Bad USB).",26,Sixième paragraphe,,,
+GESS,GESS.Q.13,Qu'est-ce que le cloisonnement ?,Usuelle,GESS.R.13,Fonction de sécurité assurant une séparation entre les éléments d’un SI sans impact sur le service rendu. Elle se met en œuvre techniquement par une segmentation du système en sous-systèmes. Cette démarche restreint chaque partie du SI aux actions dont elle a besoin.,29,Deuxième paragraphe,,,
+GESS,GESS.Q.14,Donne moi un exemple de scénario d'attaque lié à une vulnérabilité sur un hyperviseur avec un SIE et un SI exposé?,Complexe,GESS.R.14,"Un opérateur possède un site Web institutionnel et un SIE, non exposé sur Internet.
+Ces deux SI partagent la même infrastructure serveur virtualisée. L’opérateur ne considère pas son site Web comme critique et y applique rarement les mises à jour de sécurité, alors que ce système est très exposé.
+Un attaquant prend facilement le contrôle du site Web. Il peut ensuite utiliser une vulnérabilité de l’hyperviseur, commun au site Web et au SIE, pour compromettre le SIE.",29,Quatrième paragraphe,,,
+GESS,GESS.Q.15,Selon quels critères dois-je autoriser la communication entre le SIE et d'autres SI ? ,Usuelle,GESS.R.15,"L’opérateur doit s’assurer que toute communication entre le SIE et d’autres SI, et entre différents sous-systèmes issus de la segmentation du SIE, est associée à un besoin de fonctionnement légitime.",31,Septième paragraphe,,,
+GESS,GESS.Q.16,Que choisir : un cloisonnement physique ou un cloisonnement logique ?,Complexe,GESS.R.16,"Le cloisonnement physique ne met en œuvre aucun mécanisme logique. En conséquence, toute erreur de configuration ou toute exploitation de vulnérabilités qui aurait pour effet de propager une compromission à un autre sous-système est impossible. C’est le type de cloisonnement le plus sûr.",32,Troisième paragraphe,,,
+GESS,GESS.Q.17,"Lors de la mise en place d'un cloisonnement logique par le chiffre, quelles sont les recommandations sur le moment où réaliser le chiffrement et sur les secrets utilisés ?",Usuelle,GESS.R.17,"Pour que le cloisonnement par le chiffre d’un système de stockage soit efficace, il est fortement recommandé que le chiffrement soit appliqué en amont du système de stockage, par les systèmes propriétaires des données, et non pas par le système de stockage lui-même au moment de l’écriture sur les disques. De plus, les secrets associés au chiffrement doivent être différents pour chaque sous système.",35,Cinquième paragraphe,,,
+GESS,GESS.Q.18,Comment cloisonner mon SIE s'il est accessible au réseau public ?,Usuelle,GESS.R.18,"Si le SIE est accessible depuis un réseau public, l’opérateur doit segmenter le SIE en au moins deux sous-systèmes :
+- un premier sous-système correspondant à la partie du SIE directement accessible depuis le réseau public. Ce sous-système joue un rôle de passerelle ;
+- au moins un deuxième sous-système correspondant à la partie interne du SIE, non directement accessible depuis le réseau public mais uniquement à travers la passerelle.",36,Septième paragraphe,,,
+GESS,GESS.Q.19,Que doit formaliser un opérateur au sujet des accès à distance au SIE dans le dossier d'homologation de ce dernier ?,Usuelle,GESS.R.19,L’opérateur doit décrire les mesures mises en œuvre pour protéger les accès à distance au SIE dans le dossier d’homologation du SIE.,38,Cinquième paragraphe,,,
+GESS,GESS.Q.20,Comment généralement met-on en place le filtrage local ?,Usuelle,GESS.R.20,Il est en général mis en œuvre par des pare-feux logiciels intégrés aux équipements.,45,Cinquième paragraphe,,,
+GESS,GESS.Q.21,Depuis quoi puis-je créer les règles de filtrage qui seront implémentées dans les firewall ?,Usuelle,GESS.R.21,"Pour créer la liste des règles techniques de filtrage, il faut la décliner des besoins de filtrage établis.",48,Deuxième paragraphe,,,
+GESS,GESS.Q.22,Les comptes d'administration peuvent-ils être dédiés ?,Usuelle,GESS.R.22,"Oui, c'est même recommandé.
+L’administrateur doit disposer d’un ou plusieurs comptes d’administration dédiés, distincts de son compte utilisateur, pour effectuer des actions d’administration. Les comptes d’administration doivent être utilisés exclusivement pour des actions d’administration. En particulier, aucun compte d’administration ne doit être utilisé pour des actions bureautiques ou l’ouverture de sessions de travail sur des postes autres que ceux réservés aux actions d’administration.",54,Troisième paragraphe,,,
+GESS,GESS.Q.23,Comment protéger l'annuaire des comptes d'administration ?,Usuelle,GESS.R.23,"Il est fortement recommandé que le ou les annuaires contenant les comptes d’administration soient protégés en confidentialité et en intégrité et ne soient pas exposés sur des environnements de moindre confiance (ex. : SI bureautique).
+Il est recommandé de déployer un annuaire dédié au SI d’administration en tant qu’infrastructure d’administration. Celui-ci gère les comptes d’administration et le contrôle d’accès aux ressources administrées.",56,Septième paragraphe,,,
+GESS,GESS.Q.24,"Pour deux zone de confiance hétérogènes, puis-je utiliser le même serveur outils ?",Complexe,GESS.R.24,"Non, il est recommandé de respecter le cloisonnement, physique ou logique, entre zones de confiance jusque dans la zone des serveurs outils.",68,Deuxième paragraphe,,,
+GESS,GESS.Q.25,Est-ce que la désactivation des comptes qui ne sont plus nécessaires est aussi une mesure s'appliquant aux comptes inutilisés ?,Complexe,GESS.R.25,"Oui, cette recommandation s’applique également aux comptes inutilisés depuis un certain temps.",72,Cinquième paragraphe,,,
+GESS,GESS.Q.26,Qu'est-ce qu'attribuer les droits d'accès en suivant le principe du moindre privilège ?,Usuelle,GESS.R.26,Cela veut dire n’attribuer à un utilisateur ou à un processus automatique que les droits strictement nécessaires à l’exécution des actions dont l’utilité est avérée.,78,Quatrième paragraphe,,,
+GESS,GESS.Q.27,Quelle est la périodicité minimum recommandée par l'ANSSI sur la revue des droits d'accès ?,Usuelle,GESS.R.27,Au moins tous les ans.,79,Septième paragraphe,,,
+GHOM,GHOM.Q.1,Qu'est-ce qu'une homologation ?,Usuelle,GHOM.R.1,"Les systèmes d’information sont devenus incontournables dans le fonctionnement des entités publiques et privées. Leurs utilisations détournées peuvent entraîner des risques pouvant avoir des impacts humains, financiers, juridiques ou réputationnels catastrophiques.
+La prise en compte et l’acceptation formelle de ces risques par une autorité est appelée « homologation de sécurité » et est réglementaire dans un grand nombre de cas.",4,Premier à troisième paragraphes,,,
+GHOM,GHOM.Q.2,Qu'est-ce qu'une autorité d'homologation ?,Usuelle,GHOM.R.2,"L'autorité d'homologation est l'autorité responsable identifiant, traitant et acceptant les risques.",47,Premier paragraphe,,,
+GHOM,GHOM.Q.3,Est-ce qu'un pentest peut être remplacé par du bug-bounty ?,Complexe,GHOM.R.3,Les bug bounty ne replacent pas les pentests mais peut être complémentaire selon la nature du système d'information.,50,Premier paragraphe,,,
+GHOM,GHOM.Q.4,Quel est le rôle du CSN ?,Usuelle,GHOM.R.4,Les conseillers à la sécurité numériques CSN sont membres de la troisième ligne de maîtrise. Ils ont donc pour responsabilité de contrôler que les systèmes d’information sont suffisamment sécurisés pour être employés. ,"19
+20","19 - Septième paragraphe
+20 - Premier paragraphe",,,
+GHOM,GHOM.Q.5,Quelles sont les 8 lignes de défense ?,Complexe,GHOM.R.5,"Il n'existe que 3 lignes de défense :
+- La première ligne de maîtrise est composée des équipes opérationnelles. Elle est responsable de mettre en œuvre et de maintenir les mesures issues des politiques de sécurité, des réglementations et du plan d’action;
+- La seconde ligne de maîtrise a un rôle de support. Elle regroupe les spécialistes des risques et apporte à la première ligne le soutien nécessaire à l’amélioration de la sécurité du système d’information;
+- Enfin la troisième ligne de maîtrise doit contrôler que les systèmes d’information sont suffisamment sécurisés pour être employés. Elle doit, en étroite relation avec les autres lignes de maîtrise, collecter les informations permettant une homologation, les évaluer et proposer un avis d’homologation à son autorité. Elle organise la commission d’homologation. Il est à noter que la troisième ligne de maîtrise peut être portée par la direction des risques de l’organisation.",19,"Premier, troisième et septième paragraphe",,,
+GHOM,GHOM.Q.6,Quelle durée maximum pour une homologation ?,Complexe,GHOM.R.6,"La durée maximum pour une homologation est de :
+- trois ans au maximum pour un grand nombre de systèmes d’information règlementés (voir tableau en page 32) ;
+- trois ans au maximum pour les systèmes d’information soumis à l’IGI1300 et traitant d’informations classées SECRET ;
+- deux ans au maximum pour les systèmes d’information soumis à l’IGI1300 et traitant d’informations classées TRES SECRET ;
+- si aucune exigence réglementaire n’impose de durée maximum d’emploi, l’ANSSI recommande fortement de ne pas dépasser trois ans.",30,Quatrième paragraphe,,,
+GHOM,GHOM.Q.7,Quelle document n'est pas à formaliser pour une homologation simplifiée ?,Complexe,GHOM.R.7,"Pour une homologation simplifiée, les documents non nécessaires à l'homologation sont :
+- Dossier d’architecture technique;
+- Procédures d’exploitation;
+- Plan de maintien en condition opérationnelle;
+- Plan de maintien en condition de sécurité;
+- Plan de résilience;
+- Audits.",67,Premier paragraphe (tableau),,,
+GHOM,GHOM.Q.8,La méthode EBIOS RM est-elle obligatoire pour les homologations ?,Complexe,GHOM.R.8,"Lorsque l’ANSSI est autorité d’homologation, l’utilisation de la méthode EBIOS RM est obligatoire. Dans tous les autres cas, elle est fortement recommandée.",47,Note de bas de page : 52,,,
+GHOM,GHOM.Q.9,Une commission formelle est-elle obligatoire dans tous les cas d'homologation ?,Complexe,GHOM.R.9,Seul pour le niveau d'homologation renforcé une commission en réunion est obligatoire.,73,Quatrième paragraphe (tableau),,,
+GHOM,GHOM.Q.10,Qui doit être autorité d'homologation ?,Complexe,GHOM.R.10,"Par délégation du SGDSN, l’autorité d’homologation est l’ANSSI pour les systèmes d’information soumis aux réglementations suivantes :
+- l’Instruction Générale Interministérielle 1300 (IGI1300) pour les interconnexions entre systèmes d’information classifiés de même niveau dont l’un n’est pas sous maîtrise nationale ;
+- l’Instruction Générale Interministérielle 2102 (IGI2102) pour les systèmes d’information traitant d’informations classifiées de l’Union Européenne ;
+- l’Instruction Interministérielle 2100 (II2100) traitant d’informations classifiées de l’OTAN ;
+
+Pour toutes les autres réglementations, aucune exigence sur l’identité de l’autorité n’est spécifiée.",30,Troisième paragraphe,,,
+GHOM,GHOM.Q.11,Qui doit réaliser l'analyse de risque dans le cadre de l'homologation ?,Complexe,GHOM.R.11,Cela n'est pas spécifié dans les guides ANSSI.,//,//,,,
+GHOM,GHOM.Q.12,Que veut dire refuser une homologation ?,Usuelle,GHOM.R.12,Refuser une homologation veut dire refuser l’autorisation d’employer un système d’information au regard des risques auxquels il est exposé. ,85,Quatrième paragraphe,,,
+GHOM,GHOM.Q.13,Quelle est le rôle du FSSI au sein d'une homologation ?,Complexe,GHOM.R.13,Cela n'est pas spécifié dans les guides ANSSI.,//,//,,,
+GHOM,GHOM.Q.14,Qui doit être réuni dans une commission d'homologation ?,Usuelle,GHOM.R.14,"La démarche d’homologation doit être menée par un comité animé par un responsable (généralement le RSSI ou CSN) et regroupant les personnes disponibles et engagées en lien avec le système d’information (responsables métiers, experts techniques…). Le comité doit permettre une vérification sur les risques identifiés liés à l’utilisation du système d’information et émettre un avis à l’attention de l’autorité.",78,Premier paragraphe,,,
+GHOM,GHOM.Q.15,Dans quel cas l'ANSSI est-elle autorité d'homologation ?,Usuelle,GHOM.R.15,"Par délégation du SGDSN, l’autorité d’homologation est l’ANSSI pour les systèmes d’information soumis aux réglementations suivantes :
+- l’Instruction Générale Interministérielle 1300 (IGI1300) pour les interconnexions entre systèmes d’information classifiés de même niveau dont l’un n’est pas sous maîtrise nationale ;
+- l’Instruction Générale Interministérielle 2102 (IGI2102) pour les systèmes d’information traitant d’informations classifiées de l’Union Européenne ;
+- l’Instruction Interministérielle 2100 (II2100) traitant d’informations classifiées de l’OTAN ;
+
+Pour toutes les autres réglementations, aucune exigence sur l’identité de l’autorité n’est spécifiée.",30,Troisième paragraphe,,,
+GHOM,GHOM.Q.16,Que dois à minima détailler le plan de résilience dans un dossier d'homologation ?,Usuelle,GHOM.R.16,"Sans être exhaustif, le document de résilience doit au minima détailler les points suivants :
+- la durée maximale d’interruption49 du système d’information avant que des effets soient irréversibles pour l’organisation ;
+-  le délai nécessaire pour la remise en route50 du système d’information après incident. Il s’agit d’un objectif ;
+-  les procédures de gestion de crise ;
+-  les procédures de gestion du plan de continuité et de reprise d’activité. ",45,Sixième paragraphe,,,
+GWEB,GWEB.Q.1,Que peut entraîner l'absence de HTTPS sur un site ?,Usuelle,GWEB.R.1,"La mise en place de HTTPS sur un site ou une application web est une garantie de sécurité qui repose sur TLS pour assurer la confidentialité et l’intégrité des informations échangées, ainsi que l’authenticité du serveur contacté.
+L’absence de cette garantie peut entraîner de nombreux abus sans pour autant que l’intention soit malveillante. En exemple, certains hotspots Wi-Fi publics insèrent, à l’insu de l’utilisateur, du contenu publicitaire ou des informations annexes dans les pages provenant de sites en HTTP (ex. : horaires de vols dans les aéroports, menus de restaurants, etc.). Il n’en reste pas moins que ce type de pratiques peut être mal perçu par l’utilisateur. Par ailleurs, de nombreux acteurs du Web encouragent fortement l’utilisation de HTTPS : meilleur référencement par les moteurs de recherche, affichage de mises en garde lors de la visite de sites en clair.",16,Premier et deuxième paragraphes,,,
+GWEB,GWEB.Q.2,Quelle fonction dédiée à la transformation de chaîne de caractères en code JS doit être proscrit ?,Usuelle,GWEB.R.2,Il s'agit de la fonction eval().,25,Quatrième paragraphe,,,
+GWEB,GWEB.Q.3,Pourquoi mettre en oeuvre CSP ?,Usuelle,GWEB.R.3,Il est recommandé de mettre en œuvre CSP afin de présenter aux navigateurs une liste des sites reconnus comme présentant des ressources fiables et ainsi contribuer au principe de moindre privilège en réduisant le risque potentiel de vulnérabilité XSS.,29,Deuxième paragraphe,,,
+GWEB,GWEB.Q.4,Comment réduire l'impact des requêtes silencieuses ?,Usuelle,GWEB.R.4,Il est recommandé de définir une CSP limitant les Origins atteignables par le navigateur dans le but de bloquer l’émission de requêtes silencieuses difficiles à maîtriser à cause de la nature de la spécification HTML.,35,Cinquième paragraphe,,,
+GWEB,GWEB.Q.5,Faut-il stocker des informations sensibles dans les bases de données localStorage ?,Complexe,GWEB.R.5,"Les bases de données (dites hors ligne) localStorage et sessionStorage ne doivent être utilisées que pour le stockage de données non sensibles et pour lesquelles la perte ou la divulgation sera sans conséquence, telles que les préférences utilisateur.",39,Sixième parapgrahe,,,
+GWEB,GWEB.Q.6,L'API Web SQL Database est-elle utilisable ?,Usuelle,GWEB.R.6,"Non, il est recommandé d'interdire l’usage de l’API Web SQL Database, désormais obsolète.",42,Huitième paragraphe,,,
+GWEB,GWEB.Q.7,"Si mon site n'est accessible qu'en HTTPS, comment dois-je limiter le transit des cookies ?",Usuelle,GWEB.R.7,"Dès lors que des cookies sont nécessaires et que le site ou l’application n’est accessible qu’en HTTPS, le flag Secure doit être utilisé.",46,Premier paragraphe,,,
+GWEB,GWEB.Q.8,Puis-je utiliser le caractère '*' comme valeur d'en-tête de réponse Access-Control-Allow-Origin ?,Complexe,GWEB.R.8,"Cela est déconseillée. L’utilisation du caractère générique « * » comme valeur pour l’en-tête de réponse Access-Control-Allow-Origin est dangereuse dans le cas d’une application d’intranet. En effet, cela revient à autoriser tout site web à requêter cette application, et permet donc l’utilisation du navigateur d’un employé comme relais pour attaquer une application interne depuis internet.
+Pour cette raison entre autres, une ressource HTTP qui déclare supporter des requêtes authentifiées (Access-Control-Allow-Credentials à true) ne peut pas positionner Access-Control-Allow-Origin à « * », car cela fera échouer le preflight. Une requête authentifiée désigne ici une requête qui comporte des identifiants utilisateur, sous la forme de cookies, en-tête Authorization, ou certificat client.",51,Cinquième paragraphe,,,
+GWEB,GWEB.Q.9,Pourquoi positionner l'attribut crossorigin à anonymous lorsque la récupération ne nécessite pas d'authentification ?,Usuelle,GWEB.R.9,Cela permet de limiter l’exposition des authentifiants et de préserver la confidentialité des utilisateurs.,52,Quatrième paragraphe,,,
+GWEB,GWEB.Q.10,Comment sécuriser l'ouverture de nouvelle fenêtres ?,Usuelle,GWEB.R.10,"Il est recommandé de sécuriser systématiquement l’ouverture de nouvelles fenêtres :
+- en HTML par l’utilisation de l’attribut rel=""noopener"" dès lors que l’attribut target est utilisé pour un lien ;
+- en JavaScript par l’utilisation de l’option noopener dès lors que le second paramètre target est utilisé dans la commande window.open.
+
+De plus, il est recommandé de définir une stratégie Cross-Origin-Opener-Policy stricte afin de garantir l’isolation du contexte de navigation lors de l’ouverture de fenêtres : Cross-Origin-Opener-Policy : same-origin",55,Premier et cinquième paragraphes,,,
+GWEB,GWEB.Q.11,Comment au mieux maîtriser les composants logiciels de mes sites web ?,Usuelle,GWEB.R.11,"Il est recommandé de :
+- Limiter les composants logiciels tiers;
+- Maintenir à jour les composants logiciels tiers utilisés;
+- Ne pas modifier le cœur des composants logiciels tiers utilisés.",67,Cinquième à septième paragraphes,,,
+GWEB,GWEB.Q.12,Combien de recommandations le guide sur la sécurisation des sites web de l'ANSS comporte-t-il ?,Usuelle,GWEB.R.12,63 recommandations.,"70
+71","70 - TOUT
+71 - TOUT",,,
+GSNC,GSNC.Q.1,A qui s'applique le référentiel SecNumCloud ?,Usuelle,GSNC.R.1,"Le référentiel s'applique au prestataires SaaS, PaaS, CaaS et IaaS.",11,Deuxième à cinquième paragraphes,,,
+GSNC,GSNC.Q.2,Est-ce que la conformité au référentiel SecNumcloud atteste la conformité à la PSSI-E ?,Complexe,GSNC.R.2,Non.,14,Deuxième parapgrahe,,,
+GSNC,GSNC.Q.3,Quelles sont les mesures liées à la séparation des tâches pour les prestataires SecNumCloud ?,Usuelle,GSNC.R.3,"Le prestataire doit identifier les risques associés à des cumuls de responsabilités ou de tâches, les prendre en compte dans l’appréciation des risques et mettre en œuvre des mesures de réduction de ces risques. ",17,Neuvième paragraphe,,,
+GSNC,GSNC.Q.4,Qu'est-ce que doit faire un prestataire en plus de rendre accessible les sanctions encourues à un commanditaire (si demandé) sur le sujet du processus disciplinaire ?,Usuelle,GSNC.R.4,Le prestataire doit documenter et mettre en œuvre un processus disciplinaire applicable à l’ensemble des personnes impliquées dans la fourniture du service ayant enfreint la politique de sécurité.,20,Troisième paragraphe,,,
+GSNC,GSNC.Q.5,Est-ce qu'un prestataire SecNumCloud est aubliger de prévoir le blocage des comptes de son helpdesk interne ?,Usuelle,GSNC.R.5,"Oui, tout mécanisme d’authentification doit prévoir le blocage d’un compte après un nombre limité de tentatives infructueuses.",23,Sixième paragraphe,,,
+GSNC,GSNC.Q.6,L'interface d'administration que j'utilise est la même que celle que je fournis à mon client. Est-ce que cela pose un problème si je veux passer la qualif SecNumCloud en tant que fournisseur de PaaS ?,Complexe,GSNC.R.6,"Cela est en non conformité avec le référentiel SecNumCloud. En effet, les interfaces d’administration mises à disposition des commanditaires doivent être distinctes des interfaces d’administration utilisées par le prestataire.",23,Dixième paragraphe,,,
+GSNC,GSNC.Q.7,Quelles règles dois-je suivre sur la méthode de chiffrement à appliquer aux données stockées en tant que prestataire SecNumCloud ? ,Usuelle,GSNC.R.7,"En tant que prestataire SecNumCloud, il est obligatoire de suivre les règles et recommandations concernant la gestion des clés utilisées dans des mécanismes cryptographiques de l'ANSSI (version en vigeur).",26,"Deuxième et troisième paragraphes
+",,,
+GSNC,GSNC.Q.8,Quelle est la règle à suivre sur les certificats de clé publique pour un prestataire SecNumCloud ? Et est-ce obligatoire pour un prestataire non qualifié ?,Complexe,GSNC.R.8,"Un prestataire qualifié SecNumCloud doit, sur son infrastructure technique, utiliser exclusivement des certificats de clé publique issus d’une autorité de certification d’un État membre de l’Union Européenne (les cérémonies de génération des clés maîtresses doivent avoir lieu dans un pays membre de l’Union Européenne et en présence du prestataire).
+
+Cela n'est pas obligatoire pour un prestataire non qualifié, mais constitue une bonne pratique de sécurité pouvant être appliquée.",27,Huitième paragraphe,,,
+GSNC,GSNC.Q.9,Qu'est-ce qu'une zone physique sensible au sens SecNumCloud ?,Usuelle,GSNC.R.9,"Une zone physique sensible au sens du référentiel SecNumCloud est une zone réservées à l’hébergement du système d’information de production du service hors postes d’administration, d’exploitation et de supervision.",28,Cinquième paragraphe,,,
+GSNC,GSNC.Q.10,Quelles sont les obligations pour un prestataire SecNumCloud en terme de sortie des actifs ?,Usuelle,GSNC.R.10,"Le prestataire doit documenter et mettre en œuvre une procédure de transfert hors site de données du commanditaire, équipements et logiciels. Cette procédure doit nécessiter que la direction du prestataire donne son autorisation écrite. Dans tous les cas, le prestataire doit mettre en œuvre les moyens permettant de garantir que le niveau de protection en confidentialité et en intégrité des actifs durant leur transport est équivalent à celui sur site.",30,Douzième paragraphe,,,
+GSNC,GSNC.Q.11,Quelles sont les traces que doit conserver un prestataire SNC ? ,Usuelle,GSNC.R.11,"Le prestataire doit générer et collecter les événements suivants :
+- les activités des utilisateurs liées à la sécurité de l’information ;
+- la modification des droits d’accès dans le périmètre de sa responsabilité ;
+- les événements issus des mécanismes de lutte contre les codes malveillants (voir chapitre ;
+- les exceptions ;
+- les défaillances ;
+- tout autre événement lié à la sécurité de l’information.",33,Quatrième paragraphe,,,
+GSNC,GSNC.Q.12,Selon quoi un prestataire SCN doit il mettre en oeuvre les mesures de cloisonnement ?,Complexe,GSNC.R.12,"Le prestataire doit documenter et mettre en œuvre, pour le système d’information du service, les mesures de cloisonnement (logique, physique ou par chiffrement) pour séparer les flux réseau selon :
+- la sensibilité des informations transmises ;
+- la nature des flux (production, administration, supervision, etc.) ;
+- le domaine d’appartenance des flux (des commanditaires – avec distinction par commanditaire ou ensemble de commanditaires, du prestataire, des tiers, etc.) ;
+- le domaine technique (traitement, stockage, etc.).",37,Troisième paragraphe,,,
+GSNC,GSNC.Q.13,Qu'est-ce que doit mettre en oeuvre un prestataire SCN en terme de dev externalisé ?,Complexe,GSNC.R.13,Le prestataire doit documenter et mettre en œuvre une procédure permettant de superviser et de contrôler l’activité de développement externalisé des logiciels et des systèmes. Cette procédure doit s’assurer que l’activité de développement externalisé soit conforme à la politique de développement sécurisé du prestataire et permette d’atteindre un niveau de sécurité du développement externe équivalent à celui d’un développement interne.,39,Neuvième paragraphe,,,
+GSNC,GSNC.Q.14,Comment un prestataire SCN doit-il protéger les données de test ?,Usuelle,GSNC.R.14,"Le prestataire doit :
+- Documenter et mettre en œuvre une procédure permettant d’assurer l’intégrité des données de tests utilisés en pré-production ;
+- S'il souhaite utilisé des données du commanditaire issues de la production, le prestataire doit préalablement obtenir l’accord du commanditaire et les anonymiser en s'assurant de leur confidentialité.",40,Premier et deuxième paragraphes,,,
+GSNC,GSNC.Q.15,Que dois faire un prestataire qualifié SCN en terme de surveillance de ses tiers ? ,Usuelle,GSNC.R.15,Le prestataire doit documenter et mettre en œuvre une procédure permettant de contrôler régulièrement les mesures mises en place par les tiers participant à la mise en œuvre du service pour respecter les exigences SecNumCloud.,41,Sixième paragraphe,,,
+GSNC,GSNC.Q.16,Comment un prestataire SecNumCloud doit-il traiter les incidents de sécurité ?,Complexe,GSNC.R.16,"un prestataire SecNumCloud doit :
+- Traiter les incidents de sécurité jusqu’à leur résolution et doit informer les commanditaires conformément aux procédures ;
+- Archiver les documents détaillant les incidents de sécurité.
+
+Il lui ai aussi recommandé de faire appel à un prestataire de réponse aux incidents de sécurité qualifié. ","42
+43","42 - Dixième paragraphe
+43 - Premier et deuxième paragraphe",,,
+GSNC,GSNC.Q.17,Comment le prestataire qualifié SCN met-il en oeuvre la continuité d'activité ?,Usuelle,GSNC.R.17,Le prestataire doit documenter et mettre en œuvre des procédures permettant de maintenir ou de restaurer l’exploitation du service et d’assurer la disponibilité des informations au niveau et dans les délais pour lesquels le prestataire s’est engagé vis-à-vis du commanditaire dans la convention de service.,44,Troisième paragraphe,,,
+GSNC,GSNC.Q.18,Quels audit lors d'un changement majeur doit réaliser un prestataire SCN ?,Usuelle,GSNC.R.18,"Un prestataire SecNumCloud doit réaliser une revue indépendante par un prestataire qualifié PASSI comprenant en particulier les activités d'audit suivantes :
+- audit d’architecture ;
+- audit organisationnel et physique ;
+- audit de la configuration de l’infrastructure technique du service ;
+- un test d’intrusion portant sur les interfaces d'administration du service mises à disposition des commanditaires ;
+- Pour un service de type SaaS, un test d'intrusion sur l'interface mise à disposition des utilisateurs finaux ainsi qu'un audit du code source sur les fonctionnalités de sécurité implémentées (si le SaaS rend un service de sécurité de l'information, une certification produit dédiée est nécessaire).",46,Troisième paragraphe,,,
