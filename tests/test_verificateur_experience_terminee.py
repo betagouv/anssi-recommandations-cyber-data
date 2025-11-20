@@ -155,7 +155,7 @@ def test_verificateur_leve_une_erreur_en_cas_de_timeout(
     verificateur = VerificateurExperienceTerminee(client_experience_mock)
 
     with pytest.raises(TimeoutError):
-        verificateur.verifie(42, delai_attente=0.01, timeout_max=0.05)
+        verificateur.verifie(42, frequence_lecture=0.01, timeout_max=0.05)
 
     assert client_experience_mock.lit.call_count == 5
 
@@ -165,4 +165,4 @@ def test_verificateur_leve_une_erreur_si_experience_inconnue(client_experience_m
     verificateur = VerificateurExperienceTerminee(client_experience_mock)
 
     with pytest.raises(ExperienceInconnue):
-        verificateur.verifie(42, delai_attente=0.01, timeout_max=0.05)
+        verificateur.verifie(42, frequence_lecture=0.01, timeout_max=0.05)
