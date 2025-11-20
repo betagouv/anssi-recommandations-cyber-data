@@ -18,46 +18,6 @@ import pandas as pd
 from typing import Callable, cast
 from evalap.evalap_base_http import EvalapBaseHTTP
 
-DONNEES_JSON = {
-    "id": 42,
-    "name": "Experience Test",
-    "created_at": "2025-10-06T15:45:00Z",
-    "experiment_status": "running_metrics",
-    "experiment_set_id": 1,
-    "num_try": 8,
-    "num_success": 7,
-    "num_observation_try": 40,
-    "num_observation_success": 38,
-    "num_metrics": 3,
-    "readme": "Test readme",
-    "judge_model": {"model": "albert"},
-    "model": {"name": "albert-large"},
-    "dataset": {"id": 10},
-    "with_vision": False,
-    "results": [
-        {
-            "created_at": "2025-10-09T14:48:35.428847",
-            "experiment_id": 42,
-            "id": 125,
-            "metric_name": "judge_precision",
-            "metric_status": "running",
-            "num_success": 0,
-            "num_try": 0,
-            "observation_table": [
-                {
-                    "id": 1001,
-                    "created_at": "2025-10-09T14:48:35.428847",
-                    "score": 0.8,
-                    "observation": "test",
-                    "num_line": 0,
-                    "error_msg": None,
-                    "execution_time": 5,
-                }
-            ],
-        }
-    ],
-}
-
 
 @pytest.fixture
 def fabrique_reponse() -> Callable[[object, int], Response]:
@@ -324,13 +284,12 @@ def test_cree_experience_requete_exception_retourne_none(
 
 
 def test_lit_experience_retourne_experience_avec_resultats(
-    configuration: Configuration,
+    configuration: Configuration, une_experience: dict
 ):
     session = Mock()
-
     reponse_mockee = Mock(spec=Response)
     reponse_mockee.status_code = 200
-    reponse_mockee.json.return_value = DONNEES_JSON
+    reponse_mockee.json.return_value = une_experience
     reponse_mockee.raise_for_status = Mock()
     session.get.return_value = reponse_mockee
 
