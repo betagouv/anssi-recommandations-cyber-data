@@ -1,7 +1,9 @@
-import asyncio
 from pathlib import Path
+
+import httpx
 import pytest
 import respx
+
 from configuration import MQC
 from lecteur_csv import LecteurCSV
 from mqc.ecrivain_sortie import HorlogeSysteme, EcrivainSortie
@@ -13,30 +15,41 @@ from mqc.remplisseur_reponses import (
 )
 
 
-@respx.mock
-def test_ecriture_cree_fichier_dans_bon_dossier(
-    tmp_path: Path, configuration_mqc: MQC, reponse_creation_experience
-):
-    (tmp_path / "donnees" / "sortie").mkdir(parents=True, exist_ok=True)
-    fichier = tmp_path / "eval.csv"
-    fichier.write_text("Question type\nA?\n", encoding="utf-8")
-
+def initialise(
+    configuration_mqc: MQC,
+    fichier: Path,
+    reponse_attendue: httpx.Response,
+    sous_dossier: Path,
+    chemin_racine: Path,
+) -> tuple[RemplisseurReponses, LecteurCSV, EcrivainSortie]:
     base = construit_base_url(configuration_mqc)
     chemin = formate_route_pose_question(configuration_mqc)
-    respx.post(f"{base}{chemin}").mock(
-        return_value=reponse_creation_experience("OK", "A?")
-    )
-
+    respx.post(f"{base}{chemin}").mock(return_value=reponse_attendue)
     client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
-
     lecteur = LecteurCSV(fichier)
-    ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
-
-    horloge = HorlogeSysteme()
     ecrivain = EcrivainSortie(
-        racine=tmp_path, sous_dossier=Path("donnees/sortie"), horloge=horloge
+        racine=chemin_racine, sous_dossier=sous_dossier, horloge=(HorlogeSysteme())
     )
+    return remplisseur, lecteur, ecrivain
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_ecriture_cree_fichier_dans_bon_dossier(
+    tmp_path: Path,
+    configuration_mqc: MQC,
+    reponse_creation_experience,
+    fichier_evaluation,
+):
+    sous_dossier = Path("donnees/sortie")
+    fichier = fichier_evaluation("Question type\nA?\n", sous_dossier)
+    reponse_attendue = reponse_creation_experience("OK", "A?")
+    remplisseur, lecteur, ecrivain = initialise(
+        configuration_mqc, fichier, reponse_attendue, sous_dossier, tmp_path
+    )
+
+    ligne_enrichie = (await remplisseur.remplit_lot_lignes(lecteur, 1))[0]
     chemin_csv = ecrivain.ecrit_ligne_depuis_lecteur_csv(
         ligne_enrichie, prefixe="evaluation"
     )
@@ -45,28 +58,21 @@ def test_ecriture_cree_fichier_dans_bon_dossier(
 
 
 @respx.mock
-def test_ecriture_nom_fichier_contient_date(
-    tmp_path: Path, configuration_mqc: MQC, reponse_creation_experience
+@pytest.mark.asyncio
+async def test_ecriture_nom_fichier_contient_date(
+    tmp_path: Path,
+    configuration_mqc: MQC,
+    reponse_creation_experience,
+    fichier_evaluation,
 ):
-    fichier = tmp_path / "eval.csv"
-    fichier.write_text("Question type\nA?\n", encoding="utf-8")
-
-    base = construit_base_url(configuration_mqc)
-    chemin = formate_route_pose_question(configuration_mqc)
-    respx.post(f"{base}{chemin}").mock(
-        return_value=reponse_creation_experience("OK", "A?")
+    sous_dossier = Path("donnees/sortie")
+    fichier = fichier_evaluation("Question type\nA?\n", sous_dossier)
+    reponse_attendue = reponse_creation_experience("OK", "A?")
+    remplisseur, lecteur, ecrivain = initialise(
+        configuration_mqc, fichier, reponse_attendue, sous_dossier, tmp_path
     )
 
-    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
-    remplisseur = RemplisseurReponses(client=client)
-
-    lecteur = LecteurCSV(fichier)
-    ligne_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
-
-    horloge = HorlogeSysteme()
-    ecrivain = EcrivainSortie(
-        racine=tmp_path, sous_dossier=Path("donnees/sortie"), horloge=horloge
-    )
+    ligne_enrichie = (await remplisseur.remplit_lot_lignes(lecteur, 1))[0]
     chemin_csv = ecrivain.ecrit_ligne_depuis_lecteur_csv(
         ligne_enrichie, prefixe="evaluation"
     )
@@ -75,36 +81,27 @@ def test_ecriture_nom_fichier_contient_date(
 
 
 @respx.mock
-def test_ecriture_contenu_csv_complet(
-    tmp_path: Path, configuration_mqc: MQC, reponse_creation_experience
+@pytest.mark.asyncio
+async def test_ecriture_contenu_csv_complet(
+    tmp_path: Path,
+    configuration_mqc: MQC,
+    reponse_creation_experience,
+    fichier_evaluation,
 ):
-    fichier = tmp_path / "eval.csv"
-    fichier.write_text("Question type\nA?\nB?\n", encoding="utf-8")
-
-    base = construit_base_url(configuration_mqc)
-    chemin = formate_route_pose_question(configuration_mqc)
-    respx.post(f"{base}{chemin}").mock(
-        return_value=reponse_creation_experience("OK", "A?")
+    fichier = fichier_evaluation("Question type\nA?\nB?\n")
+    reponse_attendue = reponse_creation_experience("OK", "A?")
+    remplisseur, lecteur, ecrivain = initialise(
+        configuration_mqc, fichier, reponse_attendue, Path("donnees/sortie"), tmp_path
     )
 
-    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
-    remplisseur = RemplisseurReponses(client=client)
-
-    lecteur = LecteurCSV(fichier)
-
-    horloge = HorlogeSysteme()
-    ecrivain = EcrivainSortie(
-        racine=tmp_path, sous_dossier=Path("donnees/sortie"), horloge=horloge
-    )
-
-    ligne1_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
-    chemin_csv = ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne1_enrichie, "evaluation")
-
-    ligne2_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
-    ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne2_enrichie, "evaluation")
+    ligne1_enrichie = (await remplisseur.remplit_lot_lignes(lecteur, 1))[0]
+    ligne2_enrichie = (await remplisseur.remplit_lot_lignes(lecteur, 1))[0]
+    ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne1_enrichie, "evaluation")
+    chemin_csv = ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne2_enrichie, "evaluation")
 
     contenu = chemin_csv.read_text(encoding="utf-8").splitlines()
-    assert contenu[0].startswith("Question type")
+    assert len(contenu) == 3
+    assert "Question type,Réponse Bot" in contenu[0]
     assert "A?,OK" in contenu[1]
     assert "B?,OK" in contenu[2]
 
@@ -126,45 +123,3 @@ def test_methode_desinfecte_prefixe_nettoie_le_contenu_non_alphanumerique(
 ):
     valeur_desinfectee = EcrivainSortie._desinfecte_prefixe(valeur_infectee)
     assert valeur_desinfectee == valeur_desinfectee_attendue
-
-
-@respx.mock
-def test_ecrit_ligne_depuis_lecteur_csv_ecrit_ligne_par_ligne(
-    tmp_path: Path, configuration_mqc: MQC, reponse_creation_experience
-):
-    fichier = tmp_path / "test.csv"
-    fichier.write_text("Question type\nQ1?\nQ2?\n", encoding="utf-8")
-
-    base = construit_base_url(configuration_mqc)
-    chemin = formate_route_pose_question(configuration_mqc)
-
-    respx.post(f"{base}{chemin}").mock(
-        return_value=reponse_creation_experience("reponse_test", "Q1?")
-    )
-
-    client = ClientMQCHTTPAsync(cfg=configuration_mqc)
-    remplisseur = RemplisseurReponses(client=client)
-
-    lecteur = LecteurCSV(fichier)
-
-    horloge = HorlogeSysteme()
-    ecrivain = EcrivainSortie(
-        racine=tmp_path, sous_dossier=Path("sortie"), horloge=horloge
-    )
-
-    ligne1_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
-
-    chemin_sortie = ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne1_enrichie, "test")
-
-    contenu = chemin_sortie.read_text(encoding="utf-8").strip().split("\n")
-    assert len(contenu) == 2
-    assert "Question type,Réponse Bot" in contenu[0]
-    assert "Q1?,reponse_test" in contenu[1]
-
-    ligne2_enrichie = asyncio.run(remplisseur.remplit_lot_lignes(lecteur, 1))[0]
-
-    ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne2_enrichie, "test")
-
-    contenu = chemin_sortie.read_text(encoding="utf-8").strip().split("\n")
-    assert len(contenu) == 3
-    assert "Q2?,reponse_test" in contenu[2]
