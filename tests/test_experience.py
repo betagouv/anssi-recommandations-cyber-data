@@ -4,15 +4,11 @@ from requests import Response
 from configuration import Configuration
 from evalap import EvalapClient
 from journalisation.experience import EntrepotExperienceHttp, Experience
-from tests.test_client_evalap import DONNEES_JSON
 
 
-def test_peut_lire_une_experience(
-    configuration: Configuration,
-):
+def test_peut_lire_une_experience(configuration: Configuration, une_experience: dict):
     session = Mock()
-
-    donnees_json: dict = DONNEES_JSON
+    donnees_json: dict = une_experience
     donnees_json["results"].append(
         {
             "created_at": "2025-10-09T14:48:35.428847",
@@ -35,7 +31,6 @@ def test_peut_lire_une_experience(
             ],
         },
     )
-
     reponse_mockee = Mock(spec=Response)
     reponse_mockee.status_code = 200
     reponse_mockee.json.return_value = donnees_json
@@ -43,9 +38,9 @@ def test_peut_lire_une_experience(
     session.get.return_value = reponse_mockee
 
     client = EvalapClient(configuration, session=session)
-
     experience_http = EntrepotExperienceHttp(client.experience)
     experience_lue = typing.cast(Experience, experience_http.lit(42))
+
     assert experience_lue.id_experimentation == 42
     assert experience_lue.metriques == [
         {

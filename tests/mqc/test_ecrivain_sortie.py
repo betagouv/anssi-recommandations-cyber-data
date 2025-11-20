@@ -11,18 +11,21 @@ from mqc.remplisseur_reponses import (
     ClientMQCHTTPAsync,
     RemplisseurReponses,
 )
-from tests.mqc.test_remplisseur_pose_question import cree_reponse_mock
 
 
 @respx.mock
-def test_ecriture_cree_fichier_dans_bon_dossier(tmp_path: Path, configuration_mqc: MQC):
+def test_ecriture_cree_fichier_dans_bon_dossier(
+    tmp_path: Path, configuration_mqc: MQC, reponse_creation_experience
+):
     (tmp_path / "donnees" / "sortie").mkdir(parents=True, exist_ok=True)
     fichier = tmp_path / "eval.csv"
     fichier.write_text("Question type\nA?\n", encoding="utf-8")
 
     base = construit_base_url(configuration_mqc)
     chemin = formate_route_pose_question(configuration_mqc)
-    respx.post(f"{base}{chemin}").mock(return_value=cree_reponse_mock("OK", "A?"))
+    respx.post(f"{base}{chemin}").mock(
+        return_value=reponse_creation_experience("OK", "A?")
+    )
 
     client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
@@ -42,13 +45,17 @@ def test_ecriture_cree_fichier_dans_bon_dossier(tmp_path: Path, configuration_mq
 
 
 @respx.mock
-def test_ecriture_nom_fichier_contient_date(tmp_path: Path, configuration_mqc: MQC):
+def test_ecriture_nom_fichier_contient_date(
+    tmp_path: Path, configuration_mqc: MQC, reponse_creation_experience
+):
     fichier = tmp_path / "eval.csv"
     fichier.write_text("Question type\nA?\n", encoding="utf-8")
 
     base = construit_base_url(configuration_mqc)
     chemin = formate_route_pose_question(configuration_mqc)
-    respx.post(f"{base}{chemin}").mock(return_value=cree_reponse_mock("OK", "A?"))
+    respx.post(f"{base}{chemin}").mock(
+        return_value=reponse_creation_experience("OK", "A?")
+    )
 
     client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
@@ -68,13 +75,17 @@ def test_ecriture_nom_fichier_contient_date(tmp_path: Path, configuration_mqc: M
 
 
 @respx.mock
-def test_ecriture_contenu_csv_complet(tmp_path: Path, configuration_mqc: MQC):
+def test_ecriture_contenu_csv_complet(
+    tmp_path: Path, configuration_mqc: MQC, reponse_creation_experience
+):
     fichier = tmp_path / "eval.csv"
     fichier.write_text("Question type\nA?\nB?\n", encoding="utf-8")
 
     base = construit_base_url(configuration_mqc)
     chemin = formate_route_pose_question(configuration_mqc)
-    respx.post(f"{base}{chemin}").mock(return_value=cree_reponse_mock("OK", "A?"))
+    respx.post(f"{base}{chemin}").mock(
+        return_value=reponse_creation_experience("OK", "A?")
+    )
 
     client = ClientMQCHTTPAsync(cfg=configuration_mqc)
     remplisseur = RemplisseurReponses(client=client)
@@ -119,7 +130,7 @@ def test_methode_desinfecte_prefixe_nettoie_le_contenu_non_alphanumerique(
 
 @respx.mock
 def test_ecrit_ligne_depuis_lecteur_csv_ecrit_ligne_par_ligne(
-    tmp_path: Path, configuration_mqc: MQC
+    tmp_path: Path, configuration_mqc: MQC, reponse_creation_experience
 ):
     fichier = tmp_path / "test.csv"
     fichier.write_text("Question type\nQ1?\nQ2?\n", encoding="utf-8")
@@ -128,7 +139,7 @@ def test_ecrit_ligne_depuis_lecteur_csv_ecrit_ligne_par_ligne(
     chemin = formate_route_pose_question(configuration_mqc)
 
     respx.post(f"{base}{chemin}").mock(
-        return_value=cree_reponse_mock("reponse_test", "Q1?")
+        return_value=reponse_creation_experience("reponse_test", "Q1?")
     )
 
     client = ClientMQCHTTPAsync(cfg=configuration_mqc)
