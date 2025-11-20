@@ -212,7 +212,11 @@ def main():
     logging.info(f"Expérience affichée: {experience_listee} ")
 
     verificateur = VerificateurExperienceTerminee(client.experience)
-    verificateur.verifie(experience_id_cree, timeout_max=args.delai_limite)
+    verificateur.verifie(
+        experience_id_cree,
+        timeout_max=args.delai_limite,
+        frequence_lecture=conf.frequence_lecture,
+    )
     persiste_id_experience_dans_la_github_action(experience_id_cree)
 
 

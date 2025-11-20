@@ -26,7 +26,10 @@ class VerificateurExperienceTerminee:
         )
 
     def verifie(
-        self, experiment_id: int, delai_attente: float = 10.0, timeout_max: int = 1000
+        self,
+        experiment_id: int,
+        frequence_lecture: float = 10.0,
+        timeout_max: int = 1000,
     ) -> None:
         temps_ecoule = 0.0
 
@@ -42,10 +45,10 @@ class VerificateurExperienceTerminee:
                 return None
 
             logging.info(
-                f"Expérience {experiment_id} en cours, attente {delai_attente}s..."
+                f"Expérience {experiment_id} en cours, attente {frequence_lecture}s..."
             )
-            time.sleep(delai_attente)
-            temps_ecoule += delai_attente
+            time.sleep(frequence_lecture)
+            temps_ecoule += frequence_lecture
 
         logging.warning(f"Timeout atteint pour l'expérience {experiment_id}")
         raise TimeoutError
