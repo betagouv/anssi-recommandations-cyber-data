@@ -33,6 +33,7 @@ class Configuration(NamedTuple):
     evalap: Evalap
     albert: Albert
     base_de_donnees_journal: BaseDeDonnees | None
+    frequence_lecture: float
 
 
 def recupere_configuration_postgres() -> BaseDeDonnees | None:
@@ -68,10 +69,11 @@ def recupere_configuration() -> Configuration:
     )
 
     base_de_donnees_journal: BaseDeDonnees | None = recupere_configuration_postgres()
-
+    frequence_lecture = float(os.getenv("FREQUENCE_LECTURE", 10.0))
     return Configuration(
         mqc=configuration_mqc,
         evalap=evalap,
         albert=albert,
         base_de_donnees_journal=base_de_donnees_journal,
+        frequence_lecture=frequence_lecture,
     )
