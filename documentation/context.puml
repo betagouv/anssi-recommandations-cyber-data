@@ -1,0 +1,54 @@
+@startuml
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!include ICONURL/devicons/github.puml
+!include ICONURL/devicons/postgresql.puml
+!include ICONURL/devicons/yeoman.puml
+!include ICONURL/devicons/atom.puml
+
+
+!include https://raw.githubusercontent.com/adrianvlupu/C4-PlantUML/latest/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+Enterprise_Boundary(b0, "Evaluation") {
+    Person(developer, "Développeur·euse du LAB", "Les développeurs·euses du LAB qui participent à la construction du produit MQC")
+    Person(expertCyber, "Expert·e cyber", "Les experts·es cyber capables de juger de la qualité des réponses et fournir des réponses références.")
+
+    System(mqcData, "MQC-data", "Évaluateur de modèle MQC")
+
+    Enterprise_Boundary(b1, "MQC-data"){
+        System_Ext(githubAction, "Github Action", "Orchestre toutes les étapes d’évaluation", $sprite="github")
+        System_Boundary(jobs, "Orchestration") {
+
+            System_Boundary(b2, "Collecte réponses") {
+                System(SystemRemplisseurReponse, "Remplisseur réponses")
+            }
+
+            System_Boundary(b4, "Évalue réponses") {
+                System(SystemEvalueReponses, "Évalue les réponses de la première étape")
+            }
+
+            System_Boundary(b5, "Consigne l’évaluation") {
+                System(SystemConsigneEvaluation, "Consigne l’évaluation afin de l’exploiter dans Metabase")
+            }
+            SystemRemplisseurReponse -[#transparent]-> SystemEvalueReponses
+            SystemEvalueReponses -[#transparent]-> SystemConsigneEvaluation
+        }
+
+
+        System_Ext(SystemMQC, "MQC", $sprite="yeoman")
+        System_Ext(SystemEvalap, "Evalap", $sprite="atom")
+        System_Ext(SystemJournal, "postgresql","Journal", $sprite="postgresql")
+    }
+
+    Rel(SystemRemplisseurReponse, SystemMQC, "Pose les questions")
+    Rel(SystemEvalueReponses, SystemEvalap, "Intègre le dataset et crée l’expérience associée")
+    Rel(SystemConsigneEvaluation, SystemJournal, "Journalise les résultats de l’expérience")
+    BiRel(developer, mqcData, "Uses")
+    BiRel(expertCyber, mqcData, "Uses")
+    BiRel(mqcData, githubAction, "Uses")
+    Rel(githubAction, jobs, "Exécute")
+
+}
+
+@enduml
