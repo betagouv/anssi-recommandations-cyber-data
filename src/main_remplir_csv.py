@@ -1,8 +1,12 @@
+import asyncio
 from pathlib import Path
 from argparse import ArgumentParser
-from mqc.traite_csv_par_lots_en_parallele import traite_csv_par_lots_en_parallele
+
+from configuration import recupere_configuration
+from mqc.collecte_reponses_mqc import collecte_reponses_mqc
 import logging
-import asyncio
+
+from mqc.remplisseur_reponses import ClientMQCHTTPAsync
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -22,17 +26,11 @@ def main() -> None:
     )
     args = p.parse_args()
 
-    chemin = asyncio.run(
-        traite_csv_par_lots_en_parallele(
-            csv_path=args.csv,
-            prefixe=args.prefixe,
-            sortie=Path(args.sortie),
-            taille_lot=args.taille_lot,
-        )
+    configuration_mqc = recupere_configuration().mqc
+    asyncio.run(
+        collecte_reponses_mqc(args.csv, args.sortie, args.prefixe, args.taille_lot,
+                              ClientMQCHTTPAsync(configuration_mqc))
     )
-
-    if chemin:
-        logging.info(f"Nouveau fichier créé : {str(chemin)}")
 
 
 if __name__ == "__main__":

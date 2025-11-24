@@ -1,6 +1,9 @@
 import os
+from pathlib import Path
+from typing import Callable, Optional
 
 import pytest
+
 from configuration import (
     Evalap,
     Configuration,
@@ -86,3 +89,32 @@ def configuration() -> Configuration:
         base_de_donnees_journal=base_de_donnees,
         frequence_lecture=10.0,
     )
+
+
+@pytest.fixture()
+def fichier_evaluation(tmp_path: Path) -> Callable[[str, Optional[Path]], Path]:
+    def _fichier_evaluation(contenu: str, chemin: Optional[Path] = None) -> Path:
+        if chemin is not None:
+            (tmp_path / chemin).mkdir(parents=True, exist_ok=True)
+        fichier = tmp_path / "eval.csv"
+        fichier.write_text(contenu, encoding="utf-8")
+        return fichier
+
+    return _fichier_evaluation
+
+
+@pytest.fixture()
+def reponse_avec_paragraphes() -> dict:
+    return {
+        "reponse": "Réponse test",
+        "paragraphes": [
+            {
+                "score_similarite": 0.9,
+                "numero_page": 5,
+                "url": "https://test.com",
+                "nom_document": "Doc test",
+                "contenu": "Contenu test",
+            }
+        ],
+        "question": "Q1?",
+    }

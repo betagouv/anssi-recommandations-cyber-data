@@ -39,7 +39,7 @@ jobs:
         id: collecte_reponses_mqc
         run: |
           uv run python src/main_remplir_csv.py \
-            --csv donnees/questions_avec_verite_terrain.csv \
+            --csv donnees/questions_avec_verite_terrain_3.csv \
             --prefixe test_github_actions \
             --sortie donnees/sortie \
             --taille-lot 10
