@@ -6,9 +6,38 @@ on:
     branches: [main]
 
 jobs:
+  evaluation_mqc:
+    name: Lance l'évaluation de MQC
+    environment: DEMO
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cloner le dépôt Git
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Cloner l'intégralité du dépôt, pour ne pas avoir de « shallow repo » rejeté par Clever
+
+      - name: Installer la CLI Clever Cloud
+        shell: bash
+        run: npm install -g clever-tools
+
+      - name: Déployer en DÉMO
+        env:
+          CLEVER_SECRET: ${{ secrets.CLEVER_CLOUD_SECRET }}
+          CLEVER_TOKEN: ${{ secrets.CLEVER_CLOUD_TOKEN }}
+          ID_APP: ${{ secrets.CLEVER_CLOUD_ID_APP }}
+          ID_ORGANISATION: ${{ secrets.CLEVER_CLOUD_ID_ORGANISATION }}
+        run: |
+          RUN_COMMAND="uv run python src/main.py "
+          echo "Commande à exécuter: $RUN_COMMAND"
+          clever link -o="$ID_ORGANISATION" "$ID_APP"
+          clever env set CC_RUN_COMMAND "$RUN_COMMAND"
+          clever deploy --force --same-commit-policy=rebuild
+
   collecte_reponses:
     name: Collecte les réponses aux questions données auprès de l'API MQC
     runs-on: ubuntu-latest
+    needs: evaluation_mqc
 
     env:
       MQC_HOTE: demo-mes-questions-cyber.cleverapps.io
@@ -65,7 +94,7 @@ jobs:
       ALBERT_URL: https://albert.api.etalab.gouv.fr/v1
       EVALAP_URL: https://app-1a24ae36-a96f-4f6d-9cf1-f1af734405fc.cleverapps.io/v1
       EVALAP_TOKEN: ${{ secrets.EVALAP_TOKEN }}
-      FREQUENCE_LECTURE: ${{ env.FREQUENCE_LECTURE }}
+      FREQUENCE_LECTURE: ${{ vars.FREQUENCE_LECTURE }}
 
     steps:
       - name: Cloner le dépôt Git
