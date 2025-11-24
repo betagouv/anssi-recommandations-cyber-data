@@ -1,0 +1,32 @@
+REF Guide,REF Question,Question type,Tags,REF Réponse,Réponse envisagée,Numéro page (lecteur),Localisation paragraphe,Réponse Bot,Note réponse (/10),Commentaire Note
+GAUT,GAUT.Q.1,Qu'est-ce que l'authentification ?,Usuelle,GAUT.R.1,"La fonction d’authentification en tant que telle a pour objectif de permettre au prouveur de démontrer son identité (souvent annoncée lors de la phase d’identification).
+
+L’authentification est un mécanisme faisant intervenir deux entités distinctes : un prouveur et un
+vérifieur.
+Le prouveur cherche à prouver son identité au vérifieur. Il s’agit par exemple pour le prouveur
+de démontrer sa connaissance d’une donnée secrète comme un mot de passe.
+Le vérifieur doit être capable de s’assurer de la validité de l’identité du prouveur. Il s’agit par
+exemple pour le vérifieur de contrôler l’exactitude du mot de passe fourni par le prouveur.
+
+Un prouveur est un utilisateur du système d’information cherchant à s’authentifier. Le vérifieur est
+quant à lui classiquement un serveur du système d’information qui a la charge de vérifier l’identité
+d’un utilisateur.",10,Deuxième à cinquième paragraphe,"L'authentification est un processus visant à vérifier l'identité d'un utilisateur, d'une entité ou d'une machine. Elle repose sur la présentation d'un ou plusieurs facteurs d'authentification (comme un mot de passe, une donnée biométrique ou un certificat électronique) pour prouver cette identité. Ce processus fait suite à une phase d'identification, où l'utilisateur déclare son identité.
+
+L'authentification peut être simple (un seul facteur) ou multifacteur (plusieurs facteurs, idéalement indépendants), ce qui renforce la sécurité en rendant plus difficile la contrefaçon de l'identité.
+
+**Sources** :
+- Documents fournis (définitions de l'authentification et facteurs d'authentification).
+- Section ""Authentification"" et ""Authentification à double facteur"" des documents.",,Bonne réponse
+GAUT,GAUT.Q.2,Qu'est-ce que l'enregistrement ? ,Usuelle,GAUT.R.2,"L'enregistrement est une étape préalable à l'authentification consistant à enregistrer une entité (son identité, son moyen d’authentification, etc.) appelée prouveur auprès d’un vérifieur, c'est-à-dire l'entité en capacité de vérifier son identité.
+Cela correspond par exemple à la création d’un compte sur un site Web.",10,Sixième paragraphe,"L'enregistrement au sens de l'authentification est une étape préalable qui consiste à enregistrer un prouveur (son identité, son moyen d'authentification, etc.) auprès d'un vérifieur. Cela correspond par exemple à la création d'un compte sur un site Web. Cette phase est essentielle avant l'authentification proprement dite, car elle permet de définir les données ou éléments qui serviront à prouver l'identité lors de l'authentification.
+
+**Source** : Guide de l'ANSSI (section ""Authentification et premières définitions"", notamment le paragraphe sur l'étape d'enregistrement).",,"Deux notions d'enregistrement, donc il ne parle que de la journalisation et pas de la partie enregistrement au sens authentification.
+Mais si je rajoute ""au sens authentification"", c'est bon"
+GAUT,GAUT.Q.3,Qu'est-ce que l'identification ? ,Usuelle,GAUT.R.3,"L'identification est une étape préalable à l'authentification consistant pour une entité (un prouveur) à annoncer son identité sans prouver cette dernière. Par exemple, il peut s’agir d’un
+nom d’utilisateur à renseigner.",10,Septième paragraphe,"L'identification est l'action d'un utilisateur ou d'un processus automatique consistant à communiquer une identité préalablement enregistrée sur le système d'information (SI). Elle permet d'associer explicitement une identité à une personne ou à un processus pour assurer l'imputabilité des actions effectuées.
+
+Cette étape précède l'authentification, qui a pour but de vérifier l'identité déclarée.
+
+**Sources :**
+- Document ""Gestion des identités et des accès (règles 13 à 15)"" (section 5.1 Identification)
+- Définition extraite du tableau fourni (""Identification"").",,

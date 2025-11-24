@@ -1,21 +1,21 @@
 import logging
 from pathlib import Path
-
-from configuration import recupere_configuration
 from lecteur_csv import LecteurCSV
+from mqc.ecrivain_sortie import HorlogeSysteme, EcrivainSortie
 from mqc.remplisseur_reponses import (
     ClientMQCHTTPAsync,
     RemplisseurReponses,
 )
-from mqc.ecrivain_sortie import HorlogeSysteme, EcrivainSortie
 
 
 async def traite_csv_par_lots_en_parallele(
-    csv_path: Path, prefixe: str, sortie: Path, taille_lot: int
+    csv_path: Path,
+    prefixe: str,
+    sortie: Path,
+    taille_lot: int,
+    client: ClientMQCHTTPAsync,
 ) -> None:
-    cfg = recupere_configuration().mqc
-    client = ClientMQCHTTPAsync(cfg=cfg)
-    remplisseur = RemplisseurReponses(client=client)
+    remplisseur = RemplisseurReponses(client)
 
     lecteur = LecteurCSV(csv_path)
 
@@ -36,6 +36,7 @@ async def traite_csv_par_lots_en_parallele(
                     chemin = ecrivain.ecrit_ligne_depuis_lecteur_csv(
                         ligne_enrichie, prefixe
                     )
+                    logging.info(f"Nouveau fichier créé : {str(chemin)}")
                 else:
                     ecrivain.ecrit_ligne_depuis_lecteur_csv(ligne_enrichie, prefixe)
 
