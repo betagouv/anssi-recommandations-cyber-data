@@ -5,6 +5,7 @@ import pytest
 import respx
 from configuration import Configuration
 from main import main
+from mqc.ecrivain_sortie import HorlogeSysteme, EcrivainSortie
 from mqc.remplisseur_reponses import (
     ClientMQCHTTPAsync,
     construit_base_url,
@@ -28,7 +29,12 @@ async def test_execute_la_collecte_des_reponses_pour_creer_le_fichier_de_resulta
 
     entree = cree_fichier_csv_avec_du_contenu("Question type\nA?\n", tmp_path)
     sortie = tmp_path.joinpath("sortie")
-    await main(entree, sortie, "prefixe", 1, ClientMQCHTTPAsync(cfg=configuration.mqc))
+    ecrivain_sortie = EcrivainSortie(
+        racine=Path.cwd(), sous_dossier=sortie, horloge=HorlogeSysteme()
+    )
+    await main(
+        entree, "prefixe", ecrivain_sortie, 1, ClientMQCHTTPAsync(cfg=configuration.mqc)
+    )
 
     assert sortie.exists()
     collectes = glob.glob(str(sortie) + "/*")
