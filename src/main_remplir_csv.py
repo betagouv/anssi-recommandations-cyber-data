@@ -6,6 +6,7 @@ from configuration import recupere_configuration
 from mqc.collecte_reponses_mqc import collecte_reponses_mqc
 import logging
 
+from mqc.ecrivain_sortie import HorlogeSysteme, EcrivainSortie
 from mqc.remplisseur_reponses import ClientMQCHTTPAsync
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -27,11 +28,14 @@ def main() -> None:
     args = p.parse_args()
 
     configuration_mqc = recupere_configuration().mqc
+    ecrivain_sortie = EcrivainSortie(
+        racine=Path.cwd(), sous_dossier=Path(args.sortie), horloge=HorlogeSysteme()
+    )
     asyncio.run(
         collecte_reponses_mqc(
             args.csv,
-            args.sortie,
             args.prefixe,
+            ecrivain_sortie,
             args.taille_lot,
             ClientMQCHTTPAsync(configuration_mqc),
         )
