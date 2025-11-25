@@ -40,10 +40,10 @@ async def test_ecriture_cree_fichier_dans_bon_dossier(
     tmp_path: Path,
     configuration_mqc: MQC,
     reponse_creation_experience,
-    fichier_evaluation,
+    cree_fichier_csv_avec_du_contenu,
 ):
     sous_dossier = Path("donnees/sortie")
-    fichier = fichier_evaluation("Question type\nA?\n", sous_dossier)
+    fichier = cree_fichier_csv_avec_du_contenu("Question type\nA?\n", sous_dossier)
     reponse_attendue = reponse_creation_experience("OK", "A?")
     remplisseur, lecteur, ecrivain = initialise(
         configuration_mqc, fichier, reponse_attendue, sous_dossier, tmp_path
@@ -63,10 +63,10 @@ async def test_ecriture_nom_fichier_contient_date(
     tmp_path: Path,
     configuration_mqc: MQC,
     reponse_creation_experience,
-    fichier_evaluation,
+    cree_fichier_csv_avec_du_contenu,
 ):
     sous_dossier = Path("donnees/sortie")
-    fichier = fichier_evaluation("Question type\nA?\n", sous_dossier)
+    fichier = cree_fichier_csv_avec_du_contenu("Question type\nA?\n", sous_dossier)
     reponse_attendue = reponse_creation_experience("OK", "A?")
     remplisseur, lecteur, ecrivain = initialise(
         configuration_mqc, fichier, reponse_attendue, sous_dossier, tmp_path
@@ -86,9 +86,9 @@ async def test_ecriture_contenu_csv_complet(
     tmp_path: Path,
     configuration_mqc: MQC,
     reponse_creation_experience,
-    fichier_evaluation,
+    cree_fichier_csv_avec_du_contenu,
 ):
-    fichier = fichier_evaluation("Question type\nA?\nB?\n")
+    fichier = cree_fichier_csv_avec_du_contenu("Question type\nA?\nB?\n")
     reponse_attendue = reponse_creation_experience("OK", "A?")
     remplisseur, lecteur, ecrivain = initialise(
         configuration_mqc, fichier, reponse_attendue, Path("donnees/sortie"), tmp_path

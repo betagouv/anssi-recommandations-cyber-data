@@ -97,12 +97,14 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
     for i in range(5):
         if f"numero_page_reponse_bot_{i}" in df.columns:
-            df[f"numero_page_reponse_bot_{i}"] = df[
-                f"numero_page_reponse_bot_{i}"
-            ].fillna(0)
+            df[f"numero_page_reponse_bot_{i}"] = pd.to_numeric(
+                df[f"numero_page_reponse_bot_{i}"], errors="coerce"
+            ).fillna(0)
 
     if "numero_page_verite_terrain" in df.columns:
-        df["numero_page_verite_terrain"] = df["numero_page_verite_terrain"].fillna(0)
+        df["numero_page_verite_terrain"] = pd.to_numeric(
+            df["numero_page_verite_terrain"], errors="coerce"
+        ).fillna(0)
 
     columns_map = {
         "Question type": "query",

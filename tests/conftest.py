@@ -92,7 +92,9 @@ def configuration() -> Configuration:
 
 
 @pytest.fixture()
-def fichier_evaluation(tmp_path: Path) -> Callable[[str, Optional[Path]], Path]:
+def cree_fichier_csv_avec_du_contenu(
+    tmp_path: Path,
+) -> Callable[[str, Optional[Path]], Path]:
     def _fichier_evaluation(contenu: str, chemin: Optional[Path] = None) -> Path:
         if chemin is not None:
             (tmp_path / chemin).mkdir(parents=True, exist_ok=True)
