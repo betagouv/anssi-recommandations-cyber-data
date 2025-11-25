@@ -215,7 +215,7 @@ def resultat_collecte_mqc(tmp_path: Path):
         sortie = tmp_path.joinpath("sortie")
         contenu_fichier_csv_resultat_collecte = "REF Guide,REF Question,Que stion type,Tags,REF Réponse,Réponse envisagée,Numéro page (lecteur),Localisation paragraphe,Réponse Bot,Note réponse (/10),Commentaire Note,Contexte,Noms Documents,Numéros Page\nGAUT,GAUT.Q.1,Qu'est-ce que l'authentification ?,Usuelle,GAUT.R.1,réponse envisagée,10,en bas,réponse mqc,nan,Bonne réponse,test,[],[]"
         ecrivain_sortie_de_test = EcrivainSortieDeTest(
-            contenu_fichier_csv_resultat_collecte, Path().cwd(), sortie
+            contenu_fichier_csv_resultat_collecte, Path("/tmp"), sortie
         )
         return ecrivain_sortie_de_test, sortie
 
