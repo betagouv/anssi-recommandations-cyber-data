@@ -5,9 +5,12 @@ from pathlib import Path
 
 import requests
 
+from adaptateurs.journal import AdaptateurJournal, fabrique_adaptateur_journal
 from configuration import recupere_configuration, Configuration
+from consignateur_evaluation import consigne_evaluation
 from evalap import EvalapClient
 from evalap.lance_experience import lance_experience
+from journalisation.experience import EntrepotExperience, fabrique_entrepot_experience
 from mqc.collecte_reponses_mqc import collecte_reponses_mqc
 from mqc.ecrivain_sortie import HorlogeSysteme, EcrivainSortie
 from mqc.remplisseur_reponses import ClientMQCHTTPAsync
@@ -23,15 +26,20 @@ async def main(
     client_mqc: ClientMQCHTTPAsync,
     client_evalap: EvalapClient,
     configuration,
+    entrepot_experience: EntrepotExperience,
+    journal: AdaptateurJournal,
 ):
     await collecte_reponses_mqc(
         entree_donnees, prefixe, ecrivain_sortie, nombre_lot, client_mqc
     )
     fichier_csv = ecrivain_sortie._chemin_courant
     nom_evaluation = str(uuid.uuid4())
-    return lance_experience(
+    id_experience = lance_experience(
         client_evalap, configuration, 10_000, nom_evaluation, fichier_csv
     )
+    if id_experience is not None:
+        consigne_evaluation(id_experience, entrepot_experience, journal)
+    return id_experience
 
 
 if __name__ == "__main__":
@@ -54,5 +62,7 @@ if __name__ == "__main__":
             client,
             client_evalap,
             la_configuration,
+            fabrique_entrepot_experience(),
+            fabrique_adaptateur_journal(),
         )
     )

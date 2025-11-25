@@ -34,7 +34,9 @@ async def traite_csv_par_lots_en_parallele(
                     )
                     logging.info(f"Nouveau fichier créé : {str(chemin)}")
                 else:
-                    ecrivain_sortie.ecrit_ligne_depuis_lecteur_csv(ligne_enrichie, prefixe)
+                    ecrivain_sortie.ecrit_ligne_depuis_lecteur_csv(
+                        ligne_enrichie, prefixe
+                    )
 
             logging.info(f"Lot de {len(lignes_enrichies)} lignes traité et écrit")
     except StopIteration:

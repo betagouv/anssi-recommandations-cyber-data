@@ -1,4 +1,5 @@
 import csv
+import uuid
 from pathlib import Path
 from typing import Union
 
@@ -9,13 +10,15 @@ class EcrivainSortieDeTest(EcrivainSortie):
     def __init__(
         self,
         contenu_fichier_csv_resultat_collecte: str,
-        racine: Path = Path(),
+        racine: Path = Path("/tmp"),
         sous_dossier: Path = Path(),
     ) -> None:
         self.contenu_fichier_csv_resultat_collecte = (
             contenu_fichier_csv_resultat_collecte
         )
-        super().__init__(racine, sous_dossier, HorlogeSysteme())
+        repertoire_destination = racine.joinpath(str(uuid.uuid4()))
+        repertoire_destination.mkdir(parents=True, exist_ok=True)
+        super().__init__(repertoire_destination, sous_dossier, HorlogeSysteme())
 
     def ecrit_ligne_depuis_lecteur_csv(
         self, ligne: dict[str, Union[str, int, float]], prefixe: str

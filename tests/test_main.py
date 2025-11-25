@@ -5,9 +5,12 @@ from unittest.mock import Mock
 import httpx
 import pytest
 import respx
+
+from adaptateurs.journal import AdaptateurJournalMemoire, TypeEvenement
 from configuration import Configuration
 from infra.memoire.ecrivain import EcrivainSortieDeTest
 from infra.memoire.evalap import EvalapClientDeTest
+from journalisation.experience import EntrepotExperienceMemoire
 from main import main
 from mqc.remplisseur_reponses import (
     ClientMQCHTTPAsync,
@@ -43,6 +46,8 @@ async def test_execute_la_collecte_des_reponses_pour_creer_le_fichier_de_resulta
         ClientMQCHTTPAsync(cfg=configuration.mqc),
         client,
         configuration,
+        EntrepotExperienceMemoire(),
+        AdaptateurJournalMemoire(),
     )
 
     assert sortie.exists()
@@ -57,9 +62,6 @@ async def test_lance_l_experience(
     configuration: Configuration,
     cree_fichier_csv_avec_du_contenu,
     reponse_avec_paragraphes,
-    reponse_a_l_ajout_d_un_dataset,
-    reponse_a_la_creation_d_une_experience,
-    reponse_a_la_lecture_d_une_experience,
     une_experience_evalap,
 ):
     base = construit_base_url(configuration.mqc)
@@ -82,6 +84,52 @@ async def test_lance_l_experience(
         ClientMQCHTTPAsync(cfg=configuration.mqc),
         client,
         configuration,
+        EntrepotExperienceMemoire(),
+        AdaptateurJournalMemoire(),
     )
 
     assert id_experience_cree == 1
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_consigne_les_resultats_d_experience(
+    tmp_path: Path,
+    configuration: Configuration,
+    cree_fichier_csv_avec_du_contenu,
+    reponse_avec_paragraphes,
+    resultat_collecte_mqc,
+    resultat_experience,
+    une_experience_evalap,
+):
+    base = construit_base_url(configuration.mqc)
+    chemin = formate_route_pose_question(configuration.mqc)
+    respx.post(f"{base}{chemin}").mock(
+        return_value=httpx.Response(200, json=reponse_avec_paragraphes)
+    )
+    client = une_experience_evalap(configuration)
+    entree = cree_fichier_csv_avec_du_contenu("Question type\nA?\n", tmp_path)
+    ecrivain_sortie_de_test, sortie = resultat_collecte_mqc()
+
+    adaptateur_journal: AdaptateurJournalMemoire = AdaptateurJournalMemoire()
+    await main(
+        entree,
+        "prefixe",
+        ecrivain_sortie_de_test,
+        1,
+        ClientMQCHTTPAsync(cfg=configuration.mqc),
+        client,
+        configuration,
+        resultat_experience,
+        adaptateur_journal,
+    )
+
+    assert (
+        adaptateur_journal.les_evenements()[0]["type"]
+        == TypeEvenement.EVALUATION_CALCULEE
+    )
+    assert adaptateur_journal.les_evenements()[0]["donnees"] == {
+        "id_experimentation": 1,
+        "score_numero_page_en_contexte_4": 0.4,
+        "bon_nom_document_en_contexte_2": 0,
+    }
