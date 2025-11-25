@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from typing import Callable, Optional
+from unittest.mock import Mock
 
 import pytest
 
@@ -11,6 +12,11 @@ from configuration import (
     Albert,
     BaseDeDonnees,
 )
+from evalap import EvalapClient
+from evalap.evalap_dataset_http import DatasetReponse
+from evalap.evalap_experience_http import ExperienceReponse, ExperienceAvecResultats
+from infra.memoire.ecrivain import EcrivainSortieDeTest
+from infra.memoire.evalap import EvalapClientDeTest
 
 
 @pytest.fixture
@@ -120,3 +126,92 @@ def reponse_avec_paragraphes() -> dict:
         ],
         "question": "Q1?",
     }
+
+
+@pytest.fixture
+def reponse_a_l_ajout_d_un_dataset():
+    return DatasetReponse(
+        name="nom_dataset",
+        readme="",
+        default_metric="",
+        columns_map={},
+        id=1,
+        created_at="2024-01-01",
+        size=0,
+        columns=[],
+        parquet_size=0,
+        parquet_columns=[],
+    )
+
+
+@pytest.fixture
+def reponse_a_la_creation_d_une_experience():
+    return ExperienceReponse(
+        id=1,
+        name="nom_experience",
+        created_at="2024-01-01",
+        experiment_status="created",
+        experiment_set_id=None,
+        num_try=0,
+        num_success=0,
+        num_observation_try=0,
+        num_observation_success=0,
+        num_metrics=0,
+        readme=None,
+        judge_model="",
+        model={},
+        dataset={"id": 1, "name": "test"},
+        with_vision=False,
+    )
+
+
+@pytest.fixture
+def reponse_a_la_lecture_d_une_experience():
+    return ExperienceAvecResultats(
+        id=1,
+        name="Experience Test",
+        created_at="2024-01-01",
+        experiment_status="completed",
+        experiment_set_id=None,
+        num_try=1,
+        num_success=1,
+        num_observation_try=1,
+        num_observation_success=1,
+        num_metrics=1,
+        readme=None,
+        judge_model={},
+        model={},
+        dataset={"id": 1, "name": "test"},
+        with_vision=False,
+        results=[],
+    )
+
+
+@pytest.fixture
+def une_experience_evalap(
+    reponse_a_l_ajout_d_un_dataset,
+    reponse_a_la_creation_d_une_experience,
+    reponse_a_la_lecture_d_une_experience,
+):
+    def _une_experience_evalap(configuration) -> EvalapClient:
+        session = Mock()
+        client = EvalapClientDeTest(configuration, session=session)
+        client.reponse_ajoute_dataset(reponse_a_l_ajout_d_un_dataset)
+        client.reponse_cree_experience(reponse_a_la_creation_d_une_experience)
+        client.reponse_lit_experience(reponse_a_la_lecture_d_une_experience)
+        return client
+
+    return _une_experience_evalap
+
+
+@pytest.fixture
+def resultat_collecte_mqc(tmp_path: Path):
+    def _resultat_collecte_mqc() -> tuple[EcrivainSortieDeTest, Path]:
+        sortie = tmp_path.joinpath("sortie")
+        contenu_fichier_csv_resultat_collecte = "REF Guide,REF Question,Que stion type,Tags,REF Réponse,Réponse envisagée,Numéro page (lecteur),Localisation paragraphe,Réponse Bot,Note réponse (/10),Commentaire Note,Contexte,Noms Documents,Numéros Page\nGAUT,GAUT.Q.1,Qu'est-ce que l'authentification ?,Usuelle,GAUT.R.1,réponse envisagée,10,en bas,réponse mqc,nan,Bonne réponse,test,[],[]"
+        ecrivain_sortie_de_test = EcrivainSortieDeTest(
+            contenu_fichier_csv_resultat_collecte, Path().cwd(), sortie
+        )
+        return ecrivain_sortie_de_test, sortie
+
+    return _resultat_collecte_mqc

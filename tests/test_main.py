@@ -1,11 +1,14 @@
 import glob
 from pathlib import Path
+from unittest.mock import Mock
+
 import httpx
 import pytest
 import respx
 from configuration import Configuration
+from infra.memoire.ecrivain import EcrivainSortieDeTest
+from infra.memoire.evalap import EvalapClientDeTest
 from main import main
-from mqc.ecrivain_sortie import HorlogeSysteme, EcrivainSortie
 from mqc.remplisseur_reponses import (
     ClientMQCHTTPAsync,
     construit_base_url,
@@ -20,22 +23,65 @@ async def test_execute_la_collecte_des_reponses_pour_creer_le_fichier_de_resulta
     configuration: Configuration,
     cree_fichier_csv_avec_du_contenu,
     reponse_avec_paragraphes,
+    resultat_collecte_mqc,
 ):
     base = construit_base_url(configuration.mqc)
     chemin = formate_route_pose_question(configuration.mqc)
     respx.post(f"{base}{chemin}").mock(
         return_value=httpx.Response(200, json=reponse_avec_paragraphes)
     )
-
     entree = cree_fichier_csv_avec_du_contenu("Question type\nA?\n", tmp_path)
-    sortie = tmp_path.joinpath("sortie")
-    ecrivain_sortie = EcrivainSortie(
-        racine=Path.cwd(), sous_dossier=sortie, horloge=HorlogeSysteme()
-    )
+    ecrivain_sortie_de_test, sortie = resultat_collecte_mqc()
+    session = Mock()
+    client = EvalapClientDeTest(configuration, session=session)
+
     await main(
-        entree, "prefixe", ecrivain_sortie, 1, ClientMQCHTTPAsync(cfg=configuration.mqc)
+        entree,
+        "prefixe",
+        ecrivain_sortie_de_test,
+        1,
+        ClientMQCHTTPAsync(cfg=configuration.mqc),
+        client,
+        configuration,
     )
 
     assert sortie.exists()
     collectes = glob.glob(str(sortie) + "/*")
     assert Path(collectes[0]).name.startswith("prefixe_") is True
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_lance_l_experience(
+    tmp_path: Path,
+    configuration: Configuration,
+    cree_fichier_csv_avec_du_contenu,
+    reponse_avec_paragraphes,
+    reponse_a_l_ajout_d_un_dataset,
+    reponse_a_la_creation_d_une_experience,
+    reponse_a_la_lecture_d_une_experience,
+    une_experience_evalap,
+):
+    base = construit_base_url(configuration.mqc)
+    chemin = formate_route_pose_question(configuration.mqc)
+    respx.post(f"{base}{chemin}").mock(
+        return_value=httpx.Response(200, json=reponse_avec_paragraphes)
+    )
+    client = une_experience_evalap(configuration)
+    entree = cree_fichier_csv_avec_du_contenu("Question type\nA?\n", tmp_path)
+    contenu_fichier_csv_resultat_collecte = "REF Guide,REF Question,Que stion type,Tags,REF Réponse,Réponse envisagée,Numéro page (lecteur),Localisation paragraphe,Réponse Bot,Note réponse (/10),Commentaire Note,Contexte,Noms Documents,Numéros Page\nGAUT,GAUT.Q.1,Qu'est-ce que l'authentification ?,Usuelle,GAUT.R.1,réponse envisagée,10,en bas,réponse mqc,nan,Bonne réponse,test,[],[]"
+    ecrivain_sortie_de_test = EcrivainSortieDeTest(
+        contenu_fichier_csv_resultat_collecte
+    )
+
+    id_experience_cree = await main(
+        entree,
+        "prefixe",
+        ecrivain_sortie_de_test,
+        1,
+        ClientMQCHTTPAsync(cfg=configuration.mqc),
+        client,
+        configuration,
+    )
+
+    assert id_experience_cree == 1
