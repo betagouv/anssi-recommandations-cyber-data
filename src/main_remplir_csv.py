@@ -28,8 +28,13 @@ def main() -> None:
 
     configuration_mqc = recupere_configuration().mqc
     asyncio.run(
-        collecte_reponses_mqc(args.csv, args.sortie, args.prefixe, args.taille_lot,
-                              ClientMQCHTTPAsync(configuration_mqc))
+        collecte_reponses_mqc(
+            args.csv,
+            args.sortie,
+            args.prefixe,
+            args.taille_lot,
+            ClientMQCHTTPAsync(configuration_mqc),
+        )
     )
 
 

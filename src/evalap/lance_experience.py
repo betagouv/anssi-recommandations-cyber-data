@@ -1,0 +1,196 @@
+import ast
+import logging
+from pathlib import Path
+from typing import Optional
+
+import pandas as pd
+
+from configuration import Configuration
+from evalap import EvalapClient
+from evalap.evalap_dataset_http import DatasetReponse, DatasetPayload
+from evalap.evalap_experience_http import ExperiencePayload
+from metriques import Metriques
+from verificateur_experience_terminee import VerificateurExperienceTerminee
+
+
+def applique_mapping_noms_documents(
+    df: pd.DataFrame, chemin_mapping: Path
+) -> pd.DataFrame:
+    df_resultat = df.copy()
+    df_mapping = pd.read_csv(chemin_mapping)
+
+    def _extrait_cinq_premieres_valeurs(liste_noms: list[str]) -> pd.Series:
+        resultats = {}
+        for i in range(5):
+            resultats[f"nom_document_reponse_bot_{i}"] = (
+                liste_noms[i] if len(liste_noms) > i else ""
+            )
+        return pd.Series(resultats)
+
+    def _convertit_liste_str_en_liste(valeur):
+        # La valeur est de type str mais contient la représentation d'une liste
+        # que l'on souhaite manipuler en tant que tel.
+        return ast.literal_eval(valeur)
+
+    def _traite_et_extrait_noms(valeur: str):
+        liste_noms = _convertit_liste_str_en_liste(valeur)
+        return _extrait_cinq_premieres_valeurs(liste_noms)
+
+    nouvelles_colonnes = df_resultat["Noms Documents"].apply(_traite_et_extrait_noms)
+    df_resultat = pd.concat([df_resultat, nouvelles_colonnes], axis=1)
+
+    def obtient_nom_depuis_ref(ref: str) -> str:
+        if not isinstance(ref, str) or not ref.strip():
+            return ""
+
+        ligne_mapping = df_mapping[df_mapping["REF"] == ref]
+        if not ligne_mapping.empty:
+            url = ligne_mapping["URL"].iloc[0]
+            return url.split("/")[-1]
+        return ""
+
+    df_resultat["nom_document_verite_terrain"] = df_resultat["REF Guide"].apply(
+        obtient_nom_depuis_ref
+    )
+
+    def _extrait_cinq_premiers_numeros_page(liste_pages: list) -> pd.Series:
+        resultats = {}
+        for i in range(5):
+            resultats[f"numero_page_reponse_bot_{i}"] = (
+                liste_pages[i] if len(liste_pages) > i else None
+            )
+        return pd.Series(resultats)
+
+    def _traite_et_extrait_pages(valeur: str):
+        liste_pages = _convertit_liste_str_en_liste(valeur)
+        return _extrait_cinq_premiers_numeros_page(liste_pages)
+
+    if "Numéros Page" not in df_resultat.columns:
+        raise ValueError("La colonne 'Numéros Page' est requise")
+
+    nouvelles_colonnes_pages = df_resultat["Numéros Page"].apply(
+        _traite_et_extrait_pages
+    )
+    df_resultat = pd.concat([df_resultat, nouvelles_colonnes_pages], axis=1)
+
+    if "Numéro page (lecteur)" not in df_resultat.columns:
+        raise ValueError("La colonne 'Numéro page (lecteur)' est requise")
+
+    df_resultat["numero_page_verite_terrain"] = df_resultat["Numéro page (lecteur)"]
+
+    return df_resultat
+
+
+def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    if "Contexte" in df.columns:
+        df["Contexte"] = df["Contexte"].apply(
+            lambda x: x.split("${SEPARATEUR_DOCUMENT}")
+            if isinstance(x, str) and x.strip()
+            else []
+        )
+
+    chemin_mapping = Path("donnees/jointure-nom-guide.csv")
+    if "Noms Documents" in df.columns and "REF Guide" in df.columns:
+        df = applique_mapping_noms_documents(df, chemin_mapping)
+    else:
+        raise ValueError("Les colonnes 'Noms Documents' et 'REF Guide' sont requises")
+
+    for i in range(5):
+        if f"numero_page_reponse_bot_{i}" in df.columns:
+            df[f"numero_page_reponse_bot_{i}"] = df[
+                f"numero_page_reponse_bot_{i}"
+            ].fillna(0)
+
+    if "numero_page_verite_terrain" in df.columns:
+        df["numero_page_verite_terrain"] = df["numero_page_verite_terrain"].fillna(0)
+
+    columns_map = {
+        "Question type": "query",
+        "Réponse Bot": "output",
+        "Réponse envisagée": "output_true",
+        "Contexte": "context",
+    }
+
+    return df.rename(columns=columns_map)
+
+
+def ajoute_dataset(
+    client: EvalapClient, nom: str, df_mapped: pd.DataFrame
+) -> Optional[DatasetReponse]:
+    payload = DatasetPayload(
+        name=nom,
+        readme="Jeu d'évaluation QA pour Evalap",
+        default_metric="judge_precision",
+        df=df_mapped.astype(object).where(pd.notnull(df_mapped), None).to_json(),
+    )
+
+    resultat = client.dataset.ajoute(payload)
+
+    if resultat is None:
+        logging.error("Le dataset n'a pas pu être ajouté")
+        return None
+
+    logging.info("Dataset ajouté")
+    logging.info(f"Datasets disponibles: {len(client.dataset.liste())}")
+    return resultat
+
+
+def cree_experience(
+    client: EvalapClient,
+    dataset: DatasetReponse,
+    df_mapped: pd.DataFrame,
+    conf: Configuration,
+) -> int:
+    chargeur = Metriques()
+    fichier_metriques = Path("metriques.json")
+
+    metriques_enum = chargeur.recupere_depuis_fichier(fichier_metriques)
+    metriques = [m.value for m in metriques_enum]
+
+    payload_experience = ExperiencePayload(
+        name="Experience Test",
+        metrics=metriques,
+        dataset=dataset.name,
+        model={
+            "output": df_mapped["output"].astype(str).tolist(),
+            "aliased_name": "precomputed",
+        },
+        judge_model={
+            "name": "albert-large",
+            "base_url": conf.albert.url,
+            "api_key": conf.albert.cle_api,
+        },
+    )
+
+    resultat_experience = client.experience.cree(payload_experience)
+    if resultat_experience:
+        logging.info(
+            f"Expérience créée: {resultat_experience.name} (ID: {resultat_experience.id})"
+        )
+    else:
+        logging.error("L'expérience n'a pas pu être créée")
+    if resultat_experience is not None:
+        return resultat_experience.id
+    else:
+        return -1
+
+
+def lance_experience(
+    client: EvalapClient, conf: Configuration, limite, nom, fichier_csv
+) -> int | None:
+    df = pd.read_csv(fichier_csv)
+    df_mapped = prepare_dataframe(df)
+    dataset = ajoute_dataset(client, nom, df_mapped)
+    if dataset is None:
+        return None
+    id_experience_creee = cree_experience(client, dataset, df_mapped, conf)
+    experience_listee = client.experience.lit(id_experience_creee)
+    logging.info(f"Expérience affichée: {experience_listee} ")
+
+    verificateur = VerificateurExperienceTerminee(client.experience)
+    verificateur.verifie(
+        id_experience_creee,
+        timeout_max=limite,
+        frequence_lecture=conf.frequence_lecture,
+    )
+    return id_experience_creee

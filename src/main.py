@@ -7,6 +7,7 @@ from mqc.remplisseur_reponses import ClientMQCHTTPAsync
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
+
 async def main(
     entree_donnees: Path,
     sortie_collecte: Path,
@@ -14,7 +15,9 @@ async def main(
     nombre_lot: int,
     client_mqc: ClientMQCHTTPAsync,
 ):
-    await collecte_reponses_mqc(entree_donnees, sortie_collecte, prefixe, nombre_lot, client_mqc)
+    await collecte_reponses_mqc(
+        entree_donnees, sortie_collecte, prefixe, nombre_lot, client_mqc
+    )
 
 
 if __name__ == "__main__":
