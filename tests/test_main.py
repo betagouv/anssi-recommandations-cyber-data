@@ -17,7 +17,7 @@ from mqc.remplisseur_reponses import (
 async def test_execute_la_collecte_des_reponses_pour_creer_le_fichier_de_resultat_de_collecte(
     tmp_path: Path,
     configuration: Configuration,
-    fichier_evaluation,
+    cree_fichier_csv_avec_du_contenu,
     reponse_avec_paragraphes,
 ):
     base = construit_base_url(configuration.mqc)
@@ -26,7 +26,7 @@ async def test_execute_la_collecte_des_reponses_pour_creer_le_fichier_de_resulta
         return_value=httpx.Response(200, json=reponse_avec_paragraphes)
     )
 
-    entree = fichier_evaluation("Question type\nA?\n", tmp_path)
+    entree = cree_fichier_csv_avec_du_contenu("Question type\nA?\n", tmp_path)
     sortie = tmp_path.joinpath("sortie")
     await main(entree, sortie, "prefixe", 1, ClientMQCHTTPAsync(cfg=configuration.mqc))
 
