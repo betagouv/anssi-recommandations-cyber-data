@@ -1,60 +1,8 @@
 from pathlib import Path
-from typing import Optional
 from unittest.mock import Mock
 
-import requests
-from typing import cast
-from configuration import Configuration
-from evalap import EvalapClient, EvalapDatasetHttp, EvalapExperienceHttp
-from evalap.evalap_dataset_http import DatasetPayload, DatasetReponse
-from evalap.evalap_experience_http import (
-    ExperiencePayload,
-    ExperienceReponse,
-    ExperienceAvecResultats,
-)
 from evalap.lance_experience import lance_experience
-
-
-class EvalapDatasetDeTest(EvalapDatasetHttp):
-    def __init__(self, configuration: Configuration, session: requests.Session):
-        super().__init__(configuration, session)
-        self.dataset_reponse: None | DatasetReponse = None
-
-    def ajoute(self, payload: DatasetPayload) -> Optional[DatasetReponse]:
-        return self.dataset_reponse
-
-
-class EvalapExperienceDeTest(EvalapExperienceHttp):
-    def __init__(self, configuration: Configuration, session: requests.Session):
-        super().__init__(configuration, session)
-        self.experience_reponse: None | ExperienceReponse = None
-        self.experience_avec_resultats: None | ExperienceAvecResultats = None
-
-    def cree(self, payload: ExperiencePayload) -> Optional[ExperienceReponse]:
-        return self.experience_reponse
-
-    def lit(self, experiment_id: int) -> Optional[ExperienceAvecResultats]:
-        return self.experience_avec_resultats
-
-
-class EvalapClientDeTest(EvalapClient):
-    def __init__(self, configuration: Configuration, session: requests.Session):
-        super().__init__(configuration, session)
-        self.dataset = EvalapDatasetDeTest(configuration, session)
-        self.experience = EvalapExperienceDeTest(configuration, session)
-
-    def reponse_ajoute_dataset(self, dataset_reponse: DatasetReponse):
-        cast(EvalapDatasetDeTest, self.dataset).dataset_reponse = dataset_reponse
-
-    def reponse_cree_experience(self, experience_reponse: ExperienceReponse):
-        cast(
-            EvalapExperienceDeTest, self.experience
-        ).experience_reponse = experience_reponse
-
-    def reponse_lit_experience(self, experience_avec_resultats):
-        cast(
-            EvalapExperienceDeTest, self.experience
-        ).experience_avec_resultats = experience_avec_resultats
+from infra.memoire.evalap import EvalapClientDeTest
 
 
 def test_lance_experience(
