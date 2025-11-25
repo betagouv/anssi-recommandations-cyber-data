@@ -17,6 +17,11 @@ from evalap.evalap_dataset_http import DatasetReponse
 from evalap.evalap_experience_http import ExperienceReponse, ExperienceAvecResultats
 from infra.memoire.ecrivain import EcrivainSortieDeTest
 from infra.memoire.evalap import EvalapClientDeTest
+from journalisation.experience import (
+    EntrepotExperienceMemoire,
+    Experience,
+    EntrepotExperience,
+)
 
 
 @pytest.fixture
@@ -215,3 +220,21 @@ def resultat_collecte_mqc(tmp_path: Path):
         return ecrivain_sortie_de_test, sortie
 
     return _resultat_collecte_mqc
+
+
+@pytest.fixture
+def resultat_experience() -> EntrepotExperience:
+    entrepot_experience = EntrepotExperienceMemoire()
+    entrepot_experience.persiste(
+        Experience(
+            id_experimentation=1,
+            metriques=[
+                {
+                    "numero_ligne": 1,
+                    "score_numero_page_en_contexte_4": 0.4,
+                    "bon_nom_document_en_contexte_2": 0,
+                }
+            ],
+        )
+    )
+    return entrepot_experience
