@@ -1,7 +1,8 @@
 from pathlib import Path
-from lecteur_csv import LecteurCSV
 from typing import Mapping, Union
 import pytest
+
+from infra.lecteur_csv import LecteurCSV
 
 
 def test_peut_lire_un_fichier_csv_et_compter_les_lignes(tmp_path: Path):

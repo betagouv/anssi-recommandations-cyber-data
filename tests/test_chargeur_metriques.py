@@ -1,6 +1,7 @@
 import pytest
 from pathlib import Path
-from metriques import Metriques, MetriqueEnum
+
+from evalap.metriques import Metriques, MetriqueEnum
 
 
 def test_charge_metriques_depuis_fichier_valide(tmp_path):

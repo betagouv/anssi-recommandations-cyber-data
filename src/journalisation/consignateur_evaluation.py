@@ -4,8 +4,8 @@ from adaptateurs.journal import (
     Donnees,
     TypeEvenement,
 )
+from infra.lecteur_csv import LecteurCSV
 from journalisation.experience import EntrepotExperience
-from lecteur_csv import LecteurCSV
 
 
 def consigne_evaluation(

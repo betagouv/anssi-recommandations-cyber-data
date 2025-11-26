@@ -4,8 +4,8 @@ import asyncio
 import respx
 import pytest
 
-from lecteur_csv import LecteurCSV
 from configuration import MQC
+from infra.lecteur_csv import LecteurCSV
 from mqc.remplisseur_reponses import (
     RemplisseurReponses,
     ClientMQCHTTPAsync,

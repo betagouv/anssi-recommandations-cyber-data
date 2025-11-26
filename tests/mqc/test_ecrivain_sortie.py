@@ -5,7 +5,7 @@ import pytest
 import respx
 
 from configuration import MQC
-from lecteur_csv import LecteurCSV
+from infra.lecteur_csv import LecteurCSV
 from mqc.ecrivain_sortie import HorlogeSysteme, EcrivainSortie
 from mqc.remplisseur_reponses import (
     construit_base_url,

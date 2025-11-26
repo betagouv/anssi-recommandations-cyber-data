@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
-from lecteur_csv import LecteurCSV
+
+from infra.lecteur_csv import LecteurCSV
 from mqc.ecrivain_sortie import EcrivainSortie
 from mqc.remplisseur_reponses import (
     ClientMQCHTTPAsync,
