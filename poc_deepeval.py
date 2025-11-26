@@ -17,6 +17,11 @@ from configuration import recupere_configuration
 from infra.lecteur_csv import LecteurCSV
 from evalap.lance_experience import prepare_dataframe
 from evalap.metriques import Metriques, MetriqueEnum
+from metriques_personnalisees_evalap.metriques_personnalisees import (
+    _metrique_bon_nom_document_en_contexte,
+    _metrique_bon_numero_page_en_contexte,
+    _metrique_score_numero_page_en_contexte,
+)
 import requests
 
 
@@ -116,6 +121,30 @@ def nettoie_et_prepare_contexte_pour_evaluation(contexte_non_traite: str) -> str
     return contexte_propre
 
 
+def extrait_metadonnees_pour_metriques_personnalisees(ligne_donnees: pd.Series) -> dict:
+    metadata = {}
+    for j in range(5):
+        if f"nom_document_reponse_bot_{j}" in ligne_donnees:
+            metadata[f"nom_document_reponse_bot_{j}"] = ligne_donnees[
+                f"nom_document_reponse_bot_{j}"
+            ]
+        if f"numero_page_reponse_bot_{j}" in ligne_donnees:
+            metadata[f"numero_page_reponse_bot_{j}"] = ligne_donnees[
+                f"numero_page_reponse_bot_{j}"
+            ]
+
+    if "nom_document_verite_terrain" in ligne_donnees:
+        metadata["nom_document_verite_terrain"] = ligne_donnees[
+            "nom_document_verite_terrain"
+        ]
+    if "numero_page_verite_terrain" in ligne_donnees:
+        metadata["numero_page_verite_terrain"] = ligne_donnees[
+            "numero_page_verite_terrain"
+        ]
+
+    return metadata
+
+
 def cree_liste_cas_de_test_deepeval(
     donnees_dataframe: pd.DataFrame,
 ) -> List[LLMTestCase]:
@@ -123,12 +152,14 @@ def cree_liste_cas_de_test_deepeval(
 
     for indice, ligne_donnees in donnees_dataframe.iterrows():
         contexte = ligne_donnees["context"]
+        metadata = extrait_metadonnees_pour_metriques_personnalisees(ligne_donnees)
 
         cas_de_test_unique = LLMTestCase(
             input=ligne_donnees["query"],
             actual_output=ligne_donnees["output"],
             retrieval_context=contexte,
             context=contexte,
+            additional_metadata=metadata,
         )
         liste_cas_de_test.append(cas_de_test_unique)
 
@@ -183,30 +214,51 @@ def execute_evaluation_metriques(
     for i, test_result in enumerate(tests_resultats):
         ligne_export: dict = {"numero_ligne": i}
 
+        # Métriques DeepEval
         metrics_data = getattr(test_result, "metrics_data", None) or []
         for metric_data in metrics_data:
-            # 1) Récupère le nom "logique" de la métrique
             nom_metrique = getattr(metric_data, "name", None)
-
-            # fallback : nom de l'instance de métrique si disponible
             if not nom_metrique and hasattr(metric_data, "metric"):
                 nom_metrique = getattr(
                     metric_data.metric,
                     "name",
                     metric_data.metric.__class__.__name__,
                 )
-
-            # dernier fallback : nom de la classe MetricData (peu informatif mais évite un crash)
             if not nom_metrique:
                 nom_metrique = metric_data.__class__.__name__
 
-            # 2) Nettoyage pour en faire un nom de colonne propre
             nom_colonne = (
                 nom_metrique.replace("Metric", "").strip().lower().replace(" ", "_")
             )
-
             score = getattr(metric_data, "score", None)
             ligne_export[nom_colonne] = score
+
+        # Métriques personnalisées
+        cas_test = cas_de_test[i]
+        if hasattr(cas_test, "additional_metadata") and cas_test.additional_metadata:
+            metadata = cas_test.additional_metadata
+
+            # Métriques de nom de document
+            for j in range(5):
+                nom_doc_bot = metadata.get(f"nom_document_reponse_bot_{j}", "")
+                nom_doc_verite = metadata.get("nom_document_verite_terrain", "")
+                ligne_export[f"bon_nom_document_en_contexte_{j}"] = (
+                    _metrique_bon_nom_document_en_contexte(nom_doc_bot, nom_doc_verite)
+                )
+
+            # Métriques de numéro de page
+            for j in range(5):
+                num_page_bot = metadata.get(f"numero_page_reponse_bot_{j}", 0)
+                num_page_verite = metadata.get("numero_page_verite_terrain", 0)
+
+                ligne_export[f"bon_numero_page_en_contexte_{j}"] = (
+                    _metrique_bon_numero_page_en_contexte(num_page_bot, num_page_verite)
+                )
+                ligne_export[f"score_numero_page_en_contexte_{j}"] = (
+                    _metrique_score_numero_page_en_contexte(
+                        num_page_bot, num_page_verite
+                    )
+                )
 
         donnees_export.append(ligne_export)
 
