@@ -3,7 +3,7 @@ permissions: {}
 
 on:
   push:
-    branches: [main]
+    branches: [main, joue-toute-l-evaluation]
 
 jobs:
   evaluation_mqc:
