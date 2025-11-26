@@ -1,3 +1,4 @@
+import ast
 from pathlib import Path
 from typing import Any, Iterator, Mapping, Callable, cast, Union
 import pandas as pd
@@ -60,3 +61,14 @@ class LecteurCSV:
     @property
     def dataframe(self) -> pd.DataFrame:
         return self._df.copy()
+
+    def recupere_les_informations_de_la_ligne(self, numero_ligne: int) -> dict:
+        la_ligne = self._df.iloc[numero_ligne].to_dict()
+        informations_de_la_ligne = {
+            "question_type": la_ligne["Question type"],
+            "reponse_envisagee": la_ligne["Réponse envisagée"],
+            "reponse_bot": la_ligne["Réponse Bot"],
+            "noms_documents": ast.literal_eval(la_ligne["Noms Documents"]),
+            "numeros_page": ast.literal_eval(la_ligne["Numéros Page"]),
+        }
+        return informations_de_la_ligne
