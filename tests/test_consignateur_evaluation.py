@@ -1,6 +1,6 @@
 from adaptateurs.journal import TypeEvenement, AdaptateurJournalMemoire
-from consignateur_evaluation import consigne_evaluation
 from infra.memoire.ecrivain import EcrivainSortieDeTest
+from journalisation.consignateur_evaluation import consigne_evaluation
 
 from journalisation.experience import Experience, EntrepotExperienceMemoire
 

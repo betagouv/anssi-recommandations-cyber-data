@@ -7,9 +7,9 @@ import requests
 
 from adaptateurs.journal import AdaptateurJournal, fabrique_adaptateur_journal
 from configuration import recupere_configuration, Configuration
-from consignateur_evaluation import consigne_evaluation
 from evalap import EvalapClient
 from evalap.lance_experience import lance_experience
+from journalisation.consignateur_evaluation import consigne_evaluation
 from journalisation.experience import EntrepotExperience, fabrique_entrepot_experience
 from mqc.collecte_reponses_mqc import collecte_reponses_mqc
 from mqc.ecrivain_sortie import HorlogeSysteme, EcrivainSortie

@@ -7,7 +7,7 @@ from evalap.evalap_experience_http import (
     MetriqueResultat,
     ObservationResultat,
 )
-from verificateur_experience_terminee import (
+from evalap.verificateur_experience_terminee import (
     VerificateurExperienceTerminee,
     ExperienceInconnue,
 )

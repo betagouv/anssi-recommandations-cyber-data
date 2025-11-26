@@ -9,8 +9,8 @@ from configuration import Configuration
 from evalap import EvalapClient
 from evalap.evalap_dataset_http import DatasetReponse, DatasetPayload
 from evalap.evalap_experience_http import ExperiencePayload
-from metriques import Metriques
-from verificateur_experience_terminee import VerificateurExperienceTerminee
+from evalap.metriques import Metriques
+from evalap.verificateur_experience_terminee import VerificateurExperienceTerminee
 
 
 def applique_mapping_noms_documents(

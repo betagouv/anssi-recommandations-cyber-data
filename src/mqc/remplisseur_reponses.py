@@ -6,8 +6,9 @@ from typing import (
 import httpx
 from pydantic import BaseModel
 from configuration import MQC
-from lecteur_csv import LecteurCSV
 import asyncio
+
+from infra.lecteur_csv import LecteurCSV
 
 
 class Paragraphe(BaseModel):
