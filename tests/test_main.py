@@ -128,8 +128,8 @@ async def test_consigne_les_resultats_d_experience(
         adaptateur_journal.les_evenements()[0]["type"]
         == TypeEvenement.EVALUATION_CALCULEE
     )
-    assert adaptateur_journal.les_evenements()[0]["donnees"] == {
-        "id_experimentation": 1,
-        "score_numero_page_en_contexte_4": 0.4,
-        "bon_nom_document_en_contexte_2": 0,
-    }
+
+    donnees_recues = adaptateur_journal.les_evenements()[0]["donnees"]
+    assert donnees_recues["id_experimentation"] == 1
+    assert donnees_recues["score_numero_page_en_contexte_4"] == 0.4
+    assert donnees_recues["bon_nom_document_en_contexte_2"] == 0

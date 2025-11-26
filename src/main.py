@@ -38,7 +38,7 @@ async def main(
         client_evalap, configuration, 10_000, nom_evaluation, fichier_csv
     )
     if id_experience is not None:
-        consigne_evaluation(id_experience, entrepot_experience, journal)
+        consigne_evaluation(id_experience, entrepot_experience, journal, fichier_csv)
     return id_experience
 
 

@@ -35,3 +35,15 @@ class EcrivainSortieDeTest(EcrivainSortie):
             ecrivain.writerow(en_tete)
             ecrivain.writerow(resultat_premiere_ligne)
         return Path()
+
+    def ecris_contenu(self):
+        dossier = self._racine / self._sous_dossier
+        dossier.mkdir(parents=True, exist_ok=True)
+        prefixe = str(uuid.uuid4())
+        self._chemin_courant = (dossier / self._nom_fichier(prefixe)).resolve()
+
+        lignes = self.contenu_fichier_csv_resultat_collecte.split("\n")
+        with open(self._chemin_courant, "a", encoding="utf-8", newline="") as f:
+            ecrivain = csv.writer(f)
+            for ligne in lignes:
+                ecrivain.writerow(ligne.split(","))

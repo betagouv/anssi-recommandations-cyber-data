@@ -22,6 +22,7 @@ from journalisation.experience import (
     Experience,
     EntrepotExperience,
 )
+from mqc.ecrivain_sortie import EcrivainSortie
 
 
 @pytest.fixture
@@ -213,13 +214,28 @@ def une_experience_evalap(
 def resultat_collecte_mqc(tmp_path: Path):
     def _resultat_collecte_mqc() -> tuple[EcrivainSortieDeTest, Path]:
         sortie = tmp_path.joinpath("sortie")
-        contenu_fichier_csv_resultat_collecte = "REF Guide,REF Question,Que stion type,Tags,REF Réponse,Réponse envisagée,Numéro page (lecteur),Localisation paragraphe,Réponse Bot,Note réponse (/10),Commentaire Note,Contexte,Noms Documents,Numéros Page\nGAUT,GAUT.Q.1,Qu'est-ce que l'authentification ?,Usuelle,GAUT.R.1,réponse envisagée,10,en bas,réponse mqc,nan,Bonne réponse,test,[],[]"
+        en_tete = "REF Guide,REF Question,Question type,Tags,REF Réponse,Réponse envisagée,Numéro page (lecteur),Localisation paragraphe,Réponse Bot,Note réponse (/10),Commentaire Note,Contexte,Noms Documents,Numéros Page\n"
+        premiere_ligne = "GAUT,GAUT.Q.1,Qu'est-ce que l'authentification ?,Usuelle,GAUT.R.1,réponse envisagée,10,en bas,réponse mqc,nan,Bonne réponse,test,[],[]"
+        contenu_fichier_csv_resultat_collecte = en_tete + premiere_ligne
         ecrivain_sortie_de_test = EcrivainSortieDeTest(
             contenu_fichier_csv_resultat_collecte, Path("/tmp"), sortie
         )
         return ecrivain_sortie_de_test, sortie
 
     return _resultat_collecte_mqc
+
+
+@pytest.fixture
+def resultat_collecte_mqc_avec_deux_resultats() -> EcrivainSortie:
+    en_tete = "REF Guide,REF Question,Question type,Tags,REF Réponse,Réponse envisagée,Numéro page (lecteur),Localisation paragraphe,Réponse Bot,Note réponse (/10),Commentaire Note,Contexte,Noms Documents,Numéros Page\n"
+    premiere_ligne = "GAUT,GAUT.Q.1,Qu'est-ce que l'authentification ?,Usuelle,GAUT.R.1,réponse envisagée,10,en bas,réponse mqc,nan,Bonne réponse,test,[],[]\n"
+    seconde_ligne = "GAUT,GAUT.Q.1,Qu'elle est la bonne longueur d'un mot de passe?,Usuelle,GAUT.R.1,réponse envisagée,10,en bas,réponse mqc,nan,Excellente réponse,test,[],[]\n"
+
+    contenu_complet = en_tete + premiere_ligne + seconde_ligne
+    ecrivain_sortie_de_test = EcrivainSortieDeTest(contenu_complet)
+    ecrivain_sortie_de_test.ecris_contenu()
+
+    return ecrivain_sortie_de_test
 
 
 @pytest.fixture
@@ -230,7 +246,7 @@ def resultat_experience() -> EntrepotExperience:
             id_experimentation=1,
             metriques=[
                 {
-                    "numero_ligne": 1,
+                    "numero_ligne": 0,
                     "score_numero_page_en_contexte_4": 0.4,
                     "bon_nom_document_en_contexte_2": 0,
                 }
