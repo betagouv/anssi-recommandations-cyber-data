@@ -167,14 +167,12 @@ def cree_liste_cas_de_test_deepeval(
     return liste_cas_de_test
 
 
-def execute_evaluation_metriques(
-    cas_de_test: List[LLMTestCase], albert_llm: AlbertLLM
-) -> None:
+def cree_metriques_deepeval(albert_llm: AlbertLLM) -> list:
     chargeur = Metriques()
     fichier_metriques = Path("metriques.json")
     metriques_enum = chargeur.recupere_depuis_fichier(fichier_metriques)
 
-    metriques_deepeval: list = []
+    metriques_deepeval = []
     for metrique_enum in metriques_enum:
         if metrique_enum == MetriqueEnum.HALLUCINATION:
             metriques_deepeval.append(
@@ -191,16 +189,79 @@ def execute_evaluation_metriques(
         elif metrique_enum == MetriqueEnum.TOXICITY:
             metriques_deepeval.append(ToxicityMetric(model=albert_llm, threshold=0.5))
 
+    return metriques_deepeval
+
+
+def extrait_scores_deepeval(test_result) -> dict:
+    scores = {}
+    metrics_data = getattr(test_result, "metrics_data", None) or []
+    for metric_data in metrics_data:
+        nom_metrique = getattr(metric_data, "name", None)
+        if not nom_metrique and hasattr(metric_data, "metric"):
+            nom_metrique = getattr(
+                metric_data.metric, "name", metric_data.metric.__class__.__name__
+            )
+        if not nom_metrique:
+            nom_metrique = metric_data.__class__.__name__
+
+        nom_colonne = (
+            nom_metrique.replace("Metric", "").strip().lower().replace(" ", "_")
+        )
+        score = getattr(metric_data, "score", None)
+        scores[nom_colonne] = score
+
+    return scores
+
+
+def calcule_metriques_personnalisees(metadata: dict) -> dict:
+    scores = {}
+
+    # Métriques de nom de document
+    for j in range(5):
+        nom_doc_bot = metadata.get(f"nom_document_reponse_bot_{j}", "")
+        nom_doc_verite = metadata.get("nom_document_verite_terrain", "")
+        scores[f"bon_nom_document_en_contexte_{j}"] = (
+            _metrique_bon_nom_document_en_contexte(nom_doc_bot, nom_doc_verite)
+        )
+
+    # Métriques de numéro de page
+    for j in range(5):
+        num_page_bot = metadata.get(f"numero_page_reponse_bot_{j}", 0)
+        num_page_verite = metadata.get("numero_page_verite_terrain", 0)
+
+        scores[f"bon_numero_page_en_contexte_{j}"] = (
+            _metrique_bon_numero_page_en_contexte(num_page_bot, num_page_verite)
+        )
+        scores[f"score_numero_page_en_contexte_{j}"] = (
+            _metrique_score_numero_page_en_contexte(num_page_bot, num_page_verite)
+        )
+
+    return scores
+
+
+def exporte_resultats(donnees_export: list[dict]) -> None:
+    df_resultats = pd.DataFrame(donnees_export)
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    nom_fichier = f"resultats_deepeval_metriques_{timestamp}.csv"
+    chemin_sortie = Path("donnees/resultats_evaluations") / nom_fichier
+
+    chemin_sortie.parent.mkdir(parents=True, exist_ok=True)
+    df_resultats.to_csv(chemin_sortie, index=False)
+    logging.info(f"📄 Résultats exportés vers: {chemin_sortie}")
+
+
+def execute_evaluation_metriques(
+    cas_de_test: List[LLMTestCase], albert_llm: AlbertLLM
+) -> None:
+    metriques_deepeval = cree_metriques_deepeval(albert_llm)
+
     if not metriques_deepeval:
         logging.warning("Aucune métrique DeepEval supportée trouvée")
         return
 
     logging.info(f"Début de l'évaluation avec {len(metriques_deepeval)} métriques...")
 
-    resultats = evaluate(
-        test_cases=cas_de_test,
-        metrics=metriques_deepeval,
-    )
+    resultats = evaluate(test_cases=cas_de_test, metrics=metriques_deepeval)
 
     if hasattr(resultats, "test_results"):
         tests_resultats = resultats.test_results
@@ -209,68 +270,23 @@ def execute_evaluation_metriques(
     else:
         tests_resultats = resultats
 
-    donnees_export: list[dict] = []
-
+    donnees_export = []
     for i, test_result in enumerate(tests_resultats):
-        ligne_export: dict = {"numero_ligne": i}
+        ligne_export = {"numero_ligne": i}
 
         # Métriques DeepEval
-        metrics_data = getattr(test_result, "metrics_data", None) or []
-        for metric_data in metrics_data:
-            nom_metrique = getattr(metric_data, "name", None)
-            if not nom_metrique and hasattr(metric_data, "metric"):
-                nom_metrique = getattr(
-                    metric_data.metric,
-                    "name",
-                    metric_data.metric.__class__.__name__,
-                )
-            if not nom_metrique:
-                nom_metrique = metric_data.__class__.__name__
-
-            nom_colonne = (
-                nom_metrique.replace("Metric", "").strip().lower().replace(" ", "_")
-            )
-            score = getattr(metric_data, "score", None)
-            ligne_export[nom_colonne] = score
+        ligne_export.update(extrait_scores_deepeval(test_result))
 
         # Métriques personnalisées
         cas_test = cas_de_test[i]
         if hasattr(cas_test, "additional_metadata") and cas_test.additional_metadata:
-            metadata = cas_test.additional_metadata
-
-            # Métriques de nom de document
-            for j in range(5):
-                nom_doc_bot = metadata.get(f"nom_document_reponse_bot_{j}", "")
-                nom_doc_verite = metadata.get("nom_document_verite_terrain", "")
-                ligne_export[f"bon_nom_document_en_contexte_{j}"] = (
-                    _metrique_bon_nom_document_en_contexte(nom_doc_bot, nom_doc_verite)
-                )
-
-            # Métriques de numéro de page
-            for j in range(5):
-                num_page_bot = metadata.get(f"numero_page_reponse_bot_{j}", 0)
-                num_page_verite = metadata.get("numero_page_verite_terrain", 0)
-
-                ligne_export[f"bon_numero_page_en_contexte_{j}"] = (
-                    _metrique_bon_numero_page_en_contexte(num_page_bot, num_page_verite)
-                )
-                ligne_export[f"score_numero_page_en_contexte_{j}"] = (
-                    _metrique_score_numero_page_en_contexte(
-                        num_page_bot, num_page_verite
-                    )
-                )
+            ligne_export.update(
+                calcule_metriques_personnalisees(cas_test.additional_metadata)
+            )
 
         donnees_export.append(ligne_export)
 
-    df_resultats = pd.DataFrame(donnees_export)
-
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    nom_fichier = f"resultats_deepeval_metriques_{timestamp}.csv"
-    chemin_sortie = Path("donnees/resultats_evaluations") / nom_fichier
-
-    chemin_sortie.parent.mkdir(parents=True, exist_ok=True)
-    df_resultats.to_csv(chemin_sortie, index=False)
-    logging.info(f"📄 Résultats exportés vers: {chemin_sortie}")
+    exporte_resultats(donnees_export)
 
 
 def fonction_principale():
