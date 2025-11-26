@@ -30,3 +30,5 @@ scripts/notebooks/.ipynb_checkpoints/
 # Donnees
 donnees/jointure-nom-guide.csv
 donnees/sortie
+
+**/**/.deepeval

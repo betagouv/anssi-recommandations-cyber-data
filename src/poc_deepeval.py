@@ -1,14 +1,19 @@
 import pandas as pd
 from pathlib import Path
-from typing import List
+from typing import List, Union
 import logging
+import multiprocessing as mp
+import time
+import os
+import argparse
 
-from deepeval import evaluate
+from deepeval.evaluate import evaluate
 from deepeval.metrics import (
     HallucinationMetric,
     AnswerRelevancyMetric,
     FaithfulnessMetric,
     ToxicityMetric,
+BaseMetric
 )
 from deepeval.test_case import LLMTestCase
 from deepeval.models import DeepEvalBaseLLM
@@ -59,37 +64,20 @@ class AlbertLLM(DeepEvalBaseLLM):
         raise RuntimeError(f"Erreur API Albert {reponse.status_code} : {reponse.text}")
 
     def generate(self, messages):
-        """
-        DeepEval peut passer :
-        - une str
-        - un dict {"role":..., "content":...}
-        - une liste de messages [{"role":..., "content":...}]
-        - un objet interne avec .input ou .prompt
-        """
-
-        # 1. case: DeepEval envoie une string
         if isinstance(messages, str):
             prompt = messages
-
-        # 2. case: dict {"role": "...", "content": "..."}
         elif isinstance(messages, dict) and "content" in messages:
             prompt = messages["content"]
-
-        # 3. case: liste de messages au format OpenAI
         elif isinstance(messages, list) and len(messages) > 0:
             last = messages[-1]
             if isinstance(last, dict) and "content" in last:
                 prompt = last["content"]
             else:
                 raise ValueError("Format de liste de messages invalide pour DeepEval")
-
-        # 4. case: DeepEval TestCase objects
         elif hasattr(messages, "input"):
             prompt = messages.input
-
         elif hasattr(messages, "prompt"):
             prompt = messages.prompt
-
         else:
             raise ValueError(f"Format inattendu fourni par DeepEval: {type(messages)}")
 
@@ -107,18 +95,6 @@ def charge_donnees_depuis_fichier_csv(chemin_vers_fichier: str) -> pd.DataFrame:
     donnees_brutes = lecteur.dataframe
     donnees_preparees = prepare_dataframe(donnees_brutes)
     return donnees_preparees
-
-
-def nettoie_et_prepare_contexte_pour_evaluation(contexte_non_traite: str) -> str:
-    if pd.isna(contexte_non_traite) or not isinstance(contexte_non_traite, str):
-        return ""
-
-    liste_documents = contexte_non_traite.split("${SEPARATEUR_DOCUMENT}")
-    contexte_propre = "\n\n".join(
-        [document.strip() for document in liste_documents if document.strip()]
-    )
-
-    return contexte_propre
 
 
 def extrait_metadonnees_pour_metriques_personnalisees(ligne_donnees: pd.Series) -> dict:
@@ -172,7 +148,7 @@ def cree_metriques_deepeval(albert_llm: AlbertLLM) -> list:
     fichier_metriques = Path("metriques.json")
     metriques_enum = chargeur.recupere_depuis_fichier(fichier_metriques)
 
-    metriques_deepeval = []
+    metriques_deepeval: list[BaseMetric] = []
     for metrique_enum in metriques_enum:
         if metrique_enum == MetriqueEnum.HALLUCINATION:
             metriques_deepeval.append(
@@ -216,7 +192,6 @@ def extrait_scores_deepeval(test_result) -> dict:
 def calcule_metriques_personnalisees(metadata: dict) -> dict:
     scores = {}
 
-    # Métriques de nom de document
     for j in range(5):
         nom_doc_bot = metadata.get(f"nom_document_reponse_bot_{j}", "")
         nom_doc_verite = metadata.get("nom_document_verite_terrain", "")
@@ -224,7 +199,6 @@ def calcule_metriques_personnalisees(metadata: dict) -> dict:
             _metrique_bon_nom_document_en_contexte(nom_doc_bot, nom_doc_verite)
         )
 
-    # Métriques de numéro de page
     for j in range(5):
         num_page_bot = metadata.get(f"numero_page_reponse_bot_{j}", 0)
         num_page_verite = metadata.get("numero_page_verite_terrain", 0)
@@ -244,76 +218,128 @@ def exporte_resultats(donnees_export: list[dict]) -> None:
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     nom_fichier = f"resultats_deepeval_metriques_{timestamp}.csv"
     chemin_sortie = Path("donnees/resultats_evaluations") / nom_fichier
-
     chemin_sortie.parent.mkdir(parents=True, exist_ok=True)
     df_resultats.to_csv(chemin_sortie, index=False)
     logging.info(f"📄 Résultats exportés vers: {chemin_sortie}")
 
 
-def execute_evaluation_metriques(
-    cas_de_test: List[LLMTestCase], albert_llm: AlbertLLM
-) -> None:
+def divise_en_lots(
+    cas_de_test: List[LLMTestCase], taille_lot: int
+) -> List[List[LLMTestCase]]:
+    return [
+        cas_de_test[i : i + taille_lot] for i in range(0, len(cas_de_test), taille_lot)
+    ]
+
+
+def execute_evaluation_lot(args) -> list[dict]:
+    lot_cas_test, numero_batch = args
+    process_id = os.getpid()
+    debut = time.time()
+
+    logging.info(
+        f"🚀 Processus {process_id} - Début évaluation lot {numero_batch} ({len(lot_cas_test)} cas)"
+    )
+
+    albert_llm = AlbertLLM()
     metriques_deepeval = cree_metriques_deepeval(albert_llm)
 
-    if not metriques_deepeval:
-        logging.warning("Aucune métrique DeepEval supportée trouvée")
-        return
+    resultats_lot = []
 
-    logging.info(f"Début de l'évaluation avec {len(metriques_deepeval)} métriques...")
+    for i, cas_test in enumerate(lot_cas_test):
+        debut_cas = time.time()
+        logging.info(
+            f"⚙️ Processus {process_id} - Lot {numero_batch}, cas {i + 1}/{len(lot_cas_test)}"
+        )
 
-    resultats = evaluate(test_cases=cas_de_test, metrics=metriques_deepeval)
+        try:
+            resultat_test = evaluate([cas_test], metriques_deepeval)
 
-    if hasattr(resultats, "test_results"):
-        tests_resultats = resultats.test_results
-    elif isinstance(resultats, tuple) and len(resultats) > 0:
-        tests_resultats = resultats[0]
-    else:
-        tests_resultats = resultats
-
-    donnees_export = []
-    for i, test_result in enumerate(tests_resultats):
-        ligne_export = {"numero_ligne": i}
-
-        # Métriques DeepEval
-        ligne_export.update(extrait_scores_deepeval(test_result))
-
-        # Métriques personnalisées
-        cas_test = cas_de_test[i]
-        if hasattr(cas_test, "additional_metadata") and cas_test.additional_metadata:
-            ligne_export.update(
-                calcule_metriques_personnalisees(cas_test.additional_metadata)
+            scores_deepeval = extrait_scores_deepeval(resultat_test.test_results[0])
+            scores_personnalises = calcule_metriques_personnalisees(
+                cas_test.additional_metadata
             )
 
-        donnees_export.append(ligne_export)
+            donnees_ligne = {
+                **scores_deepeval,
+                **scores_personnalises,
+            }
+            resultats_lot.append(donnees_ligne)
 
-    exporte_resultats(donnees_export)
+            duree_cas = time.time() - debut_cas
+            logging.info(
+                f"✅ Processus {process_id} - Lot {numero_batch}, cas {i + 1} terminé en {duree_cas:.2f}s"
+            )
+
+        except Exception as e:
+            logging.error(
+                f"❌ Processus {process_id} - Erreur lot {numero_batch}, cas {i + 1}: {e}"
+            )
+            continue
+
+    duree_totale = time.time() - debut
+    logging.info(
+        f"🏁 Processus {process_id} - Lot {numero_batch} terminé en {duree_totale:.2f}s"
+    )
+
+    return resultats_lot
 
 
-def fonction_principale():
-    configuration = recupere_configuration()
+def execute_evaluations_paralleles(
+    cas_de_test: List[LLMTestCase], nb_processus: int | None = None, taille_lot: int = 5
+) -> list[dict]:
+    if nb_processus is None:
+        nb_processus = min(mp.cpu_count(), 4)
 
-    chemin_fichier_donnees_csv = "/home/pleroy/PycharmProjects/anssi-recommandations-cyber-data/donnees/sortie/echantillon_01_evaluation_complete_2025.csv"
+    logging.info(
+        f"🔧 Configuration parallélisation: {nb_processus} processus, lots de {taille_lot} cas"
+    )
 
-    if not Path(chemin_fichier_donnees_csv).exists():
-        raise FileNotFoundError(f"Fichier non trouvé: {chemin_fichier_donnees_csv}")
+    lots = divise_en_lots(cas_de_test, taille_lot)
+    args_lots = [(lot, i) for i, lot in enumerate(lots)]
 
-    logging.info("=== POC DEEPEVAL - MÉTRIQUES MULTIPLES ===")
-    logging.info(f"Fichier de données: {chemin_fichier_donnees_csv}")
-    logging.info(f"API Albert: {configuration.albert.url}")
+    logging.info(
+        f"📊 Démarrage évaluation parallèle: {len(cas_de_test)} cas répartis en {len(lots)} lots"
+    )
 
-    modele_llm_albert = AlbertLLM()
+    debut_global = time.time()
 
-    donnees_chargees = charge_donnees_depuis_fichier_csv(chemin_fichier_donnees_csv)
-    liste_cas_de_test = cree_liste_cas_de_test_deepeval(donnees_chargees)
-    logging.info(f"Nombre de cas de test réels : {len(liste_cas_de_test)}")
+    with mp.Pool(processes=nb_processus) as pool:
+        resultats_lots = pool.map(execute_evaluation_lot, args_lots)
 
-    if not liste_cas_de_test:
-        logging.warning("Aucun cas de test valide trouvé")
-        return
+    duree_globale = time.time() - debut_global
 
-    execute_evaluation_metriques(liste_cas_de_test, modele_llm_albert)
-    logging.info("=== POC TERMINÉ ===")
+    tous_resultats = []
+    for resultats_lot in resultats_lots:
+        tous_resultats.extend(resultats_lot)
+
+    logging.info(
+        f"🎉 Évaluation parallèle terminée en {duree_globale:.2f}s - {len(tous_resultats)} résultats"
+    )
+
+    return tous_resultats
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--nb-processus", type=int, default=3)
+    parser.add_argument("--taille-lot", type=int, default=2)
+    args = parser.parse_args()
+
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
+
+    chemin_fichier = "donnees/sortie/echantillon_01_evaluation_complete_2025.csv"
+    donnees = charge_donnees_depuis_fichier_csv(chemin_fichier)
+    donnees_test = donnees.head(10)
+    cas_de_test = cree_liste_cas_de_test_deepeval(donnees_test)
+
+    resultats = execute_evaluations_paralleles(
+        cas_de_test, nb_processus=args.nb_processus, taille_lot=args.taille_lot
+    )
+
+    exporte_resultats(resultats)
 
 
 if __name__ == "__main__":
-    fonction_principale()
+    main()
