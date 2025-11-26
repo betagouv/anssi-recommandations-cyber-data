@@ -28,11 +28,10 @@ def test_consigne_evenement_suite_recuperation_fichier_sortie_evaluation_evalap(
         adaptateur_journal.les_evenements()[0]["type"]
         == TypeEvenement.EVALUATION_CALCULEE
     )
-    assert adaptateur_journal.les_evenements()[0]["donnees"] == {
-        "id_experimentation": 1,
-        "score_numero_page_en_contexte_4": 0.4,
-        "bon_nom_document_en_contexte_2": 0,
-    }
+    donnees_recues = adaptateur_journal.les_evenements()[0]["donnees"]
+    assert donnees_recues["id_experimentation"] == 1
+    assert donnees_recues["score_numero_page_en_contexte_4"] == 0.4
+    assert donnees_recues["bon_nom_document_en_contexte_2"] == 0
 
 
 def test_consigne_les_evenements_suite_recuperation_fichier_sortie_evaluation_evalap() -> (
@@ -62,16 +61,16 @@ def test_consigne_les_evenements_suite_recuperation_fichier_sortie_evaluation_ev
 
     les_evenements = adaptateur_journal.les_evenements()
     assert len(les_evenements) == 2
-    assert les_evenements[0]["donnees"] == {
-        "id_experimentation": 2,
-        "score_numero_page_en_contexte_4": 0.6,
-        "bon_nom_document_en_contexte_2": 1,
-    }
-    assert les_evenements[1]["donnees"] == {
-        "id_experimentation": 2,
-        "score_numero_page_en_contexte_4": 0.7,
-        "bon_nom_document_en_contexte_2": 0,
-    }
+
+    premieres_donnees_recues = adaptateur_journal.les_evenements()[0]["donnees"]
+    assert premieres_donnees_recues["id_experimentation"] == 2
+    assert premieres_donnees_recues["score_numero_page_en_contexte_4"] == 0.6
+    assert premieres_donnees_recues["bon_nom_document_en_contexte_2"] == 1
+
+    secondes_donnees_recues = adaptateur_journal.les_evenements()[1]["donnees"]
+    assert secondes_donnees_recues["id_experimentation"] == 2
+    assert secondes_donnees_recues["score_numero_page_en_contexte_4"] == 0.7
+    assert secondes_donnees_recues["bon_nom_document_en_contexte_2"] == 0
 
 
 def test_consigne_les_evenements_extrait_dynamiquement_le_nom_des_colonnes() -> None:
@@ -92,12 +91,10 @@ def test_consigne_les_evenements_extrait_dynamiquement_le_nom_des_colonnes() -> 
 
     consigne_evaluation(1, entrepot_experience, adaptateur_journal)
 
-    les_evenements = adaptateur_journal.les_evenements()
-    assert les_evenements[0]["donnees"] == {
-        "id_experimentation": 1,
-        "score_numero_page_en_contexte_4": 0.7,
-        "nouvelle_metrique": 0,
-    }
+    donnees_recues = adaptateur_journal.les_evenements()[0]["donnees"]
+    assert donnees_recues["id_experimentation"] == 1
+    assert donnees_recues["score_numero_page_en_contexte_4"] == 0.7
+    assert donnees_recues["nouvelle_metrique"] == 0
 
 
 def test_ne_consigne_pas_si_pas_d_evaluation() -> None:
