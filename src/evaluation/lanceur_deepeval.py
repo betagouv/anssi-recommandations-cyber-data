@@ -101,7 +101,11 @@ class LanceurExperienceDeepeval(LanceurExperience):
             AnswerRelevancyMetric(model=self.client_deepeval_albert, threshold=0.5)
         )
         metriques_deepeval.append(
-            FaithfulnessMetric(model=self.client_deepeval_albert, threshold=0.5, truths_extraction_limit=20),
+            FaithfulnessMetric(
+                model=self.client_deepeval_albert,
+                threshold=0.5,
+                truths_extraction_limit=20,
+            ),
         )
         metriques_deepeval.append(
             ToxicityMetric(model=self.client_deepeval_albert, threshold=0.5)
