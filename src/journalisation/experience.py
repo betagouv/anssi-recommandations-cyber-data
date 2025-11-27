@@ -6,16 +6,19 @@ from evalap import EvalapExperienceHttp, EvalapClient
 
 
 class Experience:
-    id_experimentation: int
+    id_experimentation: int | str
     metriques: list[dict]
 
-    def __init__(self, id_experimentation: int, metriques: list[dict]):
+    def __init__(self, id_experimentation: int | str, metriques: list[dict]):
         self.id_experimentation = id_experimentation
         self.metriques = metriques
 
 
 class EntrepotExperience:
-    def lit(self, id_experience: int) -> Union[Experience, None]:
+    def lit(self, id_experience: int | str) -> Union[Experience, None]:
+        pass
+
+    def persiste(self, experience: Experience) -> None:
         pass
 
 
@@ -29,7 +32,7 @@ class EntrepotExperienceMemoire(EntrepotExperience):
     def persiste(self, experience: Experience) -> None:
         self.experiences.append(experience)
 
-    def lit(self, id_experience) -> Experience | None:
+    def lit(self, id_experience: int | str) -> Experience | None:
         for experience in self.experiences:
             if experience.id_experimentation == id_experience:
                 return experience
@@ -41,7 +44,7 @@ class EntrepotExperienceHttp(EntrepotExperience):
         super().__init__()
         self.client_experience = client_experience
 
-    def lit(self, id_experience: int) -> Union[Experience, None]:
+    def lit(self, id_experience: int | str) -> Union[Experience, None]:
         experience = self.client_experience.lit(id_experience)
 
         if experience is None:

@@ -1,14 +1,8 @@
 import asyncio
 import logging
-import uuid
 from pathlib import Path
-
-import requests
-
 from adaptateurs.journal import AdaptateurJournal, fabrique_adaptateur_journal
 from configuration import recupere_configuration, Configuration
-from evalap import EvalapClient
-from evalap.lance_experience import lance_experience
 from experience.experience import fabrique_lanceur_experience, LanceurExperience
 from journalisation.consignateur_evaluation import consigne_evaluation
 from journalisation.experience import EntrepotExperience, fabrique_entrepot_experience
@@ -19,17 +13,28 @@ from mqc.remplisseur_reponses import ClientMQCHTTPAsync
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
-async def main(entree_donnees: Path, prefixe: str, ecrivain_sortie: EcrivainSortie, nombre_lot: int,
-               client_mqc: ClientMQCHTTPAsync, client_evalap: EvalapClient, configuration,
-               entrepot_experience: EntrepotExperience, journal: AdaptateurJournal, lanceur_experience: LanceurExperience):
+async def main(
+    entree_donnees: Path,
+    prefixe: str,
+    ecrivain_sortie: EcrivainSortie,
+    nombre_lot: int,
+    client_mqc: ClientMQCHTTPAsync,
+    entrepot_experience: EntrepotExperience,
+    journal: AdaptateurJournal,
+    lanceur_experience: LanceurExperience,
+):
     await collecte_reponses_mqc(
         entree_donnees, prefixe, ecrivain_sortie, nombre_lot, client_mqc
     )
     fichier_csv = ecrivain_sortie._chemin_courant
-    id_experience = lanceur_experience.lance_l_experience(fichier_csv)
-    if id_experience is not None:
-        consigne_evaluation(id_experience, entrepot_experience, journal, fichier_csv)
-    return id_experience
+    if fichier_csv is not None:
+        id_experience = lanceur_experience.lance_l_experience(fichier_csv)
+        if id_experience is not None:
+            consigne_evaluation(
+                id_experience, entrepot_experience, journal, fichier_csv
+            )
+        return id_experience
+    return None
 
 
 if __name__ == "__main__":
@@ -41,8 +46,6 @@ if __name__ == "__main__":
     ecrivain_sortie = EcrivainSortie(
         racine=Path.cwd(), sous_dossier=sortie, horloge=HorlogeSysteme()
     )
-    session = requests.session()
-    client_evalap = EvalapClient(la_configuration, session)
     lanceur_experience = fabrique_lanceur_experience(la_configuration)
     asyncio.run(
         main(
@@ -51,10 +54,8 @@ if __name__ == "__main__":
             ecrivain_sortie,
             10,
             client,
-            client_evalap,
-            la_configuration,
             fabrique_entrepot_experience(),
             fabrique_adaptateur_journal(),
-            lanceur_experience
+            lanceur_experience,
         )
     )
