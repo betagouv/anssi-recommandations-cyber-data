@@ -65,24 +65,7 @@ class AlbertLLM(DeepEvalBaseLLM):
         raise RuntimeError(f"Erreur API Albert {reponse.status_code} : {reponse.text}")
 
     def generate(self, messages):
-        if isinstance(messages, str):
-            prompt = messages
-        elif isinstance(messages, dict) and "content" in messages:
-            prompt = messages["content"]
-        elif isinstance(messages, list) and len(messages) > 0:
-            last = messages[-1]
-            if isinstance(last, dict) and "content" in last:
-                prompt = last["content"]
-            else:
-                raise ValueError("Format de liste de messages invalide pour DeepEval")
-        elif hasattr(messages, "input"):
-            prompt = messages.input
-        elif hasattr(messages, "prompt"):
-            prompt = messages.prompt
-        else:
-            raise ValueError(f"Format inattendu fourni par DeepEval: {type(messages)}")
-
-        return self._appel_api_albert(prompt)
+        return self._appel_api_albert(messages)
 
     async def a_generate(self, messages):
         return self.generate(messages)

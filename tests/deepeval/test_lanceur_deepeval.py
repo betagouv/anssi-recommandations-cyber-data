@@ -60,3 +60,23 @@ def test_evalue_un_jeu_de_donnees_avec_des_cas_de_test(
             expected_output="réponse envisagée",
         ).__dict__
     )
+
+
+def test_evalue_un_jeu_de_donnees_avec_les_metriques_deepeval(
+    resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test
+):
+    entrepot_experience = EntrepotExperienceMemoire()
+
+    evaluateur_deepeval = evaluateur_de_test
+    lanceur_experience = LanceurExperienceDeepeval(
+        entrepot_experience, evaluateur_deepeval
+    )
+    lanceur_experience.lance_l_experience(
+        resultat_collecte_mqc_avec_deux_resultats._chemin_courant
+    )
+
+    assert len(evaluateur_deepeval.metriques_soumises) == 4
+    assert evaluateur_deepeval.metriques_soumises[0].__name__ == "Hallucination"
+    assert evaluateur_deepeval.metriques_soumises[1].__name__ == "Answer Relevancy"
+    assert evaluateur_deepeval.metriques_soumises[2].__name__ == "Faithfulness"
+    assert evaluateur_deepeval.metriques_soumises[3].__name__ == "Toxicity"
