@@ -1,33 +1,34 @@
-import pandas as pd
-from pathlib import Path
-from typing import List, Union
+import argparse
 import logging
 import multiprocessing as mp
-import time
 import os
-import argparse
+import time
+from datetime import datetime
+from pathlib import Path
+from typing import List
 
+import pandas as pd
+import requests
 from deepeval.evaluate import evaluate
 from deepeval.metrics import (
     HallucinationMetric,
     AnswerRelevancyMetric,
     FaithfulnessMetric,
     ToxicityMetric,
-BaseMetric
+    BaseMetric,
 )
-from deepeval.test_case import LLMTestCase
 from deepeval.models import DeepEvalBaseLLM
-from datetime import datetime
+from deepeval.test_case import LLMTestCase
+
 from configuration import recupere_configuration
-from infra.lecteur_csv import LecteurCSV
 from evalap.lance_experience import prepare_dataframe
 from evalap.metriques import Metriques, MetriqueEnum
+from infra.lecteur_csv import LecteurCSV
 from metriques_personnalisees_evalap.metriques_personnalisees import (
     _metrique_bon_nom_document_en_contexte,
     _metrique_bon_numero_page_en_contexte,
     _metrique_score_numero_page_en_contexte,
 )
-import requests
 
 
 class AlbertLLM(DeepEvalBaseLLM):

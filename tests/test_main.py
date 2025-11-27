@@ -8,7 +8,7 @@ import respx
 
 from adaptateurs.journal import AdaptateurJournalMemoire, TypeEvenement
 from configuration import Configuration
-from experience.experience import LanceurExperience, LanceurExperienceEvalap
+from experience.experience import LanceurExperienceEvalap
 from infra.memoire.ecrivain import EcrivainSortieDeTest
 from infra.memoire.evalap import EvalapClientDeTest
 from journalisation.experience import EntrepotExperienceMemoire
@@ -40,8 +40,16 @@ async def test_execute_la_collecte_des_reponses_pour_creer_le_fichier_de_resulta
     client = EvalapClientDeTest(configuration, session=session)
 
     lanceur_experience = LanceurExperienceEvalap(client, configuration)
-    await main(entree, "prefixe", ecrivain_sortie_de_test, 1, ClientMQCHTTPAsync(cfg=configuration.mqc), client,
-               configuration, EntrepotExperienceMemoire(), AdaptateurJournalMemoire(), lanceur_experience)
+    await main(
+        entree,
+        "prefixe",
+        ecrivain_sortie_de_test,
+        1,
+        ClientMQCHTTPAsync(cfg=configuration.mqc),
+        EntrepotExperienceMemoire(),
+        AdaptateurJournalMemoire(),
+        lanceur_experience,
+    )
 
     assert sortie.exists()
     collectes = glob.glob(str(sortie) + "/*")
@@ -70,9 +78,16 @@ async def test_lance_l_experience(
     )
     lanceur_experience = LanceurExperienceEvalap(client, configuration)
 
-    id_experience_cree = await main(entree, "prefixe", ecrivain_sortie_de_test, 1,
-                                    ClientMQCHTTPAsync(cfg=configuration.mqc), client, configuration,
-                                    EntrepotExperienceMemoire(), AdaptateurJournalMemoire(), lanceur_experience)
+    id_experience_cree = await main(
+        entree,
+        "prefixe",
+        ecrivain_sortie_de_test,
+        1,
+        ClientMQCHTTPAsync(cfg=configuration.mqc),
+        EntrepotExperienceMemoire(),
+        AdaptateurJournalMemoire(),
+        lanceur_experience,
+    )
 
     assert id_experience_cree == 1
 
@@ -99,8 +114,16 @@ async def test_consigne_les_resultats_d_experience(
     lanceur_experience = LanceurExperienceEvalap(client, configuration)
 
     adaptateur_journal: AdaptateurJournalMemoire = AdaptateurJournalMemoire()
-    await main(entree, "prefixe", ecrivain_sortie_de_test, 1, ClientMQCHTTPAsync(cfg=configuration.mqc), client,
-               configuration, resultat_experience, adaptateur_journal, lanceur_experience)
+    await main(
+        entree,
+        "prefixe",
+        ecrivain_sortie_de_test,
+        1,
+        ClientMQCHTTPAsync(cfg=configuration.mqc),
+        resultat_experience,
+        adaptateur_journal,
+        lanceur_experience,
+    )
 
     assert (
         adaptateur_journal.les_evenements()[0]["type"]

@@ -11,12 +11,11 @@ from evalap.lance_experience import lance_experience
 
 class LanceurExperience(ABC):
     @abstractmethod
-    def lance_l_experience(self, fichier_csv: Path | None) -> int | None:
+    def lance_l_experience(self, fichier_csv: Path) -> int | str | None:
         pass
 
 
 class LanceurExperienceEvalap(LanceurExperience):
-
     def __init__(self, le_client: EvalapClient, configuration: Configuration):
         super().__init__()
         self.client = le_client
@@ -33,7 +32,7 @@ class LanceurExperienceMemoire(LanceurExperience):
         return 1
 
 
-def fabrique_lanceur_experience(configuration: Configuration)-> LanceurExperience:
+def fabrique_lanceur_experience(configuration: Configuration) -> LanceurExperience:
     if configuration.mqc is not None:
         session = requests.session()
         client_evalap = EvalapClient(configuration, session)
