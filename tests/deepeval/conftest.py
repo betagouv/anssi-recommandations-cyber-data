@@ -26,15 +26,19 @@ class ConstructeurMetricData:
 
 class EvaluateurDeepevalTest(EvaluateurDeepeval):
     cas_de_test_executes: list[LLMTestCase] = []
+    metriques_soumises: list[BaseMetric] = []
 
     def __init__(self):
         super().__init__()
+        self.metriques_soumises = []
         self.cas_de_test_executes = []
 
     def evaluate(
         self, test_cases: list[LLMTestCase], metrics: Optional[list[BaseMetric]] = None
     ) -> EvaluationResult:
         self.cas_de_test_executes.extend(test_cases)
+        if metrics is not None:
+            self.metriques_soumises.extend(metrics)
         metriques = [
             ConstructeurMetricData.construis(
                 nom="bon_nom_document_en_contexte_2",
