@@ -4,6 +4,10 @@ from evaluation.metriques_personnalisees.de_deepeval.metrique_bon_nom_document i
     MetriqueBonNomDocument,
     MetriquesBonNomDocuments,
 )
+from evaluation.metriques_personnalisees.de_deepeval.metrique_bons_numeros_pages import (
+    MetriquesBonsNumerosPages,
+    MetriqueBonNumeroPage,
+)
 from evaluation.metriques_personnalisees.de_deepeval.metrique_longueur_reponse import (
     MetriqueLongueurReponse,
 )
@@ -104,4 +108,57 @@ def test_metriques_bon_nom_documents_en_contexte_retourne_1_si_meme_document():
     assert metriques[1].measure(cas_test) == 1
     assert metriques[2].measure(cas_test) == 1
     assert metriques[3].measure(cas_test) == 1
+    assert metriques[4].measure(cas_test) == 1
+
+
+def test_metrique_bon_numero_page_en_contexte_est_en_succes():
+    metadatas = {
+        "numero_page_reponse_bot_0": "1",
+        "numero_page_verite_terrain": "1",
+    }
+
+    cas_test = LLMTestCase(
+        input="Question test", actual_output="", additional_metadata=metadatas
+    )
+    metrique = MetriqueBonNumeroPage("numero_page_reponse_bot_0")
+    metrique.measure(cas_test)
+
+    assert metrique.is_successful() is True
+
+
+def test_metrique_bon_numero_page_en_contexte_est_en_echec():
+    metadatas = {
+        "numero_page_reponse_bot_0": "1",
+        "numero_page_verite_terrain": "2",
+    }
+
+    cas_test = LLMTestCase(
+        input="Question test", actual_output="", additional_metadata=metadatas
+    )
+    metrique = MetriqueBonNumeroPage("numero_page_reponse_bot_0")
+    metrique.measure(cas_test)
+
+    assert metrique.is_successful() is False
+
+
+def test_metriques_bons_numeros_pages_en_contexte_retourne_1_si_meme_page():
+    metadatas = {
+        "numero_page_reponse_bot_0": "1",
+        "numero_page_reponse_bot_1": "2",
+        "numero_page_reponse_bot_2": "1",
+        "numero_page_reponse_bot_3": "4",
+        "numero_page_reponse_bot_4": "1",
+        "numero_page_verite_terrain": "1",
+    }
+
+    cas_test = LLMTestCase(
+        input="Question test", actual_output="", additional_metadata=metadatas
+    )
+    metriques = MetriquesBonsNumerosPages.cree_metriques()
+
+    assert len(metriques) == 5
+    assert metriques[0].measure(cas_test) == 1
+    assert metriques[1].measure(cas_test) == 0
+    assert metriques[2].measure(cas_test) == 1
+    assert metriques[3].measure(cas_test) == 0
     assert metriques[4].measure(cas_test) == 1
