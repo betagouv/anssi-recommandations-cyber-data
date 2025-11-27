@@ -24,7 +24,7 @@ from configuration import recupere_configuration
 from evalap.lance_experience import prepare_dataframe
 from evalap.metriques import Metriques, MetriqueEnum
 from infra.lecteur_csv import LecteurCSV
-from metriques_personnalisees_evalap.metriques_personnalisees import (
+from evaluation.metriques_personnalisees.evalap.metriques_personnalisees import (
     _metrique_bon_nom_document_en_contexte,
     _metrique_bon_numero_page_en_contexte,
     _metrique_score_numero_page_en_contexte,
