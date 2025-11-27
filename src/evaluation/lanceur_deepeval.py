@@ -5,10 +5,17 @@ from typing import Optional
 
 import pandas as pd
 from deepeval.evaluate.types import EvaluationResult
-from deepeval.metrics import BaseMetric
+from deepeval.metrics import (
+    BaseMetric,
+    HallucinationMetric,
+    AnswerRelevancyMetric,
+    FaithfulnessMetric,
+    ToxicityMetric,
+)
 from deepeval.test_case import LLMTestCase
 
 from evalap.lance_experience import prepare_dataframe
+from evaluation.client_deepeval_albert import ClientDeepEvalAlbert
 from experience.experience import LanceurExperience
 from infra.lecteur_csv import LecteurCSV
 from journalisation.experience import EntrepotExperience, Experience
@@ -29,6 +36,7 @@ class LanceurExperienceDeepeval(LanceurExperience):
         evaluateur_deepeval: EvaluateurDeepeval,
     ):
         super().__init__()
+        self.client_deepeval_albert = ClientDeepEvalAlbert()
         self.entrepot_experience = entrepot_experience
         self.evaluateur_deepeval = evaluateur_deepeval
 
@@ -84,9 +92,24 @@ class LanceurExperienceDeepeval(LanceurExperience):
     def lance_l_experience(self, fichier_csv: Path) -> int | str | None:
         id_experience = str(uuid.uuid4())
         donnees = self.__charge_donnees_depuis_fichier_csv(fichier_csv)
+
+        metriques_deepeval: list[BaseMetric] = []
+        metriques_deepeval.append(
+            HallucinationMetric(model=self.client_deepeval_albert, threshold=0.5)
+        )
+        metriques_deepeval.append(
+            AnswerRelevancyMetric(model=self.client_deepeval_albert, threshold=0.5)
+        )
+        metriques_deepeval.append(
+            FaithfulnessMetric(model=self.client_deepeval_albert, threshold=0.5, truths_extraction_limit=20),
+        )
+        metriques_deepeval.append(
+            ToxicityMetric(model=self.client_deepeval_albert, threshold=0.5)
+        )
+
         cas_de_test = self.__cree_liste_cas_de_test_deepeval(donnees)
         resultat_evaluation = self.evaluateur_deepeval.evaluate(
-            cas_de_test, metrics=None
+            cas_de_test, metrics=metriques_deepeval
         )
         scores_deepeval = self.__extrait_scores_deepeval(
             resultat_evaluation.test_results[0]
