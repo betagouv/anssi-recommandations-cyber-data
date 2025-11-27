@@ -9,7 +9,7 @@ from journalisation.experience import EntrepotExperience
 
 
 def consigne_evaluation(
-    id_experience: int,
+    id_experience: int | str,
     entrepot_experience: EntrepotExperience,
     adaptateur_journal: AdaptateurJournal,
     fichier_questions_reponses: Path | None,

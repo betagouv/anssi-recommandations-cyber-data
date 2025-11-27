@@ -30,7 +30,7 @@ class EvalapExperienceDeTest(EvalapExperienceHttp):
     def cree(self, payload: ExperiencePayload) -> Optional[ExperienceReponse]:
         return self.experience_reponse
 
-    def lit(self, experiment_id: int) -> Optional[ExperienceAvecResultats]:
+    def lit(self, experiment_id: int | str) -> Optional[ExperienceAvecResultats]:
         return self.experience_avec_resultats
 
 
