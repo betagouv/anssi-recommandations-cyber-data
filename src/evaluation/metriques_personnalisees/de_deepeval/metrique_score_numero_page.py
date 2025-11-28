@@ -37,6 +37,10 @@ class MetriqueScoreNumeropage(BaseMetric):
             metadata[self.numero_page_verite_terrain]
         )
 
+    @property
+    def __name__(self):
+        return f"Score numéro page en contexte {self.numero_page_reponse_bot[-1:]}"
+
 
 class MetriquesScoreNumeropage:
     @staticmethod

@@ -26,7 +26,7 @@ class MetriqueBonNomDocument(BaseMetric):
 
     @property
     def __name__(self):
-        return "Bon nom document"
+        return f"Bon nom document en contexte {self.nom_document_reponse[-1:]}"
 
 
 class MetriquesBonNomDocuments:

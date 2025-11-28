@@ -26,6 +26,10 @@ class MetriqueBonNumeroPage(BaseMetric):
     def is_successful(self) -> bool:
         return self.score == 1
 
+    @property
+    def __name__(self):
+        return f"Bon numéro page en contexte {self.numero_page_reponse_bot[-1:]}"
+
 
 class MetriquesBonsNumerosPages:
     @staticmethod
