@@ -1,3 +1,4 @@
+import unicodedata
 import uuid
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -16,6 +17,18 @@ from deepeval.test_case import LLMTestCase
 
 from evalap.lance_experience import prepare_dataframe
 from evaluation.client_deepeval_albert import ClientDeepEvalAlbert
+from evaluation.metriques_personnalisees.de_deepeval.metrique_bon_nom_document import (
+    MetriquesBonNomDocuments,
+)
+from evaluation.metriques_personnalisees.de_deepeval.metrique_bons_numeros_pages import (
+    MetriquesBonsNumerosPages,
+)
+from evaluation.metriques_personnalisees.de_deepeval.metrique_longueur_reponse import (
+    MetriqueLongueurReponse,
+)
+from evaluation.metriques_personnalisees.de_deepeval.metrique_score_numero_page import (
+    MetriquesScoreNumeropage,
+)
 from experience.experience import LanceurExperience
 from infra.lecteur_csv import LecteurCSV
 from journalisation.experience import EntrepotExperience, Experience
@@ -47,7 +60,6 @@ class LanceurExperienceDeepeval(LanceurExperience):
         liste_cas_de_test = []
         for indice, ligne_donnees in donnees_dataframe.iterrows():
             contexte = ligne_donnees["context"]
-            # metadata = extrait_metadonnees_pour_metriques_personnalisees(ligne_donnees)
 
             cas_de_test_unique = LLMTestCase(
                 input=ligne_donnees["query"],
@@ -72,6 +84,20 @@ class LanceurExperienceDeepeval(LanceurExperience):
     def __extrait_scores_deepeval(test_result) -> dict:
         scores = {}
         metrics_data = getattr(test_result, "metrics_data", None) or []
+
+        def nom_colonne_normalisee():
+            return (
+                unicodedata.normalize(
+                    "NFKD",
+                    nom_metrique.replace("Metric", "")
+                    .strip()
+                    .lower()
+                    .replace(" ", "_"),
+                )
+                .encode("ASCII", "ignore")
+                .decode("utf-8", "ignore")
+            )
+
         for metric_data in metrics_data:
             nom_metrique = getattr(metric_data, "name", None)
             if not nom_metrique and hasattr(metric_data, "metric"):
@@ -81,11 +107,8 @@ class LanceurExperienceDeepeval(LanceurExperience):
             if not nom_metrique:
                 nom_metrique = metric_data.__class__.__name__
 
-            nom_colonne = (
-                nom_metrique.replace("Metric", "").strip().lower().replace(" ", "_")
-            )
             score = getattr(metric_data, "score", None)
-            scores[nom_colonne] = score
+            scores[nom_colonne_normalisee()] = score
 
         return scores
 
@@ -93,23 +116,20 @@ class LanceurExperienceDeepeval(LanceurExperience):
         id_experience = str(uuid.uuid4())
         donnees = self.__charge_donnees_depuis_fichier_csv(fichier_csv)
 
-        metriques_deepeval: list[BaseMetric] = []
-        metriques_deepeval.append(
-            HallucinationMetric(model=self.client_deepeval_albert, threshold=0.5)
-        )
-        metriques_deepeval.append(
-            AnswerRelevancyMetric(model=self.client_deepeval_albert, threshold=0.5)
-        )
-        metriques_deepeval.append(
+        metriques_deepeval: list[BaseMetric] = [
+            HallucinationMetric(model=self.client_deepeval_albert, threshold=0.5),
+            AnswerRelevancyMetric(model=self.client_deepeval_albert, threshold=0.5),
             FaithfulnessMetric(
                 model=self.client_deepeval_albert,
                 threshold=0.5,
                 truths_extraction_limit=20,
             ),
-        )
-        metriques_deepeval.append(
-            ToxicityMetric(model=self.client_deepeval_albert, threshold=0.5)
-        )
+            ToxicityMetric(model=self.client_deepeval_albert, threshold=0.5),
+            MetriqueLongueurReponse(),
+        ]
+        metriques_deepeval.extend(MetriquesBonNomDocuments.cree_metriques())
+        metriques_deepeval.extend(MetriquesBonsNumerosPages.cree_metriques())
+        metriques_deepeval.extend(MetriquesScoreNumeropage.cree_metriques())
 
         cas_de_test = self.__cree_liste_cas_de_test_deepeval(donnees)
         resultat_evaluation = self.evaluateur_deepeval.evaluate(
