@@ -48,7 +48,7 @@ def test_evalue_un_jeu_de_donnees_avec_des_cas_de_test(
             actual_output="réponse mqc",
             retrieval_context=["test"],
             context=["test"],
-            additional_metadata={},
+            additional_metadata={"numero_ligne": 0},
             expected_output="réponse envisagée",
         ).__dict__
     )
@@ -60,7 +60,7 @@ def test_evalue_un_jeu_de_donnees_avec_des_cas_de_test(
             actual_output="réponse mqc",
             retrieval_context=["test"],
             context=["test"],
-            additional_metadata={},
+            additional_metadata={"numero_ligne": 1},
             expected_output="réponse envisagée",
         ).__dict__
     )
@@ -135,6 +135,23 @@ def test_evalue_un_jeu_de_donnees_avec_les_metriques_personnalisees(
         )
         is True
     )
+
+
+def test_evalue_un_jeu_de_donnees_et_retourne_le_numero_de_ligne(
+    resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test
+):
+    entrepot_experience = EntrepotExperienceMemoire()
+    lanceur_experience = LanceurExperienceDeepeval(
+        entrepot_experience, evaluateur_de_test
+    )
+
+    id_experience = lanceur_experience.lance_l_experience(
+        resultat_collecte_mqc_avec_deux_resultats._chemin_courant
+    )
+
+    experience_creee = entrepot_experience.lit(id_experience)
+    assert experience_creee.metriques[0]["numero_ligne"] == 0
+    assert experience_creee.metriques[1]["numero_ligne"] == 1
 
 
 def les_metriques_portent_le_nom_aux_indices(
