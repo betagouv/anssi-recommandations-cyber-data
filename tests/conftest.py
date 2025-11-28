@@ -1,9 +1,13 @@
 import os
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 from unittest.mock import Mock
 
 import pytest
+from deepeval.evaluate.types import EvaluationResult, TestResult
+from deepeval.metrics import BaseMetric
+from deepeval.test_case import LLMTestCase
+from deepeval.tracing.api import MetricData
 
 from configuration import (
     Evalap,
@@ -15,6 +19,7 @@ from configuration import (
 from evalap import EvalapClient
 from evalap.evalap_dataset_http import DatasetReponse
 from evalap.evalap_experience_http import ExperienceReponse, ExperienceAvecResultats
+from evaluation.lanceur_deepeval import EvaluateurDeepeval
 from infra.memoire.ecrivain import EcrivainSortieDeTest
 from infra.memoire.evalap import EvalapClientDeTest
 from journalisation.experience import (
@@ -254,3 +259,51 @@ def resultat_experience() -> EntrepotExperience:
         )
     )
     return entrepot_experience
+
+
+class ConstructeurMetricData:
+    @staticmethod
+    def construis(nom: str, score: Union[float, int]) -> MetricData:
+        return MetricData(
+            name=nom,
+            score=score,
+            evaluationCost=0,
+            success=True,
+            threshold=0.5,
+            strictMode=False,
+            evaluationModel="gpt-4.1",
+            verboseLogs=None,
+        )
+
+
+class EvaluateurDeepevalTest(EvaluateurDeepeval):
+    def __init__(self):
+        super().__init__()
+
+    def evaluate(
+        self, test_cases: list[LLMTestCase], metrics: Optional[list[BaseMetric]] = None
+    ) -> EvaluationResult:
+        results = []
+        for test_case in test_cases:
+            results.append(
+                TestResult(
+                    metrics_data=[
+                        ConstructeurMetricData.construis(
+                            nom="Une métrique",
+                            score=1,
+                        ),
+                    ],
+                    name="",
+                    success=True,
+                    conversational=False,
+                    additional_metadata=test_case.additional_metadata,
+                )
+            )
+        return EvaluationResult(
+            test_results=results, confident_link=None, test_run_id=None
+        )
+
+
+@pytest.fixture
+def evaluateur_de_test() -> EvaluateurDeepevalTest:
+    return EvaluateurDeepevalTest()

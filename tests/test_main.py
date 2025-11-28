@@ -1,4 +1,5 @@
 import glob
+import uuid
 from pathlib import Path
 from unittest.mock import Mock
 
@@ -8,6 +9,7 @@ import respx
 
 from adaptateurs.journal import AdaptateurJournalMemoire, TypeEvenement
 from configuration import Configuration
+from evaluation.lanceur_deepeval import LanceurExperienceDeepeval
 from experience.experience import LanceurExperienceEvalap
 from infra.memoire.ecrivain import EcrivainSortieDeTest
 from infra.memoire.evalap import EvalapClientDeTest
@@ -90,6 +92,56 @@ async def test_lance_l_experience(
     )
 
     assert id_experience_cree == 1
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_lance_l_experience_avec_deepeval(
+    tmp_path: Path,
+    configuration: Configuration,
+    cree_fichier_csv_avec_du_contenu,
+    reponse_avec_paragraphes,
+    une_experience_evalap,
+    evaluateur_de_test,
+):
+    base = construit_base_url(configuration.mqc)
+    chemin = formate_route_pose_question(configuration.mqc)
+    respx.post(f"{base}{chemin}").mock(
+        return_value=httpx.Response(200, json=reponse_avec_paragraphes)
+    )
+    entree = cree_fichier_csv_avec_du_contenu("Question type\nA?\n", tmp_path)
+    en_tete = "REF Guide,REF Question,Question type,Tags,REF Réponse,Réponse envisagée,Numéro page (lecteur),Localisation paragraphe,Réponse Bot,Note réponse (/10),Commentaire Note,Contexte,Noms Documents,Numéros Page\n"
+    premiere_ligne = "GAUT,GAUT.Q.1,Qu'est-ce que l'authentification ?,Usuelle,GAUT.R.1,réponse envisagée,10,en bas,réponse mqc,nan,Bonne réponse,test,[],[]"
+    contenu_fichier_csv_resultat_collecte = en_tete + premiere_ligne
+    ecrivain_sortie_de_test = EcrivainSortieDeTest(
+        contenu_fichier_csv_resultat_collecte
+    )
+    entrepot_experience = EntrepotExperienceMemoire()
+    lanceur_experience = LanceurExperienceDeepeval(
+        entrepot_experience, evaluateur_de_test
+    )
+
+    id_experience_cree = await main(
+        entree,
+        "prefixe",
+        ecrivain_sortie_de_test,
+        1,
+        ClientMQCHTTPAsync(cfg=configuration.mqc),
+        entrepot_experience,
+        AdaptateurJournalMemoire(),
+        lanceur_experience,
+    )
+
+    assert isinstance(id_experience_cree, str) is True
+    assert est_uuid_valide(id_experience_cree) is True
+
+
+def est_uuid_valide(uuid_a_tester):
+    try:
+        uuid.UUID(uuid_a_tester, version=4)
+    except ValueError:
+        return False
+    return True
 
 
 @respx.mock
