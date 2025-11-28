@@ -120,7 +120,7 @@ class EvalapExperienceHttp(EvalapBaseHTTP):
             observation_table=observations,
         )
 
-    def lit(self, experiment_id: int) -> Optional[ExperienceAvecResultats]:
+    def lit(self, experiment_id: int | str) -> Optional[ExperienceAvecResultats]:
         try:
             donnees = self._get(
                 f"/experiment/{experiment_id}?with_results=true", timeout=20
