@@ -1,5 +1,4 @@
 from deepeval.test_case import LLMTestCase
-
 from evaluation.metriques_personnalisees.de_deepeval.metrique_bon_nom_document import (
     MetriqueBonNomDocument,
     MetriquesBonNomDocuments,
@@ -10,6 +9,10 @@ from evaluation.metriques_personnalisees.de_deepeval.metrique_bons_numeros_pages
 )
 from evaluation.metriques_personnalisees.de_deepeval.metrique_longueur_reponse import (
     MetriqueLongueurReponse,
+)
+from evaluation.metriques_personnalisees.de_deepeval.metrique_score_numero_page import (
+    MetriqueScoreNumeropage,
+    MetriquesScoreNumeropage,
 )
 
 
@@ -162,3 +165,57 @@ def test_metriques_bons_numeros_pages_en_contexte_retourne_1_si_meme_page():
     assert metriques[2].measure(cas_test) == 1
     assert metriques[3].measure(cas_test) == 0
     assert metriques[4].measure(cas_test) == 1
+
+
+def test_metrique_score_numero_page_en_contexte_est_en_succes():
+    metadatas = {
+        "numero_page_reponse_bot_0": "1",
+        "numero_page_verite_terrain": "1",
+    }
+    cas_test = LLMTestCase(
+        input="Question test", actual_output="", additional_metadata=metadatas
+    )
+    metrique = MetriqueScoreNumeropage("numero_page_reponse_bot_0")
+
+    resultat = metrique.measure(cas_test)
+
+    assert resultat == 1
+    assert metrique.is_successful() is True
+
+
+def test_metrique_score_numero_page_en_contexte_est_en_echec():
+    metadatas = {
+        "numero_page_reponse_bot_0": "1",
+        "numero_page_verite_terrain": "2",
+    }
+    cas_test = LLMTestCase(
+        input="Question test", actual_output="", additional_metadata=metadatas
+    )
+    metrique = MetriqueScoreNumeropage("numero_page_reponse_bot_0")
+
+    resultat = metrique.measure(cas_test)
+
+    assert resultat == 0.62
+    assert metrique.is_successful() is False
+
+
+def test_metriques_score_numero_page_en_contexte_retourne_le_score_base_sur_la_distance():
+    metadatas = {
+        "numero_page_reponse_bot_0": "86",
+        "numero_page_reponse_bot_1": "72",
+        "numero_page_reponse_bot_2": "11",
+        "numero_page_reponse_bot_3": "10",
+        "numero_page_reponse_bot_4": "5",
+        "numero_page_verite_terrain": "10",
+    }
+    cas_test = LLMTestCase(
+        input="Question test", actual_output="", additional_metadata=metadatas
+    )
+    metriques = MetriquesScoreNumeropage.cree_metriques()
+
+    assert len(metriques) == 5
+    assert metriques[0].measure(cas_test) == 0.22
+    assert metriques[1].measure(cas_test) == 0.22
+    assert metriques[2].measure(cas_test) == 0.62
+    assert metriques[3].measure(cas_test) == 1
+    assert metriques[4].measure(cas_test) == 0.35
