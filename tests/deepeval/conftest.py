@@ -72,11 +72,19 @@ class EvaluateurDeepevalTest(EvaluateurDeepeval):
                 score=0.6,
             ),
         ]
-        result = TestResult(
-            metrics_data=metriques, name="", success=True, conversational=False
-        )
+        results = []
+        for test_case in test_cases:
+            results.append(
+                TestResult(
+                    metrics_data=metriques,
+                    name="",
+                    success=True,
+                    conversational=False,
+                    additional_metadata=test_case.additional_metadata,
+                )
+            )
         return EvaluationResult(
-            test_results=[result], confident_link=None, test_run_id=None
+            test_results=results, confident_link=None, test_run_id=None
         )
 
 

@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional
 
 import pandas as pd
-from deepeval.evaluate.types import EvaluationResult
+from deepeval.evaluate.types import EvaluationResult, TestResult
 from deepeval.metrics import (
     BaseMetric,
     HallucinationMetric,
@@ -14,7 +14,6 @@ from deepeval.metrics import (
     ToxicityMetric,
 )
 from deepeval.test_case import LLMTestCase
-
 from evalap.lance_experience import prepare_dataframe
 from evaluation.client_deepeval_albert import ClientDeepEvalAlbert
 from evaluation.metriques_personnalisees.de_deepeval.metrique_bon_nom_document import (
@@ -61,13 +60,18 @@ class LanceurExperienceDeepeval(LanceurExperience):
         for indice, ligne_donnees in donnees_dataframe.iterrows():
             contexte = ligne_donnees["context"]
 
+            metadata = {"numero_ligne": indice}
+            for col in ligne_donnees.index:
+                if col.startswith(("nom_document_", "numero_page_")):
+                    metadata[col] = ligne_donnees[col]
+
             cas_de_test_unique = LLMTestCase(
                 input=ligne_donnees["query"],
                 actual_output=ligne_donnees["output"],
                 expected_output=ligne_donnees["output_true"],
                 retrieval_context=contexte,
                 context=contexte,
-                additional_metadata={},
+                additional_metadata=metadata,
             )
             liste_cas_de_test.append(cas_de_test_unique)
 
@@ -81,7 +85,7 @@ class LanceurExperienceDeepeval(LanceurExperience):
         return donnees_preparees
 
     @staticmethod
-    def __extrait_scores_deepeval(test_result) -> dict:
+    def __extrait_scores_deepeval(test_result: TestResult) -> dict:
         scores = {}
         metrics_data = getattr(test_result, "metrics_data", None) or []
 
@@ -109,6 +113,11 @@ class LanceurExperienceDeepeval(LanceurExperience):
 
             score = getattr(metric_data, "score", None)
             scores[nom_colonne_normalisee()] = score
+            scores["numero_ligne"] = (
+                test_result.additional_metadata["numero_ligne"]
+                if test_result.additional_metadata is not None
+                else 0
+            )
 
         return scores
 
@@ -135,8 +144,11 @@ class LanceurExperienceDeepeval(LanceurExperience):
         resultat_evaluation = self.evaluateur_deepeval.evaluate(
             cas_de_test, metrics=metriques_deepeval
         )
-        scores_deepeval = self.__extrait_scores_deepeval(
-            resultat_evaluation.test_results[0]
+        scores_deepeval = list(
+            map(
+                lambda score: self.__extrait_scores_deepeval(score),
+                resultat_evaluation.test_results,
+            )
         )
-        self.entrepot_experience.persiste(Experience(id_experience, [scores_deepeval]))
+        self.entrepot_experience.persiste(Experience(id_experience, scores_deepeval))
         return id_experience
