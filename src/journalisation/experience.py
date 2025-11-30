@@ -68,6 +68,8 @@ class EntrepotExperienceHttp(EntrepotExperience):
 
 def fabrique_entrepot_experience() -> EntrepotExperience:
     configuration = recupere_configuration()
+    if configuration.est_evaluation_deepeval:
+        return EntrepotExperienceMemoire()
     session = requests.session()
     return EntrepotExperienceHttp(
         client_experience=EvalapClient(configuration, session=session).experience
