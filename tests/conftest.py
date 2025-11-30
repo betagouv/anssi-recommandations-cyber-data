@@ -105,6 +105,7 @@ def configuration() -> Configuration:
         albert=albert,
         base_de_donnees_journal=base_de_donnees,
         frequence_lecture=10.0,
+        est_evaluation_deepeval=False,
     )
 
 

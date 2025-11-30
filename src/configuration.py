@@ -34,6 +34,7 @@ class Configuration(NamedTuple):
     albert: Albert
     base_de_donnees_journal: BaseDeDonnees | None
     frequence_lecture: float
+    est_evaluation_deepeval: bool
 
 
 def recupere_configuration_postgres() -> BaseDeDonnees | None:
@@ -58,6 +59,7 @@ def recupere_configuration() -> Configuration:
         delai_attente_maximum=float(os.getenv("MQC_DELAI_ATTENTE_MAXIMUM", 0.5)),
     )
 
+    est_evaluation_deepeval = bool(os.getenv("EVALUATION_DEEPEVAL"))
     evalap: Evalap = Evalap(
         url=os.getenv("EVALAP_URL", "http://localhost:8000/v1"),
         token_authentification=os.getenv("EVALAP_TOKEN", ""),
@@ -76,4 +78,5 @@ def recupere_configuration() -> Configuration:
         albert=albert,
         base_de_donnees_journal=base_de_donnees_journal,
         frequence_lecture=frequence_lecture,
+        est_evaluation_deepeval=est_evaluation_deepeval,
     )
