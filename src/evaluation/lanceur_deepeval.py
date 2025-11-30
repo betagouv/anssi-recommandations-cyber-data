@@ -1,6 +1,7 @@
 import unicodedata
 import uuid
 from abc import ABC, abstractmethod
+from itertools import chain
 from pathlib import Path
 from typing import Optional
 
@@ -37,7 +38,7 @@ class EvaluateurDeepeval(ABC):
     @abstractmethod
     def evaluate(
         self, test_cases: list[LLMTestCase], metrics: Optional[list[BaseMetric]] = None
-    ) -> EvaluationResult:
+    ) -> list[EvaluationResult]:
         pass
 
 
@@ -51,6 +52,21 @@ class LanceurExperienceDeepeval(LanceurExperience):
         self.client_deepeval_albert = ClientDeepEvalAlbert()
         self.entrepot_experience = entrepot_experience
         self.evaluateur_deepeval = evaluateur_deepeval
+
+    def lance_l_experience(self, fichier_csv: Path) -> int | str | None:
+        id_experience = str(uuid.uuid4())
+        donnees = self.__charge_donnees_depuis_fichier_csv(fichier_csv)
+        cas_de_test = self.__cree_liste_cas_de_test_deepeval(donnees)
+        tous_les_resultats = self.__evalue_les_cas_de_test(cas_de_test)
+
+        scores_deepeval = list(
+            map(
+                lambda score: self.__extrait_scores_deepeval(score),
+                tous_les_resultats,
+            )
+        )
+        self.entrepot_experience.persiste(Experience(id_experience, scores_deepeval))
+        return id_experience
 
     @staticmethod
     def __cree_liste_cas_de_test_deepeval(
@@ -121,10 +137,9 @@ class LanceurExperienceDeepeval(LanceurExperience):
 
         return scores
 
-    def lance_l_experience(self, fichier_csv: Path) -> int | str | None:
-        id_experience = str(uuid.uuid4())
-        donnees = self.__charge_donnees_depuis_fichier_csv(fichier_csv)
-
+    def __evalue_les_cas_de_test(
+        self, cas_de_test: list[LLMTestCase]
+    ) -> list[TestResult]:
         metriques_deepeval: list[BaseMetric] = [
             HallucinationMetric(model=self.client_deepeval_albert, threshold=0.5),
             AnswerRelevancyMetric(model=self.client_deepeval_albert, threshold=0.5),
@@ -139,16 +154,12 @@ class LanceurExperienceDeepeval(LanceurExperience):
         metriques_deepeval.extend(MetriquesBonNomDocuments.cree_metriques())
         metriques_deepeval.extend(MetriquesBonsNumerosPages.cree_metriques())
         metriques_deepeval.extend(MetriquesScoreNumeropage.cree_metriques())
-
-        cas_de_test = self.__cree_liste_cas_de_test_deepeval(donnees)
-        resultat_evaluation = self.evaluateur_deepeval.evaluate(
-            cas_de_test, metrics=metriques_deepeval
+        resultats_evaluations: list[EvaluationResult] = (
+            self.evaluateur_deepeval.evaluate(cas_de_test, metrics=metriques_deepeval)
         )
-        scores_deepeval = list(
-            map(
-                lambda score: self.__extrait_scores_deepeval(score),
-                resultat_evaluation.test_results,
+        tous_les_resultats: list[TestResult] = list(
+            chain.from_iterable(
+                map(lambda resultats: resultats.test_results, resultats_evaluations)
             )
         )
-        self.entrepot_experience.persiste(Experience(id_experience, scores_deepeval))
-        return id_experience
+        return tous_les_resultats
