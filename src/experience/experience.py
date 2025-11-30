@@ -2,8 +2,6 @@ import uuid
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-import requests
-
 from configuration import Configuration
 from evalap import EvalapClient
 from evalap.lance_experience import lance_experience
@@ -30,11 +28,3 @@ class LanceurExperienceEvalap(LanceurExperience):
 class LanceurExperienceMemoire(LanceurExperience):
     def lance_l_experience(self, fichier_csv: Path | None) -> int | None:
         return 1
-
-
-def fabrique_lanceur_experience(configuration: Configuration) -> LanceurExperience:
-    if configuration.mqc is not None:
-        session = requests.session()
-        client_evalap = EvalapClient(configuration, session)
-        return LanceurExperienceEvalap(client_evalap, configuration)
-    return LanceurExperienceMemoire()

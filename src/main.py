@@ -3,7 +3,8 @@ import logging
 from pathlib import Path
 from adaptateurs.journal import AdaptateurJournal, fabrique_adaptateur_journal
 from configuration import recupere_configuration, Configuration
-from experience.experience import fabrique_lanceur_experience, LanceurExperience
+from experience.experience import LanceurExperience
+from experience.fabrique_lanceur_experience import fabrique_lanceur_experience
 from journalisation.consignateur_evaluation import consigne_evaluation
 from journalisation.experience import EntrepotExperience, fabrique_entrepot_experience
 from mqc.collecte_reponses_mqc import collecte_reponses_mqc
@@ -46,7 +47,10 @@ if __name__ == "__main__":
     ecrivain_sortie = EcrivainSortie(
         racine=Path.cwd(), sous_dossier=sortie, horloge=HorlogeSysteme()
     )
-    lanceur_experience = fabrique_lanceur_experience(la_configuration)
+    entrepot_experience = fabrique_entrepot_experience()
+    lanceur_experience = fabrique_lanceur_experience(
+        la_configuration, entrepot_experience
+    )
     asyncio.run(
         main(
             entree,
@@ -54,7 +58,7 @@ if __name__ == "__main__":
             ecrivain_sortie,
             10,
             client,
-            fabrique_entrepot_experience(),
+            entrepot_experience,
             fabrique_adaptateur_journal(),
             lanceur_experience,
         )
