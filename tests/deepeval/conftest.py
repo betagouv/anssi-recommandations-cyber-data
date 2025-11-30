@@ -38,7 +38,7 @@ class EvaluateurDeepevalTest(EvaluateurDeepeval):
 
     def evaluate(
         self, test_cases: list[LLMTestCase], metrics: Optional[list[BaseMetric]] = None
-    ) -> EvaluationResult:
+    ) -> list[EvaluationResult]:
         self.cas_de_test_executes.extend(test_cases)
         if metrics is not None:
             self.metriques_deepeval_soumises.extend(metrics[0:4])
@@ -83,9 +83,11 @@ class EvaluateurDeepevalTest(EvaluateurDeepeval):
                     additional_metadata=test_case.additional_metadata,
                 )
             )
-        return EvaluationResult(
-            test_results=results, confident_link=None, test_run_id=None
-        )
+        return [
+            EvaluationResult(
+                test_results=results, confident_link=None, test_run_id=None
+            )
+        ]
 
 
 @pytest.fixture

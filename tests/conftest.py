@@ -282,7 +282,7 @@ class EvaluateurDeepevalTest(EvaluateurDeepeval):
 
     def evaluate(
         self, test_cases: list[LLMTestCase], metrics: Optional[list[BaseMetric]] = None
-    ) -> EvaluationResult:
+    ) -> list[EvaluationResult]:
         results = []
         for test_case in test_cases:
             results.append(
@@ -299,9 +299,11 @@ class EvaluateurDeepevalTest(EvaluateurDeepeval):
                     additional_metadata=test_case.additional_metadata,
                 )
             )
-        return EvaluationResult(
-            test_results=results, confident_link=None, test_run_id=None
-        )
+        return [
+            EvaluationResult(
+                test_results=results, confident_link=None, test_run_id=None
+            )
+        ]
 
 
 @pytest.fixture
