@@ -16,6 +16,7 @@ from configuration import (
     Albert,
     BaseDeDonnees,
 )
+from configuration import ParametresEvaluation
 from evalap import EvalapClient
 from evalap.evalap_dataset_http import DatasetReponse
 from evalap.evalap_experience_http import ExperienceReponse, ExperienceAvecResultats
@@ -99,6 +100,9 @@ def configuration() -> Configuration:
         mot_de_passe=os.getenv("DB_PASSWORD", "postgres"),
         nom="database",
     )
+    parametres_deepeval = ParametresEvaluation(
+        taille_de_lot_collecte_mqc=10, nb_processus_en_parallele_pour_deepeval=4
+    )
     return Configuration(
         mqc=configuration_mqc,
         evalap=evalap,
@@ -106,6 +110,7 @@ def configuration() -> Configuration:
         base_de_donnees_journal=base_de_donnees,
         frequence_lecture=10.0,
         est_evaluation_deepeval=False,
+        parametres_deepeval=parametres_deepeval,
     )
 
 

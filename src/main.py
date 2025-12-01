@@ -56,7 +56,7 @@ if __name__ == "__main__":
             entree,
             "collecte_reponses_mqc",
             ecrivain_sortie,
-            10,
+            la_configuration.parametres_deepeval.taille_de_lot_collecte_mqc,
             client,
             entrepot_experience,
             fabrique_adaptateur_journal(),
