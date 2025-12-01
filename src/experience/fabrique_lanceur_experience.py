@@ -19,7 +19,10 @@ def fabrique_lanceur_experience(
 ) -> LanceurExperience:
     if configuration.est_evaluation_deepeval:
         return LanceurExperienceDeepeval(
-            entrepot_experience, EvaluateurDeepevalMultiProcessus()
+            entrepot_experience,
+            EvaluateurDeepevalMultiProcessus(
+                nb_processus=configuration.parametres_deepeval.nb_processus_en_parallele_pour_deepeval
+            ),
         )
     if configuration.mqc is not None:
         session = requests.session()

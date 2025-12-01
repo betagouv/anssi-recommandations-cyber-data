@@ -10,8 +10,7 @@ from evaluation.lanceur_deepeval import EvaluateurDeepeval
 
 
 class EvaluateurDeepevalMultiProcessus(EvaluateurDeepeval):
-    def __init__(self, nb_processus=1, taille_lot=1):
-        self.taille_lot = taille_lot
+    def __init__(self, nb_processus=1):
         self.nb_processus = nb_processus
         self.metrics = []
 
@@ -33,7 +32,7 @@ class EvaluateurDeepevalMultiProcessus(EvaluateurDeepeval):
     def divise_en_lots(self, cas_de_test: list[LLMTestCase]) -> list[list[LLMTestCase]]:
         return list(self.genere_chunk(cas_de_test))
 
-    def genere_chunk(self, iterable: list[LLMTestCase])-> Generator[list[LLMTestCase]]:
+    def genere_chunk(self, iterable: list[LLMTestCase]) -> Generator[list[LLMTestCase]]:
         it = iter(iterable)
         while True:
             chunk = list(islice(it, self.nb_processus))

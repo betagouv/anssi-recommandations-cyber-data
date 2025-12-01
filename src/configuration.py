@@ -28,6 +28,11 @@ class BaseDeDonnees(NamedTuple):
     nom: str
 
 
+class ParametresEvaluation(NamedTuple):
+    taille_de_lot_collecte_mqc: int
+    nb_processus_en_parallele_pour_deepeval: int
+
+
 class Configuration(NamedTuple):
     mqc: MQC
     evalap: Evalap
@@ -35,6 +40,7 @@ class Configuration(NamedTuple):
     base_de_donnees_journal: BaseDeDonnees | None
     frequence_lecture: float
     est_evaluation_deepeval: bool
+    parametres_deepeval: ParametresEvaluation
 
 
 def recupere_configuration_postgres() -> BaseDeDonnees | None:
@@ -72,6 +78,14 @@ def recupere_configuration() -> Configuration:
 
     base_de_donnees_journal: BaseDeDonnees | None = recupere_configuration_postgres()
     frequence_lecture = float(os.getenv("FREQUENCE_LECTURE", 10.0))
+
+    parametres_deepeval = ParametresEvaluation(
+        taille_de_lot_collecte_mqc=int(os.getenv("TAILLE_DE_LOT_COLLECTE_MQC", "10")),
+        nb_processus_en_parallele_pour_deepeval=int(
+            os.getenv("NB_PROCESSUS_EN_PARALLELE_POUR_DEEPEVAL", "4")
+        ),
+    )
+
     return Configuration(
         mqc=configuration_mqc,
         evalap=evalap,
@@ -79,4 +93,5 @@ def recupere_configuration() -> Configuration:
         base_de_donnees_journal=base_de_donnees_journal,
         frequence_lecture=frequence_lecture,
         est_evaluation_deepeval=est_evaluation_deepeval,
+        parametres_deepeval=parametres_deepeval,
     )
