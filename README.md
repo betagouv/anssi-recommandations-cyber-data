@@ -164,3 +164,26 @@ curl -X GET "http://localhost:8000/v1/metrics" -H "accept: application/json" | j
 ```
 
 Remplacez `ma_metrique` par le nom de votre métrique (ex: `exact_match`).
+
+## 📚 Indexer des documents RAG dans Albert
+
+### 🎒 Prérequis
+
+1. Avoir défini dans votre fichier `.env` la variable `ALBERT_CLE_API` avec une clé API valide Albert.
+2. Placer les documents PDF à indexer dans le dossier `donnees/guides_de_lANSSI/`.
+
+### ▶️ Créer une collection et indexer les documents
+
+Exécuter la commande suivante :
+
+```bash
+uv run --env-file .env python src/guides/indexe_documents_rag.py --nom LE_NOM_DE_LA_COLLECTION --description "Contient l'ensemble des guides de l'ANSSI disponibles publiquement"
+```
+
+- `--nom` : nom de la collection à créer dans Albert
+- `--description` : description de la collection
+
+La commande va :
+1. Créer une nouvelle collection privée dans Albert
+2. Indexer tous les fichiers PDF présents dans `donnees/guides_de_lANSSI/`
+3. Associer chaque document à son URL publique sur `https://demo.messervices.cyber.gouv.fr/documents-guides/` via les metadonnees
