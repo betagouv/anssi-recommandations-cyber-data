@@ -47,6 +47,7 @@ def test_client_albert_cree_collection():
     client = ClientAlbert("https://test.api", "test-key")
 
     mock_response = Mock()
+    mock_response.status_code = 201
     mock_response.json.return_value = {
         "id": "12345",
         "name": "test collection",
@@ -83,10 +84,40 @@ def test_client_albert_ajoute_documents():
     with open("test.pdf", "wb") as f:
         f.write(b"pdf content")
 
-    documents = [DocumentPDF("test.pdf", "https://example.com/test.pdf")]
-    reponses = client.ajoute_documents(documents)
+    document = DocumentPDF("test.pdf", "https://example.com/test.pdf")
+    reponses = client.ajoute_document(document)
 
     assert len(reponses) == 1
     assert reponses[0].id == "doc123"
     assert reponses[0].name == "test.pdf"
     assert reponses[0].collection_id == "12345"
+
+
+def test_client_albert_ajoute_documents_avec_retry():
+    client = ClientAlbert("https://test.api", "test-key")
+    client.id_collection = "12345"
+
+    mock_response_echec = Mock()
+    mock_response_echec.json.side_effect = Exception("Erreur réseau")
+
+    mock_response_succes = Mock()
+    reponse_attendue = ReponseDocument(
+        id="doc123",
+        name="test.pdf",
+        collection_id="12345",
+        created_at="2024-01-01T00:00:00Z",
+        updated_at="2024-01-01T00:00:00Z",
+    )
+    mock_response_succes.json.return_value = reponse_attendue._asdict()
+
+    client.session.post = Mock(side_effect=[mock_response_echec, mock_response_succes])
+
+    with open("test.pdf", "wb") as f:
+        f.write(b"pdf content")
+
+    documents = [DocumentPDF("test.pdf", "https://example.com/test.pdf")]
+    reponses = client.ajoute_documents_avec_retry(documents, 3, 0.01)
+
+    assert len(reponses) == 1
+    assert reponses[0].id == "doc123"
+    assert client.session.post.call_count == 2
