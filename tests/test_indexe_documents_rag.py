@@ -9,6 +9,7 @@ def test_client_albert_initialise_correctement():
     assert isinstance(client, ClientAlbert)
     assert str(client.client_openai.base_url) == "https://test.api"
     assert client.session.headers["Authorization"] == "Bearer test-key"
+    assert client.id_collection is None
 
 
 def test_document_pdf_cree_correctement():
