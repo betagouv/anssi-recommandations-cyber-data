@@ -5,6 +5,7 @@ description = "Une interface permettant d'évaluer le bot de l'ANSSI, basé sur 
 requires-python = ">=3.13"
 dependencies = [
     "httpx",
+    "openai",
     "pandas",
     "pydantic",
     "pytest",
