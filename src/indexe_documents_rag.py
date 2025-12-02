@@ -1,6 +1,7 @@
 import argparse
 import glob
 import json
+import time
 from pathlib import Path
 from dataclasses import dataclass
 from typing_extensions import NamedTuple
@@ -55,26 +56,73 @@ class ClientAlbert:
     def cree_collection(self, nom: str, description: str) -> ReponseCollection:
         payload = PayloadCollection(name=nom, description=description)
         response = self.session.post(f"{self.url}/collections", json=payload._asdict())
+        if response.status_code != 201:
+            print(f"Erreur {response.status_code}: {response.text}")
+            raise Exception(f"Erreur création collection: {response.status_code}")
         result = response.json()
-        reponse_collection = ReponseCollection(**result)
-        self.id_collection = reponse_collection.id
-        return reponse_collection
+        print(f"Réponse API: {result}")
+        self.id_collection = result["id"]
+        return ReponseCollection(
+            id=result["id"],
+            name=result.get("name", nom),
+            description=result.get("description", description),
+            visibility=result.get("visibility", "private"),
+            documents=result.get("documents", 0),
+            created_at=result.get("created_at", ""),
+            updated_at=result.get("updated_at", ""),
+        )
 
-    def ajoute_documents(self, documents: list[DocumentPDF]) -> list[ReponseDocument]:
+    def ajoute_document(self, document: DocumentPDF) -> list[ReponseDocument]:
+        reponses = []
+        nom = Path(document.chemin_pdf).name
+        with open(document.chemin_pdf, "rb") as flux:
+            fichiers = {"file": (nom, flux, "application/pdf")}
+            payload = PayloadDocument(
+                collection=str(self.id_collection),
+                metadata=json.dumps({"source_url": document.url_pdf}),
+            )
+            response = self.session.post(
+                f"{self.url}/documents", data=payload._asdict(), files=fichiers
+            )
+        result = response.json()
+        print(f"Réponse document API: {result}")
+        reponses.append(
+            ReponseDocument(
+                id=result["id"],
+                name=result.get("name", nom),
+                collection_id=result.get("collection_id", str(self.id_collection)),
+                created_at=result.get("created_at", ""),
+                updated_at=result.get("updated_at", ""),
+            )
+        )
+        return reponses
+
+    def ajoute_documents_avec_retry(
+        self,
+        documents: list[DocumentPDF],
+        max_tentatives: int = 3,
+        temps_d_attente: float = 0.1,
+    ) -> list[ReponseDocument]:
         reponses = []
         for doc in documents:
-            nom = Path(doc.chemin_pdf).name
-            with open(doc.chemin_pdf, "rb") as flux:
-                fichiers = {"file": (nom, flux, "application/pdf")}
-                payload = PayloadDocument(
-                    collection=str(self.id_collection),
-                    metadata=json.dumps({"source_url": doc.url_pdf}),
-                )
-                response = self.session.post(
-                    f"{self.url}/documents", data=payload._asdict(), files=fichiers
-                )
-            result = response.json()
-            reponses.append(ReponseDocument(**result))
+            succes = False
+            tentative = 0
+
+            while tentative < max_tentatives and not succes:
+                tentative += 1
+                try:
+                    reponse = self.ajoute_document(doc)
+                    reponses.extend(reponse)
+                    succes = True
+                except Exception as e:
+                    print(f"Tentative {tentative} échouée pour {doc.chemin_pdf}: {e}")
+                    if tentative < max_tentatives:
+                        print("Nouvel essai dans 5 secondes...")
+                        time.sleep(temps_d_attente)
+                    else:
+                        print(
+                            f"Échec après {max_tentatives} tentatives pour {doc.chemin_pdf}"
+                        )
         return reponses
 
 
@@ -110,7 +158,7 @@ def main():
     print(f"Collection créée avec ID: {client.id_collection}")
     documents = collecte_documents_pdf()
     print(f"Collecté {len(documents)} documents PDF")
-    reponses = client.ajoute_documents(documents)
+    reponses = client.ajoute_documents_avec_retry(documents, 3, 1)
     print(f"Ajouté {len(reponses)} documents à la collection")
 
 
