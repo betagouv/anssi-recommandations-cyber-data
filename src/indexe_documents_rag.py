@@ -1,5 +1,6 @@
 import argparse
 import glob
+import json
 from pathlib import Path
 from dataclasses import dataclass
 from typing_extensions import NamedTuple
@@ -20,12 +21,25 @@ class PayloadCollection(NamedTuple):
     visibility: str = "private"
 
 
+class PayloadDocument(NamedTuple):
+    collection: str
+    metadata: str
+
+
 class ReponseCollection(NamedTuple):
     id: str
     name: str
     description: str
     visibility: str
     documents: int
+    created_at: str
+    updated_at: str
+
+
+class ReponseDocument(NamedTuple):
+    id: str
+    name: str
+    collection_id: str
     created_at: str
     updated_at: str
 
@@ -45,6 +59,23 @@ class ClientAlbert:
         reponse_collection = ReponseCollection(**result)
         self.id_collection = reponse_collection.id
         return reponse_collection
+
+    def ajoute_documents(self, documents: list[DocumentPDF]) -> list[ReponseDocument]:
+        reponses = []
+        for doc in documents:
+            nom = Path(doc.chemin_pdf).name
+            with open(doc.chemin_pdf, "rb") as flux:
+                fichiers = {"file": (nom, flux, "application/pdf")}
+                payload = PayloadDocument(
+                    collection=str(self.id_collection),
+                    metadata=json.dumps({"source_url": doc.url_pdf}),
+                )
+                response = self.session.post(
+                    f"{self.url}/documents", data=payload._asdict(), files=fichiers
+                )
+            result = response.json()
+            reponses.append(ReponseDocument(**result))
+        return reponses
 
 
 def fabrique_client_albert() -> ClientAlbert:
@@ -73,12 +104,14 @@ def main():
     args = parser.parse_args()
 
     client = fabrique_client_albert()
-    client.cree_collection(args.nom, args.description)
-    documents = collecte_documents_pdf()
-
     print(f"Client Albert créé avec URL: {client.client_openai.base_url}")
+
+    client.cree_collection(args.nom, args.description)
     print(f"Collection créée avec ID: {client.id_collection}")
+    documents = collecte_documents_pdf()
     print(f"Collecté {len(documents)} documents PDF")
+    reponses = client.ajoute_documents(documents)
+    print(f"Ajouté {len(reponses)} documents à la collection")
 
 
 if __name__ == "__main__":
