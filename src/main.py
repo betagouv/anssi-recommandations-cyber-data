@@ -39,7 +39,7 @@ async def main(
 
 
 if __name__ == "__main__":
-    entree = Path("donnees/questions_avec_verite_terrain_3.csv")
+    entree = Path("donnees/questions_avec_verite_terrain.csv")
     la_configuration: Configuration = recupere_configuration()
     client = ClientMQCHTTPAsync(la_configuration.mqc)
     sortie = Path("/tmp/collecte_reponses")
