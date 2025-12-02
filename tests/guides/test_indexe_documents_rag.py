@@ -1,7 +1,7 @@
 import tempfile
 import os
 from unittest.mock import Mock
-from indexe_documents_rag import (
+from guides.indexe_documents_rag import (
     ClientAlbert,
     DocumentPDF,
     collecte_documents_pdf,
