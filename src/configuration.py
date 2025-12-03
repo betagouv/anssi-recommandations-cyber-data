@@ -31,6 +31,7 @@ class BaseDeDonnees(NamedTuple):
 class ParametresEvaluation(NamedTuple):
     taille_de_lot_collecte_mqc: int
     nb_processus_en_parallele_pour_deepeval: int
+    taille_lot_max_deepeval: int
 
 
 class Configuration(NamedTuple):
@@ -84,6 +85,7 @@ def recupere_configuration() -> Configuration:
         nb_processus_en_parallele_pour_deepeval=int(
             os.getenv("NB_PROCESSUS_EN_PARALLELE_POUR_DEEPEVAL", "4")
         ),
+        taille_lot_max_deepeval=int(os.getenv("TAILLE_LOT_MAX_DEEPEVAL", 3)),
     )
 
     return Configuration(
