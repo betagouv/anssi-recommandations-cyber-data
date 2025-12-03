@@ -3,7 +3,7 @@ permissions: {}
 
 on:
   push:
-    branches: [main]
+    branches: [main, correctif_deepeval]
 
 jobs:
   evaluation_mqc:
