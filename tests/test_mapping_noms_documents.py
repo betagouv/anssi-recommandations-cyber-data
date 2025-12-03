@@ -1,7 +1,10 @@
 import pandas as pd
 import pytest
 from pathlib import Path
-from evalap.lance_experience import applique_mapping_noms_documents, prepare_dataframe
+from evaluation.lance_experience import (
+    applique_mapping_noms_documents,
+    prepare_dataframe,
+)
 
 
 def test_applique_mapping_noms_documents_avec_ref_valide(tmp_path: Path):

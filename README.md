@@ -34,22 +34,6 @@ flowchart LR
   style Externe fill:#fff3cd,stroke:#f0ad4e,stroke-width:2.5px,color:#333
 ```
 
-### Interactions pour évaluer le dataset
-```mermaid
-sequenceDiagram
-    participant Main as main_evalap.py
-    participant Client as ClientEvalap
-    participant API as Evalap API
-
-    Main->>Client: nouveau ClientEvalap(base_url, session)
-    Client-->>Main: instance ClientEvalap
-    Main->>Client: ajoute_dataset(payload)
-    Note over Client: payload inclut <prefixe>_<horodatage>.csv 
-    Client->>API: POST /dataset
-    API-->>Client: {id, name, ...}
-    Client-->>Main: DatasetReponse
-```
-
 ## 📦 Comment installer ?
 
 ### Directement sur l'hôte
@@ -70,14 +54,6 @@ Dans un environnement virtuel :
 
 Il faut créer à la racine du projet un fichier `.env`.
 A minima, ce fichier devra définir les variables déclarées dans le fichier `.env.template`.
-
-### Authentification Evalap
-
-Pour utiliser l'API Evalap, ajoutez votre token d'authentification au fichier `.env` :
-```
-EVALAP_TOKEN=votre_token_ici
-```
-⚠️ Utilisez directement la valeur du token, sans guillemets ni formatage JSON.
 
 ## 🧪 Générer les réponses du bot pour le jeu de validation
 
@@ -109,61 +85,6 @@ uv run --env-file .env python -m /main_remplir_csv.py   --csv donnees/jointure-n
 - `--sortie` : dossier où sera écrit le CSV enrichi.  
 
 Un fichier nommé `evaluation_YYYY-MM-DD_H_M_S.csv` sera alors généré dans `donnees/sortie/` avec une colonne **Réponse Bot** remplie automatiquement.
-
-## 📊 Évaluer avec Evalap
-
-### 🎒 Prérequis
-
-1. Avoir défini dans votre fichier `.env` la variable `ALBERT_CLE_API`.  
-⚠️ Sans cette variable, Evalap ne pourra pas interroger l’API Albert.
-2. Disposer de [docker](https://docs.docker.com/get-docker/) et [docker compose](https://docs.docker.com/compose/install/) installés sur votre machine.  
-
-### ▶️ Lancer Evalap
-
-Depuis la racine du projet, exécuter :
-
-```bash
-docker compose -f evalap-compose.yml up -d
-```
-
-### ✅ Vérifications
-
-S’assurer que les conteneurs démarrent correctement et que l’interface Evalap est accessible :
-- l'IHM de l'API est accessible à l'adresse : http://localhost:8000/docs
-- l'IHM de l'application web est accessible à l'adresse : http://localhost:8501
-
-Si les urls ne semblent pas accessibles, vérifier qu’aucun conflit de port n’apparaît dans les logs.
-
-### 📊 Évaluation
-
-Une fois l'application lancée, pour évaluer un jeu de données :
-
-1) Ajouter un dataset. Exécutez :
-```bash
-uv run --env-file .env python src/main_evalap.py --csv donnees/sortie/evaluation_2025-09-30_17-20-16.csv --nom nom_dataset
-```
-Le chemin passé à `--csv` est celui généré à l’étape [« ▶️ Génération des réponses »](#%EF%B8%8F-g%C3%A9n%C3%A9ration-des-r%C3%A9ponses).
-
-## 🔧 Ajouter une nouvelle métrique personnalisée Evalap
-
-### 📝 Créer une nouvelle métrique
-
-1. Créer le fichier de métrique dans `src/metriques_personnalisees_evalap/ma_metrique.py`, en se basant sur la [documentation Evalap](https://evalap.etalab.gouv.fr/doc/fr/docs/developer-guide/adding-a-new-metric) :
-
-### 🚀 Déployer la métrique
-
-```bash
-docker compose -f evalap-compose.yml build evalap
-docker compose -f evalap-compose.yml up -d
-```
-
-### ✅ Vérifier que la métrique est disponible
-
-```bash
-curl -X GET "http://localhost:8000/v1/metrics" -H "accept: application/json" | jq '.[] | select(.name == "ma_metrique")'
-```
-
-Remplacez `ma_metrique` par le nom de votre métrique (ex: `exact_match`).
 
 ## 📚 Indexer des documents RAG dans Albert
 

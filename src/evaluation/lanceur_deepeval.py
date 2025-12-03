@@ -14,7 +14,7 @@ from deepeval.metrics import (
     ToxicityMetric,
 )
 from deepeval.test_case import LLMTestCase
-from evalap.lance_experience import prepare_dataframe
+from evaluation.lance_experience import prepare_dataframe
 from evaluation.client_deepeval_albert import ClientDeepEvalAlbert
 from evaluation.metriques_personnalisees.de_deepeval.metrique_bon_nom_document import (
     MetriquesBonNomDocuments,
