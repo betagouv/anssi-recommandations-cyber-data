@@ -5,7 +5,7 @@ from journalisation.consignateur_evaluation import consigne_evaluation
 from journalisation.experience import Experience, EntrepotExperienceMemoire
 
 
-def test_consigne_evenement_suite_recuperation_fichier_sortie_evaluation_evalap(
+def test_consigne_evenement_suite_recuperation_fichier_sortie_evaluation(
     resultat_collecte_mqc_avec_deux_resultats,
 ) -> None:
     entrepot_experience = EntrepotExperienceMemoire()
@@ -40,7 +40,7 @@ def test_consigne_evenement_suite_recuperation_fichier_sortie_evaluation_evalap(
     assert donnees_recues["bon_nom_document_en_contexte_2"] == 0
 
 
-def test_consigne_les_evenements_suite_recuperation_fichier_sortie_evaluation_evalap(
+def test_consigne_les_evenements_suite_recuperation_fichier_sortie_evaluation(
     resultat_collecte_mqc_avec_deux_resultats,
 ) -> None:
     entrepot_experience = EntrepotExperienceMemoire()

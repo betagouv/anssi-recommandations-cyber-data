@@ -10,11 +10,6 @@ class MQC(NamedTuple):
     delai_attente_maximum: float
 
 
-class Evalap(NamedTuple):
-    url: str
-    token_authentification: str
-
-
 class Albert(NamedTuple):
     url: str
     cle_api: str
@@ -35,11 +30,8 @@ class ParametresEvaluation(NamedTuple):
 
 class Configuration(NamedTuple):
     mqc: MQC
-    evalap: Evalap
     albert: Albert
     base_de_donnees_journal: BaseDeDonnees | None
-    frequence_lecture: float
-    est_evaluation_deepeval: bool
     parametres_deepeval: ParametresEvaluation
 
 
@@ -65,19 +57,12 @@ def recupere_configuration() -> Configuration:
         delai_attente_maximum=float(os.getenv("MQC_DELAI_ATTENTE_MAXIMUM", 0.5)),
     )
 
-    est_evaluation_deepeval = bool(os.getenv("EVALUATION_DEEPEVAL"))
-    evalap: Evalap = Evalap(
-        url=os.getenv("EVALAP_URL", "http://localhost:8000/v1"),
-        token_authentification=os.getenv("EVALAP_TOKEN", ""),
-    )
-
     albert: Albert = Albert(
         url=os.getenv("ALBERT_URL", "https://albert.api.etalab.gouv.fr/v1"),
         cle_api=os.getenv("ALBERT_CLE_API", "cle_api"),
     )
 
     base_de_donnees_journal: BaseDeDonnees | None = recupere_configuration_postgres()
-    frequence_lecture = float(os.getenv("FREQUENCE_LECTURE", 10.0))
 
     parametres_deepeval = ParametresEvaluation(
         taille_de_lot_collecte_mqc=int(os.getenv("TAILLE_DE_LOT_COLLECTE_MQC", "10")),
@@ -88,10 +73,7 @@ def recupere_configuration() -> Configuration:
 
     return Configuration(
         mqc=configuration_mqc,
-        evalap=evalap,
         albert=albert,
         base_de_donnees_journal=base_de_donnees_journal,
-        frequence_lecture=frequence_lecture,
-        est_evaluation_deepeval=est_evaluation_deepeval,
         parametres_deepeval=parametres_deepeval,
     )

@@ -1,16 +1,6 @@
 import ast
-import logging
 from pathlib import Path
-from typing import Optional
-
 import pandas as pd
-
-from configuration import Configuration
-from evalap import EvalapClient
-from evalap.evalap_dataset_http import DatasetReponse, DatasetPayload
-from evalap.evalap_experience_http import ExperiencePayload
-from evalap.metriques import Metriques
-from evalap.verificateur_experience_terminee import VerificateurExperienceTerminee
 
 
 def applique_mapping_noms_documents(
@@ -114,85 +104,3 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     }
 
     return df.rename(columns=columns_map)
-
-
-def ajoute_dataset(
-    client: EvalapClient, nom: str, df_mapped: pd.DataFrame
-) -> Optional[DatasetReponse]:
-    payload = DatasetPayload(
-        name=nom,
-        readme="Jeu d'évaluation QA pour Evalap",
-        default_metric="judge_precision",
-        df=df_mapped.astype(object).where(pd.notnull(df_mapped), None).to_json(),
-    )
-
-    resultat = client.dataset.ajoute(payload)
-
-    if resultat is None:
-        logging.error("Le dataset n'a pas pu être ajouté")
-        return None
-
-    logging.info("Dataset ajouté")
-    logging.info(f"Datasets disponibles: {len(client.dataset.liste())}")
-    return resultat
-
-
-def cree_experience(
-    client: EvalapClient,
-    dataset: DatasetReponse,
-    df_mapped: pd.DataFrame,
-    conf: Configuration,
-) -> int:
-    chargeur = Metriques()
-    fichier_metriques = Path("metriques.json")
-
-    metriques_enum = chargeur.recupere_depuis_fichier(fichier_metriques)
-    metriques = [m.value for m in metriques_enum]
-
-    payload_experience = ExperiencePayload(
-        name="Experience Test",
-        metrics=metriques,
-        dataset=dataset.name,
-        model={
-            "output": df_mapped["output"].astype(str).tolist(),
-            "aliased_name": "precomputed",
-        },
-        judge_model={
-            "name": "albert-large",
-            "base_url": conf.albert.url,
-            "api_key": conf.albert.cle_api,
-        },
-    )
-
-    resultat_experience = client.experience.cree(payload_experience)
-    if resultat_experience:
-        logging.info(
-            f"Expérience créée: {resultat_experience.name} (ID: {resultat_experience.id})"
-        )
-    else:
-        logging.error("L'expérience n'a pas pu être créée")
-    if resultat_experience is not None:
-        return resultat_experience.id
-    else:
-        return -1
-
-
-def lance_experience(
-    client: EvalapClient, conf: Configuration, limite, nom, fichier_csv
-) -> int | None:
-    df = pd.read_csv(fichier_csv)
-    df_mapped = prepare_dataframe(df)
-    dataset = ajoute_dataset(client, nom, df_mapped)
-    if dataset is None:
-        return None
-    id_experience_creee = cree_experience(client, dataset, df_mapped, conf)
-    experience_listee = client.experience.lit(id_experience_creee)
-    logging.info(f"Expérience affichée: {experience_listee} ")
-
-    verificateur = VerificateurExperienceTerminee(client.experience)
-    verificateur.verifie(
-        id_experience_creee,
-        timeout_max=limite,
-        frequence_lecture=conf.frequence_lecture,
-    )
-    return id_experience_creee

@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 from typing import Callable, Optional, Union
-from unittest.mock import Mock
 
 import pytest
 from deepeval.evaluate.types import EvaluationResult, TestResult
@@ -10,19 +9,14 @@ from deepeval.test_case import LLMTestCase
 from deepeval.tracing.api import MetricData
 
 from configuration import (
-    Evalap,
     Configuration,
     MQC,
     Albert,
     BaseDeDonnees,
 )
 from configuration import ParametresEvaluation
-from evalap import EvalapClient
-from evalap.evalap_dataset_http import DatasetReponse
-from evalap.evalap_experience_http import ExperienceReponse, ExperienceAvecResultats
 from evaluation.lanceur_deepeval import EvaluateurDeepeval
 from infra.memoire.ecrivain import EcrivainSortieDeTest
-from infra.memoire.evalap import EvalapClientDeTest
 from journalisation.experience import (
     EntrepotExperienceMemoire,
     Experience,
@@ -54,7 +48,7 @@ def une_experience() -> dict:
                 "created_at": "2025-10-09T14:48:35.428847",
                 "experiment_id": 42,
                 "id": 125,
-                "metric_name": "judge_precision",
+                "metric_name": "hallucination",
                 "metric_status": "running",
                 "num_success": 0,
                 "num_try": 0,
@@ -75,11 +69,6 @@ def une_experience() -> dict:
 
 
 @pytest.fixture()
-def configuration_evalap() -> Evalap:
-    return Evalap(url="http://localhost:8000/v1", token_authentification="")
-
-
-@pytest.fixture()
 def configuration() -> Configuration:
     configuration_mqc = MQC(
         port=8002,
@@ -88,10 +77,7 @@ def configuration() -> Configuration:
         route_pose_question="pose_question",
         delai_attente_maximum=10.0,
     )
-    evalap: Evalap = Evalap(
-        url="http://localhost:8000",
-        token_authentification="",
-    )
+
     albert = Albert(url="https://albert.api.etalab.gouv.fr/v1", cle_api="fausse_cle")
     base_de_donnees = BaseDeDonnees(
         hote=os.getenv("DB_HOST", "localhost"),
@@ -105,11 +91,8 @@ def configuration() -> Configuration:
     )
     return Configuration(
         mqc=configuration_mqc,
-        evalap=evalap,
         albert=albert,
         base_de_donnees_journal=base_de_donnees,
-        frequence_lecture=10.0,
-        est_evaluation_deepeval=False,
         parametres_deepeval=parametres_deepeval,
     )
 
@@ -143,82 +126,6 @@ def reponse_avec_paragraphes() -> dict:
         ],
         "question": "Q1?",
     }
-
-
-@pytest.fixture
-def reponse_a_l_ajout_d_un_dataset():
-    return DatasetReponse(
-        name="nom_dataset",
-        readme="",
-        default_metric="",
-        columns_map={},
-        id=1,
-        created_at="2024-01-01",
-        size=0,
-        columns=[],
-        parquet_size=0,
-        parquet_columns=[],
-    )
-
-
-@pytest.fixture
-def reponse_a_la_creation_d_une_experience():
-    return ExperienceReponse(
-        id=1,
-        name="nom_experience",
-        created_at="2024-01-01",
-        experiment_status="created",
-        experiment_set_id=None,
-        num_try=0,
-        num_success=0,
-        num_observation_try=0,
-        num_observation_success=0,
-        num_metrics=0,
-        readme=None,
-        judge_model="",
-        model={},
-        dataset={"id": 1, "name": "test"},
-        with_vision=False,
-    )
-
-
-@pytest.fixture
-def reponse_a_la_lecture_d_une_experience():
-    return ExperienceAvecResultats(
-        id=1,
-        name="Experience Test",
-        created_at="2024-01-01",
-        experiment_status="completed",
-        experiment_set_id=None,
-        num_try=1,
-        num_success=1,
-        num_observation_try=1,
-        num_observation_success=1,
-        num_metrics=1,
-        readme=None,
-        judge_model={},
-        model={},
-        dataset={"id": 1, "name": "test"},
-        with_vision=False,
-        results=[],
-    )
-
-
-@pytest.fixture
-def une_experience_evalap(
-    reponse_a_l_ajout_d_un_dataset,
-    reponse_a_la_creation_d_une_experience,
-    reponse_a_la_lecture_d_une_experience,
-):
-    def _une_experience_evalap(configuration) -> EvalapClient:
-        session = Mock()
-        client = EvalapClientDeTest(configuration, session=session)
-        client.reponse_ajoute_dataset(reponse_a_l_ajout_d_un_dataset)
-        client.reponse_cree_experience(reponse_a_la_creation_d_une_experience)
-        client.reponse_lit_experience(reponse_a_la_lecture_d_une_experience)
-        return client
-
-    return _une_experience_evalap
 
 
 @pytest.fixture
