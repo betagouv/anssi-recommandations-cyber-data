@@ -12,6 +12,7 @@ class Donnees(BaseModel):
 
 
 class TypeEvenement(StrEnum):
+    TEMPS_EVALUATION_MESURE = "TEMPS_EVALUATION_MESURE"
     EVALUATION_CALCULEE = "EVALUATION_CALCULEE"
 
 

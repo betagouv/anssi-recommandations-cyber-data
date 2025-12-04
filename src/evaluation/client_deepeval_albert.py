@@ -7,6 +7,7 @@ import requests
 from deepeval.models import DeepEvalBaseLLM
 from pydantic import BaseModel
 from configuration import recupere_configuration
+from infra.mesure_temps import mesurer_temps
 
 
 class ClientDeepEvalAlbert(DeepEvalBaseLLM):
@@ -57,6 +58,7 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
 
         raise RuntimeError(f"Erreur API Albert {reponse.status_code} : {reponse.text}")
 
+    @mesurer_temps()
     def generate(
         self,
         prompt: str,
@@ -101,6 +103,7 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
         return "albert-large"
 
 
+@mesurer_temps()
 def separe_reflexion_reponse(
     reponse: str, tokens_reflexion: tuple[str, ...] = ("</think>", "[/think]")
 ) -> Tuple[Optional[str], str]:
