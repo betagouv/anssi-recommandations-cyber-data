@@ -4,7 +4,10 @@ from abc import ABC, abstractmethod
 from enum import StrEnum
 from pydantic import BaseModel, ConfigDict
 import psycopg2
+from psycopg2.extensions import connection
 import datetime
+
+from infra.connexion_base_de_donnees import avec_connexion
 
 
 class Donnees(BaseModel):
@@ -42,16 +45,12 @@ class AdaptateurJournalMemoire(AdaptateurJournal):
 
 
 class AdaptateurJournalPostgres(AdaptateurJournal):
-    def __init__(self, configuration: BaseDeDonnees):
-        self._connexion = psycopg2.connect(
-            host=configuration.hote,
-            database=configuration.nom,
-            user=configuration.utilisateur,
-            password=configuration.mot_de_passe,
-            port=configuration.port,
-        )
-        self._connexion.autocommit = True
+    _connexion: connection | None = None
 
+    def __init__(self, configuration: BaseDeDonnees):
+        self._configuration = configuration
+
+    @avec_connexion
     def enregistre(self, type: TypeEvenement, donnees: Donnees):
         curseur = self._le_curseur()
         curseur.execute(
@@ -63,8 +62,7 @@ class AdaptateurJournalPostgres(AdaptateurJournal):
         return self._connexion.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     def ferme_connexion(self) -> None:
-        if self._connexion:
-            self._connexion.close()
+        pass
 
 
 def fabrique_adaptateur_journal() -> AdaptateurJournal:
