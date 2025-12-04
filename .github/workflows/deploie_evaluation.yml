@@ -1,4 +1,4 @@
-name: Automatisation des calculs de métrique avec Deepeval
+name: Déploie et lance une évaluation
 permissions: {}
 
 on:
@@ -28,8 +28,5 @@ jobs:
           ID_APP: ${{ secrets.CLEVER_CLOUD_ID_APP }}
           ID_ORGANISATION: ${{ secrets.CLEVER_CLOUD_ID_ORGANISATION }}
         run: |
-          RUN_COMMAND="uv run python src/main.py"
-          echo "Commande à exécuter: $RUN_COMMAND"
           clever link -o="$ID_ORGANISATION" "$ID_APP"
-          clever env set CC_RUN_COMMAND "$RUN_COMMAND"
           clever deploy --force --same-commit-policy=rebuild --quiet --exit-on deploy-start
