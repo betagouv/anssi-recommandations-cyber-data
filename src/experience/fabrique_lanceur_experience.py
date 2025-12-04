@@ -21,7 +21,8 @@ def fabrique_lanceur_experience(
         return LanceurExperienceDeepeval(
             entrepot_experience,
             EvaluateurDeepevalMultiProcessus(
-                nb_processus=configuration.parametres_deepeval.nb_processus_en_parallele_pour_deepeval
+                nb_processus=configuration.parametres_deepeval.nb_processus_en_parallele_pour_deepeval,
+                taille_lot_max=configuration.parametres_deepeval.taille_lot_max_deepeval,
             ),
         )
     if configuration.mqc is not None:

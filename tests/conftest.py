@@ -101,7 +101,9 @@ def configuration() -> Configuration:
         nom="database",
     )
     parametres_deepeval = ParametresEvaluation(
-        taille_de_lot_collecte_mqc=10, nb_processus_en_parallele_pour_deepeval=4
+        taille_de_lot_collecte_mqc=10,
+        nb_processus_en_parallele_pour_deepeval=4,
+        taille_lot_max_deepeval=1,
     )
     return Configuration(
         mqc=configuration_mqc,
