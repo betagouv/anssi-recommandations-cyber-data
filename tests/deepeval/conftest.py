@@ -41,8 +41,8 @@ class EvaluateurDeepevalTest(EvaluateurDeepeval):
     ) -> list[EvaluationResult]:
         self.cas_de_test_executes.extend(test_cases)
         if metrics is not None:
-            self.metriques_deepeval_soumises.extend(metrics[0:4])
-            self.metriques_personnalisees_soumises.extend(metrics[4:])
+            self.metriques_deepeval_soumises.extend(metrics[0:3])
+            self.metriques_personnalisees_soumises.extend(metrics[3:])
             self.nombre_metriques_soumise = len(self.metriques_deepeval_soumises) + len(
                 self.metriques_personnalisees_soumises
             )

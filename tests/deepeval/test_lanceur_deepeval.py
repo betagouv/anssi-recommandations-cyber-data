@@ -68,8 +68,8 @@ def test_evalue_un_jeu_de_donnees_avec_les_metriques_deepeval(
         resultat_collecte_mqc_avec_deux_resultats._chemin_courant
     )
 
-    assert evaluateur_deepeval.nombre_metriques_soumise == 20
-    assert len(evaluateur_deepeval.metriques_deepeval_soumises) == 4
+    assert evaluateur_deepeval.nombre_metriques_soumise == 19
+    assert len(evaluateur_deepeval.metriques_deepeval_soumises) == 3
     assert (
         evaluateur_deepeval.metriques_deepeval_soumises[0].__name__ == "Hallucination"
     )
@@ -77,8 +77,7 @@ def test_evalue_un_jeu_de_donnees_avec_les_metriques_deepeval(
         evaluateur_deepeval.metriques_deepeval_soumises[1].__name__
         == "Answer Relevancy"
     )
-    assert evaluateur_deepeval.metriques_deepeval_soumises[2].__name__ == "Faithfulness"
-    assert evaluateur_deepeval.metriques_deepeval_soumises[3].__name__ == "Toxicity"
+    assert evaluateur_deepeval.metriques_deepeval_soumises[2].__name__ == "Toxicity"
 
 
 def test_evalue_un_jeu_de_donnees_avec_les_metriques_personnalisees(
@@ -94,7 +93,7 @@ def test_evalue_un_jeu_de_donnees_avec_les_metriques_personnalisees(
         resultat_collecte_mqc_avec_deux_resultats._chemin_courant
     )
 
-    assert evaluateur_deepeval.nombre_metriques_soumise == 20
+    assert evaluateur_deepeval.nombre_metriques_soumise == 19
     assert len(evaluateur_deepeval.metriques_personnalisees_soumises) == 16
     assert (
         evaluateur_deepeval.metriques_personnalisees_soumises[0].__name__

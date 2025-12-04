@@ -11,7 +11,6 @@ from deepeval.metrics import (
     BaseMetric,
     HallucinationMetric,
     AnswerRelevancyMetric,
-    FaithfulnessMetric,
     ToxicityMetric,
 )
 from deepeval.test_case import LLMTestCase
@@ -143,11 +142,6 @@ class LanceurExperienceDeepeval(LanceurExperience):
         metriques_deepeval: list[BaseMetric] = [
             HallucinationMetric(model=self.client_deepeval_albert, threshold=0.5),
             AnswerRelevancyMetric(model=self.client_deepeval_albert, threshold=0.5),
-            FaithfulnessMetric(
-                model=self.client_deepeval_albert,
-                threshold=0.5,
-                truths_extraction_limit=20,
-            ),
             ToxicityMetric(model=self.client_deepeval_albert, threshold=0.5),
             MetriqueLongueurReponse(),
         ]
