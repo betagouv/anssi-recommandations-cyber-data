@@ -2,13 +2,11 @@ import json
 import logging
 import re
 from typing import Tuple, Optional, Type, Any
+import json_repair
 import requests
 from deepeval.models import DeepEvalBaseLLM
 from pydantic import BaseModel
-
 from configuration import recupere_configuration
-
-logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 
 
 class ClientDeepEvalAlbert(DeepEvalBaseLLM):
@@ -71,8 +69,7 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
             return texte
 
         try:
-            donnees = json.loads(str(extrait_json(texte)))
-            return schema(**donnees)
+            donnees = json_repair.loads(texte)
         except json.JSONDecodeError as exc:
             logging.error(
                 "JSON invalide renvoyé par Albert après nettoyage, texte = %s, erreur = %s",
@@ -80,6 +77,9 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
                 exc,
             )
             raise
+
+        try:
+            return schema(**donnees)  # type: ignore
         except Exception as exc:
             logging.error(
                 "Impossible d'instancier le schéma %s avec les données %s : %s",
@@ -113,16 +113,3 @@ def separe_reflexion_reponse(
             reponse = reponse[end:].strip()
             return reflexion, reponse
     return None, reponse.strip()
-
-
-def extrait_json(text: str) -> str:
-    text = text.strip()
-
-    if text.startswith("```"):
-        lignes = text.splitlines()
-        lignes = lignes[1:]  # supprime l'ouverture
-        if lignes and lignes[-1].strip().startswith("```"):
-            lignes = lignes[:-1]
-        text = "\n".join(lignes).strip()
-
-    return text
