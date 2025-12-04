@@ -1,7 +1,6 @@
 {
   "metriques": [
     "answer_relevancy",
-    "faithfulness",
     "toxicity",
     "hallucination",
     "judge_precision",
