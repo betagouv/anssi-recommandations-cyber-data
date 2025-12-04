@@ -1,10 +1,12 @@
 from pathlib import Path
 
+from infra.mesure_temps import mesurer_temps
 from mqc.ecrivain_sortie import EcrivainSortie
 from mqc.remplisseur_reponses import ClientMQCHTTPAsync
 from mqc.traite_csv_par_lots_en_parallele import traite_csv_par_lots_en_parallele
 
 
+@mesurer_temps()
 async def collecte_reponses_mqc(
     chemin_csv: Path,
     prefixe: str,

@@ -7,6 +7,7 @@ from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
 
 from evaluation.lanceur_deepeval import EvaluateurDeepeval
+from infra.mesure_temps import mesurer_temps
 
 
 class EvaluateurDeepevalMultiProcessus(EvaluateurDeepeval):
@@ -14,6 +15,7 @@ class EvaluateurDeepevalMultiProcessus(EvaluateurDeepeval):
         self.nb_processus = nb_processus
         self.metrics = []
 
+    @mesurer_temps()
     def evaluate(
         self, test_cases: list[LLMTestCase], metrics: Optional[list[BaseMetric]] = None
     ) -> list[EvaluationResult]:
@@ -24,6 +26,7 @@ class EvaluateurDeepevalMultiProcessus(EvaluateurDeepeval):
 
         return resultats
 
+    @mesurer_temps()
     def execute_evaluation(
         self, les_cas_de_test: list[LLMTestCase]
     ) -> EvaluationResult:
