@@ -51,6 +51,7 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
 
         if reponse.status_code == 500:
             time.sleep(self.temps_attente)
+            logging.info("Erreur serveur 500, nouvelle tentative dans %s secondes", self.temps_attente)
             return self._appel_api_albert(
                 prompt, nombre_appels_restants=nombre_appels_restants - 1
             )
