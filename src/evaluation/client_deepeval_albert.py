@@ -10,15 +10,14 @@ from configuration import recupere_configuration
 
 
 class ClientDeepEvalAlbert(DeepEvalBaseLLM):
-    def __init__(self):
-        configuration = recupere_configuration()
+    def __init__(self, configuration=recupere_configuration()):
         self.cle_api = configuration.albert.cle_api
         self.url_base = configuration.albert.url
 
     def load_model(self):
         return self
 
-    def _appel_api_albert(self, prompt: str) -> str:
+    def _appel_api_albert(self, prompt: str, nombre_appels_restants: int = 3) -> str:
         en_tetes = {
             "Authorization": f"Bearer {self.cle_api}",
             "Content-Type": "application/json",
@@ -45,6 +44,11 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
         except Exception as exc:
             logging.error("Erreur réseau lors de l'appel à Albert : %s", exc)
             raise
+
+        if reponse.status_code == 500:
+            return self._appel_api_albert(
+                prompt, nombre_appels_restants=nombre_appels_restants - 1
+            )
 
         if reponse.status_code == 200:
             try:
