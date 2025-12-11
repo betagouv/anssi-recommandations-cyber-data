@@ -25,6 +25,7 @@ class PayloadCollection(NamedTuple):
 class PayloadDocument(NamedTuple):
     collection: str
     metadata: str
+    chunk_min_size: int
 
 
 class ReponseCollection(NamedTuple):
@@ -80,6 +81,7 @@ class ClientAlbert:
             payload = PayloadDocument(
                 collection=str(self.id_collection),
                 metadata=json.dumps({"source_url": document.url_pdf}),
+                chunk_min_size=150
             )
             response = self.session.post(
                 f"{self.url}/documents", data=payload._asdict(), files=fichiers
