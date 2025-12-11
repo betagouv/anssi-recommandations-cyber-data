@@ -44,7 +44,30 @@ def test_attends_en_cas_d_erreur_500(configuration):
             ),
         ],
     ) as route:
-        client = ClientDeepEvalAlbert(configuration)
+        client = ClientDeepEvalAlbert(configuration, temps_attente=0.001)
         client.generate("A prompt", Truths)
 
     assert route.call_count == 3
+
+
+@patch("time.sleep")
+def test_verifie_pause_entre_appels_500(mock_sleep, configuration):
+    with patch(
+        "requests.post",
+        side_effect=[
+            httpx.Response(500, json={}),
+            httpx.Response(500, json={}),
+            httpx.Response(
+                200,
+                json={
+                    "choices": [
+                        {"message": {"content": '```json\n{"truths": ["test"]}\n```'}}
+                    ]
+                },
+            ),
+        ],
+    ):
+        client = ClientDeepEvalAlbert(configuration, temps_attente=0.001)
+        client.generate("A prompt", Truths)
+
+    assert mock_sleep.call_count == 2

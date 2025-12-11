@@ -7,12 +7,16 @@ import requests
 from deepeval.models import DeepEvalBaseLLM
 from pydantic import BaseModel
 from configuration import recupere_configuration
+import time
 
 
 class ClientDeepEvalAlbert(DeepEvalBaseLLM):
-    def __init__(self, configuration=recupere_configuration()):
+    def __init__(
+        self, configuration=recupere_configuration(), temps_attente: float = 60.0
+    ):
         self.cle_api = configuration.albert.cle_api
         self.url_base = configuration.albert.url
+        self.temps_attente = temps_attente
 
     def load_model(self):
         return self
@@ -46,6 +50,7 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
             raise
 
         if reponse.status_code == 500:
+            time.sleep(self.temps_attente)
             return self._appel_api_albert(
                 prompt, nombre_appels_restants=nombre_appels_restants - 1
             )
