@@ -81,7 +81,7 @@ class ClientAlbert:
             payload = PayloadDocument(
                 collection=str(self.id_collection),
                 metadata=json.dumps({"source_url": document.url_pdf}),
-                chunk_min_size=150
+                chunk_min_size=150,
             )
             response = self.session.post(
                 f"{self.url}/documents", data=payload._asdict(), files=fichiers
