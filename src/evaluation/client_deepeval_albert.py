@@ -17,6 +17,7 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
         self.cle_api = configuration.albert.cle_api
         self.url_base = configuration.albert.url
         self.temps_attente = temps_attente
+        self.modele = configuration.albert.modele
 
     def load_model(self):
         return self
@@ -33,7 +34,7 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
         ]
 
         charge_utile = {
-            "model": "albert-large",
+            "model": self.modele,
             "messages": messages,
             "max_tokens": 800,
         }
@@ -51,7 +52,10 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
 
         if reponse.status_code == 500:
             time.sleep(self.temps_attente)
-            logging.info("Erreur serveur 500, nouvelle tentative dans %s secondes", self.temps_attente)
+            logging.info(
+                "Erreur serveur 500, nouvelle tentative dans %s secondes",
+                self.temps_attente,
+            )
             return self._appel_api_albert(
                 prompt, nombre_appels_restants=nombre_appels_restants - 1
             )
@@ -108,7 +112,7 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
         return self.generate(prompt, schema=schema, **kwargs)
 
     def get_model_name(self) -> str:
-        return "albert-large"
+        return self.modele
 
 
 def separe_reflexion_reponse(
