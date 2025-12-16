@@ -13,6 +13,7 @@ class MQC(NamedTuple):
 class Albert(NamedTuple):
     url: str
     cle_api: str
+    modele: str
 
 
 class BaseDeDonnees(NamedTuple):
@@ -60,6 +61,7 @@ def recupere_configuration() -> Configuration:
     albert: Albert = Albert(
         url=os.getenv("ALBERT_URL", "https://albert.api.etalab.gouv.fr/v1"),
         cle_api=os.getenv("ALBERT_CLE_API", "cle_api"),
+        modele=os.getenv("ALBERT_MODELE", "openweight-medium"),
     )
 
     base_de_donnees_journal: BaseDeDonnees | None = recupere_configuration_postgres()

@@ -78,7 +78,11 @@ def configuration() -> Configuration:
         delai_attente_maximum=10.0,
     )
 
-    albert = Albert(url="https://albert.api.etalab.gouv.fr/v1", cle_api="fausse_cle")
+    albert = Albert(
+        url="https://albert.api.etalab.gouv.fr/v1",
+        cle_api="fausse_cle",
+        modele="albert-de-test",
+    )
     base_de_donnees = BaseDeDonnees(
         hote=os.getenv("DB_HOST", "localhost"),
         port=int(os.getenv("DB_PORT", "5432")),
