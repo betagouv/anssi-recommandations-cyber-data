@@ -1,4 +1,6 @@
 import os
+from enum import StrEnum
+
 from typing_extensions import NamedTuple
 
 
@@ -10,9 +12,15 @@ class MQC(NamedTuple):
     delai_attente_maximum: float
 
 
+class IndexeurDocument(StrEnum):
+    INDEXEUR_ALBERT = ("INDEXEUR_ALBERT",)
+    INDEXEUR_DOCLING = ("INDEXEUR_DOCLING",)
+
+
 class Albert(NamedTuple):
     url: str
     cle_api: str
+    indexeur: IndexeurDocument
     modele: str
 
 
@@ -67,6 +75,7 @@ def recupere_configuration() -> Configuration:
     albert: Albert = Albert(
         url=os.getenv("ALBERT_URL", "https://albert.api.etalab.gouv.fr/v1"),
         cle_api=os.getenv("ALBERT_CLE_API", "cle_api"),
+        indexeur=IndexeurDocument(os.getenv("INDEXEUR", "INDEXEUR_ALBERT")),
         modele=os.getenv("ALBERT_MODELE", "openweight-medium"),
     )
 
@@ -80,7 +89,7 @@ def recupere_configuration() -> Configuration:
     )
 
     configuration_msc = MSC(
-        url=os.getenv("MSC_URL_BASE", "https://demo.messervices.cyber.gouv.fr"),
+        url=os.getenv("MSC_URL_BASE", "https://messervices.cyber.gouv.fr"),
         chemin_guides=os.getenv("MSC_CHEMIN_GUIDES", "documents-guides"),
     )
 

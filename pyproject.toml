@@ -2,7 +2,7 @@
 name = "RecommandationsCyberData"
 version = "0.1.0"
 description = "Une interface permettant d'évaluer le bot de l'ANSSI, basé sur Albert [Albert](https://github.com/betagouv/anssi-recommandations-cyber), et d'y indexer de nouveaux documents RAG."
-requires-python = ">=3.13"
+requires-python = "==3.13"
 dependencies = [
      "canvas",
      "deepeval",
