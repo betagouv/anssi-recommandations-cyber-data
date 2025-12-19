@@ -1,14 +1,18 @@
 from pathlib import Path
 from unittest.mock import Mock
+
 from guides.indexe_documents_rag import (
     ClientAlbert,
     collecte_documents_pdf,
 )
 from guides.indexeur import DocumentPDF
+from guides.indexeur_albert import IndexeurBaseVectorielleAlbert
 
 
 def test_client_albert_initialise_correctement():
-    client = ClientAlbert("https://test.api", "test-key")
+    url = "https://test.api"
+
+    client = ClientAlbert(url, "test-key", IndexeurBaseVectorielleAlbert(url))
 
     assert isinstance(client, ClientAlbert)
     assert str(client.client_openai.base_url) == "https://test.api"
@@ -39,7 +43,9 @@ def test_collecte_documents_pdf_retourne_liste_documents(dossier_guide_anssi):
 
 
 def test_client_albert_cree_collection():
-    client = ClientAlbert("https://test.api", "test-key")
+    url = "https://test.api"
+
+    client = ClientAlbert(url, "test-key", IndexeurBaseVectorielleAlbert(url))
 
     mock_response = Mock()
     mock_response.status_code = 201

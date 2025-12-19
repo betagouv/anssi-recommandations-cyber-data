@@ -1,4 +1,6 @@
 import os
+from enum import StrEnum
+
 from typing_extensions import NamedTuple
 
 
@@ -10,9 +12,15 @@ class MQC(NamedTuple):
     delai_attente_maximum: float
 
 
+class IndexeurDocument(StrEnum):
+    INDEXEUR_ALBERT = ("INDEXEUR_ALBERT",)
+    INDEXEUR_DOCLING = ("INDEXEUR_DOCLING",)
+
+
 class Albert(NamedTuple):
     url: str
     cle_api: str
+    indexeur: IndexeurDocument
 
 
 class BaseDeDonnees(NamedTuple):
@@ -60,6 +68,7 @@ def recupere_configuration() -> Configuration:
     albert: Albert = Albert(
         url=os.getenv("ALBERT_URL", "https://albert.api.etalab.gouv.fr/v1"),
         cle_api=os.getenv("ALBERT_CLE_API", "cle_api"),
+        indexeur=IndexeurDocument(os.getenv("INDEXEUR", "INDEXEUR_ALBERT")),
     )
 
     base_de_donnees_journal: BaseDeDonnees | None = recupere_configuration_postgres()
