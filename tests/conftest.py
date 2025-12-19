@@ -8,7 +8,14 @@ from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
 from deepeval.tracing.api import MetricData
 
-from configuration import Configuration, MQC, Albert, BaseDeDonnees, MSC
+from configuration import (
+    Configuration,
+    MQC,
+    MSC,
+    Albert,
+    BaseDeDonnees,
+    IndexeurDocument,
+)
 from configuration import ParametresEvaluation
 from evaluation.lanceur_deepeval import EvaluateurDeepeval
 from infra.memoire.ecrivain import EcrivainSortieDeTest
@@ -76,6 +83,7 @@ def configuration() -> Configuration:
     albert = Albert(
         url="https://albert.api.etalab.gouv.fr/v1",
         cle_api="fausse_cle",
+        indexeur=IndexeurDocument.INDEXEUR_ALBERT,
         modele="albert-de-test",
     )
     base_de_donnees = BaseDeDonnees(
