@@ -4,9 +4,10 @@ from pathlib import Path
 import requests
 from openai import OpenAI
 from typing_extensions import NamedTuple
-from configuration import recupere_configuration, MSC
-from guides.indexeur import DocumentPDF, ReponseDocument
+from configuration import recupere_configuration, IndexeurDocument, MSC
+from guides.indexeur import DocumentPDF, ReponseDocument, Indexeur
 from guides.indexeur_albert import IndexeurBaseVectorielleAlbert
+from guides.indexeur_docling import IndexeurDocling
 
 
 class PayloadCollection(NamedTuple):
@@ -26,12 +27,13 @@ class ReponseCollection(NamedTuple):
 
 
 class ClientAlbert:
-    def __init__(self, url: str, cle_api: str):
+    def __init__(self, url: str, cle_api: str, indexeur: Indexeur):
         self.url = url
         self.client_openai = OpenAI(base_url=url, api_key=cle_api)
         self.session = requests.session()
         self.session.headers = {"Authorization": f"Bearer {cle_api}"}
         self.id_collection: str | None = None
+        self.indexeur = indexeur
 
     def cree_collection(self, nom: str, description: str) -> ReponseCollection:
         payload = PayloadCollection(name=nom, description=description)
@@ -55,19 +57,25 @@ class ClientAlbert:
     def ajoute_documents(
         self,
         documents: list[DocumentPDF],
-        max_tentatives: int = 3,
-        temps_d_attente: float = 0.1,
     ) -> list[ReponseDocument]:
         id_collection = self.id_collection
-        url = self.url
-        return IndexeurBaseVectorielleAlbert(
-            url, max_tentatives, temps_d_attente
-        ).ajoute_documents(documents, id_collection)
+        return self.indexeur.ajoute_documents(documents, id_collection)
 
 
 def fabrique_client_albert() -> ClientAlbert:
     config = recupere_configuration().albert
-    return ClientAlbert(config.url, config.cle_api)
+    match config.indexeur:
+        case "INDEXEUR_ALBERT":
+            return ClientAlbert(
+                config.url,
+                config.cle_api,
+                IndexeurBaseVectorielleAlbert(config.url, 3, 1),
+            )
+        case "INDEXEUR_DOCLING":
+            return ClientAlbert(config.url, config.cle_api, IndexeurDocling(config.url))
+    raise Exception(
+        f"Erreur, un indexeur {', '.join([indexeur.name for indexeur in IndexeurDocument])} doit être fourni. L’indexeur configuré est : {config.indexeur}"
+    )
 
 
 def collecte_documents_pdf(
@@ -98,7 +106,7 @@ def main():
     print(f"Collection créée avec ID: {client.id_collection}")
     documents = collecte_documents_pdf()
     print(f"Collecté {len(documents)} documents PDF")
-    reponses = client.ajoute_documents(documents, 3, 1)
+    reponses = client.ajoute_documents(documents)
     print(f"Ajouté {len(reponses)} documents à la collection")
 
 
