@@ -73,6 +73,53 @@ class ClientAlbert:
             updated_at=result.get("updated_at", ""),
         )
 
+    def ajoute_document_sans_sepearateur(self,  document: DocumentPDF):
+        nom_document_converti = Path(document.chemin_pdf).name.replace( ".pdf", "_converti.pdf")
+        with pikepdf.open(document.chemin_pdf) as pdf:
+            pdf.save(nom_document_converti)
+
+        #Creation Document Docling
+        from docling.document_converter import DocumentConverter, PdfFormatOption
+        from docling.datamodel.pipeline_options import PdfPipelineOptions
+        from docling.datamodel.base_models import InputFormat
+        from docling.chunking import HierarchicalChunker
+
+        pipeline_options = PdfPipelineOptions()
+        pipeline_options.do_ocr = False
+        pipeline_options.do_table_structure = True
+        pipeline_options.generate_page_images = False
+
+        format_options = {
+            InputFormat.PDF: PdfFormatOption(
+                pipeline_options=pipeline_options,
+            )
+        }
+
+        converter = DocumentConverter()
+        result = converter.convert(nom_document_converti)
+
+        #Récupération des chunks :
+        chunker = HierarchicalChunker(max_tokens=2000)
+        chunks = list(chunker.chunk(result.document))
+        for index, chunk in enumerate(chunks, start=1):
+            contenu_paragraphe_txt = chunk.text
+            numero_page =chunk.page_no
+
+            #CREER UN FICHIER AVEC JUSTE LE CHUNK
+
+
+            #POST Document SAns separateur
+            fichiers = {"file": (Path(document.chemin_pdf).name, contenu_paragraphe_txt.encode("utf-8"), "application/pdf")}
+            payload = {
+                        "collection":str(self.id_collection),
+                        "metadata":json.dumps({"source_url": document.url_pdf, "page":numero_page}),
+                        "chunker": "NoSplitter"
+
+            }
+            response = self.session.post(
+                f"{self.url}/documents", data=payload, files=fichiers
+            )
+
     def ajoute_document(self, document: DocumentPDF) -> list[ReponseDocument]:
         reponses = []
         nom = Path(document.chemin_pdf).name
@@ -114,6 +161,7 @@ class ClientAlbert:
                 tentative += 1
                 try:
                     reponse = self.ajoute_document(doc)
+                    # reponse = self.ajoute_document_sans_separateur(doc)
                     reponses.extend(reponse)
                     succes = True
                 except Exception as e:
@@ -161,7 +209,8 @@ def main():
     print(f"Collection créée avec ID: {client.id_collection}")
     documents = collecte_documents_pdf()
     print(f"Collecté {len(documents)} documents PDF")
-    reponses = client.ajoute_documents_avec_retry(documents, 3, 1)
+    # reponses = client.ajoute_documents_avec_retry(documents, 3, 1)
+    reponses = client.ajoute_document_sans_sepearateur(documents[0])
     print(f"Ajouté {len(reponses)} documents à la collection")
 
 
