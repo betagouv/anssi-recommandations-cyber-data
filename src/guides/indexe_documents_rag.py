@@ -1,31 +1,19 @@
 import argparse
 import glob
-import json
-import time
 from pathlib import Path
-from dataclasses import dataclass
-from typing_extensions import NamedTuple
 import requests
 from openai import OpenAI
-from configuration import recupere_configuration
-
-
-@dataclass
-class DocumentPDF:
-    chemin_pdf: str
-    url_pdf: str
+from typing_extensions import NamedTuple
+from configuration import recupere_configuration, IndexeurDocument
+from guides.indexeur import DocumentPDF, ReponseDocument, Indexeur
+from guides.indexeur_albert import IndexeurBaseVectorielleAlbert
+from guides.indexeur_docling import IndexeurDocling
 
 
 class PayloadCollection(NamedTuple):
     name: str
     description: str
     visibility: str = "private"
-
-
-class PayloadDocument(NamedTuple):
-    collection: str
-    metadata: str
-    chunk_min_size: int
 
 
 class ReponseCollection(NamedTuple):
@@ -38,21 +26,14 @@ class ReponseCollection(NamedTuple):
     updated_at: str
 
 
-class ReponseDocument(NamedTuple):
-    id: str
-    name: str
-    collection_id: str
-    created_at: str
-    updated_at: str
-
-
 class ClientAlbert:
-    def __init__(self, url: str, cle_api: str):
+    def __init__(self, url: str, cle_api: str, indexeur: Indexeur):
         self.url = url
         self.client_openai = OpenAI(base_url=url, api_key=cle_api)
         self.session = requests.session()
         self.session.headers = {"Authorization": f"Bearer {cle_api}"}
         self.id_collection: str | None = None
+        self.indexeur = indexeur
 
     def cree_collection(self, nom: str, description: str) -> ReponseCollection:
         payload = PayloadCollection(name=nom, description=description)
@@ -73,64 +54,28 @@ class ClientAlbert:
             updated_at=result.get("updated_at", ""),
         )
 
-    def ajoute_document(self, document: DocumentPDF) -> list[ReponseDocument]:
-        reponses = []
-        nom = Path(document.chemin_pdf).name
-        with open(document.chemin_pdf, "rb") as flux:
-            fichiers = {"file": (nom, flux, "application/pdf")}
-            payload = PayloadDocument(
-                collection=str(self.id_collection),
-                metadata=json.dumps({"source_url": document.url_pdf}),
-                chunk_min_size=150,
-            )
-            response = self.session.post(
-                f"{self.url}/documents", data=payload._asdict(), files=fichiers
-            )
-        result = response.json()
-        print(f"Réponse document API: {result}")
-        reponses.append(
-            ReponseDocument(
-                id=result["id"],
-                name=result.get("name", nom),
-                collection_id=result.get("collection_id", str(self.id_collection)),
-                created_at=result.get("created_at", ""),
-                updated_at=result.get("updated_at", ""),
-            )
-        )
-        return reponses
-
-    def ajoute_documents_avec_retry(
+    def ajoute_documents(
         self,
         documents: list[DocumentPDF],
-        max_tentatives: int = 3,
-        temps_d_attente: float = 0.1,
     ) -> list[ReponseDocument]:
-        reponses = []
-        for doc in documents:
-            succes = False
-            tentative = 0
-
-            while tentative < max_tentatives and not succes:
-                tentative += 1
-                try:
-                    reponse = self.ajoute_document(doc)
-                    reponses.extend(reponse)
-                    succes = True
-                except Exception as e:
-                    print(f"Tentative {tentative} échouée pour {doc.chemin_pdf}: {e}")
-                    if tentative < max_tentatives:
-                        print("Nouvel essai dans 5 secondes...")
-                        time.sleep(temps_d_attente)
-                    else:
-                        print(
-                            f"Échec après {max_tentatives} tentatives pour {doc.chemin_pdf}"
-                        )
-        return reponses
+        id_collection = self.id_collection
+        return self.indexeur.ajoute_documents(documents, id_collection)
 
 
 def fabrique_client_albert() -> ClientAlbert:
     config = recupere_configuration().albert
-    return ClientAlbert(config.url, config.cle_api)
+    match config.indexeur:
+        case "INDEXEUR_ALBERT":
+            return ClientAlbert(
+                config.url,
+                config.cle_api,
+                IndexeurBaseVectorielleAlbert(config.url, 3, 1),
+            )
+        case "INDEXEUR_DOCLING":
+            return ClientAlbert(config.url, config.cle_api, IndexeurDocling(config.url))
+    raise Exception(
+        f"Erreur, un indexeur {', '.join([indexeur.name for indexeur in IndexeurDocument])} doit être fourni. L’indexeur configuré est : {config.indexeur}"
+    )
 
 
 def collecte_documents_pdf(
@@ -160,7 +105,7 @@ def main():
     print(f"Collection créée avec ID: {client.id_collection}")
     documents = collecte_documents_pdf()
     print(f"Collecté {len(documents)} documents PDF")
-    reponses = client.ajoute_documents_avec_retry(documents, 3, 1)
+    reponses = client.ajoute_documents(documents)
     print(f"Ajouté {len(reponses)} documents à la collection")
 
 
