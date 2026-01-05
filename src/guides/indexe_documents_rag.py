@@ -6,7 +6,13 @@ import requests
 from openai import OpenAI
 from typing_extensions import NamedTuple
 from configuration import recupere_configuration, IndexeurDocument, MSC
-from guides.indexeur import DocumentPDF, ReponseDocument, Indexeur
+from guides.indexeur import (
+    DocumentPDF,
+    ReponseDocument,
+    Indexeur,
+    ReponseDocumentEnErreur,
+    ReponseDocumentEnSucces,
+)
 from guides.indexeur_albert import IndexeurBaseVectorielleAlbert
 from guides.indexeur_docling import IndexeurDocling
 
@@ -112,7 +118,21 @@ def main():
         f"Collecté {len(documents)} documents PDF sur la collection {client.id_collection}"
     )
     reponses = client.ajoute_documents(documents)
-    print(f"Ajouté {len(reponses)} documents à la collection")
+
+    les_documents_en_erreur = list(
+        filter(lambda reponse: isinstance(reponse, ReponseDocumentEnErreur), reponses)
+    )
+    les_documents_en_succes = list(
+        filter(lambda reponse: isinstance(reponse, ReponseDocumentEnSucces), reponses)
+    )
+
+    print(
+        f"Ajouté {len(les_documents_en_succes)} documents à la collection {client.id_collection}"
+    )
+    print(f"{len(les_documents_en_erreur)} documents non ajoutés à la collection :")
+    print(
+        f"{'-'.join(list(map(lambda document: f'{document.document_en_erreur} - Erreur : {document.detail}', les_documents_en_erreur)))}"
+    )
 
 
 if __name__ == "__main__":

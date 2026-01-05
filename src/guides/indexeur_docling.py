@@ -40,9 +40,7 @@ OptionsGuides = dict[str, OptionsGuide]
 class ChunkerDocling:
     def __init__(self):
         super().__init__()
-        with open(
-            "src/guides/options_guides.json"
-        ) as fichier_options_guides:
+        with open("src/guides/options_guides.json") as fichier_options_guides:
             self.options_guides: OptionsGuides = json.load(fichier_options_guides)  # type: ignore[annotation-unchecked]
 
     def applique(self, document: DocumentPDF) -> list[BaseChunk]:
