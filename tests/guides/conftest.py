@@ -1,11 +1,14 @@
 from pathlib import Path
 from typing import Callable
 from unittest.mock import Mock
-from requests import Session
 
 import pytest
+from requests import Session
 
-from guides.indexeur import ReponseDocument
+from guides.indexeur import (
+    ReponseDocument,
+    ReponseDocumentEnSucces,
+)
 
 
 @pytest.fixture
@@ -36,7 +39,7 @@ def mock_post_session_creation_document() -> Callable[[Session, ReponseDocument]
 
 @pytest.fixture
 def une_reponse_document() -> ReponseDocument:
-    return ReponseDocument(
+    return ReponseDocumentEnSucces(
         id="doc123",
         name="test.pdf",
         collection_id="12345",
@@ -50,7 +53,7 @@ def une_reponse_document_parametree() -> Callable[[str, str], ReponseDocument]:
     def _une_reponse_document_parametree(
         id_document: str, nom_document: str
     ) -> ReponseDocument:
-        return ReponseDocument(
+        return ReponseDocumentEnSucces(
             id=id_document,
             name=nom_document,
             collection_id="12345",

@@ -3,7 +3,13 @@ import time
 from pathlib import Path
 import requests
 
-from guides.indexeur import Indexeur, DocumentPDF, PayloadDocument, ReponseDocument
+from guides.indexeur import (
+    Indexeur,
+    DocumentPDF,
+    PayloadDocument,
+    ReponseDocument,
+    ReponseDocumentEnSucces,
+)
 
 
 class IndexeurBaseVectorielleAlbert(Indexeur):
@@ -42,7 +48,7 @@ class IndexeurBaseVectorielleAlbert(Indexeur):
             )
         result = response.json()
         print(f"Réponse document API: {result}")
-        return ReponseDocument(
+        return ReponseDocumentEnSucces(
             id=result["id"],
             name=result.get("name", nom),
             collection_id=result.get("collection_id", str(id_collection)),

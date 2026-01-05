@@ -10,9 +10,11 @@ from pydantic import Field
 from requests.models import Response
 
 from guides.executeur_requete import ExecuteurDeRequete
-from guides.multi_processeur import Multiprocesseur
-from guides.indexeur import DocumentPDF
+from guides.indexeur import (
+    DocumentPDF,
+)
 from guides.indexeur_docling import IndexeurDocling, ChunkerDocling
+from guides.multi_processeur import Multiprocesseur
 
 
 class ConstructeurDeBaseChunk:
