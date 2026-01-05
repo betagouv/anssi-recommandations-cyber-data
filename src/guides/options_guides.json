@@ -1,0 +1,446 @@
+{
+  "2010-12-03_Guide_externalisation.pdf": {
+    "structure_table": true
+  },
+  "20150713_NP_ANSSI_SDE_vpn_court_terme_v1.0-fr.pdf": {
+    "structure_table": true
+  },
+  "20150713_NP_ANSSI_SDE_vpn_moyen_terme_v1.0-fr.pdf": {
+    "structure_table": true
+  },
+  "20151005_NP_ANSSI_SDE_4067_PJ1_diode_court_terme_PJ1.vfp_.pdf": {
+    "structure_table": true
+  },
+  "20151005_NP_ANSSI_SDE_4067_PJ2_diode_moyen_terme_PJ2.vfp_.pdf": {
+    "structure_table": true
+  },
+  "20181213_anssi_guide_cartographie_v1b.pdf": {
+    "structure_table": true
+  },
+  "20220117_np_anssi_sde_commutateur_court_terme_v1-1-fr.pdf": {
+    "structure_table": false
+  },
+  "20220117_np_anssi_sde_commutateur_moyen_terme_v1-1-fr.pdf": {
+    "structure_table": false
+  },
+  "20220117_np_anssi_sde_pare_feu_court_terme_v1-1-fr.pdf": {
+    "structure_table": false
+  },
+  "20220117_np_anssi_sde_pare_feu_moyen_terme_v1-1-fr.pdf": {
+    "structure_table": false
+  },
+  "20220516_np_anssi_guide_com_crise_cyber_en.pdf": {
+    "structure_table": true
+  },
+  "20220516_np_anssi_guide_gestion_crise_cyber_en1.pdf": {
+    "structure_table": true
+  },
+  "20230503_anssi_mesures-cyber-preventives-prioritaires.pdf": {
+    "structure_table": true
+  },
+  "20230613_np_anssi_sde_automate_moyen_terme_v1-2-fr.pdf": {
+    "structure_table": true
+  },
+  "20230614_np_anssi_sde_automate_court_terme_v1-2-fr.pdf": {
+    "structure_table": true
+  },
+  "20231218_Volet_operationnel_cyberattaquesetremediation_a5_v1j.pdf": {
+    "structure_table": true
+  },
+  "20231218_Volet_stratégique_cyberattaquesetremédiation_v1g.pdf": {
+    "structure_table": true
+  },
+  "20231218_Volet_technique_cyberattaquesetremediation_a5_v1h.pdf": {
+    "structure_table": true
+  },
+  "20240814_np_anssi_recommandations_hebergement_cloud_si_a5_v1g_fr.pdf": {
+    "structure_table": true
+  },
+  "20241001_NP_ANSSI_SDE_serveur_scada_moyen_terme_v1-1-fr.pdf": {
+    "structure_table": true
+  },
+  "20241212_np_anssi_guide_tpe-pme_v2.pdf": {
+    "structure_table": true
+  },
+  "250129_np_anssi_guide_ebios_fr_final_collection_WEB.pdf": {
+    "structure_table": true
+  },
+  "Avis de l'ANSSI sur la migration vers la cryptographie.pdf": {
+    "structure_table": true
+  },
+  "CyberDico_ANSSI_2024.pdf": {
+    "structure_table": true
+  },
+  "Document_Analyse_de_risques_FR.pdf": {
+    "structure_table": true
+  },
+  "Fiche_methode_Lhomologation_pour_les_decideurs.pdf": {
+    "structure_table": true
+  },
+  "Fiche_methode_Systeme_dinformation _isole_et_simple.pdf": {
+    "structure_table": true
+  },
+  "Fiche_methode_Systeme_dinformation_replique.pdf": {
+    "structure_table": true
+  },
+  "GISSIP-Methode-2006-12-11.pdf": {
+    "structure_table": true
+  },
+  "Guide_Systemes_industriels__Mesures_detaillees_v2.pdf": {
+    "structure_table": false
+  },
+  "Guide_pour_une_formation_sur_la_cybersécurité_des_systèmes_industriels.pdf": {
+    "structure_table": true
+  },
+  "NP_ActiveDirectory_NoteTech.pdf": {
+    "structure_table": true
+  },
+  "NP_ConfigMateriel.pdf": {
+    "structure_table": true
+  },
+  "NP_Guide_DDoS.pdf": {
+    "structure_table": true
+  },
+  "NP_Ordiphones_NoteTech_v1.2.pdf": {
+    "structure_table": true
+  },
+  "NP_Politique_pare_feu_NoteTech.pdf": {
+    "structure_table": true
+  },
+  "NP_TLS_NoteTech.pdf": {
+    "structure_table": true
+  },
+  "NP_Virtualisation_NoteTech_v1-1.pdf": {
+    "structure_table": true
+  },
+  "NP_WIFI_NoteTech.pdf": {
+    "structure_table": true
+  },
+  "NP_securiser_ToIP_NoteTech-v1.pdf": {
+    "structure_table": true
+  },
+  "NT_IPsec.pdf": {
+    "structure_table": true
+  },
+  "NT_OpenSSH.pdf": {
+    "structure_table": true
+  },
+  "Recommandations sur la sécurisation des systèmes de contrôle d'accès physique et vidéoprotection - v2.1.pdf": {
+    "structure_table": true
+  },
+  "Recommandations_de_sécurité_pour_un_système_d_IA_générative.pdf": {
+    "structure_table": true
+  },
+  "Referentiel_exigences_prestataires_integration_maintenance_V1_0.1.pdf": {
+    "structure_table": true
+  },
+  "Système de contrôle d_accès physique v1-1-fr.pdf": {
+    "structure_table": true
+  },
+  "Vidéo IP Caméra v1-0-fr.pdf": {
+    "structure_table": true
+  },
+  "Vidéo IP VMS v1-0-fr.pdf": {
+    "structure_table": true
+  },
+  "anssi-avis-migration-vers-la-cryptographie-post-quantique.pdf": {
+    "structure_table": true
+  },
+  "anssi-avis_scientifiques_et_techniques-modele_zero_trust.pdf": {
+    "structure_table": true
+  },
+  "anssi-fondamentaux-sauvegarde_systemes_dinformation_v1-0.pdf": {
+    "structure_table": true
+  },
+  "anssi-fondamentaux-securisation-acme-v1-1.pdf": {
+    "structure_table": true
+  },
+  "anssi-fondamentaux-securisation_infrastructure_vmware_v1-0.pdf": {
+    "structure_table": true
+  },
+  "anssi-fondamentaux-zero-trust-v1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-admin_securisee_si_ad_v1-0 (3).pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-admin_securisee_si_v3-0.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-archi_interco_mn-v1-0.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-archi_services_dns-v1-0.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-attaques_par_rancongiciels_tous_concernes-v1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-authentification_multifacteur_et_mots_de_passe.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-communication_crise_cyber.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-doctrine_de_detection_pour_les_systemes_industriels.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-exigences_securite_materielle.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-gestion_crise_cyber.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-guide-securite-technologies-sans-contact-pour-controle-acces-physiques-v1.0-obsolete.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-mecanismes_crypto-2.04.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-openstack_v1-0.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-organiser-un-exercice-de-gestion-de-crise-cyber-fiche_6-chronogramme.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-organiser-un-exercice-de-gestion-de-crise-cyber-v1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-passerelle_internet_securisee-v3.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-recommandations-securite-pour-mise-en-oeuvre-dispositifs-videoprotection-obsolete.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-recommandations_architectures_systemes_information_sensibles_ou_diffusion_restreinte-v1.2.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-recommandations_configuration_commutateurs_pare-feux_hirschmann.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-recommandations_configuration_commutateurs_pare-feux_siemens_scalance.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-recommandations_configuration_securisee_pare_feu_stormshield_network_security_version_3.7.17.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-recommandations_de_securite_relatives_a_tls-v1.2.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-recommandations_mise_en_oeuvre_site_web_maitriser_standards_securite_cote_navigateur-v2.0.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-recommandations_pour_la_securisation_de_la_mise_en_oeuvre_du_protocole_openid_connect-v1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-recommandations_securisation_systemes_controle_acces_physique_et_videoprotection-v2.0.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-recommandations_securite_architecture_systeme_journalisation.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-recommandations_securite_journalisation_systemes_microsoft_windows_environnement_active_directory.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-reconditionnement_ordinateurs_bureau_portables_v1-0.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-regles_de_programmation_pour_le_developpement_dapplications_securisees_en_rust-v1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-regles_de_programmation_pour_le_developpement_securise_de_logiciels_en_langage_c-v1.2.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-securite_des_systemes_objets_connectes_iot-v1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-securite_numerique_collectivites_territoriales-reglementation1.pdf": {
+    "structure_table": true
+  },
+  "anssi-guide-systemes_industriels-methode_de_classification_v2-0.pdf.pdf": {
+    "structure_table": true
+  },
+  "anssi-profil_de_fonctionnalites_et_de_securite-sas_et_station_blanche_reseaux_non_classifies-v1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi-zed-note_technique-v1.1.pdf": {
+    "structure_table": true
+  },
+  "anssi_amf-guide-cybersecurite_communes-et-intercommunalites.pdf": {
+    "structure_table": true
+  },
+  "anssi_amrae-guide-maitrise_risque_numerique-atout_confiance.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_architecture_securisee_v1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_bdd_relationnelles_1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_denis-de-service-distribues_v2.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_devsecops_v1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_données_traitements_sensibles_1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_fuites_données_1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_hygiene_telephones_mobiles_1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_igc_1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_mise-en-oeuvre-securisee-cms_v1.1 (1).pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_sauvegarde-si_v1.1.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_selection_logiciel_libre_1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_serveur_Windows_autonome_v1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_serveur_Windows_controleur_domaine_v1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_serveur_Windows_membre_AD_DS_v1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_virtualisation_v1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_essentiels_zero_trust_1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_passeport_2019_1.0.pdf": {
+    "structure_table": true
+  },
+  "anssi_supervision_les_cles_de_decision_1.0 (1).pdf": {
+    "structure_table": true
+  },
+  "anssi_supervision_piloter_un_projet_de_supervision_1.0.pdf": {
+    "structure_table": true
+  },
+  "approche_ssi_pour_l_internet_des_objets_industriels_2025.pdf": {
+    "structure_table": true
+  },
+  "bgp-configuration-best-practices.pdf": {
+    "structure_table": true
+  },
+  "bonnes_pratiques_securite_informatique_maritime_anssi.pdf": {
+    "structure_table": true
+  },
+  "docker_fiche_technique.pdf": {
+    "structure_table": true
+  },
+  "fiches-methodes-ebios_projet.pdf": {
+    "structure_table": true
+  },
+  "fr_np_linux_configuration-v2.0.pdf": {
+    "structure_table": true
+  },
+  "guide-charte-utilisation-moyens-informatiques-outils-numeriques_anssi.pdf": {
+    "structure_table": true
+  },
+  "guide-homologation-securite-web-04-2025.pdf": {
+    "structure_table": true
+  },
+  "guide-securite-numerique-agile-anssi-pa-v1.pdf": {
+    "structure_table": true
+  },
+  "guide_802.1x_anssi_pa_043_v1.pdf": {
+    "structure_table": true
+  },
+  "guide_achat_produits-securite-services-confiance-qualifies_anssi.pdf": {
+    "structure_table": true
+  },
+  "guide_cloisonnement_systeme_anssi_pg_040_v1.pdf": {
+    "structure_table": true
+  },
+  "guide_configuration_BGP.pdf": {
+    "structure_table": true
+  },
+  "guide_cpme_bonnes_pratiques.pdf": {
+    "structure_table": true
+  },
+  "guide_dns_fr_anssi_1.3.pdf": {
+    "structure_table": true
+  },
+  "guide_hygiene_informatique_anssi.pdf": {
+    "structure_table": true
+  },
+  "guide_nomadisme_anssi_pa_054_v2.pdf": {
+    "structure_table": true
+  },
+  "guide_preconisations-pare-feux-zone-exposee-internet_anssi_pa_044_v1.pdf": {
+    "structure_table": true
+  },
+  "guide_protection_des_systemes_essentiels.pdf": {
+    "structure_table": true
+  },
+  "guide_protection_scientifique_technique_nation_anssi-pa-049_v1.pdf": {
+    "structure_table": true
+  },
+  "guides.json": {
+    "structure_table": true
+  },
+  "guides_2.json": {
+    "structure_table": true
+  },
+  "maturitessi-methode-2007-11-02.pdf": {
+    "structure_table": true
+  },
+  "mementodep-v1-1.pdf": {
+    "structure_table": true
+  },
+  "messagerie_phishing_fiche_anssi.pdf": {
+    "structure_table": true
+  },
+  "np_applocker_notetech-v2.pdf": {
+    "structure_table": true
+  },
+  "np_cryhod_notetech.pdf": {
+    "structure_table": true
+  },
+  "np_nettoyage-politique-pare-feu.pdf": {
+    "structure_table": true
+  },
+  "np_securisation_windows10_collecte_de_donnees_v1.2.pdf": {
+    "structure_table": true
+  },
+  "np_securisation_windows10_securite_reposant_sur_la_virtualisation_v1.pdf": {
+    "structure_table": true
+  },
+  "np_securiser_jre_notetech.pdf": {
+    "structure_table": true
+  },
+  "np_teleassistance_notetech_v1.1.pdf": {
+    "structure_table": true
+  },
+  "np_vmwareesx_notetech_v1.pdf": {
+    "structure_table": true
+  },
+  "nt_commutateurs.pdf": {
+    "structure_table": true
+  },
+  "pssi-plaquette-2004-03-03.pdf": {
+    "structure_table": true
+  },
+  "recommandations-sur-la-sécurisation-des-systèmes-de-contrôle-d_acces-physique-et-vidéoprotection-v2.2.pdf": {
+    "structure_table": true
+  },
+  "systeme-indus_cas-pratique_tunnel_partie1_anssi.pdf": {
+    "structure_table": true
+  },
+  "tdbssi-section1-methodologie-2004-02-05.pdf": {
+    "structure_table": true
+  }
+}

@@ -1,3 +1,4 @@
+import multiprocessing as mp
 import argparse
 import glob
 from pathlib import Path
@@ -72,7 +73,9 @@ def fabrique_client_albert() -> ClientAlbert:
                 IndexeurBaseVectorielleAlbert(config.url, 3, 1),
             )
         case "INDEXEUR_DOCLING":
-            return ClientAlbert(config.url, config.cle_api, IndexeurDocling(config.url))
+            return ClientAlbert(
+                config.url, config.cle_api, IndexeurDocling(config.url, config.cle_api)
+            )
     raise Exception(
         f"Erreur, un indexeur {', '.join([indexeur.name for indexeur in IndexeurDocument])} doit être fourni. L’indexeur configuré est : {config.indexeur}"
     )
@@ -105,10 +108,13 @@ def main():
     client.cree_collection(args.nom, args.description)
     print(f"Collection créée avec ID: {client.id_collection}")
     documents = collecte_documents_pdf()
-    print(f"Collecté {len(documents)} documents PDF")
+    print(
+        f"Collecté {len(documents)} documents PDF sur la collection {client.id_collection}"
+    )
     reponses = client.ajoute_documents(documents)
     print(f"Ajouté {len(reponses)} documents à la collection")
 
 
 if __name__ == "__main__":
+    mp.set_start_method("spawn", force=True)
     main()

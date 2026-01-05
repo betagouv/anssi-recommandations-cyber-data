@@ -1,12 +1,16 @@
 import json
-from typing import Any, Iterator, Optional
+from typing import Any, Iterator, Optional, NamedTuple
+from unittest.mock import Mock
 
 from docling_core.transforms.chunker import BaseChunker, BaseChunk, DocMeta
 from docling_core.types import DoclingDocument as DLDocument
 from docling_core.types.doc import DocItem, DocItemLabel, ProvenanceItem
 from docling_core.types.doc.base import BoundingBox
 from pydantic import Field
+from requests.models import Response
 
+from guides.executeur_requete import ExecuteurDeRequete
+from guides.multi_processeur import Multiprocesseur
 from guides.indexeur import DocumentPDF
 from guides.indexeur_docling import IndexeurDocling, ChunkerDocling
 
@@ -75,12 +79,44 @@ class ChunkerDeTest(ChunkerDocling):
         return self
 
 
-def test_peut_indexer_un_document_pdf(
-    mock_post_session_creation_document, une_reponse_document, fichier_pdf
-):
+class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
+    def __init__(self, reponse_attendue: list[NamedTuple]):
+        super().__init__()
+        self.reponse_attendue = reponse_attendue
+        self.payload_recu: None | dict = None
+        self.index_courant = 0
+
+    def initialise(self, clef_api: str):
+        pass
+
+    def poste(self, url: str, payload: dict, fichiers: Optional[dict]) -> Response:
+        reponse = Mock()
+        reponse.status_code = 201
+        reponse.json.return_value = self.reponse_attendue[self.index_courant]._asdict()
+        self.payload_recu = payload
+        self.index_courant += 1
+        return reponse
+
+
+class MultiProcesseurDeTest(Multiprocesseur):
+    def execute(self, func, iterable) -> list:
+        resultats = []
+        for chunk in iterable:
+            resultats.append(func(chunk))
+        return resultats
+
+
+def test_peut_indexer_un_document_pdf(une_reponse_document, fichier_pdf):
     chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
-    indexeur = IndexeurDocling("http://albert.local", ChunkerDeTest())
-    mock_post_session_creation_document(indexeur.session, une_reponse_document)
+    executeur_de_requete = ExecuteurDeRequeteDeTest([une_reponse_document])
+    multi_processeur = MultiProcesseurDeTest()
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        ChunkerDeTest(),
+        executeur_de_requete,
+        multi_processeur,
+    )
 
     document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
     reponses = indexeur.ajoute_documents([document], "12345")
@@ -91,40 +127,88 @@ def test_peut_indexer_un_document_pdf(
     assert reponses[0].collection_id == "12345"
 
 
-def test_le_payload_est_passe_en_argument(
-    mock_post_session_creation_document, une_reponse_document, fichier_pdf
+def test_peut_indexer_plusieurs_documents_pdf(
+    une_reponse_document_parametree, fichier_pdf
 ):
+    document_1 = str(fichier_pdf("document_1.pdf").resolve())
+    document_2 = str(fichier_pdf("document_1.pdf").resolve())
+    executeur_de_requete = ExecuteurDeRequeteDeTest(
+        [
+            une_reponse_document_parametree("1", "document_1.pdf"),
+            une_reponse_document_parametree("2", "document_2.pdf"),
+        ]
+    )
+    multi_processeur = MultiProcesseurDeTest()
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        ChunkerDeTest(),
+        executeur_de_requete,
+        multi_processeur,
+    )
+
+    reponses = indexeur.ajoute_documents(
+        [
+            (DocumentPDF(document_1, "https://example.com/document_1.pdf")),
+            DocumentPDF(document_2, "https://example.com/document_2.pdf"),
+        ],
+        "12345",
+    )
+
+    assert len(reponses) == 2
+    assert reponses[0].id == "1"
+    assert reponses[0].name == "document_1.pdf"
+    assert reponses[0].collection_id == "12345"
+    assert reponses[1].id == "2"
+    assert reponses[1].name == "document_2.pdf"
+    assert reponses[1].collection_id == "12345"
+
+
+def test_le_payload_est_passe_en_argument(une_reponse_document, fichier_pdf):
     chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
+    executeur_de_requete = ExecuteurDeRequeteDeTest([une_reponse_document])
+    multi_processeur = MultiProcesseurDeTest()
     chunker = ChunkerDeTest().avec_base_chunker(
         BaseChunkerDeTest().avec_base_chunk(
             ConstructeurDeBaseChunk().avec_numero_page(10).construis()
         )
     )
-    indexeur = IndexeurDocling("http://albert.local", chunker)
-    mock_post_session_creation_document(indexeur.session, une_reponse_document)
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        chunker,
+        executeur_de_requete,
+        multi_processeur,
+    )
 
     document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
     indexeur.ajoute_documents([document], "12345")
 
-    [args, kwargs] = indexeur.session.post._mock_call_args
-    assert kwargs["data"] is not None
-    assert kwargs["data"]["collection"] == "12345"
-    assert kwargs["data"]["chunker"] == "NoSplitter"
-    metadata = json.loads(kwargs["data"]["metadata"])
+    assert executeur_de_requete.payload_recu is not None
+    assert executeur_de_requete.payload_recu["collection"] == "12345"
+    assert executeur_de_requete.payload_recu["chunker"] == "NoSplitter"
+    metadata = json.loads(executeur_de_requete.payload_recu["metadata"])
     assert metadata["page"] == 10
 
 
 def test_ne_cree_pas_de_document_si_le_paragraphe_est_trop_court(
-    mock_post_session_creation_document, une_reponse_document, fichier_pdf
+    une_reponse_document, fichier_pdf
 ):
+    executeur_de_requete = ExecuteurDeRequeteDeTest([une_reponse_document])
+    multi_processeur = MultiProcesseurDeTest()
     chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
     chunker = ChunkerDeTest().avec_base_chunker(
         BaseChunkerDeTest().avec_base_chunk(
             ConstructeurDeBaseChunk().avec_paragraphe("1").construis()
         )
     )
-    indexeur = IndexeurDocling("http://albert.local", chunker)
-    mock_post_session_creation_document(indexeur.session, une_reponse_document)
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        chunker,
+        executeur_de_requete,
+        multi_processeur,
+    )
 
     document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
     reponses = indexeur.ajoute_documents([document], "12345")
