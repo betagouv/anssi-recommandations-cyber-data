@@ -43,3 +43,19 @@ def une_reponse_document() -> ReponseDocument:
         created_at="2024-01-01T00:00:00Z",
         updated_at="2024-01-01T00:00:00Z",
     )
+
+
+@pytest.fixture
+def une_reponse_document_parametree() -> Callable[[str, str], ReponseDocument]:
+    def _une_reponse_document_parametree(
+        id_document: str, nom_document: str
+    ) -> ReponseDocument:
+        return ReponseDocument(
+            id=id_document,
+            name=nom_document,
+            collection_id="12345",
+            created_at="2024-01-01T00:00:00Z",
+            updated_at="2024-01-01T00:00:00Z",
+        )
+
+    return _une_reponse_document_parametree
