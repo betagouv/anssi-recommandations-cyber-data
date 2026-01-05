@@ -156,65 +156,72 @@ class IndexeurDocling(Indexeur):
     def __ajoute_document(
         self, document: DocumentPDF, id_collection: str | None
     ) -> list[ReponseDocument]:
+        nom_du_document = Path(document.chemin_pdf).name
         reponses: list[ReponseDocument] = []
-        chunks = list(self.chunker.applique(document))
+        try:
+            chunks = list(self.chunker.applique(document))
 
-        def bufferise() -> bytes:
-            from reportlab.pdfgen import canvas
-            import io
+            def bufferise() -> bytes:
+                from reportlab.pdfgen import canvas
+                import io
 
-            le_buffer = io.BytesIO()
-            pdf = canvas.Canvas(le_buffer)
-            pdf.drawString(50, 750, contenu_paragraphe_txt)
-            pdf.showPage()
-            pdf.save()
+                le_buffer = io.BytesIO()
+                pdf = canvas.Canvas(le_buffer)
+                pdf.drawString(50, 750, contenu_paragraphe_txt)
+                pdf.showPage()
+                pdf.save()
 
-            le_buffer.seek(0)
-            return le_buffer.getvalue()
+                le_buffer.seek(0)
+                return le_buffer.getvalue()
 
-        self.executeur_de_requete.initialise(self.clef_api)
+            self.executeur_de_requete.initialise(self.clef_api)
 
-        for index, chunk in enumerate(chunks, start=1):
-            contenu_paragraphe_txt = chunk.text
-            if len(contenu_paragraphe_txt) > 1:
-                buffer_pdf = bufferise()
-                numero_page = cast(DocMeta, chunk.meta).doc_items[0].prov[0].page_no
-                nom_du_document = Path(document.chemin_pdf).name
-                fichiers = {
-                    "file": (
-                        nom_du_document,
-                        (buffer_pdf),
-                        "application/pdf",
+            for index, chunk in enumerate(chunks, start=1):
+                contenu_paragraphe_txt = chunk.text
+                if len(contenu_paragraphe_txt) > 1:
+                    buffer_pdf = bufferise()
+                    numero_page = cast(DocMeta, chunk.meta).doc_items[0].prov[0].page_no
+                    fichiers = {
+                        "file": (
+                            nom_du_document,
+                            (buffer_pdf),
+                            "application/pdf",
+                        )
+                    }
+                    payload = {
+                        "collection": str(id_collection),
+                        "metadata": json.dumps(
+                            {"source_url": document.url_pdf, "page": numero_page}
+                        ),
+                        "chunker": "NoSplitter",
+                    }
+                    response = self.executeur_de_requete.poste(
+                        f"{self.url}/documents", payload, fichiers
                     )
-                }
-                payload = {
-                    "collection": str(id_collection),
-                    "metadata": json.dumps(
-                        {"source_url": document.url_pdf, "page": numero_page}
-                    ),
-                    "chunker": "NoSplitter",
-                }
-                response = self.executeur_de_requete.poste(
-                    f"{self.url}/documents", payload, fichiers
+                    result = response.json()
+                    if response.status_code != 201:
+                        reponses.append(
+                            ReponseDocumentEnErreur(
+                                detail=result.get("detail", "Une erreur est survenue"),
+                                document_en_erreur=nom_du_document,
+                            )
+                        )
+                    else:
+                        reponses.append(
+                            ReponseDocumentEnSucces(
+                                id=result["id"],
+                                name=result.get("name", nom_du_document),
+                                collection_id=result.get(
+                                    "collection_id", str(id_collection)
+                                ),
+                                created_at=result.get("created_at", ""),
+                                updated_at=result.get("updated_at", ""),
+                            )
+                        )
+        except Exception as e:
+            reponses.append(
+                ReponseDocumentEnErreur(
+                    detail=str(e), document_en_erreur=nom_du_document
                 )
-                result = response.json()
-                if response.status_code != 201:
-                    reponses.append(
-                        ReponseDocumentEnErreur(
-                            detail=result.get("detail", "Une erreur est survenue"),
-                            document_en_erreur=nom_du_document,
-                        )
-                    )
-                else:
-                    reponses.append(
-                        ReponseDocumentEnSucces(
-                            id=result["id"],
-                            name=result.get("name", nom_du_document),
-                            collection_id=result.get(
-                                "collection_id", str(id_collection)
-                            ),
-                            created_at=result.get("created_at", ""),
-                            updated_at=result.get("updated_at", ""),
-                        )
-                    )
+            )
         return reponses
