@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from guides.indexeur import ReponseDocument, DocumentPDF
+from guides.indexeur import DocumentPDF, ReponseDocumentEnSucces
 from guides.indexeur_albert import IndexeurBaseVectorielleAlbert
 
 
@@ -8,7 +8,7 @@ def test_indexeur_base_vectorielle_albert_ajoute_documents(fichier_pdf):
     chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
     indexeur = IndexeurBaseVectorielleAlbert("https://test.api")
     mock_response = Mock()
-    reponse_attendue = ReponseDocument(
+    reponse_attendue = ReponseDocumentEnSucces(
         id="doc123",
         name="test.pdf",
         collection_id="12345",
@@ -33,7 +33,7 @@ def test_client_albert_ajoute_documents_avec_retry(fichier_pdf):
     mock_response_echec = Mock()
     mock_response_echec.json.side_effect = Exception("Erreur réseau")
     mock_response_succes = Mock()
-    reponse_attendue = ReponseDocument(
+    reponse_attendue = ReponseDocumentEnSucces(
         id="doc123",
         name="test.pdf",
         collection_id="12345",
@@ -62,7 +62,7 @@ def test_client_albert_ajoute_documents_avec_2_tentatives_en_echec_pour_un_nombr
     mock_response_echec = Mock()
     mock_response_echec.json.side_effect = Exception("Erreur réseau")
     mock_response_succes = Mock()
-    reponse_attendue = ReponseDocument(
+    reponse_attendue = ReponseDocumentEnSucces(
         id="doc123",
         name="test.pdf",
         collection_id="12345",

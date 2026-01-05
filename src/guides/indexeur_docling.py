@@ -12,7 +12,12 @@ from docling.document_converter import DocumentConverter, PdfFormatOption, Forma
 from docling_core.transforms.chunker import DocMeta
 
 from guides.executeur_requete import ExecuteurDeRequete
-from guides.indexeur import Indexeur, DocumentPDF, ReponseDocument
+from guides.indexeur import (
+    Indexeur,
+    DocumentPDF,
+    ReponseDocument,
+    ReponseDocumentEnSucces,
+)
 from guides.multi_processeur import Multiprocesseur
 
 for name in (
@@ -150,7 +155,7 @@ class IndexeurDocling(Indexeur):
     def __ajoute_document(
         self, document: DocumentPDF, id_collection: str | None
     ) -> list[ReponseDocument]:
-        reponses = []
+        reponses: list[ReponseDocument] = []
         chunks = list(self.chunker.applique(document))
 
         def bufferise() -> bytes:
@@ -196,7 +201,7 @@ class IndexeurDocling(Indexeur):
                         f"[Erreur sur {Path(document.chemin_pdf).name}] Réponse reçue {result} - {len(buffer_pdf)}."
                     )
                 reponses.append(
-                    ReponseDocument(
+                    ReponseDocumentEnSucces(
                         id=result["id"],
                         name=result.get("name", Path(document.chemin_pdf).name),
                         collection_id=result.get("collection_id", str(id_collection)),
