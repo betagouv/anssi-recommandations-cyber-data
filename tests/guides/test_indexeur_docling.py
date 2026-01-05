@@ -1,5 +1,5 @@
 import json
-from typing import Any, Iterator, Optional, NamedTuple
+from typing import Any, Iterator, Optional, Union
 from unittest.mock import Mock
 
 from docling_core.transforms.chunker import BaseChunker, BaseChunk, DocMeta
@@ -12,6 +12,9 @@ from requests.models import Response
 from guides.executeur_requete import ExecuteurDeRequete
 from guides.indexeur import (
     DocumentPDF,
+    ReponseDocumentEnSucces,
+    ReponseDocumentEnErreur,
+    ReponseDocument,
 )
 from guides.indexeur_docling import IndexeurDocling, ChunkerDocling
 from guides.multi_processeur import Multiprocesseur
@@ -81,8 +84,35 @@ class ChunkerDeTest(ChunkerDocling):
         return self
 
 
+class ReponseAttendueAbstraite:
+    def __init__(self, reponse: ReponseDocument):
+        super().__init__()
+        self.reponse = reponse
+
+
+class ReponseAttendueOK(ReponseAttendueAbstraite):
+    def __init__(self, reponse: ReponseDocumentEnSucces):
+        super().__init__(reponse)
+
+    @property
+    def status_code(self) -> int:
+        return 201
+
+
+class ReponseAttendueKO(ReponseAttendueAbstraite):
+    def __init__(self, reponse: ReponseDocumentEnErreur):
+        super().__init__(reponse)
+
+    @property
+    def status_code(self) -> int:
+        return 400
+
+
+ReponseAttendue = Union[ReponseAttendueOK, ReponseAttendueKO]
+
+
 class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
-    def __init__(self, reponse_attendue: list[NamedTuple]):
+    def __init__(self, reponse_attendue: list[ReponseAttendue]):
         super().__init__()
         self.reponse_attendue = reponse_attendue
         self.payload_recu: None | dict = None
@@ -93,8 +123,10 @@ class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
 
     def poste(self, url: str, payload: dict, fichiers: Optional[dict]) -> Response:
         reponse = Mock()
-        reponse.status_code = 201
-        reponse.json.return_value = self.reponse_attendue[self.index_courant]._asdict()
+        reponse.status_code = self.reponse_attendue[self.index_courant].status_code
+        reponse.json.return_value = self.reponse_attendue[
+            self.index_courant
+        ].reponse._asdict()
         self.payload_recu = payload
         self.index_courant += 1
         return reponse
@@ -110,7 +142,9 @@ class MultiProcesseurDeTest(Multiprocesseur):
 
 def test_peut_indexer_un_document_pdf(une_reponse_document, fichier_pdf):
     chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
-    executeur_de_requete = ExecuteurDeRequeteDeTest([une_reponse_document])
+    executeur_de_requete = ExecuteurDeRequeteDeTest(
+        [ReponseAttendueOK(une_reponse_document)]
+    )
     multi_processeur = MultiProcesseurDeTest()
     indexeur = IndexeurDocling(
         "http://albert.local",
@@ -136,8 +170,8 @@ def test_peut_indexer_plusieurs_documents_pdf(
     document_2 = str(fichier_pdf("document_1.pdf").resolve())
     executeur_de_requete = ExecuteurDeRequeteDeTest(
         [
-            une_reponse_document_parametree("1", "document_1.pdf"),
-            une_reponse_document_parametree("2", "document_2.pdf"),
+            ReponseAttendueOK(une_reponse_document_parametree("1", "document_1.pdf")),
+            ReponseAttendueOK(une_reponse_document_parametree("2", "document_2.pdf")),
         ]
     )
     multi_processeur = MultiProcesseurDeTest()
@@ -168,7 +202,9 @@ def test_peut_indexer_plusieurs_documents_pdf(
 
 def test_le_payload_est_passe_en_argument(une_reponse_document, fichier_pdf):
     chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
-    executeur_de_requete = ExecuteurDeRequeteDeTest([une_reponse_document])
+    executeur_de_requete = ExecuteurDeRequeteDeTest(
+        [ReponseAttendueOK(une_reponse_document)]
+    )
     multi_processeur = MultiProcesseurDeTest()
     chunker = ChunkerDeTest().avec_base_chunker(
         BaseChunkerDeTest().avec_base_chunk(
@@ -196,7 +232,9 @@ def test_le_payload_est_passe_en_argument(une_reponse_document, fichier_pdf):
 def test_ne_cree_pas_de_document_si_le_paragraphe_est_trop_court(
     une_reponse_document, fichier_pdf
 ):
-    executeur_de_requete = ExecuteurDeRequeteDeTest([une_reponse_document])
+    executeur_de_requete = ExecuteurDeRequeteDeTest(
+        [ReponseAttendueOK(une_reponse_document)]
+    )
     multi_processeur = MultiProcesseurDeTest()
     chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
     chunker = ChunkerDeTest().avec_base_chunker(
@@ -216,3 +254,37 @@ def test_ne_cree_pas_de_document_si_le_paragraphe_est_trop_court(
     reponses = indexeur.ajoute_documents([document], "12345")
 
     assert len(reponses) == 0
+
+
+def test_continue_l_indexation_si_un_document_n_est_pas_indexe(
+    une_reponse_document_parametree, fichier_pdf
+):
+    document_1 = str(fichier_pdf("document_1.pdf").resolve())
+    document_2 = str(fichier_pdf("document_2.pdf").resolve())
+    executeur_de_requete = ExecuteurDeRequeteDeTest(
+        [
+            ReponseAttendueOK(une_reponse_document_parametree("1", "document_1.pdf")),
+            ReponseAttendueKO(ReponseDocumentEnErreur("Une erreur", "document_2.pdf")),
+        ]
+    )
+    multi_processeur = MultiProcesseurDeTest()
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        ChunkerDeTest(),
+        executeur_de_requete,
+        multi_processeur,
+    )
+
+    reponses = indexeur.ajoute_documents(
+        [
+            (DocumentPDF(document_1, "https://example.com/document_1.pdf")),
+            DocumentPDF(document_2, "https://example.com/document_2.pdf"),
+        ],
+        "12345",
+    )
+
+    assert len(reponses) == 2
+    assert reponses[0].id == "1"
+    assert reponses[1].detail == "Une erreur"
+    assert reponses[1].document_en_erreur == "document_2.pdf"

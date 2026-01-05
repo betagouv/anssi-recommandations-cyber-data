@@ -27,6 +27,7 @@ class ReponseDocumentEnSucces(NamedTuple):
 
 class ReponseDocumentEnErreur(NamedTuple):
     detail: str
+    document_en_erreur: str
 
 
 type ReponseDocument = Union[ReponseDocumentEnSucces, ReponseDocumentEnErreur]
