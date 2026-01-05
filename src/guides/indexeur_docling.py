@@ -17,6 +17,7 @@ from guides.indexeur import (
     DocumentPDF,
     ReponseDocument,
     ReponseDocumentEnSucces,
+    ReponseDocumentEnErreur,
 )
 from guides.multi_processeur import Multiprocesseur
 
@@ -178,9 +179,10 @@ class IndexeurDocling(Indexeur):
             if len(contenu_paragraphe_txt) > 1:
                 buffer_pdf = bufferise()
                 numero_page = cast(DocMeta, chunk.meta).doc_items[0].prov[0].page_no
+                nom_du_document = Path(document.chemin_pdf).name
                 fichiers = {
                     "file": (
-                        Path(document.chemin_pdf).name,
+                        nom_du_document,
                         (buffer_pdf),
                         "application/pdf",
                     )
@@ -197,16 +199,22 @@ class IndexeurDocling(Indexeur):
                 )
                 result = response.json()
                 if response.status_code != 201:
-                    print(
-                        f"[Erreur sur {Path(document.chemin_pdf).name}] Réponse reçue {result} - {len(buffer_pdf)}."
+                    reponses.append(
+                        ReponseDocumentEnErreur(
+                            detail=result.get("detail", "Une erreur est survenue"),
+                            document_en_erreur=nom_du_document,
+                        )
                     )
-                reponses.append(
-                    ReponseDocumentEnSucces(
-                        id=result["id"],
-                        name=result.get("name", Path(document.chemin_pdf).name),
-                        collection_id=result.get("collection_id", str(id_collection)),
-                        created_at=result.get("created_at", ""),
-                        updated_at=result.get("updated_at", ""),
+                else:
+                    reponses.append(
+                        ReponseDocumentEnSucces(
+                            id=result["id"],
+                            name=result.get("name", nom_du_document),
+                            collection_id=result.get(
+                                "collection_id", str(id_collection)
+                            ),
+                            created_at=result.get("created_at", ""),
+                            updated_at=result.get("updated_at", ""),
+                        )
                     )
-                )
         return reponses
