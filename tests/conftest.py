@@ -13,6 +13,7 @@ from configuration import (
     MQC,
     Albert,
     BaseDeDonnees,
+    IndexeurDocument,
 )
 from configuration import ParametresEvaluation
 from evaluation.lanceur_deepeval import EvaluateurDeepeval
@@ -81,6 +82,7 @@ def configuration() -> Configuration:
     albert = Albert(
         url="https://albert.api.etalab.gouv.fr/v1",
         cle_api="fausse_cle",
+        indexeur=IndexeurDocument.INDEXEUR_ALBERT,
         modele="albert-de-test",
     )
     base_de_donnees = BaseDeDonnees(
