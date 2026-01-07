@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing_extensions import NamedTuple
 import requests
 from openai import OpenAI
-from configuration import recupere_configuration
+from configuration import recupere_configuration, MSC
 
 
 @dataclass
@@ -135,12 +135,13 @@ def fabrique_client_albert() -> ClientAlbert:
 
 def collecte_documents_pdf(
     dossier: str = "donnees/guides_de_lANSSI",
+    configuration_msc: MSC = recupere_configuration().msc,
 ) -> list[DocumentPDF]:
     chemins = glob.glob(f"{dossier}/*.pdf")
     documents = []
     for chemin in chemins:
         nom_fichier = Path(chemin).name
-        url = f"https://demo.messervices.cyber.gouv.fr/documents-guides/{nom_fichier}"
+        url = f"{configuration_msc.url}/{configuration_msc.chemin_guides}/{nom_fichier}"
         documents.append(DocumentPDF(chemin, url))
     return documents
 
