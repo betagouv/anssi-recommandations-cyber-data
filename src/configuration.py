@@ -29,11 +29,17 @@ class ParametresEvaluation(NamedTuple):
     nb_processus_en_parallele_pour_deepeval: int
 
 
+class MSC(NamedTuple):
+    url: str
+    chemin_guides: str
+
+
 class Configuration(NamedTuple):
     mqc: MQC
     albert: Albert
     base_de_donnees_journal: BaseDeDonnees | None
     parametres_deepeval: ParametresEvaluation
+    msc: MSC
 
 
 def recupere_configuration_postgres() -> BaseDeDonnees | None:
@@ -73,9 +79,15 @@ def recupere_configuration() -> Configuration:
         ),
     )
 
+    configuration_msc = MSC(
+        url=os.getenv("MSC_URL_BASE", "https://demo.messervices.cyber.gouv.fr"),
+        chemin_guides=os.getenv("MSC_CHEMIN_GUIDES", "documents-guides"),
+    )
+
     return Configuration(
         mqc=configuration_mqc,
         albert=albert,
         base_de_donnees_journal=base_de_donnees_journal,
         parametres_deepeval=parametres_deepeval,
+        msc=configuration_msc,
     )

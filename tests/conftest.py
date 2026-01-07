@@ -8,12 +8,7 @@ from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
 from deepeval.tracing.api import MetricData
 
-from configuration import (
-    Configuration,
-    MQC,
-    Albert,
-    BaseDeDonnees,
-)
+from configuration import Configuration, MQC, Albert, BaseDeDonnees, MSC
 from configuration import ParametresEvaluation
 from evaluation.lanceur_deepeval import EvaluateurDeepeval
 from infra.memoire.ecrivain import EcrivainSortieDeTest
@@ -98,6 +93,7 @@ def configuration() -> Configuration:
         albert=albert,
         base_de_donnees_journal=base_de_donnees,
         parametres_deepeval=parametres_deepeval,
+        msc=MSC(url="http://msc.local", chemin_guides="/guides"),
     )
 
 
