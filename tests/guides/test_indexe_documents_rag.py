@@ -38,7 +38,7 @@ def test_collecte_documents_pdf_retourne_liste_documents(dossier_guide_anssi):
     assert documents[0].chemin_pdf == str((Path(chemin_fichier) / "test.pdf").resolve())
     assert (
         documents[0].url_pdf
-        == "https://demo.messervices.cyber.gouv.fr/documents-guides/test.pdf"
+        == "https://messervices.cyber.gouv.fr/documents-guides/test.pdf"
     )
 
 
