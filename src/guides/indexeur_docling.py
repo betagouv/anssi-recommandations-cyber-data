@@ -3,14 +3,10 @@ import logging
 from dataclasses import dataclass
 from itertools import islice
 from pathlib import Path
-from typing import cast, Generator
+from typing import Generator
 
-from docling.chunking import HierarchicalChunker, BaseChunk
-from docling.datamodel.base_models import InputFormat
-from docling.datamodel.pipeline_options import PdfPipelineOptions
-from docling.document_converter import DocumentConverter, PdfFormatOption, FormatOption
-from docling_core.transforms.chunker import DocMeta
-
+from guides.chunker_docling import ChunkerDocling
+from guides.chunker_docling_hierarchique import ChunkerDoclingHierarchique
 from guides.executeur_requete import ExecuteurDeRequete
 from guides.indexeur import (
     Indexeur,
@@ -30,60 +26,6 @@ for name in (
     logging.getLogger(name).setLevel(logging.CRITICAL)
 
 
-class OptionsGuide(dict):
-    structure_table: bool = True
-
-
-OptionsGuides = dict[str, OptionsGuide]
-
-
-class ChunkerDocling:
-    def __init__(self):
-        super().__init__()
-        with open("src/guides/options_guides.json") as fichier_options_guides:
-            self.options_guides: OptionsGuides = json.load(fichier_options_guides)  # type: ignore[annotation-unchecked]
-
-    def applique(self, document: DocumentPDF) -> list[BaseChunk]:
-        nom_document_converti = Path("donnees/conversion") / Path(
-            document.chemin_pdf
-        ).name.replace(".pdf", "_converti.pdf")
-        pipeline_options = PdfPipelineOptions()
-        pipeline_options.do_ocr = False
-        clef: OptionsGuide | None = self.options_guides.get(
-            Path(document.chemin_pdf).name
-        )
-        if clef is not None and not clef["structure_table"]:
-            print(f"Structure table - {clef['structure_table']}")
-            pipeline_options.do_table_structure = False
-        pipeline_options.generate_page_images = False
-
-        format_options: dict[InputFormat, FormatOption] = {
-            InputFormat.PDF: PdfFormatOption(
-                pipeline_options=pipeline_options,
-            )
-        }
-
-        converter = DocumentConverter(format_options=format_options)
-        result = converter.convert(nom_document_converti)
-
-        chunker = HierarchicalChunker()
-        chunks = []
-
-        def est_lisible(text: str) -> bool:
-            if not text:
-                return False
-
-            alpha = sum(c.isalpha() for c in text)
-            ratio = alpha / max(len(text), 1)
-
-            return ratio > 0.5 and " " in text
-
-        for chunk in chunker.chunk(result.document):
-            if est_lisible(chunk.text):
-                chunks.append(chunk)
-        return chunks
-
-
 @dataclass
 class DocumentsAAjouter:
     documents: list[DocumentPDF]
@@ -96,7 +38,7 @@ class IndexeurDocling(Indexeur):
         self,
         url: str,
         clef_api: str,
-        chunker: ChunkerDocling = ChunkerDocling(),
+        chunker: ChunkerDocling = ChunkerDoclingHierarchique(),
         executeur_de_requete: ExecuteurDeRequete = ExecuteurDeRequete(),
         multi_processeur: Multiprocesseur = Multiprocesseur(),
     ):
@@ -157,7 +99,16 @@ class IndexeurDocling(Indexeur):
         nom_du_document = Path(document.chemin_pdf).name
         reponses: list[ReponseDocument] = []
         try:
-            chunks = list(self.chunker.applique(document))
+            pages = self.chunker.applique(document)
+
+            # if isinstance(self.chunker, ChunkerDoclingMQC):
+            #     pages = self.chunker.fusionne_les_blocs_de_la_meme_page(chunks)
+            # elif isinstance(self.chunker, ChunkerDoclingHierarchique):
+            #     pages = self._convertit_chunks_en_pages(chunks)
+            # else:
+            #     raise NotImplementedError(
+            #         f"Chunker type {type(self.chunker)} not supported"
+            #     )
 
             def bufferise() -> bytes:
                 from reportlab.pdfgen import canvas
@@ -168,54 +119,57 @@ class IndexeurDocling(Indexeur):
                 pdf.drawString(50, 750, contenu_paragraphe_txt)
                 pdf.showPage()
                 pdf.save()
-
                 le_buffer.seek(0)
                 return le_buffer.getvalue()
 
             self.executeur_de_requete.initialise(self.clef_api)
 
-            for index, chunk in enumerate(chunks, start=1):
-                contenu_paragraphe_txt = chunk.text
-                if len(contenu_paragraphe_txt) > 1:
-                    buffer_pdf = bufferise()
-                    numero_page = cast(DocMeta, chunk.meta).doc_items[0].prov[0].page_no
-                    fichiers = {
-                        "file": (
-                            nom_du_document,
-                            (buffer_pdf),
-                            "application/pdf",
-                        )
-                    }
-                    payload = {
-                        "collection": str(id_collection),
-                        "metadata": json.dumps(
-                            {"source_url": document.url_pdf, "page": numero_page}
-                        ),
-                        "chunker": "NoSplitter",
-                    }
-                    response = self.executeur_de_requete.poste(
-                        f"{self.url}/documents", payload, fichiers
-                    )
-                    result = response.json()
-                    if response.status_code != 201:
-                        reponses.append(
-                            ReponseDocumentEnErreur(
-                                detail=result.get("detail", "Une erreur est survenue"),
-                                document_en_erreur=nom_du_document,
+            for page in pages.pages.values():
+                numero_page = page.numero_page
+
+                for bloc in page.blocs:
+                    contenu_paragraphe_txt = bloc.texte
+                    if len(contenu_paragraphe_txt) > 1:
+                        buffer_pdf = bufferise()
+                        fichiers = {
+                            "file": (
+                                nom_du_document,
+                                (buffer_pdf),
+                                "application/pdf",
                             )
+                        }
+                        payload = {
+                            "collection": str(id_collection),
+                            "metadata": json.dumps(
+                                {"source_url": document.url_pdf, "page": numero_page}
+                            ),
+                            "chunker": "NoSplitter",
+                        }
+                        response = self.executeur_de_requete.poste(
+                            f"{self.url}/documents", payload, fichiers
                         )
-                    else:
-                        reponses.append(
-                            ReponseDocumentEnSucces(
-                                id=result["id"],
-                                name=result.get("name", nom_du_document),
-                                collection_id=result.get(
-                                    "collection_id", str(id_collection)
-                                ),
-                                created_at=result.get("created_at", ""),
-                                updated_at=result.get("updated_at", ""),
+                        result = response.json()
+                        if response.status_code != 201:
+                            reponses.append(
+                                ReponseDocumentEnErreur(
+                                    detail=result.get(
+                                        "detail", "Une erreur est survenue"
+                                    ),
+                                    document_en_erreur=nom_du_document,
+                                )
                             )
-                        )
+                        else:
+                            reponses.append(
+                                ReponseDocumentEnSucces(
+                                    id=result["id"],
+                                    name=result.get("name", nom_du_document),
+                                    collection_id=result.get(
+                                        "collection_id", str(id_collection)
+                                    ),
+                                    created_at=result.get("created_at", ""),
+                                    updated_at=result.get("updated_at", ""),
+                                )
+                            )
         except Exception as e:
             reponses.append(
                 ReponseDocumentEnErreur(

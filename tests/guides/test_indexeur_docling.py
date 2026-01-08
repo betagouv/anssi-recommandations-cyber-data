@@ -1,7 +1,8 @@
 import json
-from typing import Any, Iterator, Optional, Union
+from typing import Any, Iterator, Optional, Union, Type
 from unittest.mock import Mock
 
+from docling.document_converter import DocumentConverter
 from docling_core.transforms.chunker import BaseChunker, BaseChunk, DocMeta
 from docling_core.types import DoclingDocument as DLDocument
 from docling_core.types.doc import DocItem, DocItemLabel, ProvenanceItem
@@ -9,14 +10,17 @@ from docling_core.types.doc.base import BoundingBox
 from pydantic import Field
 from requests.models import Response
 
+from guides.chunker_docling import extrait_position
+from guides.chunker_docling_hierarchique import ChunkerDoclingHierarchique
 from guides.executeur_requete import ExecuteurDeRequete
+from guides.guide import Guide
 from guides.indexeur import (
     DocumentPDF,
     ReponseDocumentEnSucces,
     ReponseDocumentEnErreur,
     ReponseDocument,
 )
-from guides.indexeur_docling import IndexeurDocling, ChunkerDocling
+from guides.indexeur_docling import IndexeurDocling
 from guides.multi_processeur import Multiprocesseur
 
 
@@ -71,13 +75,25 @@ class BaseChunkerDeTest(BaseChunker):
             yield self.base_chunk
 
 
-class ChunkerDeTest(ChunkerDocling):
+class ChunkerDeTest(ChunkerDoclingHierarchique):
     def __init__(self):
         super().__init__()
         self.chunker = BaseChunkerDeTest()
 
-    def applique(self, document: DocumentPDF) -> list[BaseChunk]:
-        return list(self.chunker.chunk(DLDocument(name=document.chemin_pdf)))
+    def applique(
+        self,
+        document: DocumentPDF,
+        converter: Type[DocumentConverter] = DocumentConverter,
+    ) -> Guide:
+        chunks = self.chunker.chunk(DLDocument(name=document.chemin_pdf))
+        guide = Guide()
+        for chunk in chunks:
+            guide.ajoute_bloc_a_la_page(
+                numero_page=chunk.meta.doc_items[0].prov[0].page_no,
+                position=extrait_position(chunk),
+                texte=chunk.text,
+            )
+        return guide
 
     def avec_base_chunker(self, chunker: BaseChunker):
         self.chunker = chunker
