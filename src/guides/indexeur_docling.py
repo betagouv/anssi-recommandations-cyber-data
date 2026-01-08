@@ -5,12 +5,9 @@ from itertools import islice
 from pathlib import Path
 from typing import cast, Generator
 
-from docling.chunking import HierarchicalChunker, BaseChunk
-from docling.datamodel.base_models import InputFormat
-from docling.datamodel.pipeline_options import PdfPipelineOptions
-from docling.document_converter import DocumentConverter, PdfFormatOption, FormatOption
 from docling_core.transforms.chunker import DocMeta
 
+from guides.chunker_docling_hierarchique import ChunkerDoclingHierarchique
 from guides.executeur_requete import ExecuteurDeRequete
 from guides.indexeur import (
     Indexeur,
@@ -30,62 +27,6 @@ for name in (
     logging.getLogger(name).setLevel(logging.CRITICAL)
 
 
-class OptionsGuide(dict):
-    structure_table: bool = True
-
-
-OptionsGuides = dict[str, OptionsGuide]
-
-
-class ChunkerDocling:
-    def __init__(self):
-        super().__init__()
-        with open(
-            "src/guides/options_guides.json"
-        ) as fichier_options_guides:
-            self.options_guides: OptionsGuides = json.load(fichier_options_guides)  # type: ignore[annotation-unchecked]
-
-    def applique(self, document: DocumentPDF) -> list[BaseChunk]:
-        nom_document_converti = Path("donnees/conversion") / Path(
-            document.chemin_pdf
-        ).name.replace(".pdf", "_converti.pdf")
-        pipeline_options = PdfPipelineOptions()
-        pipeline_options.do_ocr = False
-        clef: OptionsGuide | None = self.options_guides.get(
-            Path(document.chemin_pdf).name
-        )
-        if clef is not None and not clef["structure_table"]:
-            print(f"Structure table - {clef['structure_table']}")
-            pipeline_options.do_table_structure = False
-        pipeline_options.generate_page_images = False
-
-        format_options: dict[InputFormat, FormatOption] = {
-            InputFormat.PDF: PdfFormatOption(
-                pipeline_options=pipeline_options,
-            )
-        }
-
-        converter = DocumentConverter(format_options=format_options)
-        result = converter.convert(nom_document_converti)
-
-        chunker = HierarchicalChunker()
-        chunks = []
-
-        def est_lisible(text: str) -> bool:
-            if not text:
-                return False
-
-            alpha = sum(c.isalpha() for c in text)
-            ratio = alpha / max(len(text), 1)
-
-            return ratio > 0.5 and " " in text
-
-        for chunk in chunker.chunk(result.document):
-            if est_lisible(chunk.text):
-                chunks.append(chunk)
-        return chunks
-
-
 @dataclass
 class DocumentsAAjouter:
     documents: list[DocumentPDF]
@@ -98,7 +39,7 @@ class IndexeurDocling(Indexeur):
         self,
         url: str,
         clef_api: str,
-        chunker: ChunkerDocling = ChunkerDocling(),
+        chunker: ChunkerDoclingHierarchique = ChunkerDoclingHierarchique(),
         executeur_de_requete: ExecuteurDeRequete = ExecuteurDeRequete(),
         multi_processeur: Multiprocesseur = Multiprocesseur(),
     ):

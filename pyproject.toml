@@ -28,6 +28,7 @@ dev = [
     "pytest-asyncio",
     "ruff",
     "types-psycopg2",
+    "types-regex>=2025.11.3.20251106",
     "types-requests",
 ]
 

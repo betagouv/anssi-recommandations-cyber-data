@@ -16,7 +16,8 @@ from guides.indexeur import (
     ReponseDocumentEnErreur,
     ReponseDocument,
 )
-from guides.indexeur_docling import IndexeurDocling, ChunkerDocling
+from guides.indexeur_docling import IndexeurDocling
+from guides.chunker_docling_hierarchique import ChunkerDoclingHierarchique
 from guides.multi_processeur import Multiprocesseur
 
 
@@ -71,7 +72,7 @@ class BaseChunkerDeTest(BaseChunker):
             yield self.base_chunk
 
 
-class ChunkerDeTest(ChunkerDocling):
+class ChunkerDeTest(ChunkerDoclingHierarchique):
     def __init__(self):
         super().__init__()
         self.chunker = BaseChunkerDeTest()
