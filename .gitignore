@@ -30,3 +30,6 @@ scripts/notebooks/.ipynb_checkpoints/
 # Donnees
 donnees/jointure-nom-guide.csv
 donnees/sortie
+donnees/conversion
+donnees/guides_de_lANSSI
+.deepeval
