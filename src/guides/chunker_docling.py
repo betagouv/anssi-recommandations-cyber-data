@@ -3,9 +3,10 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Type, cast
 
+from docling.backend.pypdfium2_backend import PyPdfiumDocumentBackend
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.document import ConversionResult
-from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.datamodel.pipeline_options import PdfPipelineOptions, TesseractOcrOptions
 from docling.document_converter import DocumentConverter, FormatOption, PdfFormatOption
 from docling_core.transforms.chunker import BaseChunk, DocMeta
 
@@ -26,7 +27,7 @@ class ChunkerDocling(ABC):
         with open("src/guides/options_guides.json") as fichier_options_guides:
             self.options_guides: OptionsGuides = json.load(fichier_options_guides)  # type: ignore[annotation-unchecked]
         self.pipeline_options = PdfPipelineOptions()
-        self.pipeline_options.do_ocr = False
+        self.pipeline_options.do_ocr = True
         self.pipeline_options.generate_page_images = False
         self.pipeline_options.images_scale = 3.0
         self.pipeline_options.generate_picture_images = False
@@ -46,6 +47,7 @@ class ChunkerDocling(ABC):
         format_options: dict[InputFormat, FormatOption] = {
             InputFormat.PDF: PdfFormatOption(
                 pipeline_options=self.pipeline_options,
+                backend=PyPdfiumDocumentBackend,
             )
         }
         result = converter(format_options=format_options).convert(
