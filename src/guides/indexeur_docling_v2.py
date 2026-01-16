@@ -1,6 +1,7 @@
 import argparse
 import logging
 import sys
+from pathlib import Path
 
 from guides.chunker_docling_mqc import ChunkerDoclingMQC
 from guides.guide import Guide
@@ -11,22 +12,14 @@ from guides.indexeur_docling import DocumentPDF
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
 
 
-def afficher_chunks_avec_fusion(pages_avec_fusion, nom_document: str):
-    for page in sorted(pages_avec_fusion.keys()):
-        blocs = pages_avec_fusion[page]
-        print(f"\n{'>' * 20} PAGE {page} {'<' * 20}")
+def affiche_le_guide(guide, nom_document: str):
+    for page in guide.pages.values():
         print(f"Document : {nom_document}")
-        print(f"Blocs    : {len(blocs)}")
-
-        print("\n----- TEXTE PAGE (concaténé) -----")
-        print("\n\n".join(b.texte for b in blocs))
-        print("----------------------------------")
-
-        print("\n----- BLOCS (séparations) -----")
-        for i, bloc in enumerate(blocs, 1):
+        print(f"Blocs    : {len(page.blocs)}")
+        for i, bloc in enumerate(page.blocs):
             print(f"\n[Bloc {i}]")
             print(bloc.texte)
-        print("\n-------------------------------")
+            print("\n-------------------------------")
 
 
 def main() -> int:
@@ -77,7 +70,7 @@ def main() -> int:
         #     chunker.fusionne_les_blocs_de_la_meme_page(chunks, args.taille_maximale)
         # )
         #
-        # afficher_chunks_avec_fusion(pages_avec_fusion, Path(args.pdf).name)
+        affiche_le_guide(guide, Path(args.pdf).name)
 
         logging.info("Traitement terminé avec succès")
         return 0
