@@ -101,15 +101,6 @@ class IndexeurDocling(Indexeur):
         try:
             pages = self.chunker.applique(document)
 
-            # if isinstance(self.chunker, ChunkerDoclingMQC):
-            #     pages = self.chunker.fusionne_les_blocs_de_la_meme_page(chunks)
-            # elif isinstance(self.chunker, ChunkerDoclingHierarchique):
-            #     pages = self._convertit_chunks_en_pages(chunks)
-            # else:
-            #     raise NotImplementedError(
-            #         f"Chunker type {type(self.chunker)} not supported"
-            #     )
-
             def bufferise() -> bytes:
                 from reportlab.pdfgen import canvas
                 import io

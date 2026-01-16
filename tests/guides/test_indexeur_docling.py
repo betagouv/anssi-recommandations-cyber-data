@@ -10,7 +10,7 @@ from docling_core.types.doc.base import BoundingBox
 from pydantic import Field
 from requests.models import Response
 
-from guides.chunker_docling import extrait_position
+from guides.chunker_docling import extrais_position
 from guides.chunker_docling_hierarchique import ChunkerDoclingHierarchique
 from guides.executeur_requete import ExecuteurDeRequete
 from guides.guide import Guide
@@ -90,7 +90,7 @@ class ChunkerDeTest(ChunkerDoclingHierarchique):
         for chunk in chunks:
             guide.ajoute_bloc_a_la_page(
                 numero_page=chunk.meta.doc_items[0].prov[0].page_no,
-                position=extrait_position(chunk),
+                position=extrais_position(chunk),
                 texte=chunk.text,
             )
         return guide

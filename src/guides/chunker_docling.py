@@ -42,24 +42,23 @@ class ChunkerDocling(ABC):
         )
         if clef is not None and not clef["structure_table"]:
             print(f"Structure table - {clef['structure_table']}")
-            self.pipeline_options.do_table_structure = True
+            self.pipeline_options.do_table_structure = False
         format_options: dict[InputFormat, FormatOption] = {
             InputFormat.PDF: PdfFormatOption(
                 pipeline_options=self.pipeline_options,
             )
         }
-        nom_document_converti = Path("donnees/conversion") / Path(
-            document.chemin_pdf
-        ).name.replace(".pdf", "_converti.pdf")
-        result = converter(format_options=format_options).convert(nom_document_converti)
-        return self._convertis_en_blocs_de_pages(result)
+        result = converter(format_options=format_options).convert(
+            Path(document.chemin_pdf)
+        )
+        return self._cree_le_guide(result)
 
     @abstractmethod
-    def _convertis_en_blocs_de_pages(self, document: ConversionResult) -> Guide:
+    def _cree_le_guide(self, document: ConversionResult) -> Guide:
         pass
 
 
-def extrait_position(chunk: BaseChunk) -> Position:
+def extrais_position(chunk: BaseChunk) -> Position:
     try:
         meta = cast(DocMeta, chunk.meta)
         bbox = meta.doc_items[0].prov[0].bbox
