@@ -4,12 +4,12 @@ from docling.datamodel.document import ConversionResult
 from docling_core.transforms.chunker import HierarchicalChunker, DocMeta
 
 from guides.chunker_docling import ChunkerDocling
-from guides.chunker_docling import extrait_position
+from guides.chunker_docling import extrais_position
 from guides.guide import Guide
 
 
 class ChunkerDoclingHierarchique(ChunkerDocling):
-    def _convertis_en_blocs_de_pages(self, result: ConversionResult) -> Guide:
+    def _cree_le_guide(self, result: ConversionResult) -> Guide:
         chunker = HierarchicalChunker()
 
         def est_lisible(text: str) -> bool:
@@ -28,7 +28,7 @@ class ChunkerDoclingHierarchique(ChunkerDocling):
                 numero_page = cast(DocMeta, chunk.meta).doc_items[0].prov[0].page_no
                 guide.ajoute_bloc_a_la_page(
                     numero_page=numero_page,
-                    position=extrait_position(chunk),
+                    position=extrais_position(chunk),
                     texte=chunk.text,
                 )
         return guide

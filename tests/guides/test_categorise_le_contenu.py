@@ -6,6 +6,9 @@ from docling_core.types.doc import (
     TableItem,
     TableData,
     TableCell,
+    ProvenanceItem,
+    BoundingBox,
+    CoordOrigin,
 )
 
 from guides.categorise_le_contenu import ajoute_la_categorisation_du_contenu
@@ -125,4 +128,92 @@ def test_categorise_le_contenu_pour_les_tableaux():
     )
     resultat = ajoute_la_categorisation_du_contenu(table)
 
-    assert resultat == "[TABLEAU] Tableau exemple"
+    assert (
+        resultat
+        == """[TABLEAU]
+| Tableau exemple |
+| --- |"""
+    )
+
+
+def test_categorise_le_contenu_pour_les_tableaux_avec_plusieurs_cellules():
+    table = TableItem(
+        self_ref="#/test/42",
+        prov=[
+            ProvenanceItem(
+                page_no=1,
+                bbox=BoundingBox(
+                    l=70.24855041503906,
+                    t=628.8914947509766,
+                    r=550.4656982421875,
+                    b=484.9783630371094,
+                    coord_origin=CoordOrigin.BOTTOMLEFT,
+                ),
+                charspan=(0, 0),
+            )
+        ],
+        data=TableData(
+            num_cols=2,
+            num_rows=3,
+            table_cells=[
+                TableCell(
+                    text="Colonne 1",
+                    start_row_offset_idx=0,
+                    end_row_offset_idx=1,
+                    start_col_offset_idx=0,
+                    end_col_offset_idx=1,
+                    column_header=True,
+                ),
+                TableCell(
+                    text="Colonne 2",
+                    start_row_offset_idx=0,
+                    end_row_offset_idx=1,
+                    start_col_offset_idx=1,
+                    end_col_offset_idx=2,
+                    column_header=True,
+                ),
+                TableCell(
+                    text="Ligne 1, Colonne 1",
+                    start_row_offset_idx=1,
+                    end_row_offset_idx=2,
+                    start_col_offset_idx=0,
+                    end_col_offset_idx=1,
+                    column_header=False,
+                ),
+                TableCell(
+                    text="Ligne 1, Colonne 2",
+                    start_row_offset_idx=1,
+                    end_row_offset_idx=2,
+                    start_col_offset_idx=1,
+                    end_col_offset_idx=2,
+                    column_header=False,
+                ),
+                TableCell(
+                    text="Ligne 2, Colonne 1",
+                    start_row_offset_idx=2,
+                    end_row_offset_idx=3,
+                    start_col_offset_idx=0,
+                    end_col_offset_idx=1,
+                    column_header=False,
+                ),
+                TableCell(
+                    text="Ligne 2, Colonne 2",
+                    start_row_offset_idx=2,
+                    end_row_offset_idx=3,
+                    start_col_offset_idx=1,
+                    end_col_offset_idx=2,
+                    column_header=False,
+                ),
+            ],
+        ),
+    )
+    resultat = ajoute_la_categorisation_du_contenu(table)
+
+    assert (
+        resultat
+        == """[TABLEAU]
+| Colonne 1 | Colonne 2 |
+| --- | --- |
+| Ligne 1, Colonne 1 | Ligne 1, Colonne 2 |
+| Ligne 2, Colonne 1 | Ligne 2, Colonne 2 |"""
+    )
