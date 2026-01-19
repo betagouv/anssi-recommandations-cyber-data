@@ -80,7 +80,9 @@ def fabrique_client_albert() -> ClientAlbert:
             )
         case "INDEXEUR_DOCLING":
             return ClientAlbert(
-                config.url, config.cle_api, IndexeurDocling(config.url, config.cle_api)
+                config.url,
+                config.cle_api,
+                IndexeurDocling(config.url, config.cle_api, config.chunker),  # type: ignore[arg-type]
             )
     raise Exception(
         f"Erreur, un indexeur {', '.join([indexeur.name for indexeur in IndexeurDocument])} doit être fourni. L’indexeur configuré est : {config.indexeur}"

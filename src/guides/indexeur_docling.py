@@ -101,18 +101,6 @@ class IndexeurDocling(Indexeur):
         try:
             pages = self.chunker.applique(document)
 
-            def bufferise() -> bytes:
-                from reportlab.pdfgen import canvas
-                import io
-
-                le_buffer = io.BytesIO()
-                pdf = canvas.Canvas(le_buffer)
-                pdf.drawString(50, 750, contenu_paragraphe_txt)
-                pdf.showPage()
-                pdf.save()
-                le_buffer.seek(0)
-                return le_buffer.getvalue()
-
             self.executeur_de_requete.initialise(self.clef_api)
 
             for page in pages.pages.values():
@@ -121,12 +109,11 @@ class IndexeurDocling(Indexeur):
                 for bloc in page.blocs:
                     contenu_paragraphe_txt = bloc.texte
                     if len(contenu_paragraphe_txt) > 1:
-                        buffer_pdf = bufferise()
                         fichiers = {
                             "file": (
-                                nom_du_document,
-                                (buffer_pdf),
-                                "application/pdf",
+                                f"{nom_du_document}_page_{numero_page}_{bloc.position.x}_{bloc.position.y}.txt",
+                                contenu_paragraphe_txt.encode("utf-8"),
+                                "text/plain",
                             )
                         }
                         payload = {
@@ -139,7 +126,14 @@ class IndexeurDocling(Indexeur):
                         response = self.executeur_de_requete.poste(
                             f"{self.url}/documents", payload, fichiers
                         )
-                        result = response.json()
+                        try:
+                            result = response.json()
+                        except json.JSONDecodeError:
+                            print(
+                                f"Erreur de décodage JSON. Status: {response.status_code}"
+                            )
+                            print(f"Contenu reçu: {response.text[:200]}")
+                            raise
                         if response.status_code != 201:
                             reponses.append(
                                 ReponseDocumentEnErreur(

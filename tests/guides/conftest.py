@@ -11,7 +11,13 @@ from docling.document_converter import ConversionResult
 from docling.datamodel.settings import PageRange
 from docling.document_converter import DocumentConverter
 from docling_core.types import DoclingDocument
-from docling_core.types.doc import BoundingBox, ProvenanceItem, TextItem, DocItemLabel
+from docling_core.types.doc import (
+    BoundingBox,
+    ProvenanceItem,
+    TextItem,
+    DocItemLabel,
+    SectionHeaderItem,
+)
 from docling_core.types.io import DocumentStream
 from requests import Session
 
@@ -134,6 +140,27 @@ class ConstructeurDeTextItem:
         return TextItem(
             text=self.texte,
             label=DocItemLabel.TEXT,
+            self_ref="#/test/42",
+            orig="",
+            prov=[
+                ProvenanceItem(
+                    page_no=self.numero_page,
+                    bbox=self.bounding_box,
+                    charspan=(0, len(self.texte)),
+                )
+            ],
+        )
+
+
+class ConstructeurDeSectionHeaderItem(ConstructeurDeTextItem):
+    def avec_titre(self, titre: str):
+        self.texte = titre
+        return self
+
+    def construis(self) -> SectionHeaderItem:
+        return SectionHeaderItem(
+            text=self.texte,
+            label=DocItemLabel.SECTION_HEADER,
             self_ref="#/test/42",
             orig="",
             prov=[
@@ -382,7 +409,9 @@ def un_convertisseur_se_basant_sur_un_guide_anssi() -> Callable[
 
 
 @pytest.fixture
-def un_convertisseur_toto() -> Callable[[], Type[DocumentConverter]]:
+def un_convertisseur_avec_un_titre_et_un_texte() -> Callable[
+    [], Type[DocumentConverter]
+]:
     class ConverterDeTestAvecContenuSimple(DocumentConverter):
         def convert(
             self,
@@ -394,8 +423,8 @@ def un_convertisseur_toto() -> Callable[[], Type[DocumentConverter]]:
             page_range: PageRange = (1, 1),
         ) -> ConversionResult:
             premier_texte = (
-                ConstructeurDeTextItem()
-                .avec_texte("Titre")
+                ConstructeurDeSectionHeaderItem()
+                .avec_titre("Titre")
                 .avec_bbox(BoundingBox(l=100.0, t=300.0, r=300.0, b=290.0))
                 .construis()
             )
