@@ -81,24 +81,34 @@ def test_categorise_le_contenu_pour_les_textes_items(_description, item, attendu
             "[RECOMMANDATION] R18",
         ),
         (
-            "[SECTION] Texte lisible",
+            "[SOUS-TITRE] Sous-titre",
             SectionHeaderItem(
                 text="1.2 Hello world",
                 label=DocItemLabel.SECTION_HEADER,
                 self_ref="#/test/42",
                 orig="",
             ),
-            "[SECTION] 1.2 Hello world",
+            "[SOUS-TITRE] 1.2 Hello world",
         ),
         (
-            "[SOUS-TITRE] Note lisible",
+            "[TITRE] Titre avec décimal",
             SectionHeaderItem(
-                text="Hello world",
+                text="1 Hello world",
                 label=DocItemLabel.SECTION_HEADER,
                 self_ref="#/test/42",
                 orig="",
             ),
-            "[SOUS-TITRE] Hello world",
+            "[TITRE] 1 Hello world",
+        ),
+        (
+            "[TITRE] Titre avec décimal suivi d’un point",
+            SectionHeaderItem(
+                text="1. Hello world",
+                label=DocItemLabel.SECTION_HEADER,
+                self_ref="#/test/42",
+                orig="",
+            ),
+            "[TITRE] 1. Hello world",
         ),
     ],
 )
