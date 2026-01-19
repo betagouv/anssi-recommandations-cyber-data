@@ -6,7 +6,7 @@ from typing import Type, cast
 from docling.backend.pypdfium2_backend import PyPdfiumDocumentBackend
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.document import ConversionResult
-from docling.datamodel.pipeline_options import PdfPipelineOptions, TesseractOcrOptions
+from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, FormatOption, PdfFormatOption
 from docling_core.transforms.chunker import BaseChunk, DocMeta
 

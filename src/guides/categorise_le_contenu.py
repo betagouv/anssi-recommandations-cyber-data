@@ -69,15 +69,15 @@ class CategorisationSectionHeaderItem(Categoriseur):
                     ),
                     "prefixe": "[RECOMMANDATION]",
                 },
-                "note": {
+                "sous-titre": {
                     "execute": lambda contenu_courant: re.match(
                         r"^\d+\.\d+", contenu_courant.text.strip()
                     ),
-                    "prefixe": "[SECTION]",
-                },
-                "texte": {
-                    "execute": lambda contenu_courant: True,
                     "prefixe": "[SOUS-TITRE]",
+                },
+                "titre": {
+                    "execute": lambda contenu_courant: True,
+                    "prefixe": "[TITRE]",
                 },
             }
         )
