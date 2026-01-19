@@ -1,5 +1,4 @@
 import re
-from copy import copy
 from dataclasses import dataclass, field
 from typing import NamedTuple
 
@@ -54,28 +53,54 @@ class Page:
 
     def _fusionne_les_entetes_avec_leur_contenu(self):
         i = 0
-        blocs_fusionnes: list[BlocPage] = copy(self.blocs)  # type: ignore [annotation-unchecked]
+        blocs_fusionnes = []
         while i < len(self.blocs):
             courant = self.blocs[i]
-            if (
-                self._est_entete(courant.texte)
-                and i + 1 < len(self.blocs)
-                and not self._est_entete(self.blocs[i + 1].texte)
-            ):
-                suivant = self.blocs[i + 1]
-
-                if suivant.texte.startswith(courant.texte):
-                    blocs_fusionnes[i] = BlocPage(
-                        texte=suivant.texte, position=courant.position
-                    )
-                else:
-                    blocs_fusionnes[i] = BlocPage(
+            suivant = self.blocs[i + 1] if i + 1 < len(self.blocs) else None
+            if self.a_du_contenu_adjacent_au_titre(courant, suivant):
+                blocs_fusionnes.append(
+                    BlocPage(
                         texte=f"{courant.texte}\n{suivant.texte}",
                         position=courant.position,
                     )
-                blocs_fusionnes.pop(i + 1)
+                )
+                i += 1
+            elif self.a_du_contenu_adjacent_au_sous_titre(courant, suivant):
+                blocs_fusionnes.append(
+                    BlocPage(
+                        texte=f"{courant.texte}\n{suivant.texte}",
+                        position=courant.position,
+                    )
+                )
+                i += 1
+            else:
+                blocs_fusionnes.append(courant)
             i += 1
+
         self.blocs = blocs_fusionnes
+
+    def a_du_contenu_adjacent_au_titre(
+        self, courant: BlocPage, suivant: BlocPage | None
+    ) -> bool:
+        return self.a_du_contenu_adjacent(courant, "[TITRE]", suivant)
+
+    def a_du_contenu_adjacent_au_sous_titre(
+        self, courant: BlocPage, suivant: BlocPage | None
+    ) -> bool:
+        return self.a_du_contenu_adjacent(courant, "[SOUS-TITRE]", suivant)
+
+    def a_du_contenu_adjacent(
+        self, courant: BlocPage, sous_titre_: str, suivant: BlocPage | None
+    ) -> bool:
+        return (
+            courant.texte.startswith(sous_titre_)
+            and suivant is not None
+            and (
+                suivant.texte.startswith("[TEXTE]")
+                or suivant.texte.startswith("[RECOMMANDATION]")
+                or suivant.texte.startswith("[TABLEAU]")
+            )
+        )
 
     @staticmethod
     def _est_entete(texte: str) -> bool:

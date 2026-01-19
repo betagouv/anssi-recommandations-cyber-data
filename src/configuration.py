@@ -1,7 +1,11 @@
 import os
 from enum import StrEnum
 
-from typing_extensions import NamedTuple
+from typing_extensions import NamedTuple, Optional
+
+from guides.chunker_docling import ChunkerDocling
+from guides.chunker_docling_hierarchique import ChunkerDoclingHierarchique
+from guides.chunker_docling_mqc import ChunkerDoclingMQC
 
 
 class MQC(NamedTuple):
@@ -17,11 +21,17 @@ class IndexeurDocument(StrEnum):
     INDEXEUR_DOCLING = ("INDEXEUR_DOCLING",)
 
 
+class StrategieDeChunking(StrEnum):
+    CHUNKER_DOCLING_HIERARCHIQUE = ("CHUNKER_DOCLING_HIERARCHIQUE",)
+    CHUNKER_DOCLING_MQC = ("CHUNKER_DOCLING_MQC",)
+
+
 class Albert(NamedTuple):
     url: str
     cle_api: str
     indexeur: IndexeurDocument
     modele: str
+    chunker: Optional[ChunkerDocling] = None
 
 
 class BaseDeDonnees(NamedTuple):
@@ -72,11 +82,23 @@ def recupere_configuration() -> Configuration:
         delai_attente_maximum=float(os.getenv("MQC_DELAI_ATTENTE_MAXIMUM", 0.5)),
     )
 
+    indexeur_document = IndexeurDocument(os.getenv("INDEXEUR", "INDEXEUR_ALBERT"))
+    chunker: ChunkerDocling | None = None
+    if indexeur_document == IndexeurDocument.INDEXEUR_DOCLING:
+        strategie_de_chunking = StrategieDeChunking(
+            os.getenv("CHUNKER", "CHUNKER_DOCLING_HIERARCHIQUE")
+        )
+        if strategie_de_chunking == StrategieDeChunking.CHUNKER_DOCLING_MQC:
+            chunker = ChunkerDoclingMQC()
+        else:
+            chunker = ChunkerDoclingHierarchique()
+
     albert: Albert = Albert(
         url=os.getenv("ALBERT_URL", "https://albert.api.etalab.gouv.fr/v1"),
         cle_api=os.getenv("ALBERT_CLE_API", "cle_api"),
-        indexeur=IndexeurDocument(os.getenv("INDEXEUR", "INDEXEUR_ALBERT")),
+        indexeur=indexeur_document,
         modele=os.getenv("ALBERT_MODELE", "openweight-medium"),
+        chunker=chunker,
     )
 
     base_de_donnees_journal: BaseDeDonnees | None = recupere_configuration_postgres()
