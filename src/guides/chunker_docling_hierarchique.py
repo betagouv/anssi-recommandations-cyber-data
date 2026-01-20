@@ -6,10 +6,14 @@ from docling_core.transforms.chunker import HierarchicalChunker, DocMeta
 from guides.chunker_docling import ChunkerDocling
 from guides.chunker_docling import extrais_position
 from guides.guide import Guide
+from guides.indexeur import DocumentPDF
 
 
 class ChunkerDoclingHierarchique(ChunkerDocling):
-    def _cree_le_guide(self, result: ConversionResult) -> Guide:
+    def _cree_le_guide(
+        self, resultat_conversion: ConversionResult, document: DocumentPDF
+    ) -> Guide:
+        self.nom_fichier = document.chemin_pdf.rsplit("/", 1)[-1]
         chunker = HierarchicalChunker()
 
         def est_lisible(text: str) -> bool:
@@ -21,9 +25,9 @@ class ChunkerDoclingHierarchique(ChunkerDocling):
 
             return ratio > 0.5 and " " in text
 
-        guide = Guide()
+        guide = Guide(document)
 
-        for index, chunk in enumerate(chunker.chunk(result.document)):
+        for index, chunk in enumerate(chunker.chunk(resultat_conversion.document)):
             if est_lisible(chunk.text):
                 numero_page = cast(DocMeta, chunk.meta).doc_items[0].prov[0].page_no
                 guide.ajoute_bloc_a_la_page(

@@ -1,5 +1,6 @@
 import json
 from abc import ABC, abstractmethod
+from enum import StrEnum
 from pathlib import Path
 from typing import Type, cast
 
@@ -21,6 +22,11 @@ class OptionsGuide(dict):
 OptionsGuides = dict[str, OptionsGuide]
 
 
+class TypeFichier(StrEnum):
+    TEXTE = "TEXTE"
+    PDF = "PDF"
+
+
 class ChunkerDocling(ABC):
     def __init__(self):
         super().__init__()
@@ -32,6 +38,8 @@ class ChunkerDocling(ABC):
         self.pipeline_options.images_scale = 3.0
         self.pipeline_options.generate_picture_images = False
         self.pipeline_options.ocr_options.force_full_page_ocr = False
+        self.nom_fichier = ""
+        self.type_fichier = TypeFichier.PDF
 
     def applique(
         self,
@@ -53,10 +61,12 @@ class ChunkerDocling(ABC):
         result = converter(format_options=format_options).convert(
             Path(document.chemin_pdf)
         )
-        return self._cree_le_guide(result)
+        return self._cree_le_guide(result, document)
 
     @abstractmethod
-    def _cree_le_guide(self, document: ConversionResult) -> Guide:
+    def _cree_le_guide(
+        self, resultat_conversion: ConversionResult, document: DocumentPDF
+    ) -> Guide:
         pass
 
 

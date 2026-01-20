@@ -10,7 +10,7 @@ from docling_core.types.doc.base import BoundingBox
 from pydantic import Field
 from requests.models import Response
 
-from guides.chunker_docling import extrais_position
+from guides.chunker_docling import extrais_position, TypeFichier
 from guides.chunker_docling_hierarchique import ChunkerDoclingHierarchique
 from guides.executeur_requete import ExecuteurDeRequete
 from guides.guide import Guide
@@ -76,8 +76,14 @@ class BaseChunkerDeTest(BaseChunker):
 
 
 class ChunkerDeTest(ChunkerDoclingHierarchique):
-    def __init__(self):
+    def __init__(
+        self,
+        nom_fichier: str = "un_fichier_test.pdf",
+        type_fichier: TypeFichier = TypeFichier.PDF,
+    ):
         super().__init__()
+        self.nom_fichier = nom_fichier
+        self.type_fichier = type_fichier
         self.chunker = BaseChunkerDeTest()
 
     def applique(
@@ -86,17 +92,17 @@ class ChunkerDeTest(ChunkerDoclingHierarchique):
         converter: Type[DocumentConverter] = DocumentConverter,
     ) -> Guide:
         chunks = self.chunker.chunk(DLDocument(name=document.chemin_pdf))
-        guide = Guide()
+        guide = Guide(document)
         for chunk in chunks:
             guide.ajoute_bloc_a_la_page(
-                numero_page=chunk.meta.doc_items[0].prov[0].page_no,
+                numero_page=chunk.meta.doc_items[0].prov[0].page_no,  # type: ignore[attr-defined]
                 position=extrais_position(chunk),
                 texte=chunk.text,
             )
         return guide
 
     def avec_base_chunker(self, chunker: BaseChunker):
-        self.chunker = chunker
+        self.chunker = chunker  # type: ignore[assignment]
         return self
 
 
@@ -145,6 +151,7 @@ class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
         super().__init__()
         self.reponse_attendue = reponse_attendue
         self.payload_recu: None | dict = None
+        self.fichiers_recus: None | dict = None
         self.index_courant = 0
 
     def initialise(self, clef_api: str):
@@ -154,6 +161,7 @@ class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
         reponse = Mock()
         reponse.status_code = self.reponse_attendue[self.index_courant].status_code
         reponse.json.return_value = self.reponse_attendue[self.index_courant].reponse
+        self.fichiers_recus = fichiers
         self.payload_recu = payload
         self.index_courant += 1
         return reponse
@@ -254,6 +262,61 @@ def test_le_payload_est_passe_en_argument(une_reponse_document, fichier_pdf):
     assert executeur_de_requete.payload_recu["chunker"] == "NoSplitter"
     metadata = json.loads(executeur_de_requete.payload_recu["metadata"])
     assert metadata["page"] == 10
+
+
+def test_les_metadata_du_payload_contiennent_le_nom_du_document(
+    une_reponse_document, fichier_pdf
+):
+    chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
+    executeur_de_requete = ExecuteurDeRequeteDeTest(
+        [ReponseAttendueOK(une_reponse_document)]
+    )
+    multi_processeur = MultiProcesseurDeTest()
+    chunker = ChunkerDeTest().avec_base_chunker(
+        BaseChunkerDeTest().avec_base_chunk(
+            ConstructeurDeBaseChunk().avec_numero_page(10).construis()
+        )
+    )
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        chunker,
+        executeur_de_requete,
+        multi_processeur,
+    )
+
+    document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
+    indexeur.ajoute_documents([document], "12345")
+
+    metadata = json.loads(executeur_de_requete.payload_recu["metadata"])
+    assert metadata["nom_document"] == "test.pdf"
+
+
+def test_le_fichier_envoye_est_correctement_nomme(une_reponse_document, fichier_pdf):
+    chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
+    executeur_de_requete = ExecuteurDeRequeteDeTest(
+        [ReponseAttendueOK(une_reponse_document)]
+    )
+    multi_processeur = MultiProcesseurDeTest()
+    chunker = ChunkerDeTest("mon_fichier.txt", TypeFichier.TEXTE).avec_base_chunker(
+        BaseChunkerDeTest().avec_base_chunk(
+            ConstructeurDeBaseChunk().avec_numero_page(10).construis()
+        )
+    )
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        chunker,
+        executeur_de_requete,
+        multi_processeur,
+    )
+
+    document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
+    indexeur.ajoute_documents([document], "12345")
+
+    fichiers_envoyes = executeur_de_requete.fichiers_recus["file"]
+    assert fichiers_envoyes[0] == "mon_fichier.txt"
+    assert fichiers_envoyes[2] == "text/plain"
 
 
 def test_ne_cree_pas_de_document_si_le_paragraphe_est_trop_court(

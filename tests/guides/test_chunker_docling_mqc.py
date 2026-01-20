@@ -1,3 +1,4 @@
+from guides.chunker_docling import TypeFichier
 from guides.chunker_docling_mqc import ChunkerDoclingMQC
 from guides.indexeur import DocumentPDF
 
@@ -66,3 +67,32 @@ def test_fusionne_entetes_avec_contenu_simple(
     assert (
         guide.pages[1].blocs[0].texte == "[TITRE] Titre\n[TEXTE] Contenu du paragraphe."
     )
+
+
+def test_le_guide_retourne_le_nom_du_document(
+    fichier_pdf, un_convertisseur_avec_un_texte
+):
+    chemin_fichier_de_test = str(fichier_pdf("document_mqc.pdf").resolve())
+    document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
+
+    guide = ChunkerDoclingMQC().applique(
+        document=document, converter=un_convertisseur_avec_un_texte()
+    )
+
+    assert guide.nom_document == "document_mqc.pdf"
+
+
+def test_retourne_le_nom_du_fichier(fichier_pdf, un_convertisseur_avec_un_texte):
+    chemin_fichier_de_test = str(fichier_pdf("document_mqc.pdf").resolve())
+    document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
+
+    chunker = ChunkerDoclingMQC()
+    chunker.applique(document=document, converter=un_convertisseur_avec_un_texte())
+
+    assert chunker.nom_fichier == "document_mqc.txt"
+
+
+def test_retourne_le_type_du_fichier():
+    chunker = ChunkerDoclingMQC()
+
+    assert chunker.type_fichier == TypeFichier.TEXTE

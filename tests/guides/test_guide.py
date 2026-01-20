@@ -6,6 +6,12 @@ from guides.guide import (
     Guide,
     BlocPage,
 )
+from guides.indexeur import DocumentPDF
+
+document = DocumentPDF(
+    chemin_pdf="tests/data/guide_test.pdf",
+    url_pdf="http://document.local/guide_test.pdf",
+)
 
 
 def test_page_peut_creer_une_page():
@@ -30,17 +36,17 @@ def test_page_peut_ajouter_un_bloc():
 
 
 def test_pages_peut_etre_creee():
-    guide = Guide()
+    guide = Guide(document=document)
     assert guide is not None
 
 
 def test_pages_a_une_collection_de_pages_vide_par_defaut():
-    guide = Guide()
+    guide = Guide(document=document)
     assert guide.pages == {}
 
 
 def test_guide_peut_ajouter_un_bloc_dans_une_page():
-    guide = Guide()
+    guide = Guide(document=document)
     position = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
 
     guide.ajoute_bloc_a_la_page(1, position, "[TEXTE] Une page")
@@ -52,7 +58,7 @@ def test_guide_peut_ajouter_un_bloc_dans_une_page():
 
 
 def test_guide_peut_ajouter_deux_blocs_sur_une_meme_page():
-    guide = Guide()
+    guide = Guide(document=document)
     position_bloc_1 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=0.0, largeur=100.0, hauteur=5.0)
 
@@ -65,7 +71,7 @@ def test_guide_peut_ajouter_deux_blocs_sur_une_meme_page():
 
 
 def test_guide_reordonne_lorsque_l_on_ajoute_un_bloc():
-    guide = Guide()
+    guide = Guide(document=document)
     position_bloc_1 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
 
@@ -82,7 +88,7 @@ def test_guide_reordonne_lorsque_l_on_ajoute_un_bloc():
 
 
 def test_guide_fusionne_un_titre_avec_son_contenu():
-    guide = Guide()
+    guide = Guide(document=document)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0)
     position_bloc_3 = Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0)
@@ -105,7 +111,7 @@ def test_guide_fusionne_un_titre_avec_son_contenu():
 
 
 def test_guide_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommandations():
-    guide = Guide()
+    guide = Guide(document=document)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0)
     position_bloc_3 = Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0)
@@ -126,7 +132,7 @@ def test_guide_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommandatio
 
 
 def test_guide_fusionne_tous_les_contenus_d_un_sous_titre():
-    guide = Guide()
+    guide = Guide(document=document)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0)
     position_bloc_3 = Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0)
@@ -202,7 +208,7 @@ def test_guide_fusionne_tous_les_contenus_d_un_sous_titre():
     ],
 )
 def test_guide_fusionne_les_recommandations(_description, textes, attendu):
-    guide = Guide()
+    guide = Guide(document=document)
 
     for texte in textes:
         guide.ajoute_bloc_a_la_page(1, texte[0], texte[1])
@@ -269,7 +275,7 @@ def test_guide_fusionne_les_recommandations(_description, textes, attendu):
     ],
 )
 def test_guide_fusionne_les_tableaux(_description, textes, attendu):
-    guide = Guide()
+    guide = Guide(document=document)
 
     for texte in textes:
         guide.ajoute_bloc_a_la_page(1, texte[0], texte[1])
