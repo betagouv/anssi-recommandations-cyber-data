@@ -1,5 +1,6 @@
 import json
 import logging
+import traceback
 from dataclasses import dataclass
 from itertools import islice
 from pathlib import Path
@@ -66,7 +67,7 @@ class IndexeurDocling(Indexeur):
             it = iter(iterable)
             i = 0
             while True:
-                sous_ensemble = list(islice(it, 15))
+                sous_ensemble = list(islice(it, 10))
                 if not sous_ensemble:
                     break
                 yield DocumentsAAjouter(
@@ -165,10 +166,9 @@ class IndexeurDocling(Indexeur):
                                     updated_at=result.get("updated_at", ""),
                                 )
                             )
-        except Exception as e:
+        except Exception:
+            tb = traceback.format_exc()
             reponses.append(
-                ReponseDocumentEnErreur(
-                    detail=str(e), document_en_erreur=nom_du_document
-                )
+                ReponseDocumentEnErreur(detail=tb, document_en_erreur=nom_du_document)
             )
         return reponses

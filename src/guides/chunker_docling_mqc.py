@@ -1,6 +1,7 @@
-from typing import cast, NamedTuple
+from typing import cast, NamedTuple, Type
 
 from docling.datamodel.document import ConversionResult
+from docling.document_converter import DocumentConverter
 from docling_core.transforms.chunker import BaseChunk, DocMeta
 
 from guides.chunker_docling import ChunkerDocling, extrais_position, TypeFichier
@@ -18,8 +19,8 @@ class Position(NamedTuple):
 
 
 class ChunkerDoclingMQC(ChunkerDocling):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, converter: Type[DocumentConverter] = DocumentConverter):
+        super().__init__(converter)
         self.type_fichier = TypeFichier.TEXTE
 
     def _cree_le_guide(
