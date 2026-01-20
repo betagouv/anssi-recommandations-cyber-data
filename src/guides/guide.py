@@ -2,6 +2,8 @@ import re
 from dataclasses import dataclass, field
 from typing import NamedTuple
 
+from guides.indexeur import DocumentPDF
+
 
 class Position(NamedTuple):
     x: float
@@ -117,9 +119,11 @@ class Page:
         return True
 
 
-@dataclass
 class Guide:
-    pages: dict[int, Page] = field(default_factory=dict)
+    def __init__(self, document: DocumentPDF):
+        super().__init__()
+        self.nom_document = document.chemin_pdf.rsplit("/", 1)[-1]
+        self.pages: dict[int, Page] = {}
 
     def ajoute_bloc_a_la_page(
         self, numero_page: int, position: Position, texte: str
