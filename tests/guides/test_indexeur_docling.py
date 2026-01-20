@@ -1,8 +1,7 @@
 import json
-from typing import Any, Iterator, Optional, Union, Type
+from typing import Any, Iterator, Optional, Union
 from unittest.mock import Mock
 
-from docling.document_converter import DocumentConverter
 from docling_core.transforms.chunker import BaseChunker, BaseChunk, DocMeta
 from docling_core.types import DoclingDocument as DLDocument
 from docling_core.types.doc import DocItem, DocItemLabel, ProvenanceItem
@@ -86,11 +85,7 @@ class ChunkerDeTest(ChunkerDoclingHierarchique):
         self.type_fichier = type_fichier
         self.chunker = BaseChunkerDeTest()
 
-    def applique(
-        self,
-        document: DocumentPDF,
-        converter: Type[DocumentConverter] = DocumentConverter,
-    ) -> Guide:
+    def applique(self, document: DocumentPDF) -> Guide:
         chunks = self.chunker.chunk(DLDocument(name=document.chemin_pdf))
         guide = Guide(document)
         for chunk in chunks:
@@ -413,5 +408,5 @@ def test_continue_l_indexation_si_un_document_n_est_pas_indexe_et_qu_une_erreur_
 
     assert len(reponses) == 2
     assert reponses[0].id == "1"
-    assert reponses[1].detail == "Erreur de traitement"
+    assert "Erreur de traitement" in reponses[1].detail
     assert reponses[1].document_en_erreur == "document_2.pdf"

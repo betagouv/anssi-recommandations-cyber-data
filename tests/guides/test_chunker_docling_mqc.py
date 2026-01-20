@@ -6,8 +6,8 @@ from guides.indexeur import DocumentPDF
 def test_retourne_le_guide(un_convertisseur_avec_un_texte):
     document = DocumentPDF("mon_document.pdf", url_pdf="http://mon-document.pdf")
 
-    guide = ChunkerDoclingMQC().applique(
-        document=document, converter=un_convertisseur_avec_un_texte()
+    guide = ChunkerDoclingMQC(un_convertisseur_avec_un_texte()).applique(
+        document=document
     )
 
     assert len(guide.pages) == 1
@@ -22,8 +22,8 @@ def test_retourne_le_guide_en_tenant_compte_de_l_ordre_des_bbox(
         "mon_document_ave_bbox.pdf", url_pdf="http://mon-document-bbox.pdf"
     )
 
-    guide = ChunkerDoclingMQC().applique(
-        document=document, converter=un_convertisseur_avec_deux_bbox()
+    guide = ChunkerDoclingMQC(un_convertisseur_avec_deux_bbox()).applique(
+        document=document
     )
 
     assert len(guide.pages) == 1
@@ -40,10 +40,9 @@ def test_retourne_le_guide_et_ordonne_sans_bbox(
         "mon_document_ave_bbox.pdf", url_pdf="http://mon-document-bbox.pdf"
     )
 
-    guide = ChunkerDoclingMQC().applique(
-        document=document,
-        converter=un_convertisseur_avec_deux_textes_dont_un_sans_bbox(),
-    )
+    guide = ChunkerDoclingMQC(
+        un_convertisseur_avec_deux_textes_dont_un_sans_bbox()
+    ).applique(document=document)
 
     assert guide.pages[1].numero_page == 1
     assert guide.pages[1].blocs[0].texte == "[TEXTE] Texte première bbox"
@@ -58,9 +57,8 @@ def test_fusionne_entetes_avec_contenu_simple(
         "mon_document_ave_bbox.pdf", url_pdf="http://mon-document-bbox.pdf"
     )
 
-    guide = ChunkerDoclingMQC().applique(
-        document=document,
-        converter=un_convertisseur_avec_un_titre_et_un_texte(),
+    guide = ChunkerDoclingMQC(un_convertisseur_avec_un_titre_et_un_texte()).applique(
+        document=document
     )
 
     assert len(guide.pages[1].blocs) == 1
@@ -75,8 +73,8 @@ def test_le_guide_retourne_le_nom_du_document(
     chemin_fichier_de_test = str(fichier_pdf("document_mqc.pdf").resolve())
     document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
 
-    guide = ChunkerDoclingMQC().applique(
-        document=document, converter=un_convertisseur_avec_un_texte()
+    guide = ChunkerDoclingMQC(un_convertisseur_avec_un_texte()).applique(
+        document=document
     )
 
     assert guide.nom_document == "document_mqc.pdf"
@@ -86,8 +84,8 @@ def test_retourne_le_nom_du_fichier(fichier_pdf, un_convertisseur_avec_un_texte)
     chemin_fichier_de_test = str(fichier_pdf("document_mqc.pdf").resolve())
     document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
 
-    chunker = ChunkerDoclingMQC()
-    chunker.applique(document=document, converter=un_convertisseur_avec_un_texte())
+    chunker = ChunkerDoclingMQC(un_convertisseur_avec_un_texte())
+    chunker.applique(document=document)
 
     assert chunker.nom_fichier == "document_mqc.txt"
 
