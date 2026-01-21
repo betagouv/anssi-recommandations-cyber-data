@@ -15,9 +15,12 @@ dependencies = [
      "pydantic",
      "pytest",
      "reportlab",
-    "requests",
-    "respx",
-    "types-reportlab"
+     "requests",
+     "respx",
+     "types-reportlab",
+     "urllib3>=2.5.1",
+     "aiohttp>=3.13.3",
+     "pyasn1>=0.6.2",
 ]
 
 [dependency-groups]
