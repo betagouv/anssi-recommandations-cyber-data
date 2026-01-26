@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import cast, NamedTuple, Type
 
 from docling.datamodel.document import ConversionResult
@@ -26,9 +27,7 @@ class ChunkerDoclingMQC(ChunkerDocling):
     def _cree_le_guide(
         self, resultat_conversion: ConversionResult, document: DocumentPDF
     ) -> Guide:
-        self.nom_fichier = document.chemin_pdf.rsplit("/", 1)[-1].replace(
-            ".pdf", ".txt"
-        )
+        self.nom_fichier = Path(document.chemin_pdf).name.replace(".pdf", ".txt")
         elements_filtres = filtre_les_resultats(resultat_conversion)
         chunks = extrais_les_chunks(elements_filtres)
 

@@ -30,7 +30,8 @@ class TypeFichier(StrEnum):
 class ChunkerDocling(ABC):
     def __init__(self, converter: Type[DocumentConverter] = DocumentConverter):
         super().__init__()
-        with open("src/guides/options_guides.json") as fichier_options_guides:
+        fichier_options_path = Path(__file__).parent / "options_guides.json"
+        with open(fichier_options_path, encoding="utf-8") as fichier_options_guides:
             self.options_guides: OptionsGuides = json.load(fichier_options_guides)  # type: ignore[annotation-unchecked]
         self.pipeline_options = PdfPipelineOptions()
         self.pipeline_options.do_ocr = True

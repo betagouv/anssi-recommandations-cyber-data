@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import cast
 
 from docling.datamodel.document import ConversionResult
@@ -13,7 +14,7 @@ class ChunkerDoclingHierarchique(ChunkerDocling):
     def _cree_le_guide(
         self, resultat_conversion: ConversionResult, document: DocumentPDF
     ) -> Guide:
-        self.nom_fichier = document.chemin_pdf.rsplit("/", 1)[-1]
+        self.nom_fichier = Path(document.chemin_pdf).name
         chunker = HierarchicalChunker()
 
         def est_lisible(text: str) -> bool:

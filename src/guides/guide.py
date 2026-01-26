@@ -1,5 +1,6 @@
 import re
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import NamedTuple
 
 from guides.indexeur import DocumentPDF
@@ -122,7 +123,7 @@ class Page:
 class Guide:
     def __init__(self, document: DocumentPDF):
         super().__init__()
-        self.nom_document = document.chemin_pdf.rsplit("/", 1)[-1]
+        self.nom_document = Path(document.chemin_pdf).name
         self.pages: dict[int, Page] = {}
 
     def ajoute_bloc_a_la_page(
