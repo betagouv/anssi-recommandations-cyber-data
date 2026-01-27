@@ -2,7 +2,10 @@ import multiprocessing as mp
 import argparse
 import glob
 from pathlib import Path
+from urllib.parse import quote
+
 import requests
+import unicodedata
 from openai import OpenAI
 from typing_extensions import NamedTuple
 from configuration import recupere_configuration, IndexeurDocument, MSC
@@ -95,9 +98,14 @@ def collecte_documents_pdf(
 ) -> list[DocumentPDF]:
     chemins = glob.glob(f"{dossier}/*.pdf")
     documents = []
+    base = configuration_msc.url.rstrip("/")
+    chemin_guides = configuration_msc.chemin_guides.strip("/")
     for chemin in chemins:
         nom_fichier = Path(chemin).name
-        url = f"{configuration_msc.url}/{configuration_msc.chemin_guides}/{nom_fichier}"
+        nom_fichier = unicodedata.normalize("NFC", nom_fichier)
+        nom_fichier_encode = quote(nom_fichier, safe="-._~")
+
+        url = f"{base}/{chemin_guides}/{nom_fichier_encode}"
         documents.append(DocumentPDF(chemin, url))
     return documents
 
