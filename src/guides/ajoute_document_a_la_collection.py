@@ -19,7 +19,9 @@ def main():
     client = fabrique_client_albert()
     print(f"Client Albert créé avec URL: {client.client_openai.base_url}")
 
-    client.attribue_collection(args.id_collection)
+    if not client.attribue_collection(args.id_collection):
+        print(f"Erreur: Collection avec l'ID {args.id_collection} n'existe pas")
+        return
 
     print(f"Collection trouvée portant l'ID: {client.id_collection}")
     document = collecte_document_pdf()
@@ -32,7 +34,9 @@ def main():
         filter(lambda reponse: isinstance(reponse, ReponseDocumentEnSucces), reponses)
     )
 
-    print(f"Ajouté {len(les_documents_en_succes)} documents à la collection {client.id_collection}")
+    print(
+        f"Ajouté {len(les_documents_en_succes)} documents à la collection {client.id_collection}"
+    )
     print(f"{len(les_documents_en_erreur)} documents non ajoutés à la collection :")
     print(
         f"{'-'.join(list(map(lambda document: f'{document.document_en_erreur} - Erreur : {document.detail}', les_documents_en_erreur)))}"
