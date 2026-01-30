@@ -71,6 +71,9 @@ class ClientAlbert:
         id_collection = self.id_collection
         return self.indexeur.ajoute_documents(documents, id_collection)
 
+    def attribue_collection(self, id_collection: str) -> None:
+        self.id_collection = id_collection
+
 
 def fabrique_client_albert() -> ClientAlbert:
     config = recupere_configuration().albert
@@ -92,22 +95,30 @@ def fabrique_client_albert() -> ClientAlbert:
     )
 
 
+def _cree_document_pdf(chemin: str, configuration_msc: MSC) -> DocumentPDF:
+    base = configuration_msc.url.rstrip("/")
+    chemin_guides = configuration_msc.chemin_guides.strip("/")
+    nom_fichier = Path(chemin).name
+    nom_fichier = unicodedata.normalize("NFC", nom_fichier)
+    nom_fichier_encode = quote(nom_fichier, safe="-._~")
+    url = f"{base}/{chemin_guides}/{nom_fichier_encode}"
+    return DocumentPDF(chemin, url)
+
+
 def collecte_documents_pdf(
     dossier: str = "donnees/guides_de_lANSSI",
     configuration_msc: MSC = recupere_configuration().msc,
 ) -> list[DocumentPDF]:
     chemins = glob.glob(f"{dossier}/*.pdf")
-    documents = []
-    base = configuration_msc.url.rstrip("/")
-    chemin_guides = configuration_msc.chemin_guides.strip("/")
-    for chemin in chemins:
-        nom_fichier = Path(chemin).name
-        nom_fichier = unicodedata.normalize("NFC", nom_fichier)
-        nom_fichier_encode = quote(nom_fichier, safe="-._~")
+    return [_cree_document_pdf(chemin, configuration_msc) for chemin in chemins]
 
-        url = f"{base}/{chemin_guides}/{nom_fichier_encode}"
-        documents.append(DocumentPDF(chemin, url))
-    return documents
+
+def collecte_document_pdf(
+    dossier: str = "donnees/guides_de_lANSSI",
+    configuration_msc: MSC = recupere_configuration().msc,
+) -> DocumentPDF:
+    chemins = glob.glob(f"{dossier}/*.pdf")
+    return _cree_document_pdf(chemins[0], configuration_msc)
 
 
 def main():
