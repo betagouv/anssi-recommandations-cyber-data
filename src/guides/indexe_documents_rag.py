@@ -1,18 +1,16 @@
-import multiprocessing as mp
 import argparse
 import glob
+import multiprocessing as mp
 from pathlib import Path
 from urllib.parse import quote
 
-import requests
 import unicodedata
-from openai import OpenAI
-from typing_extensions import NamedTuple
+
+from adaptateurs.client_albert import ClientAlbert
+from adaptateurs.client_albert_reel import ClientAlbertReel
 from configuration import recupere_configuration, IndexeurDocument, MSC
 from guides.indexeur import (
     DocumentPDF,
-    ReponseDocument,
-    Indexeur,
     ReponseDocumentEnErreur,
     ReponseDocumentEnSucces,
 )
@@ -20,69 +18,17 @@ from guides.indexeur_albert import IndexeurBaseVectorielleAlbert
 from guides.indexeur_docling import IndexeurDocling
 
 
-class PayloadCollection(NamedTuple):
-    name: str
-    description: str
-    visibility: str = "private"
-
-
-class ReponseCollection(NamedTuple):
-    id: str
-    name: str
-    description: str
-    visibility: str
-    documents: int
-    created_at: str
-    updated_at: str
-
-
-class ClientAlbert:
-    def __init__(self, url: str, cle_api: str, indexeur: Indexeur):
-        self.url = url
-        self.client_openai = OpenAI(base_url=url, api_key=cle_api)
-        self.session = requests.session()
-        self.session.headers = {"Authorization": f"Bearer {cle_api}"}
-        self.id_collection: str | None = None
-        self.indexeur = indexeur
-
-    def cree_collection(self, nom: str, description: str) -> ReponseCollection:
-        payload = PayloadCollection(name=nom, description=description)
-        response = self.session.post(f"{self.url}/collections", json=payload._asdict())
-        if response.status_code != 201:
-            print(f"Erreur {response.status_code}: {response.text}")
-            raise Exception(f"Erreur création collection: {response.status_code}")
-        result = response.json()
-        print(f"Réponse API: {result}")
-        self.id_collection = result["id"]
-        return ReponseCollection(
-            id=result["id"],
-            name=result.get("name", nom),
-            description=result.get("description", description),
-            visibility=result.get("visibility", "private"),
-            documents=result.get("documents", 0),
-            created_at=result.get("created_at", ""),
-            updated_at=result.get("updated_at", ""),
-        )
-
-    def ajoute_documents(
-        self,
-        documents: list[DocumentPDF],
-    ) -> list[ReponseDocument]:
-        id_collection = self.id_collection
-        return self.indexeur.ajoute_documents(documents, id_collection)
-
-
 def fabrique_client_albert() -> ClientAlbert:
     config = recupere_configuration().albert
     match config.indexeur:
         case "INDEXEUR_ALBERT":
-            return ClientAlbert(
+            return ClientAlbertReel(
                 config.url,
                 config.cle_api,
                 IndexeurBaseVectorielleAlbert(config.url, 3, 1),
             )
         case "INDEXEUR_DOCLING":
-            return ClientAlbert(
+            return ClientAlbertReel(
                 config.url,
                 config.cle_api,
                 IndexeurDocling(config.url, config.cle_api, config.chunker),  # type: ignore[arg-type]
@@ -92,22 +38,30 @@ def fabrique_client_albert() -> ClientAlbert:
     )
 
 
+def _cree_document_pdf(chemin: str, configuration_msc: MSC) -> DocumentPDF:
+    base = configuration_msc.url.rstrip("/")
+    chemin_guides = configuration_msc.chemin_guides.strip("/")
+    nom_fichier = Path(chemin).name
+    nom_fichier = unicodedata.normalize("NFC", nom_fichier)
+    nom_fichier_encode = quote(nom_fichier, safe="-._~")
+    url = f"{base}/{chemin_guides}/{nom_fichier_encode}"
+    return DocumentPDF(chemin, url)
+
+
 def collecte_documents_pdf(
     dossier: str = "donnees/guides_de_lANSSI",
     configuration_msc: MSC = recupere_configuration().msc,
 ) -> list[DocumentPDF]:
     chemins = glob.glob(f"{dossier}/*.pdf")
-    documents = []
-    base = configuration_msc.url.rstrip("/")
-    chemin_guides = configuration_msc.chemin_guides.strip("/")
-    for chemin in chemins:
-        nom_fichier = Path(chemin).name
-        nom_fichier = unicodedata.normalize("NFC", nom_fichier)
-        nom_fichier_encode = quote(nom_fichier, safe="-._~")
+    return [_cree_document_pdf(chemin, configuration_msc) for chemin in chemins]
 
-        url = f"{base}/{chemin_guides}/{nom_fichier_encode}"
-        documents.append(DocumentPDF(chemin, url))
-    return documents
+
+def collecte_document_pdf(
+    dossier: str = "donnees/guides_de_lANSSI",
+    configuration_msc: MSC = recupere_configuration().msc,
+) -> DocumentPDF:
+    chemins = glob.glob(f"{dossier}/*.pdf")
+    return _cree_document_pdf(chemins[0], configuration_msc)
 
 
 def main():
