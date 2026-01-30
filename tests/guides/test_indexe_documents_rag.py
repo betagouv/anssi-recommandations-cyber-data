@@ -5,6 +5,7 @@ from configuration import MSC
 from guides.indexe_documents_rag import (
     ClientAlbert,
     collecte_documents_pdf,
+    collecte_document_pdf,
 )
 from guides.indexeur import DocumentPDF
 from guides.indexeur_albert import IndexeurBaseVectorielleAlbert
@@ -75,3 +76,29 @@ def test_client_albert_cree_collection():
     assert client.id_collection == "12345"
     assert reponse.id == "12345"
     assert reponse.name == "test collection"
+
+
+def test_attribue_id_a_un_client_albert():
+    client = ClientAlbert(
+        "https://test.api",
+        "test-key",
+        IndexeurBaseVectorielleAlbert("https://test.api"),
+    )
+    id_collection = "collection-123"
+
+    client.attribue_collection(id_collection)
+
+    assert client.id_collection == id_collection
+
+
+def test_collecte_document_pdf_retourne_un_document(dossier_guide_anssi):
+    chemin_fichier = str(dossier_guide_anssi.resolve())
+
+    document = collecte_document_pdf(chemin_fichier)
+
+    assert isinstance(document, DocumentPDF)
+    assert document.chemin_pdf == str((Path(chemin_fichier) / "test.pdf").resolve())
+    assert (
+        document.url_pdf
+        == "https://messervices.cyber.gouv.fr/documents-guides/test.pdf"
+    )
