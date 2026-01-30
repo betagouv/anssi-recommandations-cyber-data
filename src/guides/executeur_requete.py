@@ -15,3 +15,6 @@ class ExecuteurDeRequete:
 
     def poste(self, url: str, payload: dict, fichiers: Optional[dict]) -> Response:
         return self.session.post(f"{url}", data=payload, files=fichiers)
+
+    def recupere(self, url):
+        return self.session.get(url)

@@ -1,25 +1,11 @@
 from pathlib import Path
-from unittest.mock import Mock
 
 from configuration import MSC
 from guides.indexe_documents_rag import (
-    ClientAlbert,
     collecte_documents_pdf,
     collecte_document_pdf,
 )
 from guides.indexeur import DocumentPDF
-from guides.indexeur_albert import IndexeurBaseVectorielleAlbert
-
-
-def test_client_albert_initialise_correctement():
-    url = "https://test.api"
-
-    client = ClientAlbert(url, "test-key", IndexeurBaseVectorielleAlbert(url))
-
-    assert isinstance(client, ClientAlbert)
-    assert str(client.client_openai.base_url) == "https://test.api"
-    assert client.session.headers["Authorization"] == "Bearer test-key"
-    assert client.id_collection is None
 
 
 def test_document_pdf_cree_correctement():
@@ -51,44 +37,6 @@ def test_ajoute_l_url_vers_msc_lors_de_la_collecte(dossier_guide_anssi):
     )
 
     assert documents[0].url_pdf == "http://msc.local/documents-guides/test.pdf"
-
-
-def test_client_albert_cree_collection():
-    url = "https://test.api"
-
-    client = ClientAlbert(url, "test-key", IndexeurBaseVectorielleAlbert(url))
-
-    mock_response = Mock()
-    mock_response.status_code = 201
-    mock_response.json.return_value = {
-        "id": "12345",
-        "name": "test collection",
-        "description": "description test",
-        "visibility": "private",
-        "documents": 0,
-        "created_at": "2024-01-01T00:00:00Z",
-        "updated_at": "2024-01-01T00:00:00Z",
-    }
-    client.session.post = Mock(return_value=mock_response)
-
-    reponse = client.cree_collection("test collection", "description test")
-
-    assert client.id_collection == "12345"
-    assert reponse.id == "12345"
-    assert reponse.name == "test collection"
-
-
-def test_attribue_id_a_un_client_albert():
-    client = ClientAlbert(
-        "https://test.api",
-        "test-key",
-        IndexeurBaseVectorielleAlbert("https://test.api"),
-    )
-    id_collection = "collection-123"
-
-    client.attribue_collection(id_collection)
-
-    assert client.id_collection == id_collection
 
 
 def test_collecte_document_pdf_retourne_un_document(dossier_guide_anssi):
