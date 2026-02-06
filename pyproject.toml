@@ -4,7 +4,6 @@ version = "0.1.0"
 description = "Une interface permettant d'évaluer le bot de l'ANSSI, basé sur Albert [Albert](https://github.com/betagouv/anssi-recommandations-cyber), et d'y indexer de nouveaux documents RAG."
 requires-python = "==3.13.0"
 dependencies = [
-     "canvas",
      "deepeval",
      "docling",
      "filelock>=3.20.3",
@@ -35,6 +34,7 @@ dev = [
     "types-psycopg2",
     "types-regex>=2025.11.3.20251106",
     "types-requests",
+    "pipdeptree",
 ]
 
 [tool.mypy]
