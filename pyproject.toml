@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Une interface permettant d'évaluer le bot de l'ANSSI, basé sur Albert [Albert](https://github.com/betagouv/anssi-recommandations-cyber), et d'y indexer de nouveaux documents RAG."
 requires-python = "==3.13.0"
 dependencies = [
-     "deepeval",
+     "deepeval>=3.8.4",
      "docling",
      "filelock>=3.20.3",
      "httpx",
@@ -22,6 +22,7 @@ dependencies = [
      "aiohttp>=3.13.3",
      "pyasn1>=0.6.2",
      "wheel>=0.46.2",
+     "protobuf>=5.29.6",
 ]
 
 [dependency-groups]
