@@ -1,13 +1,14 @@
+import asyncio
 from typing import (
     Protocol,
     Final,
     Union,
 )
+
 import httpx
 from pydantic import BaseModel
-from configuration import MQC
-import asyncio
 
+from configuration import MQC
 from infra.lecteur_csv import LecteurCSV
 
 
@@ -40,14 +41,17 @@ def construit_base_url(cfg: MQC) -> str:
 
 def formate_route_pose_question(cfg: MQC) -> str:
     r = cfg.route_pose_question
-    return r if r.startswith("/") else f"/{r}"
+    path = r if r.startswith("/") else f"/{r}"
+    return (
+        f"{path}?type_utilisateur=hn+oYK21MLYm//iHPemZDvlEy68xEayxx/Lho/LcI2ClFLMmzl0="
+    )
 
 
 class InterfaceQuestions(Protocol):
     async def pose_question(self, question: str) -> ReponseQuestion: ...
 
 
-class ClientMQCHTTPAsync:
+class ClientMQCHTTPAsync(InterfaceQuestions):
     def __init__(self, cfg: MQC, client: httpx.AsyncClient | None = None) -> None:
         self._base = construit_base_url(cfg)
         self._route = formate_route_pose_question(cfg)
