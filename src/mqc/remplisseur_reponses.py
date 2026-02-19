@@ -43,7 +43,7 @@ def formate_route_pose_question(cfg: MQC) -> str:
     r = cfg.route_pose_question
     path = r if r.startswith("/") else f"/{r}"
     return (
-        f"{path}?type_utilisateur=hn+oYK21MLYm//iHPemZDvlEy68xEayxx/Lho/LcI2ClFLMmzl0="
+        f"{path}?type_utilisateur=7rmPMRn/aYxPL8ZJJGXs8/X831n/4WFtiEO4UMCnbZyzLtaPSpw="
     )
 
 
