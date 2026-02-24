@@ -1,5 +1,5 @@
 import argparse
-import glob
+from typing import Optional
 
 from configuration import MSC, recupere_configuration
 from guides.cree_document_pdf import cree_document_pdf
@@ -14,17 +14,23 @@ from guides.indexeur import (
 
 
 def collecte_document_pdf(
-    dossier: str = "donnees/guides_de_lANSSI",
+    path: str = "donnees/guides_de_lANSSI",
     configuration_msc: MSC = recupere_configuration().msc,
+    path_url: Optional[str] | None = None,
 ) -> DocumentPDF:
-    chemins = glob.glob(f"{dossier}/*.pdf")
-    return cree_document_pdf(chemins[0], configuration_msc)
+    return cree_document_pdf(path, configuration_msc, path_url)
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--id_collection", required=True, help="ID de la collection")
     parser.add_argument("--path", required=True, help="Path du document à ajouter")
+    parser.add_argument(
+        "--guides_urls_externes",
+        default="src/guides/guides_urls_externes.json",
+        help="Fichier json qui spécifie les urls pour les pdf sotckés en dehors de MSS",
+    )
+
     args = parser.parse_args()
 
     client = fabrique_client_albert()
@@ -35,7 +41,7 @@ def main():
         return
 
     print(f"Collection trouvée portant l'ID: {client.id_collection}")
-    document = collecte_document_pdf(path=args.path)
+    document = collecte_document_pdf(path=args.path, path_url=args.guides_urls_externes)
     reponses = client.ajoute_documents([document])
 
     les_documents_en_erreur = list(

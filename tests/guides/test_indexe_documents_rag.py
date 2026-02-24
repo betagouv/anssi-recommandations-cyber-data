@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from configuration import MSC
+from configuration import MSC, recupere_configuration
 from guides.ajoute_document_a_la_collection import collecte_document_pdf
+from guides.cree_document_pdf import cree_document_pdf
 from guides.indexe_documents_rag import (
     collecte_documents_pdf,
 )
@@ -50,3 +51,47 @@ def test_collecte_document_pdf_retourne_un_document(dossier_guide_anssi):
         document.url_pdf
         == "https://messervices.cyber.gouv.fr/documents-guides/test.pdf"
     )
+
+
+def test_collecte_document_pdf_utilise_url_specifique_depuis_json(
+    dossier_guide_anssi,
+    fichier_urls_specifiques,
+):
+    chemin_fichier = str(dossier_guide_anssi.resolve() / "test.pdf")
+
+    document = collecte_document_pdf(
+        path=chemin_fichier,
+        configuration_msc=recupere_configuration().msc,
+        path_url=str(fichier_urls_specifiques),
+    )
+
+    assert document.url_pdf == "https://url_de_test.com"
+
+
+def test_cree_document_pdf_avec_un_fichier_de_parametre(
+    dossier_guide_anssi, fichier_urls_specifiques
+):
+    chemin_fichier = str(dossier_guide_anssi.resolve() / "test.pdf")
+
+    configuration_msc = recupere_configuration().msc
+
+    document = cree_document_pdf(
+        chemin_fichier, configuration_msc, str(fichier_urls_specifiques)
+    )
+    assert document.url_pdf == "https://url_de_test.com"
+
+
+def test_collecte_documents_pdf_utilise_url_specifique_depuis_json(
+    dossier_guide_anssi,
+    fichier_urls_specifiques,
+):
+    chemin_dossier = str(dossier_guide_anssi.resolve())
+
+    documents = collecte_documents_pdf(
+        dossier=chemin_dossier,
+        configuration_msc=recupere_configuration().msc,
+        path_url=str(fichier_urls_specifiques),
+    )
+
+    assert len(documents) == 1
+    assert documents[0].url_pdf == "https://url_de_test.com"

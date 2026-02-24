@@ -1,6 +1,7 @@
 import argparse
 import glob
 import multiprocessing as mp
+from typing import Optional
 
 from adaptateurs.client_albert import ClientAlbert
 from adaptateurs.client_albert_reel import ClientAlbertReel
@@ -38,9 +39,12 @@ def fabrique_client_albert() -> ClientAlbert:
 def collecte_documents_pdf(
     dossier: str = "donnees/guides_de_lANSSI",
     configuration_msc: MSC = recupere_configuration().msc,
+    path_url: Optional[str] | None = None,
 ) -> list[DocumentPDF]:
     chemins = glob.glob(f"{dossier}/*.pdf")
-    return [cree_document_pdf(chemin, configuration_msc) for chemin in chemins]
+    return [
+        cree_document_pdf(chemin, configuration_msc, path_url) for chemin in chemins
+    ]
 
 
 def main():
@@ -49,6 +53,11 @@ def main():
     parser.add_argument(
         "--description", required=True, help="Description de la collection"
     )
+    parser.add_argument(
+        "--guides_urls_externes",
+        default="src/guides/guides_urls_externes.json",
+        help="Fichier json qui spécifie les urls pour les pdf sotckés en dehors de MSS",
+    )
     args = parser.parse_args()
 
     client = fabrique_client_albert()
@@ -56,7 +65,7 @@ def main():
 
     client.cree_collection(args.nom, args.description)
     print(f"Collection créée avec ID: {client.id_collection}")
-    documents = collecte_documents_pdf()
+    documents = collecte_documents_pdf(path_url=args.guides_urls_externes)
     print(
         f"Collecté {len(documents)} documents PDF sur la collection {client.id_collection}"
     )
