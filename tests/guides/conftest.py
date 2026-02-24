@@ -1,3 +1,4 @@
+import json
 import sys
 from pathlib import Path
 from typing import Callable, Type, Union, Optional
@@ -41,6 +42,16 @@ def fichier_pdf(tmp_path) -> Callable[[str], Path]:
 @pytest.fixture
 def dossier_guide_anssi(tmp_path, fichier_pdf) -> Path:
     return fichier_pdf("test.pdf").parent
+
+
+@pytest.fixture
+def fichier_urls_specifiques(tmp_path) -> Path:
+    contenu = {"test.pdf": "https://url_de_test.com"}
+
+    chemin_fichier = tmp_path / "urls_specifiques.json"
+    chemin_fichier.write_text(json.dumps(contenu), encoding="utf-8")
+
+    return chemin_fichier
 
 
 @pytest.fixture
