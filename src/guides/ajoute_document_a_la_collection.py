@@ -35,7 +35,7 @@ def main():
         return
 
     print(f"Collection trouvée portant l'ID: {client.id_collection}")
-    document = collecte_document_pdf()
+    document = collecte_document_pdf(path=args.path)
     reponses = client.ajoute_documents([document])
 
     les_documents_en_erreur = list(

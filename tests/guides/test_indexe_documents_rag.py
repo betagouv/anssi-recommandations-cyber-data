@@ -40,12 +40,12 @@ def test_ajoute_l_url_vers_msc_lors_de_la_collecte(dossier_guide_anssi):
 
 
 def test_collecte_document_pdf_retourne_un_document(dossier_guide_anssi):
-    chemin_fichier = str(dossier_guide_anssi.resolve())
+    chemin_fichier = str(dossier_guide_anssi.resolve() / "test.pdf")
 
     document = collecte_document_pdf(chemin_fichier)
-
+    print(document)
     assert isinstance(document, DocumentPDF)
-    assert document.chemin_pdf == str((Path(chemin_fichier) / "test.pdf").resolve())
+    assert document.chemin_pdf == chemin_fichier
     assert (
         document.url_pdf
         == "https://messervices.cyber.gouv.fr/documents-guides/test.pdf"
