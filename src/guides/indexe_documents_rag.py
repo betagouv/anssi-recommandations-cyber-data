@@ -1,14 +1,11 @@
 import argparse
 import glob
 import multiprocessing as mp
-from pathlib import Path
-from urllib.parse import quote
-
-import unicodedata
 
 from adaptateurs.client_albert import ClientAlbert
 from adaptateurs.client_albert_reel import ClientAlbertReel
 from configuration import recupere_configuration, IndexeurDocument, MSC
+from guides.cree_document_pdf import cree_document_pdf
 from guides.indexeur import (
     DocumentPDF,
     ReponseDocumentEnErreur,
@@ -38,30 +35,12 @@ def fabrique_client_albert() -> ClientAlbert:
     )
 
 
-def _cree_document_pdf(chemin: str, configuration_msc: MSC) -> DocumentPDF:
-    base = configuration_msc.url.rstrip("/")
-    chemin_guides = configuration_msc.chemin_guides.strip("/")
-    nom_fichier = Path(chemin).name
-    nom_fichier = unicodedata.normalize("NFC", nom_fichier)
-    nom_fichier_encode = quote(nom_fichier, safe="-._~")
-    url = f"{base}/{chemin_guides}/{nom_fichier_encode}"
-    return DocumentPDF(chemin, url)
-
-
 def collecte_documents_pdf(
     dossier: str = "donnees/guides_de_lANSSI",
     configuration_msc: MSC = recupere_configuration().msc,
 ) -> list[DocumentPDF]:
     chemins = glob.glob(f"{dossier}/*.pdf")
-    return [_cree_document_pdf(chemin, configuration_msc) for chemin in chemins]
-
-
-def collecte_document_pdf(
-    dossier: str = "donnees/guides_de_lANSSI",
-    configuration_msc: MSC = recupere_configuration().msc,
-) -> DocumentPDF:
-    chemins = glob.glob(f"{dossier}/*.pdf")
-    return _cree_document_pdf(chemins[0], configuration_msc)
+    return [cree_document_pdf(chemin, configuration_msc) for chemin in chemins]
 
 
 def main():
