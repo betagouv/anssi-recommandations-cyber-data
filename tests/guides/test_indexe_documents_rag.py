@@ -1,9 +1,9 @@
 from pathlib import Path
 
 from configuration import MSC
+from guides.ajoute_document_a_la_collection import collecte_document_pdf
 from guides.indexe_documents_rag import (
     collecte_documents_pdf,
-    collecte_document_pdf,
 )
 from guides.indexeur import DocumentPDF
 

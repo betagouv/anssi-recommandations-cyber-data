@@ -1,13 +1,24 @@
 import argparse
+import glob
 
+from configuration import MSC, recupere_configuration
+from guides.cree_document_pdf import cree_document_pdf
 from guides.indexe_documents_rag import (
     fabrique_client_albert,
-    collecte_document_pdf,
 )
 from guides.indexeur import (
     ReponseDocumentEnErreur,
     ReponseDocumentEnSucces,
+    DocumentPDF,
 )
+
+
+def collecte_document_pdf(
+    dossier: str = "donnees/guides_de_lANSSI",
+    configuration_msc: MSC = recupere_configuration().msc,
+) -> DocumentPDF:
+    chemins = glob.glob(f"{dossier}/*.pdf")
+    return cree_document_pdf(chemins[0], configuration_msc)
 
 
 def main():
