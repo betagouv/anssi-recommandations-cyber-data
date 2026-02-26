@@ -1,5 +1,5 @@
 from adaptateurs.client_albert import ClientAlbert, PayloadCollection, ReponseCollection
-from documents.indexeur import DocumentPDF, ReponseDocument
+from documents.indexeur import ReponseDocument, DocumentAIndexer
 
 
 class ClientAlbertReel(ClientAlbert):
@@ -26,7 +26,7 @@ class ClientAlbertReel(ClientAlbert):
 
     def ajoute_documents(
         self,
-        documents: list[DocumentPDF],
+        documents: list[DocumentAIndexer],
     ) -> list[ReponseDocument]:
         id_collection = self.id_collection
         return self.indexeur.ajoute_documents(documents, id_collection)

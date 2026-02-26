@@ -11,10 +11,10 @@ from documents.chunker_docling_mqc import ChunkerDoclingMQC
 from documents.executeur_requete import ExecuteurDeRequete
 from documents.indexeur import (
     Indexeur,
-    DocumentPDF,
     ReponseDocument,
     ReponseDocumentEnSucces,
     ReponseDocumentEnErreur,
+    DocumentAIndexer,
 )
 from documents.multi_processeur import Multiprocesseur
 
@@ -29,7 +29,7 @@ for name in (
 
 @dataclass
 class DocumentsAAjouter:
-    documents: list[DocumentPDF]
+    documents: list[DocumentAIndexer]
     id_collection: str | None = None
     numero_liste_en_cours: int = 0
 
@@ -57,12 +57,12 @@ class IndexeurDocling(Indexeur):
         self.clef_api = clef_api
 
     def ajoute_documents(
-        self, documents: list[DocumentPDF], id_collection: str | None
+        self, documents: list[DocumentAIndexer], id_collection: str | None
     ) -> list[ReponseDocument]:
         reponse_documents = []
 
         def decoupe_la_liste_de_documents(
-            iterable: list[DocumentPDF],
+            iterable: list[DocumentAIndexer],
         ) -> Generator[DocumentsAAjouter]:
             it = iter(iterable)
             i = 0
@@ -91,7 +91,7 @@ class IndexeurDocling(Indexeur):
         reponse_documents = []
         for indice, document in enumerate(documents.documents):
             print(
-                f"[Liste {documents.numero_liste_en_cours}][{indice + 1} de {len(documents.documents)}] - Découpage du document {document.url_pdf}"
+                f"[Liste {documents.numero_liste_en_cours}][{indice + 1} de {len(documents.documents)}] - Découpage du document {document.url}"
             )
             reponse_documents.extend(
                 self.__ajoute_document(document, documents.id_collection)
@@ -101,9 +101,9 @@ class IndexeurDocling(Indexeur):
         return reponse_documents
 
     def __ajoute_document(
-        self, document_pdf: DocumentPDF, id_collection: str | None
+        self, document_pdf: DocumentAIndexer, id_collection: str | None
     ) -> list[ReponseDocument]:
-        nom_du_document = Path(document_pdf.chemin_pdf).name
+        nom_du_document = Path(document_pdf.chemin).name
         reponses: list[ReponseDocument] = []
         try:
             document = self.chunker.applique(document_pdf)
@@ -127,7 +127,7 @@ class IndexeurDocling(Indexeur):
                             "collection": str(id_collection),
                             "metadata": json.dumps(
                                 {
-                                    "source_url": document_pdf.url_pdf,
+                                    "source_url": document_pdf.url,
                                     "page": numero_page,
                                     "nom_document": document.nom_document,
                                 }

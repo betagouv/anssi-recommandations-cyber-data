@@ -6,7 +6,7 @@ from documents.document import (
     Document,
     BlocPage,
 )
-from documents.indexeur import DocumentPDF
+from documents.document_pdf import DocumentPDF
 
 document_pdf = DocumentPDF(
     chemin_pdf="tests/data/guide_test.pdf",

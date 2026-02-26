@@ -4,7 +4,7 @@ from openai import OpenAI
 from typing_extensions import NamedTuple
 
 from documents.executeur_requete import ExecuteurDeRequete
-from documents.indexeur import DocumentPDF, ReponseDocument, Indexeur
+from documents.indexeur import ReponseDocument, Indexeur, DocumentAIndexer
 
 
 class PayloadCollection(NamedTuple):
@@ -55,7 +55,7 @@ class ClientAlbert(ABC):
     @abstractmethod
     def ajoute_documents(
         self,
-        documents: list[DocumentPDF],
+        documents: list[DocumentAIndexer],
     ) -> list[ReponseDocument]:
         pass
 
