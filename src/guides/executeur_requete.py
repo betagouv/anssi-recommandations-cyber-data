@@ -1,7 +1,7 @@
 from typing import Optional
 
-from requests.models import Response
 import requests
+from requests.models import Response
 
 
 class ExecuteurDeRequete:
@@ -14,7 +14,9 @@ class ExecuteurDeRequete:
         self.session.headers = {"Authorization": f"Bearer {clef_api}"}
 
     def poste(self, url: str, payload: dict, fichiers: Optional[dict]) -> Response:
-        return self.session.post(f"{url}", data=payload, files=fichiers)
+        if fichiers is not None:
+            return self.session.post(f"{url}", data=payload, files=fichiers)
+        return self.session.post(f"{url}", json=payload, files=fichiers)
 
     def recupere(self, url):
         return self.session.get(url)
