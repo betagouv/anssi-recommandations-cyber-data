@@ -4,7 +4,7 @@ import traceback
 from dataclasses import dataclass
 from itertools import islice
 from pathlib import Path
-from typing import Generator
+from typing import Callable, Generator
 
 from guides.chunker_docling import ChunkerDocling, TypeFichier
 from guides.chunker_docling_hierarchique import ChunkerDoclingHierarchique
@@ -48,6 +48,7 @@ class IndexeurDocling(Indexeur):
         chunker: ChunkerDocling = ChunkerDoclingHierarchique(),
         executeur_de_requete: ExecuteurDeRequete = ExecuteurDeRequete(),
         multi_processeur: Multiprocesseur = Multiprocesseur(),
+        producteur_contenus: Callable[[str], list[str]] | None = None,
     ):
         super().__init__()
         self.multi_processeur = multi_processeur
@@ -55,6 +56,11 @@ class IndexeurDocling(Indexeur):
         self.chunker = chunker
         self.url = url
         self.clef_api = clef_api
+        self.producteur_contenus = (
+            producteur_contenus
+            if producteur_contenus is not None
+            else lambda texte: [texte]
+        )
 
     def ajoute_documents(
         self, documents: list[DocumentPDF], id_collection: str | None
@@ -116,56 +122,62 @@ class IndexeurDocling(Indexeur):
                 for bloc in page.blocs:
                     contenu_paragraphe_txt = bloc.texte
                     if len(contenu_paragraphe_txt) > 1:
-                        fichiers = {
-                            "file": (
-                                f"{self.chunker.nom_fichier}",
-                                contenu_paragraphe_txt.encode("utf-8"),
-                                CONTENT_TYPE[self.chunker.type_fichier],
-                            )
-                        }
-                        payload = {
-                            "collection": str(id_collection),
-                            "metadata": json.dumps(
-                                {
-                                    "source_url": document.url_pdf,
-                                    "page": numero_page,
-                                    "nom_document": guide.nom_document,
-                                }
-                            ),
-                            "chunker": "NoSplitter",
-                        }
-                        response = self.executeur_de_requete.poste(
-                            f"{self.url}/documents", payload, fichiers
+                        textes_a_indexer = self.producteur_contenus(
+                            contenu_paragraphe_txt
                         )
-                        try:
-                            result = response.json()
-                        except json.JSONDecodeError:
-                            print(
-                                f"Erreur de décodage JSON. Status: {response.status_code}"
-                            )
-                            print(f"Contenu reçu: {response.text[:200]}")
-                            raise
-                        if response.status_code != 201:
-                            reponses.append(
-                                ReponseDocumentEnErreur(
-                                    detail=result.get(
-                                        "detail", "Une erreur est survenue"
-                                    ),
-                                    document_en_erreur=nom_du_document,
+                        for texte in textes_a_indexer:
+                            if len(texte) <= 1:
+                                continue
+                            fichiers = {
+                                "file": (
+                                    f"{self.chunker.nom_fichier}",
+                                    texte.encode("utf-8"),
+                                    CONTENT_TYPE[self.chunker.type_fichier],
                                 )
+                            }
+                            payload = {
+                                "collection": str(id_collection),
+                                "metadata": json.dumps(
+                                    {
+                                        "source_url": document.url_pdf,
+                                        "page": numero_page,
+                                        "nom_document": guide.nom_document,
+                                    }
+                                ),
+                                "chunker": "NoSplitter",
+                            }
+                            response = self.executeur_de_requete.poste(
+                                f"{self.url}/documents", payload, fichiers
                             )
-                        else:
-                            reponses.append(
-                                ReponseDocumentEnSucces(
-                                    id=result["id"],
-                                    name=result.get("name", nom_du_document),
-                                    collection_id=result.get(
-                                        "collection_id", str(id_collection)
-                                    ),
-                                    created_at=result.get("created_at", ""),
-                                    updated_at=result.get("updated_at", ""),
+                            try:
+                                result = response.json()
+                            except json.JSONDecodeError:
+                                print(
+                                    f"Erreur de décodage JSON. Status: {response.status_code}"
                                 )
-                            )
+                                print(f"Contenu reçu: {response.text[:200]}")
+                                raise
+                            if response.status_code != 201:
+                                reponses.append(
+                                    ReponseDocumentEnErreur(
+                                        detail=result.get(
+                                            "detail", "Une erreur est survenue"
+                                        ),
+                                        document_en_erreur=nom_du_document,
+                                    )
+                                )
+                            else:
+                                reponses.append(
+                                    ReponseDocumentEnSucces(
+                                        id=result["id"],
+                                        name=result.get("name", nom_du_document),
+                                        collection_id=result.get(
+                                            "collection_id", str(id_collection)
+                                        ),
+                                        created_at=result.get("created_at", ""),
+                                        updated_at=result.get("updated_at", ""),
+                                    )
+                                )
         except Exception:
             tb = traceback.format_exc()
             reponses.append(
