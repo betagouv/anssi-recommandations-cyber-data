@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Generator
 
 from documents.chunker_docling import ChunkerDocling, TypeFichier
-from documents.chunker_docling_hierarchique import ChunkerDoclingHierarchique
+from documents.chunker_docling_mqc import ChunkerDoclingMQC
 from documents.executeur_requete import ExecuteurDeRequete
 from documents.indexeur import (
     Indexeur,
@@ -45,7 +45,7 @@ class IndexeurDocling(Indexeur):
         self,
         url: str,
         clef_api: str,
-        chunker: ChunkerDocling = ChunkerDoclingHierarchique(),
+        chunker: ChunkerDocling = ChunkerDoclingMQC(),
         executeur_de_requete: ExecuteurDeRequete = ExecuteurDeRequete(),
         multi_processeur: Multiprocesseur = Multiprocesseur(),
     ):

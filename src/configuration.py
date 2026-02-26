@@ -4,7 +4,6 @@ from enum import StrEnum
 from typing_extensions import NamedTuple, Optional
 
 from documents.chunker_docling import ChunkerDocling
-from documents.chunker_docling_hierarchique import ChunkerDoclingHierarchique
 from documents.chunker_docling_mqc import ChunkerDoclingMQC
 
 
@@ -19,11 +18,6 @@ class MQC(NamedTuple):
 class IndexeurDocument(StrEnum):
     INDEXEUR_ALBERT = ("INDEXEUR_ALBERT",)
     INDEXEUR_DOCLING = ("INDEXEUR_DOCLING",)
-
-
-class StrategieDeChunking(StrEnum):
-    CHUNKER_DOCLING_HIERARCHIQUE = ("CHUNKER_DOCLING_HIERARCHIQUE",)
-    CHUNKER_DOCLING_MQC = ("CHUNKER_DOCLING_MQC",)
 
 
 class Albert(NamedTuple):
@@ -85,13 +79,7 @@ def recupere_configuration() -> Configuration:
     indexeur_document = IndexeurDocument(os.getenv("INDEXEUR", "INDEXEUR_ALBERT"))
     chunker: ChunkerDocling | None = None
     if indexeur_document == IndexeurDocument.INDEXEUR_DOCLING:
-        strategie_de_chunking = StrategieDeChunking(
-            os.getenv("CHUNKER", "CHUNKER_DOCLING_HIERARCHIQUE")
-        )
-        if strategie_de_chunking == StrategieDeChunking.CHUNKER_DOCLING_MQC:
-            chunker = ChunkerDoclingMQC()
-        else:
-            chunker = ChunkerDoclingHierarchique()
+        chunker = ChunkerDoclingMQC()
 
     albert: Albert = Albert(
         url=os.getenv("ALBERT_URL", "https://albert.api.etalab.gouv.fr/v1"),
