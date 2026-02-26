@@ -1,4 +1,5 @@
 import re
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import NamedTuple
@@ -20,10 +21,20 @@ class BlocPage:
 
 
 @dataclass
-class Page:
+class Page(ABC):
     numero_page: int
     blocs: list[BlocPage] = field(default_factory=list)
 
+    @abstractmethod
+    def ajoute_bloc(self, bloc: BlocPage) -> None:
+        pass
+
+    @abstractmethod
+    def supprime_bloc(self, bloc: BlocPage) -> None:
+        pass
+
+
+class PagePDF(Page):
     def ajoute_bloc(self, bloc: BlocPage) -> None:
         les_positions = [bloc.position for bloc in self.blocs]
         les_positions.append(bloc.position)
@@ -60,7 +71,7 @@ class Page:
         while i < len(self.blocs):
             courant = self.blocs[i]
             suivant = self.blocs[i + 1] if i + 1 < len(self.blocs) else None
-            if self.a_du_contenu_adjacent_au_titre(courant, suivant):
+            if self._a_du_contenu_adjacent_au_titre(courant, suivant):
                 blocs_fusionnes.append(
                     BlocPage(
                         texte=f"{courant.texte}\n{suivant.texte}",
@@ -68,7 +79,7 @@ class Page:
                     )
                 )
                 i += 1
-            elif self.a_du_contenu_adjacent_au_sous_titre(courant, suivant):
+            elif self._a_du_contenu_adjacent_au_sous_titre(courant, suivant):
                 blocs_fusionnes.append(
                     BlocPage(
                         texte=f"{courant.texte}\n{suivant.texte}",
@@ -82,12 +93,12 @@ class Page:
 
         self.blocs = blocs_fusionnes
 
-    def a_du_contenu_adjacent_au_titre(
+    def _a_du_contenu_adjacent_au_titre(
         self, courant: BlocPage, suivant: BlocPage | None
     ) -> bool:
         return self.a_du_contenu_adjacent(courant, "[TITRE]", suivant)
 
-    def a_du_contenu_adjacent_au_sous_titre(
+    def _a_du_contenu_adjacent_au_sous_titre(
         self, courant: BlocPage, suivant: BlocPage | None
     ) -> bool:
         return self.a_du_contenu_adjacent(courant, "[SOUS-TITRE]", suivant)
@@ -130,7 +141,7 @@ class Document:
         self, numero_page: int, position: Position, texte: str
     ) -> None:
         if self.pages.get(numero_page) is None:
-            page = Page(numero_page=numero_page)
+            page = PagePDF(numero_page=numero_page)
             page.ajoute_bloc(BlocPage(texte=texte, position=position))
             self.pages[numero_page] = page
         else:
