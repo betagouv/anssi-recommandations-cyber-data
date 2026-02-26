@@ -6,10 +6,10 @@ import requests
 
 from documents.indexeur import (
     Indexeur,
-    DocumentPDF,
     PayloadDocument,
     ReponseDocument,
     ReponseDocumentEnSucces,
+    DocumentAIndexer,
 )
 
 
@@ -22,7 +22,7 @@ class IndexeurBaseVectorielleAlbert(Indexeur):
         self.session = requests.session()
 
     def ajoute_documents(
-        self, documents: list[DocumentPDF], id_collection: str | None
+        self, documents: list[DocumentAIndexer], id_collection: str | None
     ) -> list[ReponseDocument]:
         reponses = []
         for document in documents:
@@ -34,14 +34,14 @@ class IndexeurBaseVectorielleAlbert(Indexeur):
         return reponses
 
     def __ajoute_document(
-        self, document: DocumentPDF, id_collection
+        self, document: DocumentAIndexer, id_collection
     ) -> ReponseDocument:
-        nom = Path(document.chemin_pdf).name
-        with open(document.chemin_pdf, "rb") as flux:
+        nom = Path(document.chemin).name
+        with open(document.chemin, "rb") as flux:
             fichiers = {"file": (nom, flux, "application/pdf")}
             payload = PayloadDocument(
                 collection=str(id_collection),
-                metadata=json.dumps({"source_url": document.url_pdf}),
+                metadata=json.dumps({"source_url": document.url}),
                 chunk_min_size=150,
             )
             response = self.session.post(
@@ -58,7 +58,7 @@ class IndexeurBaseVectorielleAlbert(Indexeur):
         )
 
     def __ajoute_document_avec_retry(
-        self, doc: DocumentPDF, id_collection: str | None
+        self, doc: DocumentAIndexer, id_collection: str | None
     ) -> ReponseDocument | None:
         succes = False
         tentative = 0
@@ -69,12 +69,12 @@ class IndexeurBaseVectorielleAlbert(Indexeur):
                 succes = True
                 return reponse
             except Exception as e:
-                print(f"Tentative {tentative} échouée pour {doc.chemin_pdf}: {e}")
+                print(f"Tentative {tentative} échouée pour {doc.chemin}: {e}")
                 if tentative < self.max_tentatives:
                     print("Nouvel essai dans 5 secondes...")
                     time.sleep(self.temps_d_attente)
                 else:
                     print(
-                        f"Échec après {self.max_tentatives} tentatives pour {doc.chemin_pdf}"
+                        f"Échec après {self.max_tentatives} tentatives pour {doc.chemin}"
                     )
         return None

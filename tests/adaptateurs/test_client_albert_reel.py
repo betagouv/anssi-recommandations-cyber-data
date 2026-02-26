@@ -1,6 +1,7 @@
 from adaptateurs.client_albert import ReponseCollectionAlbert
 from adaptateurs.client_albert_reel import ClientAlbertReel
-from documents.indexeur import DocumentPDF, Indexeur, ReponseDocument
+from documents.document_pdf import DocumentPDF
+from documents.indexeur import Indexeur, ReponseDocument, DocumentAIndexer
 from documents.indexeur_albert import IndexeurBaseVectorielleAlbert
 
 
@@ -98,7 +99,7 @@ class IndexeurDeTest(Indexeur):
         self.collection_recue = None
 
     def ajoute_documents(
-        self, documents: list[DocumentPDF], id_collection: str | None
+        self, documents: list[DocumentAIndexer], id_collection: str | None
     ) -> list[ReponseDocument]:
         self.documents_recus.extend(documents)
         self.collection_recue = id_collection

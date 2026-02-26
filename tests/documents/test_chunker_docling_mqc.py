@@ -1,6 +1,6 @@
 from documents.chunker_docling import TypeFichier
 from documents.chunker_docling_mqc import ChunkerDoclingMQC
-from documents.indexeur import DocumentPDF
+from documents.document_pdf import DocumentPDF
 
 
 def test_retourne_le_document(un_convertisseur_avec_un_texte):

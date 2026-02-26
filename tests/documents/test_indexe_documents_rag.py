@@ -3,10 +3,10 @@ from pathlib import Path
 from configuration import MSC, recupere_configuration
 from documents.ajoute_document_a_la_collection import collecte_document_pdf
 from documents.cree_document_pdf import cree_document_pdf
+from documents.document_pdf import DocumentPDF
 from documents.indexe_documents_rag import (
     collecte_documents_pdf,
 )
-from documents.indexeur import DocumentPDF
 
 
 def test_document_pdf_cree_correctement():

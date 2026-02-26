@@ -9,7 +9,7 @@ from documents.chunker_docling import ChunkerDocling, extrais_position, TypeFich
 from documents.document import Document
 from documents.extrais_les_chunks import extrais_les_chunks
 from documents.filtre_resultat import filtre_les_resultats
-from documents.indexeur import DocumentPDF
+from documents.indexeur import DocumentAIndexer
 
 
 class Position(NamedTuple):
@@ -25,16 +25,16 @@ class ChunkerDoclingMQC(ChunkerDocling):
         self.type_fichier = TypeFichier.TEXTE
 
     def _cree_le_document(
-        self, resultat_conversion: ConversionResult, document: DocumentPDF
+        self, resultat_conversion: ConversionResult, document: DocumentAIndexer
     ) -> Document:
-        self.nom_fichier = Path(document.chemin_pdf).name.replace(".pdf", ".txt")
+        self.nom_fichier = Path(document.chemin).name.replace(".pdf", ".txt")
         elements_filtres = filtre_les_resultats(resultat_conversion)
         chunks = extrais_les_chunks(elements_filtres)
 
         return self.__extrais_le_document(chunks, document)
 
     def __extrais_le_document(
-        self, chunks: list[BaseChunk], document_pdf: DocumentPDF
+        self, chunks: list[BaseChunk], document_pdf: DocumentAIndexer
     ) -> Document:
         document = Document(document_pdf)
 

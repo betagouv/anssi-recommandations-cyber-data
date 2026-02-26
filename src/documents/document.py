@@ -1,10 +1,9 @@
 import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import NamedTuple
 
-from documents.indexeur import DocumentPDF
+from documents.indexeur import DocumentAIndexer
 
 
 class Position(NamedTuple):
@@ -132,16 +131,20 @@ class PagePDF(Page):
 
 
 class Document:
-    def __init__(self, document: DocumentPDF):
+    def __init__(self, document: DocumentAIndexer):
         super().__init__()
-        self.nom_document = Path(document.chemin_pdf).name
+        self._document_a_indexer = document
         self.pages: dict[int, Page] = {}
+
+    @property
+    def nom_document(self):
+        return self._document_a_indexer.nom_document
 
     def ajoute_bloc_a_la_page(
         self, numero_page: int, position: Position, texte: str
     ) -> None:
         if self.pages.get(numero_page) is None:
-            page = PagePDF(numero_page=numero_page)
+            page = self._document_a_indexer.initie_page(numero_page)
             page.ajoute_bloc(BlocPage(texte=texte, position=position))
             self.pages[numero_page] = page
         else:

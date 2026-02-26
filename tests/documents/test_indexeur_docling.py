@@ -10,9 +10,10 @@ from pydantic import Field
 from documents.chunker_docling import extrais_position, TypeFichier
 from documents.chunker_docling_mqc import ChunkerDoclingMQC
 from documents.document import Document
+from documents.document_pdf import DocumentPDF
 from documents.indexeur import (
-    DocumentPDF,
     ReponseDocumentEnErreur,
+    DocumentAIndexer,
 )
 from documents.indexeur_docling import IndexeurDocling
 from documents.multi_processeur import Multiprocesseur
@@ -80,8 +81,8 @@ class ChunkerDeTest(ChunkerDoclingMQC):
         self.type_fichier = type_fichier
         self.chunker = BaseChunkerDeTest()
 
-    def applique(self, document_pdf: DocumentPDF) -> Document:
-        chunks = self.chunker.chunk(DLDocument(name=document_pdf.chemin_pdf))
+    def applique(self, document_pdf: DocumentAIndexer) -> Document:
+        chunks = self.chunker.chunk(DLDocument(name=document_pdf.chemin))
         document = Document(document_pdf)
         for chunk in chunks:
             document.ajoute_bloc_a_la_page(

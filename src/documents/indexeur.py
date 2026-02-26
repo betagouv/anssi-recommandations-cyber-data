@@ -1,14 +1,34 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Union
+from typing import Union, Literal, Optional
 
 from typing_extensions import NamedTuple
 
 
-@dataclass
-class DocumentPDF:
-    chemin_pdf: str
-    url_pdf: str
+class DocumentAIndexer(ABC):
+    _type: Literal["PDF", "HTML"]
+
+    @property
+    def type(self) -> Literal["PDF", "HTML"]:
+        return self._type
+
+    @property
+    @abstractmethod
+    def nom_document(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def url(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def chemin(self) -> str:
+        pass
+
+    @abstractmethod
+    def initie_page(self, numero_page: Optional[int] = None):
+        pass
 
 
 class PayloadDocument(NamedTuple):
@@ -36,6 +56,6 @@ type ReponseDocument = Union[ReponseDocumentEnSucces, ReponseDocumentEnErreur]
 class Indexeur(ABC):
     @abstractmethod
     def ajoute_documents(
-        self, documents: list[DocumentPDF], id_collection: str | None
+        self, documents: list[DocumentAIndexer], id_collection: str | None
     ) -> list[ReponseDocument]:
         pass

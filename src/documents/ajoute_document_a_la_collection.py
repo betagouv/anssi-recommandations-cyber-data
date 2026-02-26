@@ -3,13 +3,13 @@ from typing import Optional
 
 from configuration import MSC, recupere_configuration
 from documents.cree_document_pdf import cree_document_pdf
+from documents.document_pdf import DocumentPDF
 from documents.indexe_documents_rag import (
     fabrique_client_albert,
 )
 from documents.indexeur import (
     ReponseDocumentEnErreur,
     ReponseDocumentEnSucces,
-    DocumentPDF,
 )
 
 
