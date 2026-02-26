@@ -5,7 +5,7 @@ from typing import Optional
 from urllib.parse import quote
 
 from configuration import MSC
-from guides.indexeur import DocumentPDF
+from documents.indexeur import DocumentPDF
 
 
 def cree_document_pdf(

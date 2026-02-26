@@ -1,12 +1,12 @@
 from pathlib import Path
 
 from configuration import MSC, recupere_configuration
-from guides.ajoute_document_a_la_collection import collecte_document_pdf
-from guides.cree_document_pdf import cree_document_pdf
-from guides.indexe_documents_rag import (
+from documents.ajoute_document_a_la_collection import collecte_document_pdf
+from documents.cree_document_pdf import cree_document_pdf
+from documents.indexe_documents_rag import (
     collecte_documents_pdf,
 )
-from guides.indexeur import DocumentPDF
+from documents.indexeur import DocumentPDF
 
 
 def test_document_pdf_cree_correctement():

@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import NamedTuple
 
-from guides.indexeur import DocumentPDF
+from documents.indexeur import DocumentPDF
 
 
 class Position(NamedTuple):
@@ -120,7 +120,7 @@ class Page:
         return True
 
 
-class Guide:
+class Document:
     def __init__(self, document: DocumentPDF):
         super().__init__()
         self.nom_document = Path(document.chemin_pdf).name

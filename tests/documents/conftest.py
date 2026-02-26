@@ -8,8 +8,8 @@ import pytest
 from docling.backend.pdf_backend import PdfDocumentBackend
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.document import InputDocument
-from docling.document_converter import ConversionResult
 from docling.datamodel.settings import PageRange
+from docling.document_converter import ConversionResult
 from docling.document_converter import DocumentConverter
 from docling_core.types import DoclingDocument
 from docling_core.types.doc import (
@@ -22,7 +22,7 @@ from docling_core.types.doc import (
 from docling_core.types.io import DocumentStream
 from requests import Session
 
-from guides.indexeur import (
+from documents.indexeur import (
     ReponseDocument,
     ReponseDocumentEnSucces,
 )

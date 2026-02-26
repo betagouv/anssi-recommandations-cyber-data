@@ -6,17 +6,17 @@ from itertools import islice
 from pathlib import Path
 from typing import Generator
 
-from guides.chunker_docling import ChunkerDocling, TypeFichier
-from guides.chunker_docling_hierarchique import ChunkerDoclingHierarchique
-from guides.executeur_requete import ExecuteurDeRequete
-from guides.indexeur import (
+from documents.chunker_docling import ChunkerDocling, TypeFichier
+from documents.chunker_docling_hierarchique import ChunkerDoclingHierarchique
+from documents.executeur_requete import ExecuteurDeRequete
+from documents.indexeur import (
     Indexeur,
     DocumentPDF,
     ReponseDocument,
     ReponseDocumentEnSucces,
     ReponseDocumentEnErreur,
 )
-from guides.multi_processeur import Multiprocesseur
+from documents.multi_processeur import Multiprocesseur
 
 for name in (
     "docling",
@@ -101,16 +101,16 @@ class IndexeurDocling(Indexeur):
         return reponse_documents
 
     def __ajoute_document(
-        self, document: DocumentPDF, id_collection: str | None
+        self, document_pdf: DocumentPDF, id_collection: str | None
     ) -> list[ReponseDocument]:
-        nom_du_document = Path(document.chemin_pdf).name
+        nom_du_document = Path(document_pdf.chemin_pdf).name
         reponses: list[ReponseDocument] = []
         try:
-            guide = self.chunker.applique(document)
+            document = self.chunker.applique(document_pdf)
 
             self.executeur_de_requete.initialise(self.clef_api)
 
-            for page in guide.pages.values():
+            for page in document.pages.values():
                 numero_page = page.numero_page
 
                 for bloc in page.blocs:
@@ -127,9 +127,9 @@ class IndexeurDocling(Indexeur):
                             "collection": str(id_collection),
                             "metadata": json.dumps(
                                 {
-                                    "source_url": document.url_pdf,
+                                    "source_url": document_pdf.url_pdf,
                                     "page": numero_page,
-                                    "nom_document": guide.nom_document,
+                                    "nom_document": document.nom_document,
                                 }
                             ),
                             "chunker": "NoSplitter",

@@ -1,14 +1,14 @@
 import pytest
 
-from guides.chunker_docling_mqc import Position
-from guides.guide import (
+from documents.chunker_docling_mqc import Position
+from documents.document import (
     Page,
-    Guide,
+    Document,
     BlocPage,
 )
-from guides.indexeur import DocumentPDF
+from documents.indexeur import DocumentPDF
 
-document = DocumentPDF(
+document_pdf = DocumentPDF(
     chemin_pdf="tests/data/guide_test.pdf",
     url_pdf="http://document.local/guide_test.pdf",
 )
@@ -36,116 +36,120 @@ def test_page_peut_ajouter_un_bloc():
 
 
 def test_pages_peut_etre_creee():
-    guide = Guide(document=document)
-    assert guide is not None
+    document = Document(document=document_pdf)
+    assert document is not None
 
 
 def test_pages_a_une_collection_de_pages_vide_par_defaut():
-    guide = Guide(document=document)
-    assert guide.pages == {}
+    document = Document(document=document_pdf)
+    assert document.pages == {}
 
 
-def test_guide_peut_ajouter_un_bloc_dans_une_page():
-    guide = Guide(document=document)
+def test_document_peut_ajouter_un_bloc_dans_une_page():
+    document = Document(document=document_pdf)
     position = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
 
-    guide.ajoute_bloc_a_la_page(1, position, "[TEXTE] Une page")
+    document.ajoute_bloc_a_la_page(1, position, "[TEXTE] Une page")
 
-    assert len(guide.pages) == 1
-    assert guide.pages[1] == Page(
+    assert len(document.pages) == 1
+    assert document.pages[1] == Page(
         numero_page=1, blocs=[BlocPage(texte="[TEXTE] Une page", position=position)]
     )
 
 
-def test_guide_peut_ajouter_deux_blocs_sur_une_meme_page():
-    guide = Guide(document=document)
+def test_document_peut_ajouter_deux_blocs_sur_une_meme_page():
+    document = Document(document=document_pdf)
     position_bloc_1 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=0.0, largeur=100.0, hauteur=5.0)
 
-    guide.ajoute_bloc_a_la_page(1, position_bloc_1, "[TEXTE] Un titre")
-    guide.ajoute_bloc_a_la_page(1, position_bloc_2, "[TEXTE] Un paragraphe")
+    document.ajoute_bloc_a_la_page(1, position_bloc_1, "[TEXTE] Un titre")
+    document.ajoute_bloc_a_la_page(1, position_bloc_2, "[TEXTE] Un paragraphe")
 
-    assert len(guide.pages) == 1
-    assert guide.pages[1].blocs[0].texte == "[TEXTE] Un titre"
-    assert guide.pages[1].blocs[1].texte == "[TEXTE] Un paragraphe"
+    assert len(document.pages) == 1
+    assert document.pages[1].blocs[0].texte == "[TEXTE] Un titre"
+    assert document.pages[1].blocs[1].texte == "[TEXTE] Un paragraphe"
 
 
-def test_guide_reordonne_lorsque_l_on_ajoute_un_bloc():
-    guide = Guide(document=document)
+def test_document_reordonne_lorsque_l_on_ajoute_un_bloc():
+    document = Document(document=document_pdf)
     position_bloc_1 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
 
-    guide.ajoute_bloc_a_la_page(
+    document.ajoute_bloc_a_la_page(
         1, position_bloc_1, "[TEXTE] Un paragraphe en seconde position"
     )
-    guide.ajoute_bloc_a_la_page(
+    document.ajoute_bloc_a_la_page(
         1, position_bloc_2, "[TEXTE] Un paragraphe en première position"
     )
 
-    assert len(guide.pages) == 1
-    assert guide.pages[1].blocs[0].texte == "[TEXTE] Un paragraphe en première position"
-    assert guide.pages[1].blocs[1].texte == "[TEXTE] Un paragraphe en seconde position"
+    assert len(document.pages) == 1
+    assert (
+        document.pages[1].blocs[0].texte == "[TEXTE] Un paragraphe en première position"
+    )
+    assert (
+        document.pages[1].blocs[1].texte == "[TEXTE] Un paragraphe en seconde position"
+    )
 
 
-def test_guide_fusionne_un_titre_avec_son_contenu():
-    guide = Guide(document=document)
+def test_document_fusionne_un_titre_avec_son_contenu():
+    document = Document(document=document_pdf)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0)
     position_bloc_3 = Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0)
     position_bloc_4 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_5 = Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0)
 
-    guide.ajoute_bloc_a_la_page(1, position_bloc_1, "[TITRE] Titre 1")
-    guide.ajoute_bloc_a_la_page(1, position_bloc_2, "[TITRE] Titre 2")
-    guide.ajoute_bloc_a_la_page(1, position_bloc_3, "[TEXTE] Contenu 1.")
-    guide.ajoute_bloc_a_la_page(1, position_bloc_4, "[TEXTE] Contenu 2.")
-    guide.ajoute_bloc_a_la_page(1, position_bloc_5, "[SOUS-TITRE] 1.1 Sous-titre.")
+    document.ajoute_bloc_a_la_page(1, position_bloc_1, "[TITRE] Titre 1")
+    document.ajoute_bloc_a_la_page(1, position_bloc_2, "[TITRE] Titre 2")
+    document.ajoute_bloc_a_la_page(1, position_bloc_3, "[TEXTE] Contenu 1.")
+    document.ajoute_bloc_a_la_page(1, position_bloc_4, "[TEXTE] Contenu 2.")
+    document.ajoute_bloc_a_la_page(1, position_bloc_5, "[SOUS-TITRE] 1.1 Sous-titre.")
 
-    assert len(guide.pages[1].blocs) == 3
-    assert guide.pages[1].blocs[0].texte == "[TITRE] Titre 1"
+    assert len(document.pages[1].blocs) == 3
+    assert document.pages[1].blocs[0].texte == "[TITRE] Titre 1"
     assert (
-        guide.pages[1].blocs[1].texte
+        document.pages[1].blocs[1].texte
         == "[TITRE] Titre 2\n[TEXTE] Contenu 1.\n[TEXTE] Contenu 2."
     )
-    assert guide.pages[1].blocs[2].texte == "[SOUS-TITRE] 1.1 Sous-titre."
+    assert document.pages[1].blocs[2].texte == "[SOUS-TITRE] 1.1 Sous-titre."
 
 
-def test_guide_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommandations():
-    guide = Guide(document=document)
+def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommandations():
+    document = Document(document=document_pdf)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0)
     position_bloc_3 = Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0)
     position_bloc_4 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_5 = Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0)
 
-    guide.ajoute_bloc_a_la_page(1, position_bloc_1, "[TITRE] Titre")
-    guide.ajoute_bloc_a_la_page(1, position_bloc_2, "[RECOMMANDATION] R1")
-    guide.ajoute_bloc_a_la_page(1, position_bloc_3, "[TEXTE] Recommandation 1.")
-    guide.ajoute_bloc_a_la_page(1, position_bloc_4, "[RECOMMANDATION] R2")
-    guide.ajoute_bloc_a_la_page(1, position_bloc_5, "[TEXTE] Recommandation 2.")
+    document.ajoute_bloc_a_la_page(1, position_bloc_1, "[TITRE] Titre")
+    document.ajoute_bloc_a_la_page(1, position_bloc_2, "[RECOMMANDATION] R1")
+    document.ajoute_bloc_a_la_page(1, position_bloc_3, "[TEXTE] Recommandation 1.")
+    document.ajoute_bloc_a_la_page(1, position_bloc_4, "[RECOMMANDATION] R2")
+    document.ajoute_bloc_a_la_page(1, position_bloc_5, "[TEXTE] Recommandation 2.")
 
-    assert len(guide.pages[1].blocs) == 1
+    assert len(document.pages[1].blocs) == 1
     assert (
-        guide.pages[1].blocs[0].texte
+        document.pages[1].blocs[0].texte
         == "[TITRE] Titre\n[RECOMMANDATION] R1\n[TEXTE] Recommandation 1.\n[RECOMMANDATION] R2\n[TEXTE] Recommandation 2."
     )
 
 
-def test_guide_fusionne_tous_les_contenus_d_un_sous_titre():
-    guide = Guide(document=document)
+def test_document_fusionne_tous_les_contenus_d_un_sous_titre():
+    document = Document(document=document_pdf)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0)
     position_bloc_3 = Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0)
     position_bloc_4 = Position(x=10.0, y=5.0, largeur=100.0, hauteur=5.0)
 
-    guide.ajoute_bloc_a_la_page(1, position_bloc_1, "[SOUS-TITRE] 1.2 Sous-titre 1")
-    guide.ajoute_bloc_a_la_page(1, position_bloc_2, "[TEXTE] Paragraphe 1.")
-    guide.ajoute_bloc_a_la_page(1, position_bloc_3, "[TEXTE] Paragraphe 2.")
-    guide.ajoute_bloc_a_la_page(1, position_bloc_4, "[TEXTE] Paragraphe 3.")
+    document.ajoute_bloc_a_la_page(1, position_bloc_1, "[SOUS-TITRE] 1.2 Sous-titre 1")
+    document.ajoute_bloc_a_la_page(1, position_bloc_2, "[TEXTE] Paragraphe 1.")
+    document.ajoute_bloc_a_la_page(1, position_bloc_3, "[TEXTE] Paragraphe 2.")
+    document.ajoute_bloc_a_la_page(1, position_bloc_4, "[TEXTE] Paragraphe 3.")
 
-    assert len(guide.pages[1].blocs) == 1
+    assert len(document.pages[1].blocs) == 1
     assert (
-        guide.pages[1].blocs[0].texte
+        document.pages[1].blocs[0].texte
         == "[SOUS-TITRE] 1.2 Sous-titre 1\n[TEXTE] Paragraphe 1.\n[TEXTE] Paragraphe 2.\n[TEXTE] Paragraphe 3."
     )
 
@@ -207,14 +211,14 @@ def test_guide_fusionne_tous_les_contenus_d_un_sous_titre():
         ),
     ],
 )
-def test_guide_fusionne_les_recommandations(_description, textes, attendu):
-    guide = Guide(document=document)
+def test_document_fusionne_les_recommandations(_description, textes, attendu):
+    document = Document(document=document_pdf)
 
     for texte in textes:
-        guide.ajoute_bloc_a_la_page(1, texte[0], texte[1])
+        document.ajoute_bloc_a_la_page(1, texte[0], texte[1])
 
-    assert len(guide.pages[1].blocs) == 1
-    assert guide.pages[1].blocs[0].texte == attendu
+    assert len(document.pages[1].blocs) == 1
+    assert document.pages[1].blocs[0].texte == attendu
 
 
 @pytest.mark.parametrize(
@@ -274,11 +278,11 @@ def test_guide_fusionne_les_recommandations(_description, textes, attendu):
         ),
     ],
 )
-def test_guide_fusionne_les_tableaux(_description, textes, attendu):
-    guide = Guide(document=document)
+def test_document_fusionne_les_tableaux(_description, textes, attendu):
+    document = Document(document=document_pdf)
 
     for texte in textes:
-        guide.ajoute_bloc_a_la_page(1, texte[0], texte[1])
+        document.ajoute_bloc_a_la_page(1, texte[0], texte[1])
 
-    assert len(guide.pages[1].blocs) == 1
-    assert guide.pages[1].blocs[0].texte == attendu
+    assert len(document.pages[1].blocs) == 1
+    assert document.pages[1].blocs[0].texte == attendu

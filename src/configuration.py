@@ -3,9 +3,9 @@ from enum import StrEnum
 
 from typing_extensions import NamedTuple, Optional
 
-from guides.chunker_docling import ChunkerDocling
-from guides.chunker_docling_hierarchique import ChunkerDoclingHierarchique
-from guides.chunker_docling_mqc import ChunkerDoclingMQC
+from documents.chunker_docling import ChunkerDocling
+from documents.chunker_docling_hierarchique import ChunkerDoclingHierarchique
+from documents.chunker_docling_mqc import ChunkerDoclingMQC
 
 
 class MQC(NamedTuple):

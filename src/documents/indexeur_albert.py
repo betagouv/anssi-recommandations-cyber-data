@@ -1,9 +1,10 @@
 import json
 import time
 from pathlib import Path
+
 import requests
 
-from guides.indexeur import (
+from documents.indexeur import (
     Indexeur,
     DocumentPDF,
     PayloadDocument,
