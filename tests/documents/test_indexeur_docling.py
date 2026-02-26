@@ -8,7 +8,7 @@ from docling_core.types.doc.base import BoundingBox
 from pydantic import Field
 
 from documents.chunker_docling import extrais_position, TypeFichier
-from documents.chunker_docling_hierarchique import ChunkerDoclingHierarchique
+from documents.chunker_docling_mqc import ChunkerDoclingMQC
 from documents.document import Document
 from documents.indexeur import (
     DocumentPDF,
@@ -69,7 +69,7 @@ class BaseChunkerDeTest(BaseChunker):
             yield self.base_chunk
 
 
-class ChunkerDeTest(ChunkerDoclingHierarchique):
+class ChunkerDeTest(ChunkerDoclingMQC):
     def __init__(
         self,
         nom_fichier: str = "un_fichier_test.pdf",
