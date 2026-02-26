@@ -2,7 +2,7 @@ import pytest
 
 from documents.chunker_docling_mqc import Position
 from documents.document import (
-    Page,
+    PagePDF,
     Document,
     BlocPage,
 )
@@ -15,17 +15,17 @@ document_pdf = DocumentPDF(
 
 
 def test_page_peut_creer_une_page():
-    page = Page(numero_page=1)
+    page = PagePDF(numero_page=1)
     assert page.numero_page == 1
 
 
 def test_page_a_une_liste_de_blocs_vide_par_defaut():
-    page = Page(numero_page=1)
+    page = PagePDF(numero_page=1)
     assert page.blocs == []
 
 
 def test_page_peut_ajouter_un_bloc():
-    page = Page(numero_page=1)
+    page = PagePDF(numero_page=1)
     position = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     bloc = BlocPage(texte="[TEXTE] Mon texte", position=position)
 
@@ -52,7 +52,7 @@ def test_document_peut_ajouter_un_bloc_dans_une_page():
     document.ajoute_bloc_a_la_page(1, position, "[TEXTE] Une page")
 
     assert len(document.pages) == 1
-    assert document.pages[1] == Page(
+    assert document.pages[1] == PagePDF(
         numero_page=1, blocs=[BlocPage(texte="[TEXTE] Une page", position=position)]
     )
 
