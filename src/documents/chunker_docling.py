@@ -11,8 +11,8 @@ from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, FormatOption, PdfFormatOption
 from docling_core.transforms.chunker import BaseChunk, DocMeta
 
-from guides.guide import Guide, Position
-from guides.indexeur import DocumentPDF
+from documents.document import Document, Position
+from documents.indexeur import DocumentPDF
 
 
 class OptionsGuide(dict):
@@ -49,7 +49,7 @@ class ChunkerDocling(ABC):
         }
         self.converter = converter(format_options=format_options)
 
-    def applique(self, document: DocumentPDF) -> Guide:
+    def applique(self, document: DocumentPDF) -> Document:
         clef: OptionsGuide | None = self.options_guides.get(
             Path(document.chemin_pdf).name
         )
@@ -63,12 +63,12 @@ class ChunkerDocling(ABC):
         else:
             pdf_options.do_table_structure = True
         result = self.converter.convert(Path(document.chemin_pdf))
-        return self._cree_le_guide(result, document)
+        return self._cree_le_document(result, document)
 
     @abstractmethod
-    def _cree_le_guide(
+    def _cree_le_document(
         self, resultat_conversion: ConversionResult, document: DocumentPDF
-    ) -> Guide:
+    ) -> Document:
         pass
 
 

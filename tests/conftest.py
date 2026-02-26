@@ -8,6 +8,12 @@ from deepeval.evaluate.types import EvaluationResult, TestResult
 from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
 from deepeval.tracing.api import MetricData
+from documents.executeur_requete import ExecuteurDeRequete
+from documents.indexeur import (
+    ReponseDocument,
+    ReponseDocumentEnSucces,
+    ReponseDocumentEnErreur,
+)
 from requests import Response
 
 from adaptateurs.client_albert import ReponseCollectionAlbert
@@ -21,12 +27,6 @@ from configuration import (
 )
 from configuration import ParametresEvaluation
 from evaluation.lanceur_deepeval import EvaluateurDeepeval
-from guides.executeur_requete import ExecuteurDeRequete
-from guides.indexeur import (
-    ReponseDocument,
-    ReponseDocumentEnSucces,
-    ReponseDocumentEnErreur,
-)
 from infra.memoire.ecrivain import EcrivainSortieDeTest
 from journalisation.experience import (
     EntrepotExperienceMemoire,

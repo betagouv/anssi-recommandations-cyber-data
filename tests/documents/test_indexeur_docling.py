@@ -7,15 +7,15 @@ from docling_core.types.doc import DocItem, DocItemLabel, ProvenanceItem
 from docling_core.types.doc.base import BoundingBox
 from pydantic import Field
 
-from guides.chunker_docling import extrais_position, TypeFichier
-from guides.chunker_docling_hierarchique import ChunkerDoclingHierarchique
-from guides.guide import Guide
-from guides.indexeur import (
+from documents.chunker_docling import extrais_position, TypeFichier
+from documents.chunker_docling_hierarchique import ChunkerDoclingHierarchique
+from documents.document import Document
+from documents.indexeur import (
     DocumentPDF,
     ReponseDocumentEnErreur,
 )
-from guides.indexeur_docling import IndexeurDocling
-from guides.multi_processeur import Multiprocesseur
+from documents.indexeur_docling import IndexeurDocling
+from documents.multi_processeur import Multiprocesseur
 
 
 class ConstructeurDeBaseChunk:
@@ -80,16 +80,16 @@ class ChunkerDeTest(ChunkerDoclingHierarchique):
         self.type_fichier = type_fichier
         self.chunker = BaseChunkerDeTest()
 
-    def applique(self, document: DocumentPDF) -> Guide:
-        chunks = self.chunker.chunk(DLDocument(name=document.chemin_pdf))
-        guide = Guide(document)
+    def applique(self, document_pdf: DocumentPDF) -> Document:
+        chunks = self.chunker.chunk(DLDocument(name=document_pdf.chemin_pdf))
+        document = Document(document_pdf)
         for chunk in chunks:
-            guide.ajoute_bloc_a_la_page(
+            document.ajoute_bloc_a_la_page(
                 numero_page=chunk.meta.doc_items[0].prov[0].page_no,  # type: ignore[attr-defined]
                 position=extrais_position(chunk),
                 texte=chunk.text,
             )
-        return guide
+        return document
 
     def avec_base_chunker(self, chunker: BaseChunker):
         self.chunker = chunker  # type: ignore[assignment]

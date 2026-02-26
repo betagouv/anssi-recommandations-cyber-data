@@ -9,7 +9,7 @@ from docling_core.types.doc import (
     TableItem,
 )
 
-from guides.categorise_le_contenu import ajoute_la_categorisation_du_contenu
+from documents.categorise_le_contenu import ajoute_la_categorisation_du_contenu
 
 
 def extrais_les_chunks(

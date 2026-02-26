@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
-from guides.indexeur import DocumentPDF, ReponseDocumentEnSucces
-from guides.indexeur_albert import IndexeurBaseVectorielleAlbert
+from documents.indexeur import DocumentPDF, ReponseDocumentEnSucces
+from documents.indexeur_albert import IndexeurBaseVectorielleAlbert
 
 
 def test_indexeur_base_vectorielle_albert_ajoute_documents(fichier_pdf):

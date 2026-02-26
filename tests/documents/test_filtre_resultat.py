@@ -8,7 +8,7 @@ from docling.document_converter import ConversionResult
 from docling_core.types import DoclingDocument
 from docling_core.types.doc import TextItem, DocItemLabel, TableItem, TableData
 
-from guides.filtre_resultat import filtre_les_resultats
+from documents.filtre_resultat import filtre_les_resultats
 
 
 @pytest.mark.parametrize(

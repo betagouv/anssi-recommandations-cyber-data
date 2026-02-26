@@ -4,7 +4,7 @@ from docling_core.types.doc import BoundingBox
 from docling_core.types.doc import TextItem, DocItemLabel
 from docling_core.types.doc.document import ProvenanceItem
 
-from guides.extrais_les_chunks import extrais_les_chunks
+from documents.extrais_les_chunks import extrais_les_chunks
 
 
 @pytest.fixture

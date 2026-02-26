@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod
 from openai import OpenAI
 from typing_extensions import NamedTuple
 
-from guides.executeur_requete import ExecuteurDeRequete
-from guides.indexeur import DocumentPDF, ReponseDocument, Indexeur
+from documents.executeur_requete import ExecuteurDeRequete
+from documents.indexeur import DocumentPDF, ReponseDocument, Indexeur
 
 
 class PayloadCollection(NamedTuple):
