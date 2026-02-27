@@ -17,9 +17,7 @@ type GenerationDePage = Callable[
 
 class GenerateurDePage(ABC):
     @abstractmethod
-    def genere(
-        self, chunk: BaseChunk
-    ) -> GenerationDePage:
+    def genere(self, chunk: BaseChunk) -> GenerationDePage:
         pass
 
 

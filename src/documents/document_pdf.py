@@ -5,14 +5,18 @@ from docling_core.transforms.chunker import BaseChunk, DocMeta
 
 from documents.chunker_docling import extrais_position
 from documents.document import Page, BlocPage, PagePDF, Position
-from documents.indexeur import DocumentAIndexer, GenerateurDePage, GenerationDePage, NumeroPage, CreationDePage, \
-    CreationDeBlocPage
+from documents.indexeur import (
+    DocumentAIndexer,
+    GenerateurDePage,
+    GenerationDePage,
+    NumeroPage,
+    CreationDePage,
+    CreationDeBlocPage,
+)
 
 
 class GenerateurDePagePDF(GenerateurDePage):
-    def genere(
-        self, chunk: BaseChunk
-    ) -> GenerationDePage:
+    def genere(self, chunk: BaseChunk) -> GenerationDePage:
         def _cree_page(numero_page: int, texte: str, position: Position) -> Page:
             page = PagePDF(numero_page=numero_page)
             page.ajoute_bloc(BlocPage(texte=texte, position=position))
