@@ -34,13 +34,13 @@ class ChunkerDoclingMQC(ChunkerDocling):
         return self.__extrais_le_document(chunks, document)
 
     def __extrais_le_document(
-        self, chunks: list[BaseChunk], document_pdf: DocumentAIndexer
+        self, chunks: list[BaseChunk], document_a_indexer: DocumentAIndexer
     ) -> Document:
-        document = Document(document_pdf.nom_document, document_pdf.url)
+        document = Document(document_a_indexer.nom_document, document_a_indexer.url)
 
         for chunk in chunks:
             try:
-                document.ajoute(document_pdf.generateur.genere(chunk))
+                document.ajoute(document_a_indexer.generateur.genere(chunk))
             except Exception:
                 continue
 

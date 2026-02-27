@@ -81,12 +81,12 @@ class ChunkerDeTest(ChunkerDoclingMQC):
         self.type_fichier = type_fichier
         self.chunker = BaseChunkerDeTest()
 
-    def applique(self, document_pdf: DocumentAIndexer) -> Document:
-        chunks = self.chunker.chunk(DLDocument(name=document_pdf.chemin))
-        document = Document(document_pdf.nom_document, document_pdf.url)
+    def applique(self, document_a_indexer: DocumentAIndexer) -> Document:
+        chunks = self.chunker.chunk(DLDocument(name=document_a_indexer.chemin))
+        document = Document(document_a_indexer.nom_document, document_a_indexer.url)
         for chunk in chunks:
             document.ajoute(
-                document_pdf.generateur.genere(chunk),
+                document_a_indexer.generateur.genere(chunk),
             )
         return document
 
