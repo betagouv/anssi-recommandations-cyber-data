@@ -7,7 +7,7 @@ from docling_core.types.doc import DocItem, DocItemLabel, ProvenanceItem
 from docling_core.types.doc.base import BoundingBox
 from pydantic import Field
 
-from documents.chunker_docling import extrais_position, TypeFichier
+from documents.chunker_docling import TypeFichier
 from documents.chunker_docling_mqc import ChunkerDoclingMQC
 from documents.document import Document
 from documents.document_pdf import DocumentPDF
@@ -83,12 +83,10 @@ class ChunkerDeTest(ChunkerDoclingMQC):
 
     def applique(self, document_pdf: DocumentAIndexer) -> Document:
         chunks = self.chunker.chunk(DLDocument(name=document_pdf.chemin))
-        document = Document(document_pdf)
+        document = Document(document_pdf.nom_document, document_pdf.url)
         for chunk in chunks:
-            document.ajoute_bloc_a_la_page(
-                numero_page=chunk.meta.doc_items[0].prov[0].page_no,  # type: ignore[attr-defined]
-                position=extrais_position(chunk),
-                texte=chunk.text,
+            document.ajoute(
+                document_pdf.generateur.genere(chunk),
             )
         return document
 

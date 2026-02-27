@@ -11,6 +11,7 @@ from docling.datamodel.document import InputDocument
 from docling.datamodel.settings import PageRange
 from docling.document_converter import ConversionResult
 from docling.document_converter import DocumentConverter
+from docling_core.transforms.chunker import BaseChunk, DocMeta
 from docling_core.types import DoclingDocument
 from docling_core.types.doc import (
     BoundingBox,
@@ -18,10 +19,12 @@ from docling_core.types.doc import (
     TextItem,
     DocItemLabel,
     SectionHeaderItem,
+    DocItem,
 )
 from docling_core.types.io import DocumentStream
 from requests import Session
 
+from documents.document import Position
 from documents.indexeur import (
     ReponseDocument,
     ReponseDocumentEnSucces,
@@ -460,3 +463,56 @@ def un_convertisseur_avec_un_titre_et_un_texte() -> Callable[
         return ConverterDeTestAvecContenuSimple
 
     return _convertisseur
+
+
+class ConstructeurDeBaseChunk:
+    def __init__(self):
+        super().__init__()
+        self.texte = "Un texte"
+        self.bounding_box = BoundingBox(l=100.0, t=200.0, r=300.0, b=400.0)
+        self.numero_page = 1
+
+    def a_la_page(self, numero_page: int):
+        self.numero_page = numero_page
+        return self
+
+    def a_la_position(self, position: Position):
+        self.bounding_box = BoundingBox(
+            l=position.x,
+            t=position.y,
+            r=position.largeur + position.x,
+            b=position.hauteur + position.y,
+        )
+        return self
+
+    def avec_le_texte(self, texte: str):
+        self.texte = texte
+        return self
+
+    def construis(self) -> BaseChunk:
+        return BaseChunk(
+            text=self.texte,
+            meta=DocMeta(
+                doc_items=[
+                    DocItem(
+                        prov=[
+                            ProvenanceItem(
+                                page_no=self.numero_page,
+                                bbox=self.bounding_box,
+                                charspan=(0, 0),
+                            ),
+                        ],
+                        label=DocItemLabel.TEXT,
+                        self_ref="#/tables/9",
+                    )
+                ]
+            ),
+        )
+
+
+@pytest.fixture
+def un_constructeur_de_base_chunk() -> Callable[[], ConstructeurDeBaseChunk]:
+    def _constructeur_de_base_chunk() -> ConstructeurDeBaseChunk:
+        return ConstructeurDeBaseChunk()
+
+    return _constructeur_de_base_chunk

@@ -36,20 +36,28 @@ def test_page_peut_ajouter_un_bloc():
 
 
 def test_pages_peut_etre_creee():
-    document = Document(document=document_pdf)
+    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     assert document is not None
 
 
 def test_pages_a_une_collection_de_pages_vide_par_defaut():
-    document = Document(document=document_pdf)
+    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     assert document.pages == {}
 
 
-def test_document_peut_ajouter_un_bloc_dans_une_page():
-    document = Document(document=document_pdf)
+def test_document_peut_ajouter_un_bloc_dans_une_page(un_constructeur_de_base_chunk):
+    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
 
-    document.ajoute_bloc_a_la_page(1, position, "[TEXTE] Une page")
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position)
+            .avec_le_texte("[TEXTE] Une page")
+            .construis()
+        )
+    )
 
     assert len(document.pages) == 1
     assert document.pages[1] == PagePDF(
@@ -57,29 +65,59 @@ def test_document_peut_ajouter_un_bloc_dans_une_page():
     )
 
 
-def test_document_peut_ajouter_deux_blocs_sur_une_meme_page():
-    document = Document(document=document_pdf)
+def test_document_peut_ajouter_deux_blocs_sur_une_meme_page(
+    un_constructeur_de_base_chunk,
+):
+    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=0.0, largeur=100.0, hauteur=5.0)
 
-    document.ajoute_bloc_a_la_page(1, position_bloc_1, "[TEXTE] Un titre")
-    document.ajoute_bloc_a_la_page(1, position_bloc_2, "[TEXTE] Un paragraphe")
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_1)
+            .avec_le_texte("[TEXTE] Un titre")
+            .construis()
+        )
+    )
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_2)
+            .avec_le_texte("[TEXTE] Un paragraphe")
+            .construis()
+        )
+    )
 
     assert len(document.pages) == 1
     assert document.pages[1].blocs[0].texte == "[TEXTE] Un titre"
     assert document.pages[1].blocs[1].texte == "[TEXTE] Un paragraphe"
 
 
-def test_document_reordonne_lorsque_l_on_ajoute_un_bloc():
-    document = Document(document=document_pdf)
+def test_document_reordonne_lorsque_l_on_ajoute_un_bloc(un_constructeur_de_base_chunk):
+    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
 
-    document.ajoute_bloc_a_la_page(
-        1, position_bloc_1, "[TEXTE] Un paragraphe en seconde position"
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_1)
+            .avec_le_texte("[TEXTE] Un paragraphe en seconde position")
+            .construis()
+        )
     )
-    document.ajoute_bloc_a_la_page(
-        1, position_bloc_2, "[TEXTE] Un paragraphe en première position"
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_2)
+            .avec_le_texte("[TEXTE] Un paragraphe en première position")
+            .construis()
+        )
     )
 
     assert len(document.pages) == 1
@@ -91,19 +129,59 @@ def test_document_reordonne_lorsque_l_on_ajoute_un_bloc():
     )
 
 
-def test_document_fusionne_un_titre_avec_son_contenu():
-    document = Document(document=document_pdf)
+def test_document_fusionne_un_titre_avec_son_contenu(un_constructeur_de_base_chunk):
+    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0)
     position_bloc_3 = Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0)
     position_bloc_4 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_5 = Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0)
 
-    document.ajoute_bloc_a_la_page(1, position_bloc_1, "[TITRE] Titre 1")
-    document.ajoute_bloc_a_la_page(1, position_bloc_2, "[TITRE] Titre 2")
-    document.ajoute_bloc_a_la_page(1, position_bloc_3, "[TEXTE] Contenu 1.")
-    document.ajoute_bloc_a_la_page(1, position_bloc_4, "[TEXTE] Contenu 2.")
-    document.ajoute_bloc_a_la_page(1, position_bloc_5, "[SOUS-TITRE] 1.1 Sous-titre.")
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_1)
+            .avec_le_texte("[TITRE] Titre 1")
+            .construis()
+        )
+    )
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_2)
+            .avec_le_texte("[TITRE] Titre 2")
+            .construis()
+        )
+    )
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_3)
+            .avec_le_texte("[TEXTE] Contenu 1.")
+            .construis()
+        )
+    )
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_4)
+            .avec_le_texte("[TEXTE] Contenu 2.")
+            .construis()
+        )
+    )
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_5)
+            .avec_le_texte("[SOUS-TITRE] 1.1 Sous-titre.")
+            .construis()
+        )
+    )
 
     assert len(document.pages[1].blocs) == 3
     assert document.pages[1].blocs[0].texte == "[TITRE] Titre 1"
@@ -114,19 +192,61 @@ def test_document_fusionne_un_titre_avec_son_contenu():
     assert document.pages[1].blocs[2].texte == "[SOUS-TITRE] 1.1 Sous-titre."
 
 
-def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommandations():
-    document = Document(document=document_pdf)
+def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommandations(
+    un_constructeur_de_base_chunk,
+):
+    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0)
     position_bloc_3 = Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0)
     position_bloc_4 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_5 = Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0)
 
-    document.ajoute_bloc_a_la_page(1, position_bloc_1, "[TITRE] Titre")
-    document.ajoute_bloc_a_la_page(1, position_bloc_2, "[RECOMMANDATION] R1")
-    document.ajoute_bloc_a_la_page(1, position_bloc_3, "[TEXTE] Recommandation 1.")
-    document.ajoute_bloc_a_la_page(1, position_bloc_4, "[RECOMMANDATION] R2")
-    document.ajoute_bloc_a_la_page(1, position_bloc_5, "[TEXTE] Recommandation 2.")
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_1)
+            .avec_le_texte("[TITRE] Titre")
+            .construis()
+        )
+    )
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_2)
+            .avec_le_texte("[RECOMMANDATION] R1")
+            .construis()
+        )
+    )
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_3)
+            .avec_le_texte("[TEXTE] Recommandation 1.")
+            .construis()
+        )
+    )
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_4)
+            .avec_le_texte("[RECOMMANDATION] R2")
+            .construis()
+        )
+    )
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_5)
+            .avec_le_texte("[TEXTE] Recommandation 2.")
+            .construis()
+        )
+    )
 
     assert len(document.pages[1].blocs) == 1
     assert (
@@ -135,17 +255,51 @@ def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommanda
     )
 
 
-def test_document_fusionne_tous_les_contenus_d_un_sous_titre():
-    document = Document(document=document_pdf)
+def test_document_fusionne_tous_les_contenus_d_un_sous_titre(
+    un_constructeur_de_base_chunk,
+):
+    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0)
     position_bloc_3 = Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0)
     position_bloc_4 = Position(x=10.0, y=5.0, largeur=100.0, hauteur=5.0)
 
-    document.ajoute_bloc_a_la_page(1, position_bloc_1, "[SOUS-TITRE] 1.2 Sous-titre 1")
-    document.ajoute_bloc_a_la_page(1, position_bloc_2, "[TEXTE] Paragraphe 1.")
-    document.ajoute_bloc_a_la_page(1, position_bloc_3, "[TEXTE] Paragraphe 2.")
-    document.ajoute_bloc_a_la_page(1, position_bloc_4, "[TEXTE] Paragraphe 3.")
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_1)
+            .avec_le_texte("[SOUS-TITRE] 1.2 Sous-titre 1")
+            .construis()
+        )
+    )
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_2)
+            .avec_le_texte("[TEXTE] Paragraphe 1.")
+            .construis()
+        )
+    )
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_3)
+            .avec_le_texte("[TEXTE] Paragraphe 2.")
+            .construis()
+        )
+    )
+    document.ajoute(
+        document_pdf.generateur.genere(
+            un_constructeur_de_base_chunk()
+            .a_la_page(1)
+            .a_la_position(position_bloc_4)
+            .avec_le_texte("[TEXTE] Paragraphe 3.")
+            .construis()
+        )
+    )
 
     assert len(document.pages[1].blocs) == 1
     assert (
@@ -211,11 +365,21 @@ def test_document_fusionne_tous_les_contenus_d_un_sous_titre():
         ),
     ],
 )
-def test_document_fusionne_les_recommandations(_description, textes, attendu):
-    document = Document(document=document_pdf)
+def test_document_fusionne_les_recommandations(
+    _description, textes, attendu, un_constructeur_de_base_chunk
+):
+    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
 
     for texte in textes:
-        document.ajoute_bloc_a_la_page(1, texte[0], texte[1])
+        document.ajoute(
+            document_pdf.generateur.genere(
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(texte[0])
+                .avec_le_texte(texte[1])
+                .construis()
+            )
+        )
 
     assert len(document.pages[1].blocs) == 1
     assert document.pages[1].blocs[0].texte == attendu
@@ -278,11 +442,21 @@ def test_document_fusionne_les_recommandations(_description, textes, attendu):
         ),
     ],
 )
-def test_document_fusionne_les_tableaux(_description, textes, attendu):
-    document = Document(document=document_pdf)
+def test_document_fusionne_les_tableaux(
+    _description, textes, attendu, un_constructeur_de_base_chunk
+):
+    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
 
     for texte in textes:
-        document.ajoute_bloc_a_la_page(1, texte[0], texte[1])
+        document.ajoute(
+            document_pdf.generateur.genere(
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(texte[0])
+                .avec_le_texte(texte[1])
+                .construis()
+            )
+        )
 
     assert len(document.pages[1].blocs) == 1
     assert document.pages[1].blocs[0].texte == attendu
