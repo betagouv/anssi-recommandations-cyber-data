@@ -101,18 +101,16 @@ class IndexeurDocling(Indexeur):
         return reponse_documents
 
     def __ajoute_document(
-        self, document_pdf: DocumentAIndexer, id_collection: str | None
+        self, document_a_indexer: DocumentAIndexer, id_collection: str | None
     ) -> list[ReponseDocument]:
-        nom_du_document = Path(document_pdf.chemin).name
+        nom_du_document = Path(document_a_indexer.chemin).name
         reponses: list[ReponseDocument] = []
         try:
-            document = self.chunker.applique(document_pdf)
+            document = self.chunker.applique(document_a_indexer)
 
             self.executeur_de_requete.initialise(self.clef_api)
 
             for page in document.pages.values():
-                numero_page = page.numero_page
-
                 for bloc in page.blocs:
                     contenu_paragraphe_txt = bloc.texte
                     if len(contenu_paragraphe_txt) > 1:
@@ -125,13 +123,7 @@ class IndexeurDocling(Indexeur):
                         }
                         payload = {
                             "collection": str(id_collection),
-                            "metadata": json.dumps(
-                                {
-                                    "source_url": document_pdf.url,
-                                    "page": numero_page,
-                                    "nom_document": document.nom_document,
-                                }
-                            ),
+                            "metadata": json.dumps(document.metatada(page)),
                             "chunker": "NoSplitter",
                         }
                         response = self.executeur_de_requete.poste(

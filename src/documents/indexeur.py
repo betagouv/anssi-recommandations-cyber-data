@@ -1,11 +1,33 @@
 from abc import ABC, abstractmethod
-from typing import Union, Literal, Optional
+from typing import Union, Literal, Callable
 
+from docling_core.transforms.chunker import BaseChunk
 from typing_extensions import NamedTuple
+
+from documents.document import BlocPage, Page
+
+type NumeroPage = int
+type CreationDePage = Callable[[], Page]
+type CreationDeBlocPage = Callable[[], BlocPage]
+
+type GenerationDePage = Callable[
+    [], tuple[NumeroPage, CreationDePage, CreationDeBlocPage]
+]
+
+
+class GenerateurDePage(ABC):
+    @abstractmethod
+    def genere(
+        self, chunk: BaseChunk
+    ) -> GenerationDePage:
+        pass
 
 
 class DocumentAIndexer(ABC):
     _type: Literal["PDF", "HTML"]
+
+    def __init__(self):
+        self._generateur = None
 
     @property
     def type(self) -> Literal["PDF", "HTML"]:
@@ -26,8 +48,9 @@ class DocumentAIndexer(ABC):
     def chemin(self) -> str:
         pass
 
+    @property
     @abstractmethod
-    def initie_page(self, numero_page: Optional[int] = None):
+    def generateur(self) -> GenerateurDePage:
         pass
 
 

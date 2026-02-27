@@ -1,11 +1,11 @@
 from pathlib import Path
-from typing import cast, NamedTuple, Type
+from typing import NamedTuple, Type
 
 from docling.datamodel.document import ConversionResult
 from docling.document_converter import DocumentConverter
-from docling_core.transforms.chunker import BaseChunk, DocMeta
+from docling_core.transforms.chunker import BaseChunk
 
-from documents.chunker_docling import ChunkerDocling, extrais_position, TypeFichier
+from documents.chunker_docling import ChunkerDocling, TypeFichier
 from documents.document import Document
 from documents.extrais_les_chunks import extrais_les_chunks
 from documents.filtre_resultat import filtre_les_resultats
@@ -36,13 +36,11 @@ class ChunkerDoclingMQC(ChunkerDocling):
     def __extrais_le_document(
         self, chunks: list[BaseChunk], document_pdf: DocumentAIndexer
     ) -> Document:
-        document = Document(document_pdf)
+        document = Document(document_pdf.nom_document, document_pdf.url)
 
         for chunk in chunks:
             try:
-                numero_page = cast(DocMeta, chunk.meta).doc_items[0].prov[0].page_no
-                position = extrais_position(chunk)
-                document.ajoute_bloc_a_la_page(numero_page, position, chunk.text)
+                document.ajoute(document_pdf.generateur.genere(chunk))
             except Exception:
                 continue
 

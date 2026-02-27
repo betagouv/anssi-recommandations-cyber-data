@@ -1,9 +1,7 @@
 import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import NamedTuple
-
-from documents.indexeur import DocumentAIndexer
+from typing import NamedTuple, Callable
 
 
 class Position(NamedTuple):
@@ -131,23 +129,40 @@ class PagePDF(Page):
 
 
 class Document:
-    def __init__(self, document: DocumentAIndexer):
+    def __init__(self, nom_document, url):
         super().__init__()
-        self._document_a_indexer = document
+        self._nom_document = nom_document
+        self._url = url
         self.pages: dict[int, Page] = {}
 
     @property
     def nom_document(self):
-        return self._document_a_indexer.nom_document
+        return self._nom_document
 
-    def ajoute_bloc_a_la_page(
-        self, numero_page: int, position: Position, texte: str
+    @property
+    def url(self):
+        return self._url
+
+    def ajoute(
+        self,
+        generateur: Callable[
+            [],
+            tuple[
+                int,
+                Callable[[], Page],
+                Callable[[], BlocPage],
+            ],
+        ],
     ) -> None:
+        (numero_page, cree_page, cree_bloc) = generateur()
         if self.pages.get(numero_page) is None:
-            page = self._document_a_indexer.initie_page(numero_page)
-            page.ajoute_bloc(BlocPage(texte=texte, position=position))
-            self.pages[numero_page] = page
+            self.pages[numero_page] = cree_page()
         else:
-            self.pages[numero_page].ajoute_bloc(
-                BlocPage(texte=texte, position=position)
-            )
+            self.pages[numero_page].ajoute_bloc(cree_bloc())
+
+    def metatada(self, page) -> dict:
+        return {
+            "source_url": self.url,
+            "page": page.numero_page,
+            "nom_document": self.nom_document,
+        }
