@@ -1,7 +1,10 @@
 import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import NamedTuple, Callable
+from typing import NamedTuple, Callable, TypeVar, Generic
+
+
+T_Bloc = TypeVar("T_Bloc", bound="BlocPage")
 
 
 class Position(NamedTuple):
@@ -14,25 +17,29 @@ class Position(NamedTuple):
 @dataclass(frozen=True)
 class BlocPage:
     texte: str
+
+
+@dataclass(frozen=True)
+class BlocPagePDF(BlocPage):
     position: Position
 
 
 @dataclass
-class Page(ABC):
+class Page(ABC, Generic[T_Bloc]):
     numero_page: int
-    blocs: list[BlocPage] = field(default_factory=list)
+    blocs: list[T_Bloc] = field(default_factory=list)
 
     @abstractmethod
-    def ajoute_bloc(self, bloc: BlocPage) -> None:
+    def ajoute_bloc(self, bloc: T_Bloc) -> None:
         pass
 
     @abstractmethod
-    def supprime_bloc(self, bloc: BlocPage) -> None:
+    def supprime_bloc(self, bloc: T_Bloc) -> None:
         pass
 
 
-class PagePDF(Page):
-    def ajoute_bloc(self, bloc: BlocPage) -> None:
+class PagePDF(Page[BlocPagePDF]):
+    def ajoute_bloc(self, bloc: BlocPagePDF) -> None:
         les_positions = [bloc.position for bloc in self.blocs]
         les_positions.append(bloc.position)
         les_positions_ordonnees = [
@@ -42,12 +49,12 @@ class PagePDF(Page):
         for indice, position in enumerate(les_positions_ordonnees):
             if bloc.position == position:
                 self.blocs.insert(
-                    indice, BlocPage(texte=bloc.texte, position=bloc.position)
+                    indice, BlocPagePDF(texte=bloc.texte, position=bloc.position)
                 )
 
         self._fusionne_les_entetes_avec_leur_contenu()
 
-    def supprime_bloc(self, bloc: BlocPage) -> None:
+    def supprime_bloc(self, bloc: BlocPagePDF) -> None:
         bloc_a_supprimer = None
         for b in self.blocs:
             if b.texte == bloc.texte and b.position == bloc.position:
@@ -59,7 +66,7 @@ class PagePDF(Page):
 
         self.blocs.remove(bloc_a_supprimer)
         for i, b in enumerate(self.blocs):
-            nouveau_bloc = BlocPage(texte=b.texte, position=b.position)
+            nouveau_bloc = BlocPagePDF(texte=b.texte, position=b.position)
             self.blocs[i] = nouveau_bloc
 
     def _fusionne_les_entetes_avec_leur_contenu(self):
@@ -70,7 +77,7 @@ class PagePDF(Page):
             suivant = self.blocs[i + 1] if i + 1 < len(self.blocs) else None
             if self._a_du_contenu_adjacent_au_titre(courant, suivant):
                 blocs_fusionnes.append(
-                    BlocPage(
+                    BlocPagePDF(
                         texte=f"{courant.texte}\n{suivant.texte}",
                         position=courant.position,
                     )
@@ -78,7 +85,7 @@ class PagePDF(Page):
                 i += 1
             elif self._a_du_contenu_adjacent_au_sous_titre(courant, suivant):
                 blocs_fusionnes.append(
-                    BlocPage(
+                    BlocPagePDF(
                         texte=f"{courant.texte}\n{suivant.texte}",
                         position=courant.position,
                     )
@@ -91,17 +98,17 @@ class PagePDF(Page):
         self.blocs = blocs_fusionnes
 
     def _a_du_contenu_adjacent_au_titre(
-        self, courant: BlocPage, suivant: BlocPage | None
+        self, courant: BlocPagePDF, suivant: BlocPagePDF | None
     ) -> bool:
         return self.a_du_contenu_adjacent(courant, "[TITRE]", suivant)
 
     def _a_du_contenu_adjacent_au_sous_titre(
-        self, courant: BlocPage, suivant: BlocPage | None
+        self, courant: BlocPagePDF, suivant: BlocPagePDF | None
     ) -> bool:
         return self.a_du_contenu_adjacent(courant, "[SOUS-TITRE]", suivant)
 
     def a_du_contenu_adjacent(
-        self, courant: BlocPage, sous_titre_: str, suivant: BlocPage | None
+        self, courant: BlocPagePDF, sous_titre_: str, suivant: BlocPagePDF | None
     ) -> bool:
         return (
             courant.texte.startswith(sous_titre_)
@@ -150,7 +157,7 @@ class Document:
             tuple[
                 int,
                 Callable[[], Page],
-                Callable[[], BlocPage],
+                Callable[[], BlocPagePDF],
             ],
         ],
     ) -> None:

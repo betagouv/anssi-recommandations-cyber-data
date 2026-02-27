@@ -4,11 +4,11 @@ from typing import Union, Literal, Callable
 from docling_core.transforms.chunker import BaseChunk
 from typing_extensions import NamedTuple
 
-from documents.document import BlocPage, Page
+from documents.document import BlocPagePDF, Page
 
 type NumeroPage = int
 type CreationDePage = Callable[[], Page]
-type CreationDeBlocPage = Callable[[], BlocPage]
+type CreationDeBlocPage = Callable[[], BlocPagePDF]
 
 type GenerationDePage = Callable[
     [], tuple[NumeroPage, CreationDePage, CreationDeBlocPage]
