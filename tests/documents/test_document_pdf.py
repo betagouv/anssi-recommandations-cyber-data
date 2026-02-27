@@ -4,7 +4,7 @@ from documents.chunker_docling_mqc import Position
 from documents.document import (
     PagePDF,
     Document,
-    BlocPage,
+    BlocPagePDF,
 )
 from documents.document_pdf import DocumentPDF
 
@@ -27,7 +27,7 @@ def test_page_a_une_liste_de_blocs_vide_par_defaut():
 def test_page_peut_ajouter_un_bloc():
     page = PagePDF(numero_page=1)
     position = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
-    bloc = BlocPage(texte="[TEXTE] Mon texte", position=position)
+    bloc = BlocPagePDF(texte="[TEXTE] Mon texte", position=position)
 
     page.ajoute_bloc(bloc)
 
@@ -61,7 +61,7 @@ def test_document_peut_ajouter_un_bloc_dans_une_page(un_constructeur_de_base_chu
 
     assert len(document.pages) == 1
     assert document.pages[1] == PagePDF(
-        numero_page=1, blocs=[BlocPage(texte="[TEXTE] Une page", position=position)]
+        numero_page=1, blocs=[BlocPagePDF(texte="[TEXTE] Une page", position=position)]
     )
 
 
