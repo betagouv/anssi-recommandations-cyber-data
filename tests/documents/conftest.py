@@ -24,11 +24,11 @@ from docling_core.types.doc import (
 from docling_core.types.io import DocumentStream
 from requests import Session
 
-from documents.document import Position
 from documents.indexeur import (
     ReponseDocument,
     ReponseDocumentEnSucces,
 )
+from documents.page import Position
 
 
 @pytest.fixture

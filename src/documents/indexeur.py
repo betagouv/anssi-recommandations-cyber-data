@@ -1,18 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Union, Literal, Callable
+from typing import Union, Literal
 
 from docling_core.transforms.chunker import BaseChunk
 from typing_extensions import NamedTuple
 
-from documents.document import BlocPagePDF, Page
-
-type NumeroPage = int
-type CreationDePage = Callable[[], Page]
-type CreationDeBlocPage = Callable[[], BlocPagePDF]
-
-type GenerationDePage = Callable[
-    [], tuple[NumeroPage, CreationDePage, CreationDeBlocPage]
-]
+from documents.generateur_de_pages import GenerationDePage, GenerateurDePages
 
 
 class GenerateurDePage(ABC):
@@ -48,7 +40,7 @@ class DocumentAIndexer(ABC):
 
     @property
     @abstractmethod
-    def generateur(self) -> GenerateurDePage:
+    def generateur(self) -> GenerateurDePages:
         pass
 
 

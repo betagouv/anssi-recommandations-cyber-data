@@ -3,7 +3,6 @@ from typing import NamedTuple, Type
 
 from docling.datamodel.document import ConversionResult
 from docling.document_converter import DocumentConverter
-from docling_core.transforms.chunker import BaseChunk
 
 from documents.chunker_docling import ChunkerDocling, TypeFichier
 from documents.document import Document
@@ -25,23 +24,14 @@ class ChunkerDoclingMQC(ChunkerDocling):
         self.type_fichier = TypeFichier.TEXTE
 
     def _cree_le_document(
-        self, resultat_conversion: ConversionResult, document: DocumentAIndexer
+        self,
+        resultat_conversion: ConversionResult,
+        document_a_indexer: DocumentAIndexer,
     ) -> Document:
-        self.nom_fichier = Path(document.chemin).name.replace(".pdf", ".txt")
+        self.nom_fichier = Path(document_a_indexer.chemin).name.replace(".pdf", ".txt")
         elements_filtres = filtre_les_resultats(resultat_conversion)
         chunks = extrais_les_chunks(elements_filtres)
 
-        return self.__extrais_le_document(chunks, document)
-
-    def __extrais_le_document(
-        self, chunks: list[BaseChunk], document_a_indexer: DocumentAIndexer
-    ) -> Document:
         document = Document(document_a_indexer.nom_document, document_a_indexer.url)
-
-        for chunk in chunks:
-            try:
-                document.ajoute(document_a_indexer.generateur.genere(chunk))
-            except Exception:
-                continue
-
+        document.genere_les_pages(chunks, document_a_indexer.generateur)
         return document

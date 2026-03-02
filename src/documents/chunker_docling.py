@@ -11,8 +11,9 @@ from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, FormatOption, PdfFormatOption
 from docling_core.transforms.chunker import BaseChunk, DocMeta
 
-from documents.document import Document, Position
+from documents.document import Document
 from documents.indexeur import DocumentAIndexer
+from documents.page import Position
 
 
 class OptionsGuide(dict):
