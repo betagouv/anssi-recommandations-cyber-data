@@ -26,15 +26,11 @@ class BlocPagePDF(BlocPage):
 
 @dataclass
 class Page(ABC, Generic[T_Bloc]):
-    numero_page: int
+    numero_page: int | None
     blocs: list[T_Bloc] = field(default_factory=list)
 
     @abstractmethod
     def ajoute_bloc(self, bloc: T_Bloc) -> None:
-        pass
-
-    @abstractmethod
-    def supprime_bloc(self, bloc: T_Bloc) -> None:
         pass
 
 
@@ -53,21 +49,6 @@ class PagePDF(Page[BlocPagePDF]):
                 )
 
         self._fusionne_les_entetes_avec_leur_contenu()
-
-    def supprime_bloc(self, bloc: BlocPagePDF) -> None:
-        bloc_a_supprimer = None
-        for b in self.blocs:
-            if b.texte == bloc.texte and b.position == bloc.position:
-                bloc_a_supprimer = b
-                break
-
-        if bloc_a_supprimer is None:
-            raise ValueError("Bloc non trouvé")
-
-        self.blocs.remove(bloc_a_supprimer)
-        for i, b in enumerate(self.blocs):
-            nouveau_bloc = BlocPagePDF(texte=b.texte, position=b.position)
-            self.blocs[i] = nouveau_bloc
 
     def _fusionne_les_entetes_avec_leur_contenu(self):
         i = 0
