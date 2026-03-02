@@ -84,10 +84,7 @@ class ChunkerDeTest(ChunkerDoclingMQC):
     def applique(self, document_a_indexer: DocumentAIndexer) -> Document:
         chunks = self.chunker.chunk(DLDocument(name=document_a_indexer.chemin))
         document = Document(document_a_indexer.nom_document, document_a_indexer.url)
-        for chunk in chunks:
-            document.ajoute(
-                document_a_indexer.generateur.genere(chunk),
-            )
+        document.genere_les_pages(list(chunks), document_a_indexer.generateur)
         return document
 
     def avec_base_chunker(self, chunker: BaseChunker):

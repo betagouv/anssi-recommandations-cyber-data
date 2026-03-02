@@ -2,11 +2,10 @@ import pytest
 
 from documents.chunker_docling_mqc import Position
 from documents.document import (
-    PagePDF,
     Document,
-    BlocPagePDF,
 )
 from documents.document_pdf import DocumentPDF
+from documents.page import BlocPagePDF, PagePDF
 
 document_pdf = DocumentPDF(
     chemin_pdf="tests/data/guide_test.pdf",
@@ -51,11 +50,13 @@ def test_document_peut_ajouter_un_bloc_dans_une_page(un_constructeur_de_base_chu
 
     document.ajoute(
         document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position)
-            .avec_le_texte("[TEXTE] Une page")
-            .construis()
+            [
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position)
+                .avec_le_texte("[TEXTE] Une page")
+                .construis()
+            ]
         )
     )
 
@@ -74,20 +75,18 @@ def test_document_peut_ajouter_deux_blocs_sur_une_meme_page(
 
     document.ajoute(
         document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_1)
-            .avec_le_texte("[TEXTE] Un titre")
-            .construis()
-        )
-    )
-    document.ajoute(
-        document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_2)
-            .avec_le_texte("[TEXTE] Un paragraphe")
-            .construis()
+            [
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_1)
+                .avec_le_texte("[TEXTE] Un titre")
+                .construis(),
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_2)
+                .avec_le_texte("[TEXTE] Un paragraphe")
+                .construis(),
+            ]
         )
     )
 
@@ -103,20 +102,18 @@ def test_document_reordonne_lorsque_l_on_ajoute_un_bloc(un_constructeur_de_base_
 
     document.ajoute(
         document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_1)
-            .avec_le_texte("[TEXTE] Un paragraphe en seconde position")
-            .construis()
-        )
-    )
-    document.ajoute(
-        document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_2)
-            .avec_le_texte("[TEXTE] Un paragraphe en première position")
-            .construis()
+            [
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_1)
+                .avec_le_texte("[TEXTE] Un paragraphe en seconde position")
+                .construis(),
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_2)
+                .avec_le_texte("[TEXTE] Un paragraphe en première position")
+                .construis(),
+            ]
         )
     )
 
@@ -139,47 +136,33 @@ def test_document_fusionne_un_titre_avec_son_contenu(un_constructeur_de_base_chu
 
     document.ajoute(
         document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_1)
-            .avec_le_texte("[TITRE] Titre 1")
-            .construis()
-        )
-    )
-    document.ajoute(
-        document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_2)
-            .avec_le_texte("[TITRE] Titre 2")
-            .construis()
-        )
-    )
-    document.ajoute(
-        document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_3)
-            .avec_le_texte("[TEXTE] Contenu 1.")
-            .construis()
-        )
-    )
-    document.ajoute(
-        document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_4)
-            .avec_le_texte("[TEXTE] Contenu 2.")
-            .construis()
-        )
-    )
-    document.ajoute(
-        document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_5)
-            .avec_le_texte("[SOUS-TITRE] 1.1 Sous-titre.")
-            .construis()
+            [
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_1)
+                .avec_le_texte("[TITRE] Titre 1")
+                .construis(),
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_2)
+                .avec_le_texte("[TITRE] Titre 2")
+                .construis(),
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_3)
+                .avec_le_texte("[TEXTE] Contenu 1.")
+                .construis(),
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_4)
+                .avec_le_texte("[TEXTE] Contenu 2.")
+                .construis(),
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_5)
+                .avec_le_texte("[SOUS-TITRE] 1.1 Sous-titre.")
+                .construis(),
+            ]
         )
     )
 
@@ -204,47 +187,33 @@ def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommanda
 
     document.ajoute(
         document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_1)
-            .avec_le_texte("[TITRE] Titre")
-            .construis()
-        )
-    )
-    document.ajoute(
-        document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_2)
-            .avec_le_texte("[RECOMMANDATION] R1")
-            .construis()
-        )
-    )
-    document.ajoute(
-        document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_3)
-            .avec_le_texte("[TEXTE] Recommandation 1.")
-            .construis()
-        )
-    )
-    document.ajoute(
-        document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_4)
-            .avec_le_texte("[RECOMMANDATION] R2")
-            .construis()
-        )
-    )
-    document.ajoute(
-        document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_5)
-            .avec_le_texte("[TEXTE] Recommandation 2.")
-            .construis()
+            [
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_1)
+                .avec_le_texte("[TITRE] Titre")
+                .construis(),
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_2)
+                .avec_le_texte("[RECOMMANDATION] R1")
+                .construis(),
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_3)
+                .avec_le_texte("[TEXTE] Recommandation 1.")
+                .construis(),
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_4)
+                .avec_le_texte("[RECOMMANDATION] R2")
+                .construis(),
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_5)
+                .avec_le_texte("[TEXTE] Recommandation 2.")
+                .construis(),
+            ]
         )
     )
 
@@ -266,38 +235,28 @@ def test_document_fusionne_tous_les_contenus_d_un_sous_titre(
 
     document.ajoute(
         document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_1)
-            .avec_le_texte("[SOUS-TITRE] 1.2 Sous-titre 1")
-            .construis()
-        )
-    )
-    document.ajoute(
-        document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_2)
-            .avec_le_texte("[TEXTE] Paragraphe 1.")
-            .construis()
-        )
-    )
-    document.ajoute(
-        document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_3)
-            .avec_le_texte("[TEXTE] Paragraphe 2.")
-            .construis()
-        )
-    )
-    document.ajoute(
-        document_pdf.generateur.genere(
-            un_constructeur_de_base_chunk()
-            .a_la_page(1)
-            .a_la_position(position_bloc_4)
-            .avec_le_texte("[TEXTE] Paragraphe 3.")
-            .construis()
+            [
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_1)
+                .avec_le_texte("[SOUS-TITRE] 1.2 Sous-titre 1")
+                .construis(),
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_2)
+                .avec_le_texte("[TEXTE] Paragraphe 1.")
+                .construis(),
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_3)
+                .avec_le_texte("[TEXTE] Paragraphe 2.")
+                .construis(),
+                un_constructeur_de_base_chunk()
+                .a_la_page(1)
+                .a_la_position(position_bloc_4)
+                .avec_le_texte("[TEXTE] Paragraphe 3.")
+                .construis(),
+            ]
         )
     )
 
@@ -370,16 +329,18 @@ def test_document_fusionne_les_recommandations(
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
 
-    for texte in textes:
-        document.ajoute(
-            document_pdf.generateur.genere(
+    document.ajoute(
+        document_pdf.generateur.genere(
+            [
                 un_constructeur_de_base_chunk()
                 .a_la_page(1)
                 .a_la_position(texte[0])
                 .avec_le_texte(texte[1])
                 .construis()
-            )
+                for texte in textes
+            ]
         )
+    )
 
     assert len(document.pages[1].blocs) == 1
     assert document.pages[1].blocs[0].texte == attendu
@@ -447,16 +408,18 @@ def test_document_fusionne_les_tableaux(
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
 
-    for texte in textes:
-        document.ajoute(
-            document_pdf.generateur.genere(
+    document.ajoute(
+        document_pdf.generateur.genere(
+            [
                 un_constructeur_de_base_chunk()
                 .a_la_page(1)
                 .a_la_position(texte[0])
                 .avec_le_texte(texte[1])
                 .construis()
-            )
+                for texte in textes
+            ]
         )
+    )
 
     assert len(document.pages[1].blocs) == 1
     assert document.pages[1].blocs[0].texte == attendu
