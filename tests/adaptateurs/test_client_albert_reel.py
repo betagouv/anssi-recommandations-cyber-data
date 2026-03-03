@@ -1,8 +1,8 @@
 from adaptateurs.client_albert import ReponseCollectionAlbert
 from adaptateurs.client_albert_reel import ClientAlbertReel
-from documents.document_pdf import DocumentPDF
 from documents.indexeur import Indexeur, ReponseDocument, DocumentAIndexer
 from documents.indexeur_albert import IndexeurBaseVectorielleAlbert
+from documents.pdf.document_pdf import DocumentPDF
 
 
 def test_client_albert_initialise_correctement():

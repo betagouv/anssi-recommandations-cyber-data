@@ -6,14 +6,14 @@ from typing import Optional
 from adaptateurs.client_albert import ClientAlbert
 from adaptateurs.client_albert_reel import ClientAlbertReel
 from configuration import recupere_configuration, IndexeurDocument, MSC
-from documents.cree_document_pdf import cree_document_pdf
-from documents.document_pdf import DocumentPDF
 from documents.indexeur import (
     ReponseDocumentEnErreur,
     ReponseDocumentEnSucces,
 )
 from documents.indexeur_albert import IndexeurBaseVectorielleAlbert
 from documents.indexeur_docling import IndexeurDocling
+from documents.pdf.cree_document_pdf import cree_document_pdf
+from documents.pdf.document_pdf import DocumentPDF
 
 
 def fabrique_client_albert() -> ClientAlbert:
