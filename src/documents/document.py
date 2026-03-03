@@ -1,5 +1,4 @@
-from docling_core.transforms.chunker import BaseChunk
-
+from documents.extrais_les_chunks import ElementsFiltres
 from documents.generateur_de_pages import GenerateurDePages
 from documents.page import Page
 
@@ -32,5 +31,7 @@ class Document:
             "nom_document": self.nom_document,
         }
 
-    def genere_les_pages(self, chunks: list[BaseChunk], generateur: GenerateurDePages):
-        self.pages = generateur.genere(chunks)
+    def genere_les_pages(
+        self, generateur: GenerateurDePages, elements_filtres: ElementsFiltres
+    ):
+        self.pages = generateur.genere(elements_filtres)
