@@ -18,13 +18,7 @@ class Document:
     def url(self):
         return self._url
 
-    def ajoute(
-        self,
-        pages: dict[int, Page],
-    ) -> None:
-        self.pages = pages
-
-    def metatada(self, page) -> dict:
+    def metadata(self, page) -> dict:
         return {
             "source_url": self.url,
             "page": page.numero_page,

@@ -123,7 +123,7 @@ class IndexeurDocling(Indexeur):
                         }
                         payload = {
                             "collection": str(id_collection),
-                            "metadata": json.dumps(document.metatada(page)),
+                            "metadata": json.dumps(document.metadata(page)),
                             "chunker": "NoSplitter",
                         }
                         response = self.executeur_de_requete.poste(
