@@ -49,16 +49,15 @@ def test_document_peut_ajouter_un_bloc_dans_une_page(un_constructeur_de_text_ite
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
 
-    document.ajoute(
-        document_pdf.generateur.genere(
-            [
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position)
-                .avec_texte("Une page")
-                .construis()
-            ]
-        )
+    document.genere_les_pages(
+        document_pdf.generateur,
+        [
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position)
+            .avec_texte("Une page")
+            .construis()
+        ],
     )
 
     assert len(document.pages) == 1
@@ -74,21 +73,20 @@ def test_document_peut_ajouter_deux_blocs_sur_une_meme_page(
     position_bloc_1 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=0.0, largeur=100.0, hauteur=5.0)
 
-    document.ajoute(
-        document_pdf.generateur.genere(
-            [
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_1)
-                .avec_texte("Un titre")
-                .construis(),
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_2)
-                .avec_texte("Un paragraphe")
-                .construis(),
-            ]
-        )
+    document.genere_les_pages(
+        document_pdf.generateur,
+        [
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_1)
+            .avec_texte("Un titre")
+            .construis(),
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_2)
+            .avec_texte("Un paragraphe")
+            .construis(),
+        ],
     )
 
     assert len(document.pages) == 1
@@ -101,21 +99,20 @@ def test_document_reordonne_lorsque_l_on_ajoute_un_bloc(un_constructeur_de_text_
     position_bloc_1 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
 
-    document.ajoute(
-        document_pdf.generateur.genere(
-            [
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_1)
-                .avec_texte("Un paragraphe en seconde position")
-                .construis(),
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_2)
-                .avec_texte("Un paragraphe en première position")
-                .construis(),
-            ]
-        )
+    document.genere_les_pages(
+        document_pdf.generateur,
+        [
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_1)
+            .avec_texte("Un paragraphe en seconde position")
+            .construis(),
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_2)
+            .avec_texte("Un paragraphe en première position")
+            .construis(),
+        ],
     )
 
     assert len(document.pages) == 1
@@ -135,39 +132,38 @@ def test_document_fusionne_un_titre_avec_son_contenu(un_constructeur_de_text_ite
     position_bloc_4 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_5 = Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0)
 
-    document.ajoute(
-        document_pdf.generateur.genere(
-            [
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_1)
-                .avec_texte("Titre 1")
-                .de_type_header()
-                .construis(),
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_2)
-                .avec_texte("Titre 2")
-                .de_type_header()
-                .construis(),
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_3)
-                .avec_texte("Contenu 1.")
-                .construis(),
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_4)
-                .avec_texte("Contenu 2.")
-                .construis(),
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_5)
-                .avec_texte("1.1 Sous-titre.")
-                .de_type_header()
-                .construis(),
-            ]
-        )
+    document.genere_les_pages(
+        document_pdf.generateur,
+        [
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_1)
+            .avec_texte("Titre 1")
+            .de_type_header()
+            .construis(),
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_2)
+            .avec_texte("Titre 2")
+            .de_type_header()
+            .construis(),
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_3)
+            .avec_texte("Contenu 1.")
+            .construis(),
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_4)
+            .avec_texte("Contenu 2.")
+            .construis(),
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_5)
+            .avec_texte("1.1 Sous-titre.")
+            .de_type_header()
+            .construis(),
+        ],
     )
 
     assert len(document.pages[1].blocs) == 3
@@ -189,37 +185,36 @@ def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommanda
     position_bloc_4 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_5 = Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0)
 
-    document.ajoute(
-        document_pdf.generateur.genere(
-            [
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_1)
-                .avec_texte("Titre")
-                .de_type_header()
-                .construis(),
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_2)
-                .avec_texte("R1")
-                .construis(),
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_3)
-                .avec_texte("Recommandation 1.")
-                .construis(),
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_4)
-                .avec_texte("R2")
-                .construis(),
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_5)
-                .avec_texte("Recommandation 2.")
-                .construis(),
-            ]
-        )
+    document.genere_les_pages(
+        document_pdf.generateur,
+        [
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_1)
+            .avec_texte("Titre")
+            .de_type_header()
+            .construis(),
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_2)
+            .avec_texte("R1")
+            .construis(),
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_3)
+            .avec_texte("Recommandation 1.")
+            .construis(),
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_4)
+            .avec_texte("R2")
+            .construis(),
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_5)
+            .avec_texte("Recommandation 2.")
+            .construis(),
+        ],
     )
 
     assert len(document.pages[1].blocs) == 1
@@ -238,32 +233,31 @@ def test_document_fusionne_tous_les_contenus_d_un_sous_titre(
     position_bloc_3 = Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0)
     position_bloc_4 = Position(x=10.0, y=5.0, largeur=100.0, hauteur=5.0)
 
-    document.ajoute(
-        document_pdf.generateur.genere(
-            [
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_1)
-                .avec_texte("1.2 Sous-titre 1")
-                .de_type_header()
-                .construis(),
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_2)
-                .avec_texte("Paragraphe 1.")
-                .construis(),
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_3)
-                .avec_texte("Paragraphe 2.")
-                .construis(),
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(position_bloc_4)
-                .avec_texte("Paragraphe 3.")
-                .construis(),
-            ]
-        )
+    document.genere_les_pages(
+        document_pdf.generateur,
+        [
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_1)
+            .avec_texte("1.2 Sous-titre 1")
+            .de_type_header()
+            .construis(),
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_2)
+            .avec_texte("Paragraphe 1.")
+            .construis(),
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_3)
+            .avec_texte("Paragraphe 2.")
+            .construis(),
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(position_bloc_4)
+            .avec_texte("Paragraphe 3.")
+            .construis(),
+        ],
     )
 
     assert len(document.pages[1].blocs) == 1
@@ -345,18 +339,17 @@ def test_document_fusionne_les_recommandations(
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
 
-    document.ajoute(
-        document_pdf.generateur.genere(
-            [
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(texte[1])
-                .avec_texte(texte[2])
-                .de_type(texte[0])
-                .construis()
-                for texte in textes
-            ]
-        )
+    document.genere_les_pages(
+        document_pdf.generateur,
+        [
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(texte[1])
+            .avec_texte(texte[2])
+            .de_type(texte[0])
+            .construis()
+            for texte in textes
+        ],
     )
 
     assert len(document.pages[1].blocs) == 1
@@ -435,18 +428,17 @@ def test_document_fusionne_les_tableaux(
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
 
-    document.ajoute(
-        document_pdf.generateur.genere(
-            [
-                un_constructeur_de_text_item()
-                .avec_numero_page(1)
-                .a_la_position(texte[1])
-                .avec_texte(texte[2])
-                .de_type(texte[0])
-                .construis()
-                for texte in textes
-            ]
-        )
+    document.genere_les_pages(
+        document_pdf.generateur,
+        [
+            un_constructeur_de_text_item()
+            .avec_numero_page(1)
+            .a_la_position(texte[1])
+            .avec_texte(texte[2])
+            .de_type(texte[0])
+            .construis()
+            for texte in textes
+        ],
     )
 
     assert len(document.pages[1].blocs) == 1
