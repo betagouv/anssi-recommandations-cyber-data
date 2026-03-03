@@ -4,11 +4,12 @@ from pathlib import Path
 from typing import Callable, Type, Union, Optional
 
 import pytest
+from docling.backend.html_backend import HTMLDocumentBackend
 from docling.backend.pdf_backend import PdfDocumentBackend
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.document import InputDocument
 from docling.datamodel.settings import PageRange
-from docling.document_converter import ConversionResult
+from docling.document_converter import ConversionResult, FormatOption
 from docling.document_converter import DocumentConverter
 from docling_core.types import DoclingDocument
 from docling_core.types.doc import (
@@ -21,6 +22,7 @@ from docling_core.types.doc import (
     TableItem,
     TableData,
     TableCell,
+    TitleItem,
 )
 from docling_core.types.io import DocumentStream
 
@@ -96,7 +98,7 @@ def un_convertisseur_avec_un_texte() -> Callable[[], Type[DocumentConverter]]:
     class ConverterDeTest(DocumentConverter):
         def convert(
             self,
-            document: Union[Path, str, DocumentStream],  # TODO review naming
+            document: Union[Path, str, DocumentStream],
             headers: Optional[dict[str, str]] = None,
             raises_on_error: bool = True,
             max_num_pages: int = sys.maxsize,
@@ -124,6 +126,53 @@ def un_convertisseur_avec_un_texte() -> Callable[[], Type[DocumentConverter]]:
 
     def _convertisseur() -> Type[DocumentConverter]:
         return ConverterDeTest
+
+    return _convertisseur
+
+
+@pytest.fixture
+def un_convertisseur_de_test() -> Callable[[], Type[DocumentConverter]]:
+    class ConvertisseurDeTest(DocumentConverter):
+        def __init__(
+            self,
+            allowed_formats: Optional[list[InputFormat]] = None,
+            format_options: Optional[dict[InputFormat, FormatOption]] = None,
+        ):
+            super().__init__(allowed_formats, format_options)
+            self.document_recu = None
+
+        def convert(
+            self,
+            document: Union[Path, str, DocumentStream],
+            headers: Optional[dict[str, str]] = None,
+            raises_on_error: bool = True,
+            max_num_pages: int = sys.maxsize,
+            max_file_size: int = sys.maxsize,
+            page_range: PageRange = (1, 1),
+        ) -> ConversionResult:
+            self.document_recu = document  # type: ignore[assignment]
+            texte = "Un document HTML"
+            bbox = BoundingBox(l=100.0, t=200.0, r=300.0, b=400.0)
+            prov = ProvenanceItem(page_no=1, bbox=bbox, charspan=(0, len(texte)))
+            text = TextItem(
+                text=texte,
+                label=DocItemLabel.TEXT,
+                self_ref="#/test/42",
+                orig="",
+                prov=[prov],
+            )
+
+            return ConversionResult(
+                document=DoclingDocument(name="", texts=[text]),
+                input=InputDocument(
+                    format=InputFormat.HTML,
+                    backend=HTMLDocumentBackend,  # type: ignore[type-abstract]
+                    path_or_stream=document,  # type: ignore[arg-type]
+                ),
+            )
+
+    def _convertisseur() -> Type[DocumentConverter]:
+        return ConvertisseurDeTest
 
     return _convertisseur
 
@@ -264,6 +313,32 @@ class ConstructeurDeSectionHeaderItem(ConstructeurDItem):
         )
 
 
+class ConstructeurDeTitleItem(ConstructeurDItem):
+    def __init__(self):
+        super().__init__()
+        self.enfants = []
+
+    def ayant_les_enfants(self, enfants: list[str]):
+        self.enfants = [RefItem(**{"$ref": f"#/{enfant}"}) for enfant in enfants]
+        return self
+
+    def construis(self) -> TitleItem:
+        return TitleItem(
+            text=self.texte,
+            label=DocItemLabel.TITLE,
+            self_ref="#/test/42",
+            orig="",
+            children=self.enfants,
+            prov=[
+                ProvenanceItem(
+                    page_no=self.numero_page,
+                    bbox=self.bounding_box,
+                    charspan=(0, len(self.texte)),
+                )
+            ],
+        )
+
+
 class ConstructeurDElementFiltrable:
     def de_type_texte(self) -> ConstructeurDeTextItem:
         return ConstructeurDeTextItem()
@@ -271,8 +346,11 @@ class ConstructeurDElementFiltrable:
     def de_type_header(self) -> ConstructeurDeSectionHeaderItem:
         return ConstructeurDeSectionHeaderItem()
 
-    def de_type_tableau(self):
+    def de_type_tableau(self) -> ConstructeurDeTableItem:
         return ConstructeurDeTableItem()
+
+    def de_type_titre(self) -> ConstructeurDeTitleItem:
+        return ConstructeurDeTitleItem()
 
 
 @pytest.fixture

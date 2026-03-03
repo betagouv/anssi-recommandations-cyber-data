@@ -162,3 +162,49 @@ def test_peut_creer_un_document_avec_des_tableaux(
             )
         ]
     )
+
+
+def test_peut_créer_un_document_avec_des_tableaux_sous_un_titre(
+    un_constructeur_d_element_filtrable,
+):
+    nom_document = "test.html"
+    url_document = "https://mon-document.local/test.html"
+    document = Document(nom_document=nom_document, url=url_document)
+
+    document_html = DocumentHTML(nom_document, url_document)
+    document.genere_les_pages(
+        document_html.generateur,
+        [
+            un_constructeur_d_element_filtrable()
+            .de_type_titre()
+            .avec_texte("Des tableaux")
+            .ayant_les_enfants(["tableau/1", "tableau/2"])
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_tableau()
+            .portant_la_reference("tableau/1")
+            .avec_texte("Un premier tableau")
+            .avec_une_cellule("Une cellule dans tableau 1")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_tableau()
+            .portant_la_reference("tableau/2")
+            .avec_texte("Un deuxième tableau")
+            .avec_une_cellule("Une cellule dans tableau 2")
+            .construis(),
+        ],
+    )
+
+    assert document is not None
+    assert len(document.pages) == 1
+    assert document.pages[0] == PageHTML(
+        blocs=[
+            BlocPageHTML(
+                texte="Des tableaux\n"
+                "| Un premier tableau         |\n|----------------------------|\n"
+                "| Une cellule dans tableau 1 |\n"
+                "| Un deuxième tableau        |\n|----------------------------|\n"
+                "| Une cellule dans tableau 2 |"
+            )
+        ]
+    )

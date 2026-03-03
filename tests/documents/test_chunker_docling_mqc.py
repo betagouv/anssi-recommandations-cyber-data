@@ -1,5 +1,6 @@
 from documents.chunker_docling import TypeFichier
 from documents.chunker_docling_mqc import ChunkerDoclingMQC
+from documents.html.document_html import DocumentHTML
 from documents.pdf.document_pdf import DocumentPDF
 
 
@@ -95,3 +96,14 @@ def test_retourne_le_type_du_fichier():
     chunker = ChunkerDoclingMQC()
 
     assert chunker.type_fichier == TypeFichier.TEXTE
+
+
+def test_prend_en_compte_un_document_html(un_convertisseur_de_test):
+    document_html = DocumentHTML("Mon document", "http://mon-document.local/index.html")
+
+    chunker = ChunkerDoclingMQC(un_convertisseur_de_test())
+    document = chunker.applique(document=document_html)
+
+    assert chunker.converter.document_recu == "http://mon-document.local/index.html"
+    assert chunker.nom_fichier == "index.txt"
+    assert len(document.pages) == 1

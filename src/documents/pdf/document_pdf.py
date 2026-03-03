@@ -69,8 +69,8 @@ class DocumentPDF(DocumentAIndexer):
         return self.url_pdf
 
     @property
-    def chemin(self) -> str:
-        return self.chemin_pdf
+    def chemin(self) -> Path:
+        return Path(self.chemin_pdf)
 
     @property
     def generateur(self) -> GenerateurDePages:
