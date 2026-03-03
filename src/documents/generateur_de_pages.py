@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Callable
 
-from docling_core.transforms.chunker import BaseChunk
-
+from documents.extrais_les_chunks import ElementsFiltres
 from documents.page import BlocPagePDF, Page
 
 type NumeroPage = int
@@ -16,5 +15,5 @@ type GenerationDePage = Callable[
 
 class GenerateurDePages(ABC):
     @abstractmethod
-    def genere(self, chunks: list[BaseChunk]) -> dict[int, Page]:
+    def genere(self, elements_filtres: ElementsFiltres) -> dict[int, Page]:
         pass

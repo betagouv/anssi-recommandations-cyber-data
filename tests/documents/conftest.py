@@ -20,15 +20,24 @@ from docling_core.types.doc import (
     DocItemLabel,
     SectionHeaderItem,
     DocItem,
+    TableItem,
+    TableData,
+    TableCell,
 )
 from docling_core.types.io import DocumentStream
 from requests import Session
 
+from documents.chunker_docling import TypeFichier
+from documents.chunker_docling_mqc import ChunkerDoclingMQC
+from documents.document import Document
+from documents.extrais_les_chunks import ElementsFiltres
+from documents.generateur_de_pages import GenerateurDePages
 from documents.indexeur import (
     ReponseDocument,
     ReponseDocumentEnSucces,
+    DocumentAIndexer,
 )
-from documents.page import Position
+from documents.page import Position, PagePDF, BlocPagePDF, Page
 
 
 @pytest.fixture
@@ -137,6 +146,9 @@ class ConstructeurDeTextItem:
         self.texte = "Un texte"
         self.bounding_box = BoundingBox(l=100.0, t=200.0, r=300.0, b=400.0)
         self.numero_page = 1
+        self.position: Position | None = None
+        self.label = DocItemLabel.TEXT
+        self.item = TextItem
 
     def avec_texte(self, texte: str):
         self.texte = texte
@@ -150,16 +162,66 @@ class ConstructeurDeTextItem:
         self.numero_page = numero_page
         return self
 
-    def construis(self) -> TextItem:
-        return TextItem(
+    def a_la_position(self, position: Position):
+        self.position = position
+        return self
+
+    def de_type_header(self):
+        self.item = SectionHeaderItem
+        self.label = DocItemLabel.SECTION_HEADER
+        return self
+
+    def de_type(self, label: DocItemLabel):
+        if label == DocItemLabel.SECTION_HEADER:
+            self.item = SectionHeaderItem
+        if label == DocItemLabel.TABLE:
+            self.item = TableItem
+        self.label = label
+        return self
+
+    def construis(self) -> TextItem | TableItem:
+        bounding_box = self.bounding_box
+        if self.position:
+            bounding_box = BoundingBox(
+                l=self.position.x,
+                t=self.position.y,
+                r=self.position.largeur + self.position.x,
+                b=self.position.hauteur + self.position.y,
+            )
+        if self.label == DocItemLabel.TABLE:
+            return TableItem(
+                data=TableData(
+                    num_cols=1,
+                    num_rows=1,
+                    table_cells=[
+                        TableCell(
+                            text=self.texte,
+                            start_row_offset_idx=0,
+                            start_col_offset_idx=0,
+                            end_row_offset_idx=1,
+                            end_col_offset_idx=1,
+                        )
+                    ],
+                ),
+                label=self.label,
+                self_ref="#/test/43",
+                prov=[
+                    ProvenanceItem(
+                        page_no=self.numero_page,
+                        bbox=bounding_box,
+                        charspan=(0, len(self.texte)),
+                    )
+                ],
+            )
+        return self.item(
             text=self.texte,
-            label=DocItemLabel.TEXT,
+            label=self.label,
             self_ref="#/test/42",
             orig="",
             prov=[
                 ProvenanceItem(
                     page_no=self.numero_page,
-                    bbox=self.bounding_box,
+                    bbox=bounding_box,
                     charspan=(0, len(self.texte)),
                 )
             ],
@@ -516,3 +578,90 @@ def un_constructeur_de_base_chunk() -> Callable[[], ConstructeurDeBaseChunk]:
         return ConstructeurDeBaseChunk()
 
     return _constructeur_de_base_chunk
+
+
+@pytest.fixture
+def un_constructeur_de_text_item() -> Callable[[], ConstructeurDeTextItem]:
+    def _constructeur_de_doc_item() -> ConstructeurDeTextItem:
+        return ConstructeurDeTextItem()
+
+    return _constructeur_de_doc_item
+
+
+class GenerateurDePagesStatique(GenerateurDePages):
+    def __init__(self, numero_page: int = 0, contenu: str = "Un contenu"):
+        super().__init__()
+        self.numero_page = numero_page
+        self.contenu = contenu
+
+    def genere(self, elements_filtres: ElementsFiltres) -> dict[int, Page]:
+        resultat: dict[int, Page] = {
+            self.numero_page: PagePDF(
+                self.numero_page,
+                [BlocPagePDF(self.contenu, Position(x=0, y=0, hauteur=0, largeur=0))],
+            ),
+        }
+        return resultat
+
+
+class ChunkerDeTest(ChunkerDoclingMQC):
+    def __init__(
+        self,
+        nom_fichier: str = "un_fichier_test.pdf",
+        type_fichier: TypeFichier = TypeFichier.PDF,
+        generateur: GenerateurDePagesStatique = GenerateurDePagesStatique(),
+    ):
+        super().__init__()
+        self.nom_fichier = nom_fichier
+        self.type_fichier = type_fichier
+        self.generateur = generateur
+
+    def applique(self, document_a_indexer: DocumentAIndexer) -> Document:
+        document = Document(document_a_indexer.nom_document, document_a_indexer.url)
+        document.genere_les_pages(self.generateur, [])
+        return document
+
+
+class ConstructeurDeChunker:
+    def __init__(self):
+        super().__init__()
+        self.nom_fichier = "un_fichier_test.pdf"
+        self.type_fichier = TypeFichier.PDF
+        self.numero_page = 0
+        self.contenu_page = "Un contenu"
+
+    def avec_le_contenu(self, contenu: str):
+        self.contenu_page = contenu
+        return self
+
+    def a_la_page(self, numero_page: int):
+        self.numero_page = numero_page
+        return self
+
+    def avec_un_nom_de_fichier(self, nom_de_fichier: str):
+        self.nom_fichier = nom_de_fichier
+        return self
+
+    def de_type_texte(self):
+        self.type_fichier = TypeFichier.TEXTE
+        return self
+
+    def construis(self) -> ChunkerDeTest:
+        generateur_de_pages_statique = GenerateurDePagesStatique(
+            numero_page=self.numero_page, contenu=self.contenu_page
+        )
+        return ChunkerDeTest(
+            nom_fichier=self.nom_fichier,
+            type_fichier=self.type_fichier,
+            generateur=generateur_de_pages_statique,
+        )
+
+
+@pytest.fixture
+def un_chunker_avec_generation_de_page_statique() -> Callable[
+    [], ConstructeurDeChunker
+]:
+    def _chunker_avec_generation_de_page_statique() -> ConstructeurDeChunker:
+        return ConstructeurDeChunker()
+
+    return _chunker_avec_generation_de_page_statique

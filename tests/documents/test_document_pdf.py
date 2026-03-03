@@ -1,4 +1,5 @@
 import pytest
+from docling_core.types.doc import DocItemLabel
 
 from documents.chunker_docling_mqc import Position
 from documents.document import (
@@ -44,17 +45,17 @@ def test_pages_a_une_collection_de_pages_vide_par_defaut():
     assert document.pages == {}
 
 
-def test_document_peut_ajouter_un_bloc_dans_une_page(un_constructeur_de_base_chunk):
+def test_document_peut_ajouter_un_bloc_dans_une_page(un_constructeur_de_text_item):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
 
     document.ajoute(
         document_pdf.generateur.genere(
             [
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position)
-                .avec_le_texte("[TEXTE] Une page")
+                .avec_texte("Une page")
                 .construis()
             ]
         )
@@ -67,7 +68,7 @@ def test_document_peut_ajouter_un_bloc_dans_une_page(un_constructeur_de_base_chu
 
 
 def test_document_peut_ajouter_deux_blocs_sur_une_meme_page(
-    un_constructeur_de_base_chunk,
+    un_constructeur_de_text_item,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
@@ -76,15 +77,15 @@ def test_document_peut_ajouter_deux_blocs_sur_une_meme_page(
     document.ajoute(
         document_pdf.generateur.genere(
             [
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_1)
-                .avec_le_texte("[TEXTE] Un titre")
+                .avec_texte("Un titre")
                 .construis(),
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_2)
-                .avec_le_texte("[TEXTE] Un paragraphe")
+                .avec_texte("Un paragraphe")
                 .construis(),
             ]
         )
@@ -95,7 +96,7 @@ def test_document_peut_ajouter_deux_blocs_sur_une_meme_page(
     assert document.pages[1].blocs[1].texte == "[TEXTE] Un paragraphe"
 
 
-def test_document_reordonne_lorsque_l_on_ajoute_un_bloc(un_constructeur_de_base_chunk):
+def test_document_reordonne_lorsque_l_on_ajoute_un_bloc(un_constructeur_de_text_item):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
@@ -103,15 +104,15 @@ def test_document_reordonne_lorsque_l_on_ajoute_un_bloc(un_constructeur_de_base_
     document.ajoute(
         document_pdf.generateur.genere(
             [
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_1)
-                .avec_le_texte("[TEXTE] Un paragraphe en seconde position")
+                .avec_texte("Un paragraphe en seconde position")
                 .construis(),
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_2)
-                .avec_le_texte("[TEXTE] Un paragraphe en première position")
+                .avec_texte("Un paragraphe en première position")
                 .construis(),
             ]
         )
@@ -126,7 +127,7 @@ def test_document_reordonne_lorsque_l_on_ajoute_un_bloc(un_constructeur_de_base_
     )
 
 
-def test_document_fusionne_un_titre_avec_son_contenu(un_constructeur_de_base_chunk):
+def test_document_fusionne_un_titre_avec_son_contenu(un_constructeur_de_text_item):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0)
@@ -137,30 +138,33 @@ def test_document_fusionne_un_titre_avec_son_contenu(un_constructeur_de_base_chu
     document.ajoute(
         document_pdf.generateur.genere(
             [
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_1)
-                .avec_le_texte("[TITRE] Titre 1")
+                .avec_texte("Titre 1")
+                .de_type_header()
                 .construis(),
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_2)
-                .avec_le_texte("[TITRE] Titre 2")
+                .avec_texte("Titre 2")
+                .de_type_header()
                 .construis(),
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_3)
-                .avec_le_texte("[TEXTE] Contenu 1.")
+                .avec_texte("Contenu 1.")
                 .construis(),
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_4)
-                .avec_le_texte("[TEXTE] Contenu 2.")
+                .avec_texte("Contenu 2.")
                 .construis(),
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_5)
-                .avec_le_texte("[SOUS-TITRE] 1.1 Sous-titre.")
+                .avec_texte("1.1 Sous-titre.")
+                .de_type_header()
                 .construis(),
             ]
         )
@@ -176,7 +180,7 @@ def test_document_fusionne_un_titre_avec_son_contenu(un_constructeur_de_base_chu
 
 
 def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommandations(
-    un_constructeur_de_base_chunk,
+    un_constructeur_de_text_item,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
@@ -188,30 +192,31 @@ def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommanda
     document.ajoute(
         document_pdf.generateur.genere(
             [
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_1)
-                .avec_le_texte("[TITRE] Titre")
+                .avec_texte("Titre")
+                .de_type_header()
                 .construis(),
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_2)
-                .avec_le_texte("[RECOMMANDATION] R1")
+                .avec_texte("R1")
                 .construis(),
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_3)
-                .avec_le_texte("[TEXTE] Recommandation 1.")
+                .avec_texte("Recommandation 1.")
                 .construis(),
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_4)
-                .avec_le_texte("[RECOMMANDATION] R2")
+                .avec_texte("R2")
                 .construis(),
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_5)
-                .avec_le_texte("[TEXTE] Recommandation 2.")
+                .avec_texte("Recommandation 2.")
                 .construis(),
             ]
         )
@@ -225,7 +230,7 @@ def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommanda
 
 
 def test_document_fusionne_tous_les_contenus_d_un_sous_titre(
-    un_constructeur_de_base_chunk,
+    un_constructeur_de_text_item,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
@@ -236,25 +241,26 @@ def test_document_fusionne_tous_les_contenus_d_un_sous_titre(
     document.ajoute(
         document_pdf.generateur.genere(
             [
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_1)
-                .avec_le_texte("[SOUS-TITRE] 1.2 Sous-titre 1")
+                .avec_texte("1.2 Sous-titre 1")
+                .de_type_header()
                 .construis(),
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_2)
-                .avec_le_texte("[TEXTE] Paragraphe 1.")
+                .avec_texte("Paragraphe 1.")
                 .construis(),
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_3)
-                .avec_le_texte("[TEXTE] Paragraphe 2.")
+                .avec_texte("Paragraphe 2.")
                 .construis(),
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
                 .a_la_position(position_bloc_4)
-                .avec_le_texte("[TEXTE] Paragraphe 3.")
+                .avec_texte("Paragraphe 3.")
                 .construis(),
             ]
         )
@@ -274,24 +280,29 @@ def test_document_fusionne_tous_les_contenus_d_un_sous_titre(
             "d’un titre",
             [
                 (
+                    DocItemLabel.SECTION_HEADER,
                     Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0),
-                    "[TITRE] Titre",
+                    "Titre",
                 ),
                 (
+                    DocItemLabel.TEXT,
                     Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0),
-                    "[RECOMMANDATION] R1",
+                    "R1",
                 ),
                 (
+                    DocItemLabel.TEXT,
                     Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0),
-                    "[TEXTE] Recommandation 1.",
+                    "Recommandation 1.",
                 ),
                 (
+                    DocItemLabel.TEXT,
                     Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0),
-                    "[RECOMMANDATION] R2",
+                    "R2",
                 ),
                 (
+                    DocItemLabel.TEXT,
                     Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0),
-                    "[TEXTE] Recommandation 2.",
+                    "Recommandation 2.",
                 ),
             ],
             "[TITRE] Titre\n[RECOMMANDATION] R1\n[TEXTE] Recommandation 1.\n[RECOMMANDATION] R2\n[TEXTE] Recommandation 2.",
@@ -300,42 +311,48 @@ def test_document_fusionne_tous_les_contenus_d_un_sous_titre(
             "d’un sous titre",
             [
                 (
+                    DocItemLabel.SECTION_HEADER,
                     Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0),
-                    "[SOUS-TITRE] Sous-Titre",
+                    "1.1 Sous-Titre",
                 ),
                 (
+                    DocItemLabel.TEXT,
                     Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0),
-                    "[RECOMMANDATION] R1",
+                    "R1",
                 ),
                 (
+                    DocItemLabel.TEXT,
                     Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0),
-                    "[TEXTE] Recommandation 1.",
+                    "Recommandation 1.",
                 ),
                 (
+                    DocItemLabel.TEXT,
                     Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0),
-                    "[RECOMMANDATION] R2",
+                    "R2",
                 ),
                 (
+                    DocItemLabel.TEXT,
                     Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0),
-                    "[TEXTE] Recommandation 2.",
+                    "Recommandation 2.",
                 ),
             ],
-            "[SOUS-TITRE] Sous-Titre\n[RECOMMANDATION] R1\n[TEXTE] Recommandation 1.\n[RECOMMANDATION] R2\n[TEXTE] Recommandation 2.",
+            "[SOUS-TITRE] 1.1 Sous-Titre\n[RECOMMANDATION] R1\n[TEXTE] Recommandation 1.\n[RECOMMANDATION] R2\n[TEXTE] Recommandation 2.",
         ),
     ],
 )
 def test_document_fusionne_les_recommandations(
-    _description, textes, attendu, un_constructeur_de_base_chunk
+    _description, textes, attendu, un_constructeur_de_text_item
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
 
     document.ajoute(
         document_pdf.generateur.genere(
             [
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
-                .a_la_position(texte[0])
-                .avec_le_texte(texte[1])
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
+                .a_la_position(texte[1])
+                .avec_texte(texte[2])
+                .de_type(texte[0])
                 .construis()
                 for texte in textes
             ]
@@ -353,68 +370,79 @@ def test_document_fusionne_les_recommandations(
             "d’un titre",
             [
                 (
+                    DocItemLabel.SECTION_HEADER,
                     Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0),
-                    "[TITRE] Titre",
+                    "Titre",
                 ),
                 (
+                    DocItemLabel.TABLE,
                     Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0),
-                    "[TABLEAU] Un tableau",
+                    "Un tableau",
                 ),
                 (
+                    DocItemLabel.TEXT,
                     Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0),
-                    "[TEXTE] Un texte.",
+                    "Un texte.",
                 ),
                 (
+                    DocItemLabel.TABLE,
                     Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0),
-                    "[TABLEAU] Un autre tableau",
+                    "Un autre tableau",
                 ),
                 (
+                    DocItemLabel.TEXT,
                     Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0),
-                    "[TEXTE] Un autre texte.",
+                    "Un autre texte.",
                 ),
             ],
-            "[TITRE] Titre\n[TABLEAU] Un tableau\n[TEXTE] Un texte.\n[TABLEAU] Un autre tableau\n[TEXTE] Un autre texte.",
+            "[TITRE] Titre\n[TABLEAU]\n| Un tableau |\n[TEXTE] Un texte.\n[TABLEAU]\n| Un autre tableau |\n[TEXTE] Un autre texte.",
         ),
         (
             "d’un sous titre",
             [
                 (
+                    DocItemLabel.SECTION_HEADER,
                     Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0),
-                    "[SOUS-TITRE] Sous-Titre",
+                    "1.1 Sous-Titre",
                 ),
                 (
+                    DocItemLabel.TABLE,
                     Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0),
-                    "[TABLEAU] un tableau",
+                    "un tableau",
                 ),
                 (
+                    DocItemLabel.TEXT,
                     Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0),
-                    "[TEXTE] Un texte.",
+                    "Un texte.",
                 ),
                 (
+                    DocItemLabel.TABLE,
                     Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0),
-                    "[TABLEAU] un autre tableau",
+                    "un autre tableau",
                 ),
                 (
+                    DocItemLabel.TEXT,
                     Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0),
-                    "[TEXTE] Un autre texte.",
+                    "Un autre texte.",
                 ),
             ],
-            "[SOUS-TITRE] Sous-Titre\n[TABLEAU] un tableau\n[TEXTE] Un texte.\n[TABLEAU] un autre tableau\n[TEXTE] Un autre texte.",
+            "[SOUS-TITRE] 1.1 Sous-Titre\n[TABLEAU]\n| un tableau |\n[TEXTE] Un texte.\n[TABLEAU]\n| un autre tableau |\n[TEXTE] Un autre texte.",
         ),
     ],
 )
 def test_document_fusionne_les_tableaux(
-    _description, textes, attendu, un_constructeur_de_base_chunk
+    _description, textes, attendu, un_constructeur_de_text_item
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
 
     document.ajoute(
         document_pdf.generateur.genere(
             [
-                un_constructeur_de_base_chunk()
-                .a_la_page(1)
-                .a_la_position(texte[0])
-                .avec_le_texte(texte[1])
+                un_constructeur_de_text_item()
+                .avec_numero_page(1)
+                .a_la_position(texte[1])
+                .avec_texte(texte[2])
+                .de_type(texte[0])
                 .construis()
                 for texte in textes
             ]

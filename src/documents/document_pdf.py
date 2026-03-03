@@ -4,6 +4,7 @@ from typing import cast
 from docling_core.transforms.chunker import BaseChunk, DocMeta
 
 from documents.chunker_docling import extrais_position
+from documents.extrais_les_chunks import ElementsFiltres, extrais_les_chunks
 from documents.generateur_de_pages import (
     GenerateurDePages,
     NumeroPage,
@@ -18,10 +19,10 @@ from documents.page import Position, BlocPagePDF, Page, PagePDF
 
 
 class GenerateurDePagesPDF(GenerateurDePages):
-    def genere(self, chunks: list[BaseChunk]) -> dict[int, Page]:
+    def genere(self, elements_filtres: ElementsFiltres) -> dict[int, Page]:
         resultat: dict[int, Page] = {}
 
-        for chunk in chunks:
+        for chunk in extrais_les_chunks(elements_filtres):
             try:
                 (numero_page, cree_page, cree_bloc) = self.__genere(chunk)()
                 if resultat.get(numero_page) is None:

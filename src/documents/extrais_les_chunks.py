@@ -11,17 +11,19 @@ from docling_core.types.doc import (
 
 from documents.categorise_le_contenu import ajoute_la_categorisation_du_contenu
 
+type ElementsFiltres = list[
+    TitleItem
+    | SectionHeaderItem
+    | ListItem
+    | CodeItem
+    | FormulaItem
+    | TextItem
+    | TableItem
+]
+
 
 def extrais_les_chunks(
-    elements_filtres: list[
-        TitleItem
-        | SectionHeaderItem
-        | ListItem
-        | CodeItem
-        | FormulaItem
-        | TextItem
-        | TableItem
-    ],
+    elements_filtres: ElementsFiltres,
 ) -> list[BaseChunk]:
     return list(
         map(

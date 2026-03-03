@@ -1,95 +1,11 @@
 import json
-from typing import Any, Iterator, Optional
 
-from docling_core.transforms.chunker import BaseChunker, BaseChunk, DocMeta
-from docling_core.types import DoclingDocument as DLDocument
-from docling_core.types.doc import DocItem, DocItemLabel, ProvenanceItem
-from docling_core.types.doc.base import BoundingBox
-from pydantic import Field
-
-from documents.chunker_docling import TypeFichier
-from documents.chunker_docling_mqc import ChunkerDoclingMQC
-from documents.document import Document
 from documents.document_pdf import DocumentPDF
 from documents.indexeur import (
     ReponseDocumentEnErreur,
-    DocumentAIndexer,
 )
 from documents.indexeur_docling import IndexeurDocling
 from documents.multi_processeur import Multiprocesseur
-
-
-class ConstructeurDeBaseChunk:
-    def __init__(self):
-        super().__init__()
-        self.texte = "Un texte chunké"
-        self.numero_page = 5
-
-    def avec_numero_page(self, numero_page: int):
-        self.numero_page = numero_page
-        return self
-
-    def avec_paragraphe(self, paragraphe: str):
-        self.texte = paragraphe
-        return self
-
-    def construis(self) -> BaseChunk:
-        return BaseChunk(
-            text=self.texte,
-            meta=DocMeta(
-                doc_items=[
-                    DocItem(
-                        prov=[
-                            ProvenanceItem(
-                                page_no=self.numero_page,
-                                bbox=BoundingBox(l=0.0, b=0.0, r=0.0, t=0.0),
-                                charspan=(0, 0),
-                            ),
-                        ],
-                        label=DocItemLabel.TEXT,
-                        self_ref="#/tables/9",
-                    )
-                ]
-            ),
-        )
-
-
-class BaseChunkerDeTest(BaseChunker):
-    base_chunk: Optional[BaseChunk] = Field(default=None)
-
-    def __init__(self, /, **data: Any) -> None:
-        super().__init__(**data)
-        self.base_chunk = ConstructeurDeBaseChunk().construis()
-
-    def avec_base_chunk(self, base_chunk: BaseChunk):
-        self.base_chunk = base_chunk
-        return self
-
-    def chunk(self, dl_doc: DLDocument, **kwargs: Any) -> Iterator[BaseChunk]:
-        if self.base_chunk is not None:
-            yield self.base_chunk
-
-
-class ChunkerDeTest(ChunkerDoclingMQC):
-    def __init__(
-        self,
-        nom_fichier: str = "un_fichier_test.pdf",
-        type_fichier: TypeFichier = TypeFichier.PDF,
-    ):
-        super().__init__()
-        self.nom_fichier = nom_fichier
-        self.type_fichier = type_fichier
-        self.chunker = BaseChunkerDeTest()
-
-    def applique(self, document_a_indexer: DocumentAIndexer) -> Document:
-        chunks = self.chunker.chunk(DLDocument(name=document_a_indexer.chemin))
-        document = Document(document_a_indexer.nom_document, document_a_indexer.url)
-        document.genere_les_pages(list(chunks), document_a_indexer.generateur)
-        return document
-
-    def avec_base_chunker(self, chunker: BaseChunker):
-        self.chunker = chunker  # type: ignore[assignment]
-        return self
 
 
 class MultiProcesseurDeTest(Multiprocesseur):
@@ -101,7 +17,11 @@ class MultiProcesseurDeTest(Multiprocesseur):
 
 
 def test_peut_indexer_un_document_pdf(
-    une_reponse_document, fichier_pdf, un_executeur_de_requete, une_reponse_attendue_OK
+    une_reponse_document,
+    fichier_pdf,
+    un_executeur_de_requete,
+    une_reponse_attendue_OK,
+    un_chunker_avec_generation_de_page_statique,
 ):
     chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
     executeur_de_requete = un_executeur_de_requete(
@@ -111,7 +31,7 @@ def test_peut_indexer_un_document_pdf(
     indexeur = IndexeurDocling(
         "http://albert.local",
         "une_clef",
-        ChunkerDeTest(),
+        un_chunker_avec_generation_de_page_statique().construis(),
         executeur_de_requete,
         multi_processeur,
     )
@@ -130,6 +50,7 @@ def test_peut_indexer_plusieurs_documents_pdf(
     fichier_pdf,
     un_executeur_de_requete,
     une_reponse_attendue_OK,
+    un_chunker_avec_generation_de_page_statique,
 ):
     document_1 = str(fichier_pdf("document_1.pdf").resolve())
     document_2 = str(fichier_pdf("document_1.pdf").resolve())
@@ -147,7 +68,7 @@ def test_peut_indexer_plusieurs_documents_pdf(
     indexeur = IndexeurDocling(
         "http://albert.local",
         "une_clef",
-        ChunkerDeTest(),
+        un_chunker_avec_generation_de_page_statique().construis(),
         executeur_de_requete,
         multi_processeur,
     )
@@ -170,18 +91,18 @@ def test_peut_indexer_plusieurs_documents_pdf(
 
 
 def test_le_payload_est_passe_en_argument(
-    une_reponse_document, fichier_pdf, un_executeur_de_requete, une_reponse_attendue_OK
+    une_reponse_document,
+    fichier_pdf,
+    un_executeur_de_requete,
+    une_reponse_attendue_OK,
+    un_chunker_avec_generation_de_page_statique,
 ):
     chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
     executeur_de_requete = un_executeur_de_requete(
         [une_reponse_attendue_OK(une_reponse_document)]
     )
     multi_processeur = MultiProcesseurDeTest()
-    chunker = ChunkerDeTest().avec_base_chunker(
-        BaseChunkerDeTest().avec_base_chunk(
-            ConstructeurDeBaseChunk().avec_numero_page(10).construis()
-        )
-    )
+    chunker = un_chunker_avec_generation_de_page_statique().a_la_page(10).construis()
     indexeur = IndexeurDocling(
         "http://albert.local",
         "une_clef",
@@ -201,17 +122,21 @@ def test_le_payload_est_passe_en_argument(
 
 
 def test_les_metadata_du_payload_contiennent_le_nom_du_document(
-    une_reponse_document, fichier_pdf, un_executeur_de_requete, une_reponse_attendue_OK
+    une_reponse_document,
+    fichier_pdf,
+    un_executeur_de_requete,
+    une_reponse_attendue_OK,
+    un_chunker_avec_generation_de_page_statique,
 ):
     chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
     executeur_de_requete = un_executeur_de_requete(
         [une_reponse_attendue_OK(une_reponse_document)]
     )
     multi_processeur = MultiProcesseurDeTest()
-    chunker = ChunkerDeTest().avec_base_chunker(
-        BaseChunkerDeTest().avec_base_chunk(
-            ConstructeurDeBaseChunk().avec_numero_page(10).construis()
-        )
+    chunker = (
+        un_chunker_avec_generation_de_page_statique()
+        .avec_un_nom_de_fichier("test.pdf")
+        .construis()
     )
     indexeur = IndexeurDocling(
         "http://albert.local",
@@ -229,17 +154,22 @@ def test_les_metadata_du_payload_contiennent_le_nom_du_document(
 
 
 def test_le_fichier_envoye_est_correctement_nomme(
-    une_reponse_document, fichier_pdf, un_executeur_de_requete, une_reponse_attendue_OK
+    une_reponse_document,
+    fichier_pdf,
+    un_executeur_de_requete,
+    une_reponse_attendue_OK,
+    un_chunker_avec_generation_de_page_statique,
 ):
     chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
     executeur_de_requete = un_executeur_de_requete(
         [une_reponse_attendue_OK(une_reponse_document)]
     )
     multi_processeur = MultiProcesseurDeTest()
-    chunker = ChunkerDeTest("mon_fichier.txt", TypeFichier.TEXTE).avec_base_chunker(
-        BaseChunkerDeTest().avec_base_chunk(
-            ConstructeurDeBaseChunk().avec_numero_page(10).construis()
-        )
+    chunker = (
+        un_chunker_avec_generation_de_page_statique()
+        .avec_un_nom_de_fichier("mon_fichier.txt")
+        .de_type_texte()
+        .construis()
     )
     indexeur = IndexeurDocling(
         "http://albert.local",
@@ -258,17 +188,19 @@ def test_le_fichier_envoye_est_correctement_nomme(
 
 
 def test_ne_cree_pas_de_document_si_le_paragraphe_est_trop_court(
-    une_reponse_document, fichier_pdf, un_executeur_de_requete, une_reponse_attendue_OK
+    une_reponse_document,
+    fichier_pdf,
+    un_executeur_de_requete,
+    une_reponse_attendue_OK,
+    un_chunker_avec_generation_de_page_statique,
 ):
     executeur_de_requete = un_executeur_de_requete(
         [une_reponse_attendue_OK(une_reponse_document)]
     )
     multi_processeur = MultiProcesseurDeTest()
     chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
-    chunker = ChunkerDeTest().avec_base_chunker(
-        BaseChunkerDeTest().avec_base_chunk(
-            ConstructeurDeBaseChunk().avec_paragraphe("1").construis()
-        )
+    chunker = (
+        un_chunker_avec_generation_de_page_statique().avec_le_contenu("1").construis()
     )
     indexeur = IndexeurDocling(
         "http://albert.local",
@@ -290,6 +222,7 @@ def test_continue_l_indexation_si_un_document_n_est_pas_indexe(
     un_executeur_de_requete,
     une_reponse_attendue_OK,
     une_reponse_attendue_KO,
+    un_chunker_avec_generation_de_page_statique,
 ):
     document_1 = str(fichier_pdf("document_1.pdf").resolve())
     document_2 = str(fichier_pdf("document_2.pdf").resolve())
@@ -307,7 +240,7 @@ def test_continue_l_indexation_si_un_document_n_est_pas_indexe(
     indexeur = IndexeurDocling(
         "http://albert.local",
         "une_clef",
-        ChunkerDeTest(),
+        un_chunker_avec_generation_de_page_statique().construis(),
         executeur_de_requete,
         multi_processeur,
     )
@@ -332,6 +265,7 @@ def test_continue_l_indexation_si_un_document_n_est_pas_indexe_et_qu_une_erreur_
     un_executeur_de_requete,
     une_reponse_attendue_KO,
     une_reponse_attendue_OK,
+    un_chunker_avec_generation_de_page_statique,
 ):
     document_1 = str(fichier_pdf("document_1.pdf").resolve())
     document_2 = str(fichier_pdf("document_2.pdf").resolve())
@@ -349,7 +283,7 @@ def test_continue_l_indexation_si_un_document_n_est_pas_indexe_et_qu_une_erreur_
     indexeur = IndexeurDocling(
         "http://albert.local",
         "une_clef",
-        ChunkerDeTest(),
+        un_chunker_avec_generation_de_page_statique().construis(),
         executeur_de_requete,
         multi_processeur,
     )
