@@ -1,11 +1,11 @@
 import json
 
-from documents.document_pdf import DocumentPDF
 from documents.indexeur import (
     ReponseDocumentEnErreur,
 )
 from documents.indexeur_docling import IndexeurDocling
 from documents.multi_processeur import Multiprocesseur
+from documents.pdf.document_pdf import DocumentPDF
 
 
 class MultiProcesseurDeTest(Multiprocesseur):

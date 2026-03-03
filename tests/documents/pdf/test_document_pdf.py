@@ -4,7 +4,7 @@ from docling_core.types.doc import DocItemLabel
 from documents.document import (
     Document,
 )
-from documents.document_pdf import DocumentPDF, Position, BlocPagePDF, PagePDF
+from documents.pdf.document_pdf import DocumentPDF, PagePDF, Position, BlocPagePDF
 
 document_pdf = DocumentPDF(
     chemin_pdf="tests/data/guide_test.pdf",

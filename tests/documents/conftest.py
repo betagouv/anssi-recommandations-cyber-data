@@ -26,7 +26,6 @@ from docling_core.types.io import DocumentStream
 from documents.chunker_docling import TypeFichier
 from documents.chunker_docling_mqc import ChunkerDoclingMQC
 from documents.document import Document
-from documents.document_pdf import Position, BlocPagePDF, PagePDF
 from documents.extrais_les_chunks import ElementsFiltres
 from documents.generateur_de_pages import GenerateurDePages
 from documents.indexeur import (
@@ -35,6 +34,7 @@ from documents.indexeur import (
     DocumentAIndexer,
 )
 from documents.page import Page
+from documents.pdf.document_pdf import Position, PagePDF, BlocPagePDF
 
 
 @pytest.fixture
