@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Union, Literal
 
 from docling_core.transforms.chunker import BaseChunk
@@ -35,7 +36,7 @@ class DocumentAIndexer(ABC):
 
     @property
     @abstractmethod
-    def chemin(self) -> str:
+    def chemin(self) -> Union[Path, str]:
         pass
 
     @property

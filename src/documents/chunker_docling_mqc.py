@@ -20,7 +20,11 @@ class ChunkerDoclingMQC(ChunkerDocling):
         resultat_conversion: ConversionResult,
         document_a_indexer: DocumentAIndexer,
     ) -> Document:
-        self.nom_fichier = Path(document_a_indexer.chemin).name.replace(".pdf", ".txt")
+        self.nom_fichier = (
+            Path(document_a_indexer.chemin)
+            .name.replace(".pdf", ".txt")
+            .replace(".html", ".txt")
+        )
         elements_filtres = filtre_les_resultats(resultat_conversion)
         document = Document(document_a_indexer.nom_document, document_a_indexer.url)
         document.genere_les_pages(document_a_indexer.generateur, elements_filtres)

@@ -25,8 +25,9 @@ class GenerateurDePagesHTML(GenerateurDePages):
         page = PageHTML()
         les_headers: list[SectionHeaderItem] = list(
             filter(
-                lambda item: item.label == DocItemLabel.SECTION_HEADER,
-                elements_filtres,  # type: ignore[arg-type]
+                lambda item: item.label == DocItemLabel.SECTION_HEADER  # type: ignore[arg-type]
+                or item.label == DocItemLabel.TITLE,
+                elements_filtres,
             )
         )
         if len(les_headers) == 0:
@@ -50,8 +51,8 @@ class GenerateurDePagesHTML(GenerateurDePages):
 
     def __extrais_contenu_textuel(self, elements_filtres: ElementsFiltres) -> str:
         les_tableaux: list[TableItem] = list(
-            filter(lambda item: isinstance(item, TableItem), elements_filtres)
-        )  # type: ignore[arg-type]
+            filter(lambda item: isinstance(item, TableItem), elements_filtres)  # type: ignore[arg-type]
+        )
         if len(les_tableaux) > 0:
             return "\n".join(map(lambda item: item.export_to_markdown(), les_tableaux))
         return "\n".join(map(lambda element: element.text, elements_filtres))  # type: ignore[union-attr]
@@ -62,6 +63,7 @@ class DocumentHTML(DocumentAIndexer):
         super().__init__()
         self._url = url
         self._nom_document = nom_document
+        self._type = "HTML"
 
     @property
     def nom_document(self) -> str:
