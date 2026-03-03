@@ -1,12 +1,10 @@
 import pytest
 from docling_core.types.doc import DocItemLabel
 
-from documents.chunker_docling_mqc import Position
 from documents.document import (
     Document,
 )
-from documents.document_pdf import DocumentPDF
-from documents.page import BlocPagePDF, PagePDF
+from documents.document_pdf import DocumentPDF, Position, BlocPagePDF, PagePDF
 
 document_pdf = DocumentPDF(
     chemin_pdf="tests/data/guide_test.pdf",

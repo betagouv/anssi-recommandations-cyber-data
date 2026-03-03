@@ -1,26 +1,13 @@
-import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import TypeVar, NamedTuple, Generic
+from typing import TypeVar, Generic
 
 T_Bloc = TypeVar("T_Bloc", bound="BlocPage")
-
-
-class Position(NamedTuple):
-    x: float
-    y: float
-    largeur: float
-    hauteur: float
 
 
 @dataclass(frozen=True)
 class BlocPage:
     texte: str
-
-
-@dataclass(frozen=True)
-class BlocPagePDF(BlocPage):
-    position: Position
 
 
 @dataclass
@@ -31,85 +18,3 @@ class Page(ABC, Generic[T_Bloc]):
     @abstractmethod
     def ajoute_bloc(self, bloc: T_Bloc) -> None:
         pass
-
-
-class PagePDF(Page[BlocPagePDF]):
-    def ajoute_bloc(self, bloc: BlocPagePDF) -> None:
-        les_positions = [bloc.position for bloc in self.blocs]
-        les_positions.append(bloc.position)
-        les_positions_ordonnees = [
-            pos
-            for idx, pos in sorted(enumerate(les_positions), key=lambda it: -it[1].y)
-        ]
-        for indice, position in enumerate(les_positions_ordonnees):
-            if bloc.position == position:
-                self.blocs.insert(
-                    indice, BlocPagePDF(texte=bloc.texte, position=bloc.position)
-                )
-
-        self._fusionne_les_entetes_avec_leur_contenu()
-
-    def _fusionne_les_entetes_avec_leur_contenu(self):
-        i = 0
-        blocs_fusionnes = []
-        while i < len(self.blocs):
-            courant = self.blocs[i]
-            suivant = self.blocs[i + 1] if i + 1 < len(self.blocs) else None
-            if self._a_du_contenu_adjacent_au_titre(courant, suivant):
-                blocs_fusionnes.append(
-                    BlocPagePDF(
-                        texte=f"{courant.texte}\n{suivant.texte}",
-                        position=courant.position,
-                    )
-                )
-                i += 1
-            elif self._a_du_contenu_adjacent_au_sous_titre(courant, suivant):
-                blocs_fusionnes.append(
-                    BlocPagePDF(
-                        texte=f"{courant.texte}\n{suivant.texte}",
-                        position=courant.position,
-                    )
-                )
-                i += 1
-            else:
-                blocs_fusionnes.append(courant)
-            i += 1
-
-        self.blocs = blocs_fusionnes
-
-    def _a_du_contenu_adjacent_au_titre(
-        self, courant: BlocPagePDF, suivant: BlocPagePDF | None
-    ) -> bool:
-        return self.a_du_contenu_adjacent(courant, "[TITRE]", suivant)
-
-    def _a_du_contenu_adjacent_au_sous_titre(
-        self, courant: BlocPagePDF, suivant: BlocPagePDF | None
-    ) -> bool:
-        return self.a_du_contenu_adjacent(courant, "[SOUS-TITRE]", suivant)
-
-    def a_du_contenu_adjacent(
-        self, courant: BlocPagePDF, sous_titre_: str, suivant: BlocPagePDF | None
-    ) -> bool:
-        return (
-            courant.texte.startswith(sous_titre_)
-            and suivant is not None
-            and (
-                suivant.texte.startswith("[TEXTE]")
-                or suivant.texte.startswith("[RECOMMANDATION]")
-                or suivant.texte.startswith("[TABLEAU]")
-            )
-        )
-
-    @staticmethod
-    def _est_entete(texte: str) -> bool:
-        t = (texte or "").strip()
-        if not t:
-            return False
-        if t.endswith((".", "…", "!", "?")):
-            return False
-        tokens = re.findall(r"[A-Za-zÀ-ÖØ-öø-ÿ']+", t)
-        if not (1 <= len(tokens) <= 6):
-            return False
-        if len(t) > 60:
-            return False
-        return True
