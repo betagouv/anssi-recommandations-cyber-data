@@ -17,10 +17,7 @@ from docling_core.types.doc import (
     TextItem,
     DocItemLabel,
     SectionHeaderItem,
-    TableItem,
-    TableData,
-    TableCell,
-)
+    RefItem, TableItem, TableData, TableCell, )
 from docling_core.types.io import DocumentStream
 
 from documents.chunker_docling import TypeFichier
@@ -127,15 +124,14 @@ def un_convertisseur_avec_un_texte() -> Callable[[], Type[DocumentConverter]]:
     return _convertisseur
 
 
-class ConstructeurDeTextItem:
+class ConstructeurDItem:
+
     def __init__(self):
         super().__init__()
         self.texte = "Un texte"
         self.bounding_box = BoundingBox(l=100.0, t=200.0, r=300.0, b=400.0)
         self.numero_page = 1
-        self.position: Position | None = None
-        self.label = DocItemLabel.TEXT
-        self.item = TextItem
+        self.reference = "tables/9"
 
     def avec_texte(self, texte: str):
         self.texte = texte
@@ -150,81 +146,26 @@ class ConstructeurDeTextItem:
         return self
 
     def a_la_position(self, position: Position):
-        self.position = position
-        return self
-
-    def de_type_header(self):
-        self.item = SectionHeaderItem
-        self.label = DocItemLabel.SECTION_HEADER
-        return self
-
-    def de_type(self, label: DocItemLabel):
-        if label == DocItemLabel.SECTION_HEADER:
-            self.item = SectionHeaderItem
-        if label == DocItemLabel.TABLE:
-            self.item = TableItem
-        self.label = label
-        return self
-
-    def construis(self) -> TextItem | TableItem:
-        bounding_box = self.bounding_box
-        if self.position:
-            bounding_box = BoundingBox(
-                l=self.position.x,
-                t=self.position.y,
-                r=self.position.largeur + self.position.x,
-                b=self.position.hauteur + self.position.y,
-            )
-        if self.label == DocItemLabel.TABLE:
-            return TableItem(
-                data=TableData(
-                    num_cols=1,
-                    num_rows=1,
-                    table_cells=[
-                        TableCell(
-                            text=self.texte,
-                            start_row_offset_idx=0,
-                            start_col_offset_idx=0,
-                            end_row_offset_idx=1,
-                            end_col_offset_idx=1,
-                        )
-                    ],
-                ),
-                label=self.label,
-                self_ref="#/test/43",
-                prov=[
-                    ProvenanceItem(
-                        page_no=self.numero_page,
-                        bbox=bounding_box,
-                        charspan=(0, len(self.texte)),
-                    )
-                ],
-            )
-        return self.item(
-            text=self.texte,
-            label=self.label,
-            self_ref="#/test/42",
-            orig="",
-            prov=[
-                ProvenanceItem(
-                    page_no=self.numero_page,
-                    bbox=bounding_box,
-                    charspan=(0, len(self.texte)),
-                )
-            ],
+        self.bounding_box = BoundingBox(
+            l=position.x,
+            t=position.y,
+            r=position.largeur + position.x,
+            b=position.hauteur + position.y,
         )
-
-
-class ConstructeurDeSectionHeaderItem(ConstructeurDeTextItem):
-    def avec_titre(self, titre: str):
-        self.texte = titre
         return self
 
-    def construis(self) -> SectionHeaderItem:
-        return SectionHeaderItem(
+    def portant_la_reference(self, reference: str):
+        self.reference = reference
+        return self
+
+
+class ConstructeurDeTextItem(ConstructeurDItem):
+
+    def construis(self) -> TextItem:
+        return TextItem(
             text=self.texte,
-            label=DocItemLabel.SECTION_HEADER,
-            self_ref="#/test/42",
+            label=DocItemLabel.TEXT,
+            self_ref=f"#/{self.reference}",
             orig="",
             prov=[
                 ProvenanceItem(
@@ -234,6 +175,93 @@ class ConstructeurDeSectionHeaderItem(ConstructeurDeTextItem):
                 )
             ],
         )
+
+@pytest.fixture
+def un_constructeur_de_text_item() -> Callable[[], ConstructeurDeTextItem]:
+    def _constructeur_de_text_item() -> ConstructeurDeTextItem:
+        return ConstructeurDeTextItem()
+
+    return _constructeur_de_text_item
+
+class ConstructeurDeTableItem(ConstructeurDItem):
+    def construis(self) -> TableItem:
+        return TableItem(
+            data=TableData(
+                num_cols=1,
+                num_rows=1,
+                table_cells=[
+                    TableCell(
+                        text=self.texte,
+                        start_row_offset_idx=0,
+                        start_col_offset_idx=0,
+                        end_row_offset_idx=1,
+                        end_col_offset_idx=1,
+                    )
+                ],
+            ),
+            label=DocItemLabel.TABLE,
+            self_ref="#/test/43",
+            prov=[
+                ProvenanceItem(
+                    page_no=self.numero_page,
+                    bbox=self.bounding_box,
+                    charspan=(0, len(self.texte)),
+                )
+            ],
+        )
+
+
+class ConstructeurDeSectionHeaderItem(ConstructeurDItem):
+
+    def __init__(self):
+        super().__init__()
+        self.enfants = []
+
+    def avec_titre(self, titre: str):
+        self.texte = titre
+        return self
+
+    def ayant_les_enfants(self, enfants: list[str]):
+        self.enfants = [RefItem(**{"$ref": f"#/{enfant}"}) for enfant in enfants]
+        return self
+
+    def construis(self) -> SectionHeaderItem:
+        return SectionHeaderItem(
+            text=self.texte,
+            label=DocItemLabel.SECTION_HEADER,
+            self_ref="#/test/42",
+            orig="",
+            children=self.enfants,
+            prov=[
+                ProvenanceItem(
+                    page_no=self.numero_page,
+                    bbox=self.bounding_box,
+                    charspan=(0, len(self.texte)),
+                )
+            ],
+        )
+
+
+class ConstructeurDElementFiltrable:
+
+    def de_type_texte(self) -> ConstructeurDeTextItem:
+        return ConstructeurDeTextItem()
+
+    def de_type_header(self) -> ConstructeurDeSectionHeaderItem:
+        return ConstructeurDeSectionHeaderItem()
+
+
+    def de_type_tableau(self):
+        return ConstructeurDeTableItem()
+
+
+@pytest.fixture
+def un_constructeur_d_element_filtrable() -> Callable[[], ConstructeurDElementFiltrable]:
+    def _constructeur_d_element_filtrable() -> ConstructeurDElementFiltrable:
+        return ConstructeurDElementFiltrable()
+
+    return _constructeur_d_element_filtrable
+
 
 
 @pytest.fixture
@@ -362,14 +390,6 @@ def un_convertisseur_avec_un_titre_et_un_texte() -> Callable[
     return _convertisseur
 
 
-@pytest.fixture
-def un_constructeur_de_text_item() -> Callable[[], ConstructeurDeTextItem]:
-    def _constructeur_de_doc_item() -> ConstructeurDeTextItem:
-        return ConstructeurDeTextItem()
-
-    return _constructeur_de_doc_item
-
-
 class GenerateurDePagesStatique(GenerateurDePages):
     def __init__(self, numero_page: int = 0, contenu: str = "Un contenu"):
         super().__init__()
@@ -438,7 +458,6 @@ class ConstructeurDeChunker:
             generateur=generateur_de_pages_statique,
         )
 
-
 @pytest.fixture
 def un_chunker_avec_generation_de_page_statique() -> Callable[
     [], ConstructeurDeChunker
@@ -447,3 +466,4 @@ def un_chunker_avec_generation_de_page_statique() -> Callable[
         return ConstructeurDeChunker()
 
     return _chunker_avec_generation_de_page_statique
+
