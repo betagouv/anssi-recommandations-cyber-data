@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import NamedTuple, Type
+from typing import Type
 
 from docling.datamodel.document import ConversionResult
 from docling.document_converter import DocumentConverter
@@ -8,13 +8,6 @@ from documents.chunker_docling import ChunkerDocling, TypeFichier
 from documents.document import Document
 from documents.filtre_resultat import filtre_les_resultats
 from documents.indexeur import DocumentAIndexer
-
-
-class Position(NamedTuple):
-    x: float
-    y: float
-    largeur: float
-    hauteur: float
 
 
 class ChunkerDoclingMQC(ChunkerDocling):

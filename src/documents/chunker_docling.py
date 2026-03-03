@@ -9,11 +9,9 @@ from docling.datamodel.base_models import InputFormat
 from docling.datamodel.document import ConversionResult
 from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, FormatOption, PdfFormatOption
-from docling_core.transforms.chunker import BaseChunk, DocMeta
 
 from documents.document import Document
 from documents.indexeur import DocumentAIndexer
-from documents.page import Position
 
 
 class OptionsGuide(dict):
@@ -69,17 +67,3 @@ class ChunkerDocling(ABC):
         self, resultat_conversion: ConversionResult, document: DocumentAIndexer
     ) -> Document:
         pass
-
-
-def extrais_position(chunk: BaseChunk) -> Position:
-    try:
-        meta = cast(DocMeta, chunk.meta)
-        bbox = meta.doc_items[0].prov[0].bbox
-        return Position(
-            x=float(bbox.l),
-            y=float(bbox.t),
-            largeur=float(bbox.r - bbox.l),
-            hauteur=float(bbox.b - bbox.t),
-        )
-    except Exception:
-        return Position(x=0.0, y=0.0, largeur=0.0, hauteur=0.0)
