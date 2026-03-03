@@ -1,6 +1,3 @@
-import pytest
-from docling_core.types.doc import DocItemLabel
-
 from documents.document import (
     Document,
 )
@@ -122,7 +119,9 @@ def test_document_reordonne_lorsque_l_on_ajoute_un_bloc(un_constructeur_de_text_
     )
 
 
-def test_document_fusionne_un_titre_avec_son_contenu(un_constructeur_de_text_item):
+def test_document_fusionne_un_titre_avec_son_contenu(
+    un_constructeur_d_element_filtrable,
+):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0)
@@ -133,33 +132,35 @@ def test_document_fusionne_un_titre_avec_son_contenu(un_constructeur_de_text_ite
     document.genere_les_pages(
         document_pdf.generateur,
         [
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_header()
             .avec_numero_page(1)
             .a_la_position(position_bloc_1)
             .avec_texte("Titre 1")
-            .de_type_header()
             .construis(),
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_header()
             .avec_numero_page(1)
             .a_la_position(position_bloc_2)
             .avec_texte("Titre 2")
-            .de_type_header()
             .construis(),
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
             .avec_numero_page(1)
             .a_la_position(position_bloc_3)
             .avec_texte("Contenu 1.")
             .construis(),
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
             .avec_numero_page(1)
             .a_la_position(position_bloc_4)
             .avec_texte("Contenu 2.")
             .construis(),
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_header()
             .avec_numero_page(1)
             .a_la_position(position_bloc_5)
             .avec_texte("1.1 Sous-titre.")
-            .de_type_header()
             .construis(),
         ],
     )
@@ -174,7 +175,7 @@ def test_document_fusionne_un_titre_avec_son_contenu(un_constructeur_de_text_ite
 
 
 def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommandations(
-    un_constructeur_de_text_item,
+    un_constructeur_d_element_filtrable,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
@@ -186,28 +187,32 @@ def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommanda
     document.genere_les_pages(
         document_pdf.generateur,
         [
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_header()
             .avec_numero_page(1)
             .a_la_position(position_bloc_1)
             .avec_texte("Titre")
-            .de_type_header()
             .construis(),
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
             .avec_numero_page(1)
             .a_la_position(position_bloc_2)
             .avec_texte("R1")
             .construis(),
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
             .avec_numero_page(1)
             .a_la_position(position_bloc_3)
             .avec_texte("Recommandation 1.")
             .construis(),
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
             .avec_numero_page(1)
             .a_la_position(position_bloc_4)
             .avec_texte("R2")
             .construis(),
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
             .avec_numero_page(1)
             .a_la_position(position_bloc_5)
             .avec_texte("Recommandation 2.")
@@ -223,7 +228,7 @@ def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommanda
 
 
 def test_document_fusionne_tous_les_contenus_d_un_sous_titre(
-    un_constructeur_de_text_item,
+    un_constructeur_d_element_filtrable,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
@@ -234,23 +239,26 @@ def test_document_fusionne_tous_les_contenus_d_un_sous_titre(
     document.genere_les_pages(
         document_pdf.generateur,
         [
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_header()
             .avec_numero_page(1)
             .a_la_position(position_bloc_1)
             .avec_texte("1.2 Sous-titre 1")
-            .de_type_header()
             .construis(),
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
             .avec_numero_page(1)
             .a_la_position(position_bloc_2)
             .avec_texte("Paragraphe 1.")
             .construis(),
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
             .avec_numero_page(1)
             .a_la_position(position_bloc_3)
             .avec_texte("Paragraphe 2.")
             .construis(),
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
             .avec_numero_page(1)
             .a_la_position(position_bloc_4)
             .avec_texte("Paragraphe 3.")
@@ -265,179 +273,193 @@ def test_document_fusionne_tous_les_contenus_d_un_sous_titre(
     )
 
 
-@pytest.mark.parametrize(
-    "_description, textes, attendu",
-    [
-        (
-            "d’un titre",
-            [
-                (
-                    DocItemLabel.SECTION_HEADER,
-                    Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0),
-                    "Titre",
-                ),
-                (
-                    DocItemLabel.TEXT,
-                    Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0),
-                    "R1",
-                ),
-                (
-                    DocItemLabel.TEXT,
-                    Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0),
-                    "Recommandation 1.",
-                ),
-                (
-                    DocItemLabel.TEXT,
-                    Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0),
-                    "R2",
-                ),
-                (
-                    DocItemLabel.TEXT,
-                    Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0),
-                    "Recommandation 2.",
-                ),
-            ],
-            "[TITRE] Titre\n[RECOMMANDATION] R1\n[TEXTE] Recommandation 1.\n[RECOMMANDATION] R2\n[TEXTE] Recommandation 2.",
-        ),
-        (
-            "d’un sous titre",
-            [
-                (
-                    DocItemLabel.SECTION_HEADER,
-                    Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0),
-                    "1.1 Sous-Titre",
-                ),
-                (
-                    DocItemLabel.TEXT,
-                    Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0),
-                    "R1",
-                ),
-                (
-                    DocItemLabel.TEXT,
-                    Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0),
-                    "Recommandation 1.",
-                ),
-                (
-                    DocItemLabel.TEXT,
-                    Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0),
-                    "R2",
-                ),
-                (
-                    DocItemLabel.TEXT,
-                    Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0),
-                    "Recommandation 2.",
-                ),
-            ],
-            "[SOUS-TITRE] 1.1 Sous-Titre\n[RECOMMANDATION] R1\n[TEXTE] Recommandation 1.\n[RECOMMANDATION] R2\n[TEXTE] Recommandation 2.",
-        ),
-    ],
-)
-def test_document_fusionne_les_recommandations(
-    _description, textes, attendu, un_constructeur_de_text_item
+def test_document_fusionne_les_recommandations_pour_un_titre(
+    un_constructeur_d_element_filtrable,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
 
     document.genere_les_pages(
         document_pdf.generateur,
         [
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_header()
             .avec_numero_page(1)
-            .a_la_position(texte[1])
-            .avec_texte(texte[2])
-            .de_type(texte[0])
-            .construis()
-            for texte in textes
+            .a_la_position(Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("Titre")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("R1")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("Recommandation 1.")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("R2")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("Recommandation 2.")
+            .construis(),
         ],
     )
 
     assert len(document.pages[1].blocs) == 1
-    assert document.pages[1].blocs[0].texte == attendu
+    assert (
+        document.pages[1].blocs[0].texte
+        == "[TITRE] Titre\n[RECOMMANDATION] R1\n[TEXTE] Recommandation 1.\n[RECOMMANDATION] R2\n[TEXTE] Recommandation 2."
+    )
 
 
-@pytest.mark.parametrize(
-    "_description, textes, attendu",
-    [
-        (
-            "d’un titre",
-            [
-                (
-                    DocItemLabel.SECTION_HEADER,
-                    Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0),
-                    "Titre",
-                ),
-                (
-                    DocItemLabel.TABLE,
-                    Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0),
-                    "Un tableau",
-                ),
-                (
-                    DocItemLabel.TEXT,
-                    Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0),
-                    "Un texte.",
-                ),
-                (
-                    DocItemLabel.TABLE,
-                    Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0),
-                    "Un autre tableau",
-                ),
-                (
-                    DocItemLabel.TEXT,
-                    Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0),
-                    "Un autre texte.",
-                ),
-            ],
-            "[TITRE] Titre\n[TABLEAU]\n| Un tableau |\n[TEXTE] Un texte.\n[TABLEAU]\n| Un autre tableau |\n[TEXTE] Un autre texte.",
-        ),
-        (
-            "d’un sous titre",
-            [
-                (
-                    DocItemLabel.SECTION_HEADER,
-                    Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0),
-                    "1.1 Sous-Titre",
-                ),
-                (
-                    DocItemLabel.TABLE,
-                    Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0),
-                    "un tableau",
-                ),
-                (
-                    DocItemLabel.TEXT,
-                    Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0),
-                    "Un texte.",
-                ),
-                (
-                    DocItemLabel.TABLE,
-                    Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0),
-                    "un autre tableau",
-                ),
-                (
-                    DocItemLabel.TEXT,
-                    Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0),
-                    "Un autre texte.",
-                ),
-            ],
-            "[SOUS-TITRE] 1.1 Sous-Titre\n[TABLEAU]\n| un tableau |\n[TEXTE] Un texte.\n[TABLEAU]\n| un autre tableau |\n[TEXTE] Un autre texte.",
-        ),
-    ],
-)
-def test_document_fusionne_les_tableaux(
-    _description, textes, attendu, un_constructeur_de_text_item
+def test_document_fusionne_les_recommandations_pour_un_sous_titre(
+    un_constructeur_d_element_filtrable,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
 
     document.genere_les_pages(
         document_pdf.generateur,
         [
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_header()
             .avec_numero_page(1)
-            .a_la_position(texte[1])
-            .avec_texte(texte[2])
-            .de_type(texte[0])
-            .construis()
-            for texte in textes
+            .a_la_position(Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("1.1 Sous-Titre")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("R1")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("Recommandation 1.")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("R2")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("Recommandation 2.")
+            .construis(),
         ],
     )
 
     assert len(document.pages[1].blocs) == 1
-    assert document.pages[1].blocs[0].texte == attendu
+    assert (
+        document.pages[1].blocs[0].texte
+        == "[SOUS-TITRE] 1.1 Sous-Titre\n[RECOMMANDATION] R1\n[TEXTE] Recommandation 1.\n[RECOMMANDATION] R2\n[TEXTE] Recommandation 2."
+    )
+
+
+def test_document_fusionne_les_tableaux_pour_un_titre(
+    un_constructeur_d_element_filtrable,
+):
+    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
+
+    document.genere_les_pages(
+        document_pdf.generateur,
+        [
+            un_constructeur_d_element_filtrable()
+            .de_type_header()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("Titre")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_tableau()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("Un tableau")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("Un texte.")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_tableau()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("Un autre tableau")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("Un autre texte.")
+            .construis(),
+        ],
+    )
+
+    assert len(document.pages[1].blocs) == 1
+    assert (
+        document.pages[1].blocs[0].texte
+        == "[TITRE] Titre\n[TABLEAU]\n| Un tableau |\n[TEXTE] Un texte.\n[TABLEAU]\n| Un autre tableau |\n[TEXTE] Un autre texte."
+    )
+
+
+def test_document_fusionne_les_tableaux_pour_un_sous_titre(
+    un_constructeur_d_element_filtrable,
+):
+    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
+
+    document.genere_les_pages(
+        document_pdf.generateur,
+        [
+            un_constructeur_d_element_filtrable()
+            .de_type_header()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("1.1 Sous-Titre")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_tableau()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("Un tableau")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("Un texte.")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_tableau()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("Un autre tableau")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(1)
+            .a_la_position(Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0))
+            .avec_texte("Un autre texte.")
+            .construis(),
+        ],
+    )
+
+    assert len(document.pages[1].blocs) == 1
+    assert (
+        document.pages[1].blocs[0].texte
+        == "[SOUS-TITRE] 1.1 Sous-Titre\n[TABLEAU]\n| Un tableau |\n[TEXTE] Un texte.\n[TABLEAU]\n| Un autre tableau |\n[TEXTE] Un autre texte."
+    )
