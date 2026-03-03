@@ -17,7 +17,11 @@ from docling_core.types.doc import (
     TextItem,
     DocItemLabel,
     SectionHeaderItem,
-    RefItem, TableItem, TableData, TableCell, )
+    RefItem,
+    TableItem,
+    TableData,
+    TableCell,
+)
 from docling_core.types.io import DocumentStream
 
 from documents.chunker_docling import TypeFichier
@@ -125,13 +129,12 @@ def un_convertisseur_avec_un_texte() -> Callable[[], Type[DocumentConverter]]:
 
 
 class ConstructeurDItem:
-
     def __init__(self):
         super().__init__()
         self.texte = "Un texte"
         self.bounding_box = BoundingBox(l=100.0, t=200.0, r=300.0, b=400.0)
         self.numero_page = 1
-        self.reference = "tables/9"
+        self.reference = "#/tables/9"
 
     def avec_texte(self, texte: str):
         self.texte = texte
@@ -155,17 +158,16 @@ class ConstructeurDItem:
         return self
 
     def portant_la_reference(self, reference: str):
-        self.reference = reference
+        self.reference = f"#/{reference}"
         return self
 
 
 class ConstructeurDeTextItem(ConstructeurDItem):
-
     def construis(self) -> TextItem:
         return TextItem(
             text=self.texte,
             label=DocItemLabel.TEXT,
-            self_ref=f"#/{self.reference}",
+            self_ref=self.reference,
             orig="",
             prov=[
                 ProvenanceItem(
@@ -176,6 +178,7 @@ class ConstructeurDeTextItem(ConstructeurDItem):
             ],
         )
 
+
 @pytest.fixture
 def un_constructeur_de_text_item() -> Callable[[], ConstructeurDeTextItem]:
     def _constructeur_de_text_item() -> ConstructeurDeTextItem:
@@ -183,24 +186,44 @@ def un_constructeur_de_text_item() -> Callable[[], ConstructeurDeTextItem]:
 
     return _constructeur_de_text_item
 
+
 class ConstructeurDeTableItem(ConstructeurDItem):
+    def __init__(self):
+        super().__init__()
+        self.cellules = []
+
+    def avec_une_cellule(self, contenu_cellule: str):
+        self.cellules.append(
+            TableCell(
+                text=contenu_cellule,
+                start_row_offset_idx=len(self.cellules),
+                start_col_offset_idx=0,
+                end_row_offset_idx=len(self.cellules) + 1,
+                end_col_offset_idx=1,
+            )
+        )
+        return self
+
+    def avec_texte(self, texte: str):
+        super().avec_texte(texte)
+        self.cellules.append(
+            TableCell(
+                text=self.texte,
+                start_row_offset_idx=0,
+                start_col_offset_idx=0,
+                end_row_offset_idx=1,
+                end_col_offset_idx=1,
+            )
+        )
+        return self
+
     def construis(self) -> TableItem:
         return TableItem(
             data=TableData(
-                num_cols=1,
-                num_rows=1,
-                table_cells=[
-                    TableCell(
-                        text=self.texte,
-                        start_row_offset_idx=0,
-                        start_col_offset_idx=0,
-                        end_row_offset_idx=1,
-                        end_col_offset_idx=1,
-                    )
-                ],
+                num_cols=1, num_rows=len(self.cellules), table_cells=self.cellules
             ),
             label=DocItemLabel.TABLE,
-            self_ref="#/test/43",
+            self_ref=self.reference,
             prov=[
                 ProvenanceItem(
                     page_no=self.numero_page,
@@ -212,7 +235,6 @@ class ConstructeurDeTableItem(ConstructeurDItem):
 
 
 class ConstructeurDeSectionHeaderItem(ConstructeurDItem):
-
     def __init__(self):
         super().__init__()
         self.enfants = []
@@ -243,25 +265,24 @@ class ConstructeurDeSectionHeaderItem(ConstructeurDItem):
 
 
 class ConstructeurDElementFiltrable:
-
     def de_type_texte(self) -> ConstructeurDeTextItem:
         return ConstructeurDeTextItem()
 
     def de_type_header(self) -> ConstructeurDeSectionHeaderItem:
         return ConstructeurDeSectionHeaderItem()
 
-
     def de_type_tableau(self):
         return ConstructeurDeTableItem()
 
 
 @pytest.fixture
-def un_constructeur_d_element_filtrable() -> Callable[[], ConstructeurDElementFiltrable]:
+def un_constructeur_d_element_filtrable() -> Callable[
+    [], ConstructeurDElementFiltrable
+]:
     def _constructeur_d_element_filtrable() -> ConstructeurDElementFiltrable:
         return ConstructeurDElementFiltrable()
 
     return _constructeur_d_element_filtrable
-
 
 
 @pytest.fixture
@@ -458,6 +479,7 @@ class ConstructeurDeChunker:
             generateur=generateur_de_pages_statique,
         )
 
+
 @pytest.fixture
 def un_chunker_avec_generation_de_page_statique() -> Callable[
     [], ConstructeurDeChunker
@@ -466,4 +488,3 @@ def un_chunker_avec_generation_de_page_statique() -> Callable[
         return ConstructeurDeChunker()
 
     return _chunker_avec_generation_de_page_statique
-
