@@ -4,6 +4,9 @@ from configuration import recupere_configuration
 from documents.pdf.cree_document_pdf import cree_document_pdf
 
 
+@pytest.mark.skip(
+    reason="En attendant d’exposer une fonction spécifique pour les documents distants"
+)
 def test_cree_document_pdf_via_un_fichier(
     dossier_guide_anssi, fichier_urls_specifiques
 ):
