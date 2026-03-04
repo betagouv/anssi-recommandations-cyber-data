@@ -1,20 +1,10 @@
 import unicodedata
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Literal
+from typing import Optional
 from urllib.parse import quote
 
 from configuration import MSC
-from documents.pdf.document_pdf import DocumentPDF
-
-
-@dataclass
-class URLDocument:
-    type: Literal["PDF", "HTML"]
-    url: str
-
-
-type DocumentDistant = dict[str, URLDocument]
+from documents.pdf.document_pdf import DocumentPDF, DocumentPDFDistant
 
 
 def cree_document_pdf(
@@ -29,3 +19,7 @@ def cree_document_pdf(
     nom_fichier_encode = quote(nom_fichier, safe="-._~")
     url = f"{base}/{chemin_guides}/{nom_fichier_encode}"
     return DocumentPDF(chemin, url)
+
+
+def cree_document_pdf_distant(nom, url: str) -> DocumentPDFDistant:
+    return DocumentPDFDistant(nom, url)

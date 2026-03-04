@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast, NamedTuple
+from typing import cast, NamedTuple, Union
 
 from docling_core.transforms.chunker import BaseChunk, DocMeta
 
@@ -71,6 +71,30 @@ class DocumentPDF(DocumentAIndexer):
     @property
     def chemin(self) -> Path:
         return Path(self.chemin_pdf)
+
+    @property
+    def generateur(self) -> GenerateurDePages:
+        return GenerateurDePagesPDF()
+
+
+class DocumentPDFDistant(DocumentAIndexer):
+    def __init__(self, nom: str, url: str):
+        super().__init__()
+        self.url_pdf = url
+        self._nom_document = nom
+        self._type = "PDF"
+
+    @property
+    def nom_document(self) -> str:
+        return self._nom_document
+
+    @property
+    def url(self) -> str:
+        return self.url_pdf
+
+    @property
+    def chemin(self) -> Union[Path, str]:
+        return self.url_pdf
 
     @property
     def generateur(self) -> GenerateurDePages:
