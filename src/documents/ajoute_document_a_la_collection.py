@@ -1,6 +1,6 @@
 import argparse
 
-from configuration import MSC, recupere_configuration
+from documents.collecte.collecte import collecte_guide_anssi
 from documents.indexe_documents_rag import (
     fabrique_client_albert,
 )
@@ -8,15 +8,6 @@ from documents.indexeur import (
     ReponseDocumentEnErreur,
     ReponseDocumentEnSucces,
 )
-from documents.pdf.cree_document_pdf import cree_document_pdf
-from documents.pdf.document_pdf import DocumentPDF
-
-
-def collecte_guide_anssi(
-    path: str = "donnees/guides_de_lANSSI",
-    configuration_msc: MSC = recupere_configuration().msc,
-) -> DocumentPDF:
-    return cree_document_pdf(path, configuration_msc)
 
 
 def main():

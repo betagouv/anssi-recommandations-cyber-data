@@ -40,6 +40,13 @@ def test_pages_a_une_collection_de_pages_vide_par_defaut():
     assert document.pages == {}
 
 
+def test_document_pdf_cree_correctement():
+    doc = DocumentPDF("chemin/vers/fichier.pdf", "https://example.com/fichier.pdf")
+
+    assert doc.chemin_pdf == "chemin/vers/fichier.pdf"
+    assert doc.url_pdf == "https://example.com/fichier.pdf"
+
+
 def test_document_peut_ajouter_un_bloc_dans_une_page(un_constructeur_de_text_item):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
