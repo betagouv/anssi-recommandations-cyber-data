@@ -1,6 +1,11 @@
 import argparse
+from pathlib import Path
 
-from documents.collecte.collecte import collecte_guide_anssi
+from documents.collecte.collecte import (
+    collecte_guide_anssi,
+    collecte_documents_distants,
+    mappe_en_document_distant,
+)
 from documents.indexe_documents_rag import (
     fabrique_client_albert,
 )
@@ -30,8 +35,11 @@ def main():
         return
 
     print(f"Collection trouvée portant l'ID: {client.id_collection}")
-    document = collecte_guide_anssi(path=args.path)
-    reponses = client.ajoute_documents([document])
+    guides_anssi = collecte_guide_anssi(path=args.path)
+    documents_distants = collecte_documents_distants(
+        mappe_en_document_distant(Path(args.documents_distants))
+    )
+    reponses = client.ajoute_documents([guides_anssi, *documents_distants])
 
     les_documents_en_erreur = list(
         filter(lambda reponse: isinstance(reponse, ReponseDocumentEnErreur), reponses)

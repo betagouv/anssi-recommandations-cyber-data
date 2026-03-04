@@ -1,10 +1,15 @@
 import argparse
 import multiprocessing as mp
+from pathlib import Path
 
 from adaptateurs.client_albert import ClientAlbert
 from adaptateurs.client_albert_reel import ClientAlbertReel
 from configuration import recupere_configuration, IndexeurDocument
-from documents.collecte.collecte import collecte_guides_anssi
+from documents.collecte.collecte import (
+    collecte_guides_anssi,
+    collecte_documents_distants,
+    mappe_en_document_distant,
+)
 from documents.indexeur import (
     ReponseDocumentEnErreur,
     ReponseDocumentEnSucces,
@@ -51,11 +56,14 @@ def main():
 
     client.cree_collection(args.nom, args.description)
     print(f"Collection créée avec ID: {client.id_collection}")
-    documents = collecte_guides_anssi()
-    print(
-        f"Collecté {len(documents)} documents PDF sur la collection {client.id_collection}"
+    guides_anssi = collecte_guides_anssi()
+    documents_distants = collecte_documents_distants(
+        mappe_en_document_distant(Path(args.documents_distants))
     )
-    reponses = client.ajoute_documents(documents)
+    print(
+        f"Collecté {len(guides_anssi)} documents PDF sur la collection {client.id_collection}"
+    )
+    reponses = client.ajoute_documents([*guides_anssi, *documents_distants])
 
     les_documents_en_erreur = list(
         filter(lambda reponse: isinstance(reponse, ReponseDocumentEnErreur), reponses)

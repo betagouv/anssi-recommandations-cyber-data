@@ -1,4 +1,6 @@
 import glob
+import json
+from pathlib import Path
 from typing import Literal, TypedDict
 
 from configuration import MSC, recupere_configuration
@@ -29,6 +31,22 @@ def collecte_guide_anssi(
     configuration_msc: MSC = recupere_configuration().msc,
 ) -> DocumentPDF:
     return cree_document_pdf(path, configuration_msc)
+
+
+def mappe_en_document_distant(documents_distants: Path) -> DocumentDistant | None:
+    if documents_distants.exists():
+
+        def _mappe(document: dict) -> URLDocument | dict:
+            if "url" in document and "type" in document:
+                return URLDocument(type=document["type"], url=document["url"])
+            return document
+
+        contenu: DocumentDistant = json.loads(
+            documents_distants.read_text(encoding="utf-8"),
+            object_hook=_mappe,
+        )
+        return contenu
+    return None
 
 
 def collecte_documents_distants(
