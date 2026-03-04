@@ -24,8 +24,8 @@ def main():
     parser.add_argument("--id_collection", required=True, help="ID de la collection")
     parser.add_argument("--path", required=True, help="Path du document à ajouter")
     parser.add_argument(
-        "--guides_urls_externes",
-        default="src/guides/guides_urls_externes.json",
+        "--documents-distants",
+        default="src/guides/documents_distants.json",
         help="Fichier json qui spécifie les urls pour les pdf sotckés en dehors de MSS",
     )
 

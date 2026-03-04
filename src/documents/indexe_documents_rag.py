@@ -50,8 +50,8 @@ def main():
         "--description", required=True, help="Description de la collection"
     )
     parser.add_argument(
-        "--guides_urls_externes",
-        default="src/guides/guides_urls_externes.json",
+        "--documents-distants",
+        default="src/guides/documents_distants.json",
         help="Fichier json qui spécifie les urls pour les pdf sotckés en dehors de MSS",
     )
     args = parser.parse_args()
