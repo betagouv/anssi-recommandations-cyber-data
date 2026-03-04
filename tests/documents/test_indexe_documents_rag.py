@@ -5,7 +5,6 @@ from documents.ajoute_document_a_la_collection import collecte_document_pdf
 from documents.indexe_documents_rag import (
     collecte_documents_pdf,
 )
-from documents.pdf.cree_document_pdf import cree_document_pdf
 from documents.pdf.document_pdf import DocumentPDF
 
 
@@ -65,19 +64,6 @@ def test_collecte_document_pdf_utilise_url_specifique_depuis_json(
         path_url=str(fichier_urls_specifiques),
     )
 
-    assert document.url_pdf == "https://url_de_test.com"
-
-
-def test_cree_document_pdf_avec_un_fichier_de_parametre(
-    dossier_guide_anssi, fichier_urls_specifiques
-):
-    chemin_fichier = str(dossier_guide_anssi.resolve() / "test.pdf")
-
-    configuration_msc = recupere_configuration().msc
-
-    document = cree_document_pdf(
-        chemin_fichier, configuration_msc, str(fichier_urls_specifiques)
-    )
     assert document.url_pdf == "https://url_de_test.com"
 
 
