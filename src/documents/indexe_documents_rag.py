@@ -1,18 +1,16 @@
 import argparse
-import glob
 import multiprocessing as mp
 
 from adaptateurs.client_albert import ClientAlbert
 from adaptateurs.client_albert_reel import ClientAlbertReel
-from configuration import recupere_configuration, IndexeurDocument, MSC
+from configuration import recupere_configuration, IndexeurDocument
+from documents.collecte.collecte import collecte_guides_anssi
 from documents.indexeur import (
     ReponseDocumentEnErreur,
     ReponseDocumentEnSucces,
 )
 from documents.indexeur_albert import IndexeurBaseVectorielleAlbert
 from documents.indexeur_docling import IndexeurDocling
-from documents.pdf.cree_document_pdf import cree_document_pdf
-from documents.pdf.document_pdf import DocumentPDF
 
 
 def fabrique_client_albert() -> ClientAlbert:
@@ -33,14 +31,6 @@ def fabrique_client_albert() -> ClientAlbert:
     raise Exception(
         f"Erreur, un indexeur {', '.join([indexeur.name for indexeur in IndexeurDocument])} doit être fourni. L’indexeur configuré est : {config.indexeur}"
     )
-
-
-def collecte_guides_anssi(
-    dossier: str = "donnees/guides_de_lANSSI",
-    configuration_msc: MSC = recupere_configuration().msc,
-) -> list[DocumentPDF]:
-    chemins = glob.glob(f"{dossier}/*.pdf")
-    return [cree_document_pdf(chemin, configuration_msc) for chemin in chemins]
 
 
 def main():
