@@ -1,5 +1,4 @@
 import argparse
-from typing import Optional
 
 from configuration import MSC, recupere_configuration
 from documents.indexe_documents_rag import (
@@ -13,12 +12,11 @@ from documents.pdf.cree_document_pdf import cree_document_pdf
 from documents.pdf.document_pdf import DocumentPDF
 
 
-def collecte_document_pdf(
+def collecte_guide_anssi(
     path: str = "donnees/guides_de_lANSSI",
     configuration_msc: MSC = recupere_configuration().msc,
-    path_url: Optional[str] | None = None,
 ) -> DocumentPDF:
-    return cree_document_pdf(path, configuration_msc, path_url)
+    return cree_document_pdf(path, configuration_msc)
 
 
 def main():
@@ -41,7 +39,7 @@ def main():
         return
 
     print(f"Collection trouvée portant l'ID: {client.id_collection}")
-    document = collecte_document_pdf(path=args.path, path_url=args.guides_urls_externes)
+    document = collecte_guide_anssi(path=args.path)
     reponses = client.ajoute_documents([document])
 
     les_documents_en_erreur = list(
