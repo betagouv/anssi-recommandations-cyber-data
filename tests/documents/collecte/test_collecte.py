@@ -5,6 +5,7 @@ from documents.collecte.collecte import (
     collecte_guides_anssi,
     collecte_guide_anssi,
     collecte_documents_distants,
+    mappe_en_document_distant,
 )
 from documents.html.document_html import GenerateurDePagesHTML
 from documents.pdf.document_pdf import DocumentPDF, GenerateurDePagesPDF
@@ -74,3 +75,24 @@ def test_collecte_un_document_distant_de_type_html():
     assert documents[0].url == "https://une-page-distante.local/index.html"
     assert documents[0].chemin == "https://une-page-distante.local/index.html"
     assert isinstance(documents[0].generateur, GenerateurDePagesHTML)
+
+
+def test_mappe_un_json_vers_un_document_distant(json_documents_distant):
+    documents = mappe_en_document_distant(json_documents_distant)
+
+    assert documents == {
+        "un_fichier.pdf": {
+            "type": "PDF",
+            "url": "https://un-pdf-distant.local/un_fichier.pdf",
+        },
+        "une_page.html": {
+            "type": "HTML",
+            "url": "https://une-page-distante.local/une_page.html",
+        },
+    }
+
+
+def test_retourne_none_si_le_fichier_documents_distants_n_existe_pas():
+    documents = mappe_en_document_distant(Path("fichier_inexistant.json"))
+
+    assert documents is None

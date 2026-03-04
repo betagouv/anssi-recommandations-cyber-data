@@ -57,10 +57,19 @@ def dossier_guide_anssi(tmp_path, fichier_pdf) -> Path:
 
 
 @pytest.fixture
-def fichier_urls_specifiques(tmp_path) -> Path:
-    contenu = {"test.pdf": {"type": "PDF", "url": "https://url_de_test.com"}}
+def json_documents_distant(tmp_path) -> Path:
+    contenu = {
+        "un_fichier.pdf": {
+            "type": "PDF",
+            "url": "https://un-pdf-distant.local/un_fichier.pdf",
+        },
+        "une_page.html": {
+            "type": "HTML",
+            "url": "https://une-page-distante.local/une_page.html",
+        },
+    }
 
-    chemin_fichier = tmp_path / "urls_specifiques.json"
+    chemin_fichier = tmp_path / "documents_distants.json"
     chemin_fichier.write_text(json.dumps(contenu), encoding="utf-8")
 
     return chemin_fichier
