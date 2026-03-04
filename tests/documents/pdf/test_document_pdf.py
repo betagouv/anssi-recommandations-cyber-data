@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from documents.document import (
     Document,
 )
@@ -43,8 +45,8 @@ def test_pages_a_une_collection_de_pages_vide_par_defaut():
 def test_document_pdf_cree_correctement():
     doc = DocumentPDF("chemin/vers/fichier.pdf", "https://example.com/fichier.pdf")
 
-    assert doc.chemin_pdf == "chemin/vers/fichier.pdf"
-    assert doc.url_pdf == "https://example.com/fichier.pdf"
+    assert doc.chemin == Path("chemin/vers/fichier.pdf")
+    assert doc.url == "https://example.com/fichier.pdf"
 
 
 def test_document_peut_ajouter_un_bloc_dans_une_page(un_constructeur_de_text_item):

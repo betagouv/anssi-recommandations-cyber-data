@@ -56,21 +56,21 @@ class GenerateurDePagesPDF(GenerateurDePages):
 class DocumentPDF(DocumentAIndexer):
     def __init__(self, chemin_pdf: str, url_pdf: str):
         super().__init__()
-        self.url_pdf = url_pdf
-        self.chemin_pdf = chemin_pdf
+        self._url_pdf = url_pdf
+        self._chemin_pdf = chemin_pdf
         self._type = "PDF"
 
     @property
     def nom_document(self) -> str:
-        return Path(self.chemin_pdf).name
+        return Path(self._chemin_pdf).name
 
     @property
     def url(self) -> str:
-        return self.url_pdf
+        return self._url_pdf
 
     @property
     def chemin(self) -> Path:
-        return Path(self.chemin_pdf)
+        return Path(self._chemin_pdf)
 
     @property
     def generateur(self) -> GenerateurDePages:
@@ -80,7 +80,7 @@ class DocumentPDF(DocumentAIndexer):
 class DocumentPDFDistant(DocumentAIndexer):
     def __init__(self, nom: str, url: str):
         super().__init__()
-        self.url_pdf = url
+        self._url_pdf = url
         self._nom_document = nom
         self._type = "PDF"
 
@@ -90,11 +90,11 @@ class DocumentPDFDistant(DocumentAIndexer):
 
     @property
     def url(self) -> str:
-        return self.url_pdf
+        return self._url_pdf
 
     @property
     def chemin(self) -> Union[Path, str]:
-        return self.url_pdf
+        return self._url_pdf
 
     @property
     def generateur(self) -> GenerateurDePages:
