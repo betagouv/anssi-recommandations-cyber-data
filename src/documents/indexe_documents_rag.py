@@ -43,7 +43,7 @@ def main():
     )
     parser.add_argument(
         "--documents-distants",
-        default="src/guides/documents_distants.json",
+        default="donnees/documents_distants.json",
         help="Fichier json qui spécifie les urls pour les pdf sotckés en dehors de MSS",
     )
     args = parser.parse_args()
@@ -58,7 +58,9 @@ def main():
         mappe_en_document_distant(Path(args.documents_distants))
     )
     print(
-        f"Collecté {len(guides_anssi)} documents PDF sur la collection {client.id_collection}"
+        f"Collecte en cours sur la collection {client.id_collection} :\n"
+        f"- Guides ANSSI : {len(guides_anssi)} documents PDF\n"
+        f"- Documents distants : {len(documents_distants)} documents"
     )
     reponses = client.ajoute_documents([*guides_anssi, *documents_distants])
 

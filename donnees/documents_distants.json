@@ -1,0 +1,82 @@
+{
+  "ADS - Active Directory Security": {
+    "type": "HTML",
+    "url": "https://messervices.cyber.gouv.fr/services/ads.html"
+  },
+  "MSC - MonAideCyber": {
+    "type": "HTML",
+    "url": "https://messervices.cyber.gouv.fr/services/mon-aide-cyber.html"
+  },
+  "MSC - Silene": {
+    "type": "HTML",
+    "url": "https://messervices.cyber.gouv.fr/services/silene.html"
+  },
+  "MSC - MonServiceSecurise": {
+    "type": "HTML",
+    "url": "https://messervices.cyber.gouv.fr/services/mon-service-securise.html"
+  },
+  "MSC - CyberEnJeux": {
+    "type": "HTML",
+    "url": "https://messervices.cyber.gouv.fr/ressources/cyber-enjeux.html"
+  },
+  "MSC - MonAideCyber - Aidants": {
+    "type": "HTML",
+    "url": "https://messervices.cyber.gouv.fr/services/mon-aide-cyber-aidants.html"
+  },
+  "ANSSI - Déléguées territoriaux": {
+    "type": "HTML",
+    "url": "https://cyber.gouv.fr/nous-connaitre/lagence/organisation/delegues-territoriaux/"
+  },
+  "ANSSI - Direction générale": {
+    "type": "HTML",
+    "url": "https://cyber.gouv.fr/nous-connaitre/lagence/organisation/direction-generale/"
+  },
+  "ANSSI - Missions": {
+    "type": "HTML",
+    "url": "https://cyber.gouv.fr/nous-connaitre/lagence/missions/"
+  },
+  "ANSSI - CERT-FR": {
+    "type": "HTML",
+    "url": "https://cyber.gouv.fr/nous-connaitre/lagence/organisation/cert-fr/"
+  },
+  "CLUB SSI": {
+    "type": "HTML",
+    "url": "https://club.ssi.gouv.fr/#/declarations"
+  },
+  "MonServiceSecurise": {
+    "type": "HTML",
+    "url": "https://monservicesecurise.cyber.gouv.fr/"
+  },
+  "MSC - Sites certifiés": {
+    "type": "PDF",
+    "url": "https://messervices.cyber.gouv.fr/visas/catalogue-produits-services-profils-de-protection-sites-certifies-qualifies-agrees-anssi.pdf"
+  },
+  "CNIL - Conservation": {
+    "type": "PDF",
+    "url": "https://www.cnil.fr/sites/cnil/files/atoms/files/guide_durees_de_conservation.pdf"
+  },
+  "CNIL - Guide pratique RGPD": {
+    "type": "PDF",
+    "url": "https://www.cnil.fr/sites/cnil/files/atoms/files/guide_pratique_rgpd_-_delegues_a_la_protection_des_donnees.pdf"
+  },
+  "CNIL - Guide sécurité personnelle": {
+    "type": "PDF",
+    "url": "https://www.cnil.fr/sites/cnil/files/2024-03/cnil_guide_securite_personnelle_2024.pdf"
+  },
+  "CNIL - Guide gestion RH": {
+    "type": "PDF",
+    "url": "https://www.cnil.fr/sites/cnil/files/2023-09/referentiel_gestion_des_ressources_humaines.pdf"
+  },
+  "CNIL - Guide TPE PME": {
+    "type": "PDF",
+    "url": "https://www.cnil.fr/sites/default/files/atoms/files/bpi-cnil-rgpd_guide-tpe-pme.pdf"
+  },
+  "CNIL - Recommandations applications mobiles": {
+    "type": "PDF",
+    "url": "https://www.cnil.fr/sites/default/files/2025-04/recommandation-applications-mobiles-modifiee.pdf"
+  },
+  "CNIL - La loi": {
+    "type": "HTML",
+    "url": "https://www.cnil.fr/fr/le-cadre-national/la-loi-informatique-et-libertes#article87"
+  }
+}
