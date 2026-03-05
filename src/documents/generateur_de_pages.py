@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Callable
 
-from documents.extrais_les_chunks import ElementsFiltres
+from documents.elements_filtres import ElementsFiltres
 from documents.page import Page, BlocPage
 
 type NumeroPage = int

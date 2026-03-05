@@ -5,7 +5,7 @@ from typing import Literal, TypedDict
 
 from configuration import MSC, recupere_configuration
 from documents.html.document_html import DocumentHTML
-from documents.indexeur import DocumentAIndexer
+from documents.indexeur.indexeur import DocumentAIndexer
 from documents.pdf.cree_document_pdf import cree_document_pdf, cree_document_pdf_distant
 from documents.pdf.document_pdf import DocumentPDF
 

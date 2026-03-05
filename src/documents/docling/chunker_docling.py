@@ -15,8 +15,8 @@ from docling.document_converter import (
     HTMLFormatOption,
 )
 
-from documents.document import Document
-from documents.indexeur import DocumentAIndexer
+from documents.docling.document import Document
+from documents.indexeur.indexeur import DocumentAIndexer
 
 
 class OptionsGuide(dict):
@@ -62,7 +62,7 @@ format_options: dict[
 class ChunkerDocling(ABC):
     def __init__(self, converter: Type[DocumentConverter] = DocumentConverter):
         super().__init__()
-        fichier_options_path = Path(__file__).parent / "options_guides.json"
+        fichier_options_path = Path(__file__).parent / "../options_guides.json"
         with open(fichier_options_path, encoding="utf-8") as fichier_options_guides:
             self.options_guides: OptionsGuides = json.load(fichier_options_guides)  # type: ignore[annotation-unchecked]
         self.converter = converter()

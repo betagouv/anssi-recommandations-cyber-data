@@ -1,4 +1,4 @@
-from documents.extrais_les_chunks import ElementsFiltres
+from documents.elements_filtres import ElementsFiltres
 from documents.generateur_de_pages import GenerateurDePages
 from documents.page import Page
 

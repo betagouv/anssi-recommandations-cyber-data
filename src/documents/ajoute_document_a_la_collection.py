@@ -9,10 +9,7 @@ from documents.collecte.collecte import (
 from documents.indexe_documents_rag import (
     fabrique_client_albert,
 )
-from documents.indexeur import (
-    ReponseDocumentEnErreur,
-    ReponseDocumentEnSucces,
-)
+from documents.indexeur.indexeur import ReponseDocumentEnErreur, ReponseDocumentEnSucces
 
 
 def main():

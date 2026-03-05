@@ -6,17 +6,17 @@ from itertools import islice
 from pathlib import Path
 from typing import Generator
 
-from documents.chunker_docling import ChunkerDocling, TypeFichier
-from documents.chunker_docling_mqc import ChunkerDoclingMQC
-from documents.executeur_requete import ExecuteurDeRequete
-from documents.indexeur import (
+from documents.docling.chunker_docling import TypeFichier, ChunkerDocling
+from documents.docling.chunker_docling_mqc import ChunkerDoclingMQC
+from documents.docling.multi_processeur import Multiprocesseur
+from documents.indexeur.indexeur import (
+    DocumentAIndexer,
     Indexeur,
     ReponseDocument,
-    ReponseDocumentEnSucces,
     ReponseDocumentEnErreur,
-    DocumentAIndexer,
+    ReponseDocumentEnSucces,
 )
-from documents.multi_processeur import Multiprocesseur
+from infra.executeur_requete import ExecuteurDeRequete
 
 for name in (
     "docling",

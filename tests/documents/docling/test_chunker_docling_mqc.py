@@ -1,5 +1,5 @@
-from documents.chunker_docling import TypeFichier
-from documents.chunker_docling_mqc import ChunkerDoclingMQC
+from documents.docling.chunker_docling import TypeFichier
+from documents.docling.chunker_docling_mqc import ChunkerDoclingMQC
 from documents.html.document_html import DocumentHTML
 from documents.pdf.document_pdf import DocumentPDF
 

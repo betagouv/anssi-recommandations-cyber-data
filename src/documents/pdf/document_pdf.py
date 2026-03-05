@@ -5,18 +5,17 @@ from typing import cast, NamedTuple, Union
 
 from docling_core.transforms.chunker import BaseChunk, DocMeta
 
-from documents.extrais_les_chunks import ElementsFiltres, extrais_les_chunks
+from documents.elements_filtres import ElementsFiltres
 from documents.generateur_de_pages import (
     GenerateurDePages,
     NumeroPage,
     CreationDePage,
     CreationDeBlocPage,
-)
-from documents.indexeur import (
-    DocumentAIndexer,
     GenerationDePage,
 )
+from documents.indexeur.indexeur import DocumentAIndexer
 from documents.page import Page, BlocPage
+from documents.pdf.extrais_les_chunks import extrais_les_chunks
 
 
 class GenerateurDePagesPDF(GenerateurDePages):
