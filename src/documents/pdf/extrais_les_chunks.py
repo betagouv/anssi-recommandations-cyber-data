@@ -1,25 +1,7 @@
 from docling_core.transforms.chunker import BaseChunk, DocMeta
-from docling_core.types.doc import (
-    TitleItem,
-    SectionHeaderItem,
-    ListItem,
-    CodeItem,
-    FormulaItem,
-    TextItem,
-    TableItem,
-)
 
-from documents.categorise_le_contenu import ajoute_la_categorisation_du_contenu
-
-type ElementsFiltres = list[
-    TitleItem
-    | SectionHeaderItem
-    | ListItem
-    | CodeItem
-    | FormulaItem
-    | TextItem
-    | TableItem
-]
+from documents.elements_filtres import ElementsFiltres
+from documents.pdf.categorise_le_contenu import ajoute_la_categorisation_du_contenu
 
 
 def extrais_les_chunks(

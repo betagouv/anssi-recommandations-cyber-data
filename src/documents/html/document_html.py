@@ -2,9 +2,9 @@ from typing import Optional
 
 from docling_core.types.doc import DocItemLabel, TableItem, SectionHeaderItem
 
-from documents.extrais_les_chunks import ElementsFiltres
+from documents.elements_filtres import ElementsFiltres
 from documents.generateur_de_pages import GenerateurDePages
-from documents.indexeur import DocumentAIndexer
+from documents.indexeur.indexeur import DocumentAIndexer
 from documents.page import BlocPage, Page
 
 

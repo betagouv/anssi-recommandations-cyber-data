@@ -1,8 +1,5 @@
-from documents.document import Document
+from documents.docling.document import Document
 from documents.html.document_html import BlocPageHTML, PageHTML, DocumentHTML
-
-
-# from tests.documents.page_html import document
 
 
 def test_page_peut_creer_une_page():

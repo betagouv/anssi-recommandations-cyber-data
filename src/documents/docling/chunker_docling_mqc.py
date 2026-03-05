@@ -4,10 +4,10 @@ from typing import Type
 from docling.datamodel.document import ConversionResult
 from docling.document_converter import DocumentConverter
 
-from documents.chunker_docling import ChunkerDocling, TypeFichier
-from documents.document import Document
-from documents.filtre_resultat import filtre_les_resultats
-from documents.indexeur import DocumentAIndexer
+from documents.docling.chunker_docling import ChunkerDocling, TypeFichier
+from documents.docling.document import Document
+from documents.docling.filtre_resultat import filtre_les_resultats
+from documents.indexeur.indexeur import DocumentAIndexer
 
 
 class ChunkerDoclingMQC(ChunkerDocling):

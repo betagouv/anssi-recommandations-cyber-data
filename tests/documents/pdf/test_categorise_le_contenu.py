@@ -11,7 +11,7 @@ from docling_core.types.doc import (
     CoordOrigin,
 )
 
-from documents.categorise_le_contenu import ajoute_la_categorisation_du_contenu
+from documents.pdf.categorise_le_contenu import ajoute_la_categorisation_du_contenu
 
 
 @pytest.mark.parametrize(

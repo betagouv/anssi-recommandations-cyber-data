@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
-from documents.indexeur import ReponseDocumentEnSucces
-from documents.indexeur_albert import IndexeurBaseVectorielleAlbert
+from documents.indexeur.indexeur import ReponseDocumentEnSucces
+from documents.indexeur.indexeur_albert import IndexeurBaseVectorielleAlbert
 from documents.pdf.document_pdf import DocumentPDF
 
 

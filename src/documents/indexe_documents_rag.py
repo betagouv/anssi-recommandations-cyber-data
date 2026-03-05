@@ -10,12 +10,9 @@ from documents.collecte.collecte import (
     collecte_documents_distants,
     mappe_en_document_distant,
 )
-from documents.indexeur import (
-    ReponseDocumentEnErreur,
-    ReponseDocumentEnSucces,
-)
-from documents.indexeur_albert import IndexeurBaseVectorielleAlbert
-from documents.indexeur_docling import IndexeurDocling
+from documents.indexeur.indexeur import ReponseDocumentEnErreur, ReponseDocumentEnSucces
+from documents.indexeur.indexeur_albert import IndexeurBaseVectorielleAlbert
+from documents.indexeur.indexeur_docling import IndexeurDocling
 
 
 def fabrique_client_albert() -> ClientAlbert:

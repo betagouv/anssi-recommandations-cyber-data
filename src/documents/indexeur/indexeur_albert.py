@@ -4,12 +4,12 @@ from pathlib import Path
 
 import requests
 
-from documents.indexeur import (
+from documents.indexeur.indexeur import (
     Indexeur,
-    PayloadDocument,
-    ReponseDocument,
-    ReponseDocumentEnSucces,
     DocumentAIndexer,
+    ReponseDocument,
+    PayloadDocument,
+    ReponseDocumentEnSucces,
 )
 
 

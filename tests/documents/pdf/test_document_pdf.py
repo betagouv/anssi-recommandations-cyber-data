@@ -1,8 +1,6 @@
 from pathlib import Path
 
-from documents.document import (
-    Document,
-)
+from documents.docling.document import Document
 from documents.pdf.document_pdf import DocumentPDF, PagePDF, Position, BlocPagePDF
 
 document_pdf = DocumentPDF(

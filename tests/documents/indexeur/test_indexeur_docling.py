@@ -1,10 +1,8 @@
 import json
 
-from documents.indexeur import (
-    ReponseDocumentEnErreur,
-)
-from documents.indexeur_docling import IndexeurDocling
-from documents.multi_processeur import Multiprocesseur
+from documents.docling.multi_processeur import Multiprocesseur
+from documents.indexeur.indexeur import ReponseDocumentEnErreur
+from documents.indexeur.indexeur_docling import IndexeurDocling
 from documents.pdf.document_pdf import DocumentPDF
 
 

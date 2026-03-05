@@ -1,5 +1,5 @@
 from adaptateurs.client_albert import ClientAlbert, PayloadCollection, ReponseCollection
-from documents.indexeur import ReponseDocument, DocumentAIndexer
+from documents.indexeur.indexeur import DocumentAIndexer, ReponseDocument
 
 
 class ClientAlbertReel(ClientAlbert):
