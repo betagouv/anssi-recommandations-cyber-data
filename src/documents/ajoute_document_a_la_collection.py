@@ -15,10 +15,10 @@ from documents.indexeur.indexeur import ReponseDocumentEnErreur, ReponseDocument
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--id_collection", required=True, help="ID de la collection")
-    parser.add_argument("--path", required=True, help="Path du document à ajouter")
+    parser.add_argument("--path", required=False, help="Path du document à ajouter")
     parser.add_argument(
         "--documents-distants",
-        default="src/guides/documents_distants.json",
+        required=False,
         help="Fichier json qui spécifie les urls pour les pdf sotckés en dehors de MSS",
     )
 
@@ -32,11 +32,15 @@ def main():
         return
 
     print(f"Collection trouvée portant l'ID: {client.id_collection}")
-    guides_anssi = collecte_guide_anssi(path=args.path)
-    documents_distants = collecte_documents_distants(
-        mappe_en_document_distant(Path(args.documents_distants))
-    )
-    reponses = client.ajoute_documents([guides_anssi, *documents_distants])
+    guides_anssi = []
+    documents_distants = []
+    if args.path is not None:
+        guides_anssi = [collecte_guide_anssi(path=args.path)]
+    if args.documents_distants is not None:
+        documents_distants = collecte_documents_distants(
+            mappe_en_document_distant(Path(args.documents_distants))
+        )
+    reponses = client.ajoute_documents([*guides_anssi, *documents_distants])
 
     les_documents_en_erreur = list(
         filter(lambda reponse: isinstance(reponse, ReponseDocumentEnErreur), reponses)
