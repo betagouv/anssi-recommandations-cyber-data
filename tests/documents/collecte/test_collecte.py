@@ -79,10 +79,12 @@ def test_mappe_un_json_vers_un_document_distant(json_documents_distant):
 
     assert documents == {
         "un_fichier.pdf": {
+            'chemin': None,
             "type": "PDF",
             "url": "https://un-pdf-distant.local/un_fichier.pdf",
         },
         "une_page.html": {
+            'chemin': None,
             "type": "HTML",
             "url": "https://une-page-distante.local/une_page.html",
         },
@@ -93,3 +95,18 @@ def test_retourne_none_si_le_fichier_documents_distants_n_existe_pas():
     documents = mappe_en_document_distant(Path("fichier_inexistant.json"))
 
     assert documents is None
+
+
+def test_retoune_un_document_html_avec_son_chemin():
+    documents = collecte_documents_distants(
+        {
+            "Mes Services Cyber": {
+                "type": "HTML",
+                "url": "https://messervices.cyber.gouv.fr/",
+                "chemin": "messervices.cyber.gouv.fr",
+            }
+        }
+    )
+
+    assert documents[0].url == "https://messervices.cyber.gouv.fr/"
+    assert documents[0].chemin == Path("messervices.cyber.gouv.fr")

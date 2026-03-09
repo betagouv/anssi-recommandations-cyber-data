@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional
 
 from docling_core.types.doc import DocItemLabel, TableItem, SectionHeaderItem
@@ -59,9 +60,10 @@ class GenerateurDePagesHTML(GenerateurDePages):
 
 
 class DocumentHTML(DocumentAIndexer):
-    def __init__(self, nom_document: str, url: str):
+    def __init__(self, nom_document: str, url: str, chemin: Optional[str] = None):
         super().__init__()
         self._url = url
+        self._chemin = chemin
         self._nom_document = nom_document
         self._type = "HTML"
 
@@ -74,7 +76,9 @@ class DocumentHTML(DocumentAIndexer):
         return self._url
 
     @property
-    def chemin(self) -> str:
+    def chemin(self) -> Path | str:
+        if self._chemin is not None:
+            return Path(self._chemin)
         return self._url
 
     @property
