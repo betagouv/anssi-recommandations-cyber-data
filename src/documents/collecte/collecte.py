@@ -1,7 +1,7 @@
 import glob
 import json
 from pathlib import Path
-from typing import Literal, TypedDict
+from typing import Literal, TypedDict, Optional
 
 from configuration import MSC, recupere_configuration
 from documents.html.document_html import DocumentHTML
@@ -13,6 +13,7 @@ from documents.pdf.document_pdf import DocumentPDF
 class URLDocument(TypedDict):
     type: Literal["PDF", "HTML"]
     url: str
+    chemin: Optional[str]
 
 
 type DocumentDistant = dict[str, URLDocument]
@@ -38,7 +39,12 @@ def mappe_en_document_distant(documents_distants: Path) -> DocumentDistant | Non
 
         def _mappe(document: dict) -> URLDocument | dict:
             if "url" in document and "type" in document:
-                return URLDocument(type=document["type"], url=document["url"])
+                chemin = None
+                if "chemin" in document:
+                    chemin = document["chemin"]
+                return URLDocument(
+                    type=document["type"], url=document["url"], chemin=chemin
+                )
             return document
 
         contenu: DocumentDistant = json.loads(
@@ -57,5 +63,13 @@ def collecte_documents_distants(
         if document_distant["type"] == "PDF":
             resultat.append(cree_document_pdf_distant(nom, document_distant["url"]))
         if document_distant["type"] == "HTML":
-            resultat.append(DocumentHTML(nom, document_distant["url"]))
+            resultat.append(
+                DocumentHTML(
+                    nom,
+                    document_distant["url"],
+                    document_distant["chemin"]
+                    if "chemin" in document_distant
+                    else None,
+                )
+            )
     return resultat
