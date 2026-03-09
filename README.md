@@ -108,3 +108,21 @@ La commande va :
 1. Créer une nouvelle collection privée dans Albert
 2. Indexer tous les fichiers PDF présents dans `donnees/guides_de_lANSSI/`
 3. Associer chaque document à son URL publique sur `https://demo.messervices.cyber.gouv.fr/documents-guides/` via les metadonnees
+
+
+### Ajouter des pages statiques non prises en compte par Docling
+**Prérequis :**
+- Installer Puppeteer `node install puppeteer`
+
+1. Exécuter `node scripts/puppeteer.js` (mettre à jour le chemin vers l’exécutable du navigateur si besoin)
+2. Créer un fichier JSON au format suivant :
+```json
+{
+  "Mes Services Cyber": {
+    "type": "HTML",
+    "url": "URL_DE_LA_PAGE_STATIQUE_A_INDEXER",
+    "chemin": "FICHIER_HTML_EXTRAIS_PAR_PUPPETEER"
+  }
+}
+```
+3. Exécuter le script d’ajout à une collection : `uv run --env-file .env python src/documents/ajoute_document_a_la_collection.py --id_collection ID_COLLECTION --documents-distants CHEMIN_VERS_LE_FICHIER_PRÉCÉDEMMENT_CRÉÉ`
