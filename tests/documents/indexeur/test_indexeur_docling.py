@@ -112,10 +112,11 @@ def test_le_payload_est_passe_en_argument(
     document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
     indexeur.ajoute_documents([document], "12345")
 
-    assert executeur_de_requete.payload_recu is not None
-    assert executeur_de_requete.payload_recu["collection"] == "12345"
-    assert executeur_de_requete.payload_recu["chunker"] == "NoSplitter"
-    metadata = json.loads(executeur_de_requete.payload_recu["metadata"])
+    url_appelee = "http://albert.local/documents"
+    assert executeur_de_requete.payload_recu[url_appelee] is not None
+    assert executeur_de_requete.payload_recu[url_appelee]["collection"] == "12345"
+    assert executeur_de_requete.payload_recu[url_appelee]["chunker"] == "NoSplitter"
+    metadata = json.loads(executeur_de_requete.payload_recu[url_appelee]["metadata"])
     assert metadata["page"] == 10
 
 
@@ -147,7 +148,8 @@ def test_les_metadata_du_payload_contiennent_le_nom_du_document(
     document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
     indexeur.ajoute_documents([document], "12345")
 
-    metadata = json.loads(executeur_de_requete.payload_recu["metadata"])
+    url_appelee = "http://albert.local/documents"
+    metadata = json.loads(executeur_de_requete.payload_recu[url_appelee]["metadata"])
     assert metadata["nom_document"] == "test.pdf"
 
 
@@ -180,7 +182,8 @@ def test_le_fichier_envoye_est_correctement_nomme(
     document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
     indexeur.ajoute_documents([document], "12345")
 
-    fichiers_envoyes = executeur_de_requete.fichiers_recus["file"]
+    url_appelee = "http://albert.local/documents"
+    fichiers_envoyes = executeur_de_requete.fichiers_recus[url_appelee]["file"]
     assert fichiers_envoyes[0] == "mon_fichier.txt"
     assert fichiers_envoyes[2] == "text/plain"
 
