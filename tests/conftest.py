@@ -332,8 +332,8 @@ class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
     def __init__(self, reponse_attendue: list[ReponseAttendue]):
         super().__init__()
         self.reponse_attendue = reponse_attendue
-        self.payload_recu: None | dict = None
-        self.fichiers_recus: None | dict = None
+        self.payload_recu: dict[str, dict] = {}
+        self.fichiers_recus: dict[str, dict] = {}
         self.index_courant = 0
 
     def initialise(self, clef_api: str):
@@ -343,8 +343,9 @@ class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
         reponse = Mock()
         reponse.status_code = self.reponse_attendue[self.index_courant].status_code
         reponse.json.return_value = self.reponse_attendue[self.index_courant].reponse
-        self.fichiers_recus = fichiers
-        self.payload_recu = payload
+        if fichiers is not None:
+            self.fichiers_recus[url] = fichiers
+        self.payload_recu[url] = payload
         self.index_courant += 1
         return reponse
 
@@ -357,10 +358,12 @@ class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
 
 
 @pytest.fixture
-def un_executeur_de_requete() -> Callable[[list[ReponseAttendue]], ExecuteurDeRequete]:
+def un_executeur_de_requete() -> Callable[
+    [list[ReponseAttendue]], ExecuteurDeRequeteDeTest
+]:
     def _un_executeur_de_requete(
         reponse_attendue: list[ReponseAttendue],
-    ) -> ExecuteurDeRequete:
+    ) -> ExecuteurDeRequeteDeTest:
         return ExecuteurDeRequeteDeTest(reponse_attendue)
 
     return _un_executeur_de_requete
