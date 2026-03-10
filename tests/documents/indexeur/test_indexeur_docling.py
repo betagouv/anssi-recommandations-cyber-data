@@ -19,11 +19,15 @@ def test_peut_indexer_un_document_pdf(
     fichier_pdf,
     un_executeur_de_requete,
     une_reponse_attendue_OK,
+    une_reponse_chunk,
     un_chunker_avec_generation_de_page_statique,
 ):
     chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
     executeur_de_requete = un_executeur_de_requete(
-        [une_reponse_attendue_OK(une_reponse_document)]
+        [
+            une_reponse_attendue_OK(une_reponse_document),
+            une_reponse_attendue_OK(une_reponse_chunk),
+        ]
     )
     multi_processeur = MultiProcesseurDeTest()
     indexeur = IndexeurDocling(
@@ -43,11 +47,52 @@ def test_peut_indexer_un_document_pdf(
     assert reponses[0].collection_id == "12345"
 
 
-def test_peut_indexer_plusieurs_documents_pdf(
+def test_peut_indexer_un_document_puis_ajouter_un_chunk(
+    une_reponse_document,
+    une_reponse_chunk,
+    fichier_pdf,
+    un_executeur_de_requete,
+    une_reponse_attendue_OK,
+    un_chunker_avec_generation_de_page_statique,
+):
+    chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
+    executeur_de_requete = un_executeur_de_requete(
+        [
+            une_reponse_attendue_OK(une_reponse_document),
+            une_reponse_attendue_OK(une_reponse_chunk),
+        ]
+    )
+    multi_processeur = MultiProcesseurDeTest()
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        un_chunker_avec_generation_de_page_statique().a_la_page(10).construis(),
+        executeur_de_requete,
+        multi_processeur,
+    )
+
+    document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
+    reponses = indexeur.ajoute_documents([document], "12345")
+
+    assert len(reponses) == 1
+    url_appelee = "http://albert.local/documents/doc123/chunks"
+    assert executeur_de_requete.payload_recu[url_appelee] is not None
+    assert len(executeur_de_requete.payload_recu[url_appelee]["chunks"]) == 1
+    chunks = executeur_de_requete.payload_recu[url_appelee]["chunks"]
+    assert chunks[0]["content"] == "Un contenu"
+    assert chunks[0]["metadata"] == {
+        "source_url": "https://example.com/test.pdf",
+        "page": 10,
+        "nom_document": "test.pdf",
+    }
+
+
+def test_peut_indexer_plusieurs_documents(
     une_reponse_document_parametree,
     fichier_pdf,
     un_executeur_de_requete,
     une_reponse_attendue_OK,
+    une_reponse_chunk,
     un_chunker_avec_generation_de_page_statique,
 ):
     document_1 = str(fichier_pdf("document_1.pdf").resolve())
@@ -57,9 +102,11 @@ def test_peut_indexer_plusieurs_documents_pdf(
             une_reponse_attendue_OK(
                 une_reponse_document_parametree("1", "document_1.pdf")
             ),
+            une_reponse_attendue_OK(une_reponse_chunk),
             une_reponse_attendue_OK(
                 une_reponse_document_parametree("2", "document_2.pdf")
             ),
+            une_reponse_attendue_OK(une_reponse_chunk),
         ]
     )
     multi_processeur = MultiProcesseurDeTest()
@@ -88,7 +135,7 @@ def test_peut_indexer_plusieurs_documents_pdf(
     assert reponses[1].collection_id == "12345"
 
 
-def test_le_payload_est_passe_en_argument(
+def test_les_informations_de_creation_de_document_sont_passees_a_la_requete(
     une_reponse_document,
     fichier_pdf,
     un_executeur_de_requete,
@@ -114,78 +161,13 @@ def test_le_payload_est_passe_en_argument(
 
     url_appelee = "http://albert.local/documents"
     assert executeur_de_requete.payload_recu[url_appelee] is not None
-    assert executeur_de_requete.payload_recu[url_appelee]["collection"] == "12345"
+    assert executeur_de_requete.payload_recu[url_appelee]["collection_id"] == 12345
     assert executeur_de_requete.payload_recu[url_appelee]["chunker"] == "NoSplitter"
     metadata = json.loads(executeur_de_requete.payload_recu[url_appelee]["metadata"])
-    assert metadata["page"] == 10
-
-
-def test_les_metadata_du_payload_contiennent_le_nom_du_document(
-    une_reponse_document,
-    fichier_pdf,
-    un_executeur_de_requete,
-    une_reponse_attendue_OK,
-    un_chunker_avec_generation_de_page_statique,
-):
-    chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
-    executeur_de_requete = un_executeur_de_requete(
-        [une_reponse_attendue_OK(une_reponse_document)]
-    )
-    multi_processeur = MultiProcesseurDeTest()
-    chunker = (
-        un_chunker_avec_generation_de_page_statique()
-        .avec_un_nom_de_fichier("test.pdf")
-        .construis()
-    )
-    indexeur = IndexeurDocling(
-        "http://albert.local",
-        "une_clef",
-        chunker,
-        executeur_de_requete,
-        multi_processeur,
-    )
-
-    document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
-    indexeur.ajoute_documents([document], "12345")
-
-    url_appelee = "http://albert.local/documents"
-    metadata = json.loads(executeur_de_requete.payload_recu[url_appelee]["metadata"])
-    assert metadata["nom_document"] == "test.pdf"
-
-
-def test_le_fichier_envoye_est_correctement_nomme(
-    une_reponse_document,
-    fichier_pdf,
-    un_executeur_de_requete,
-    une_reponse_attendue_OK,
-    un_chunker_avec_generation_de_page_statique,
-):
-    chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
-    executeur_de_requete = un_executeur_de_requete(
-        [une_reponse_attendue_OK(une_reponse_document)]
-    )
-    multi_processeur = MultiProcesseurDeTest()
-    chunker = (
-        un_chunker_avec_generation_de_page_statique()
-        .avec_un_nom_de_fichier("mon_fichier.txt")
-        .de_type_texte()
-        .construis()
-    )
-    indexeur = IndexeurDocling(
-        "http://albert.local",
-        "une_clef",
-        chunker,
-        executeur_de_requete,
-        multi_processeur,
-    )
-
-    document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
-    indexeur.ajoute_documents([document], "12345")
-
-    url_appelee = "http://albert.local/documents"
-    fichiers_envoyes = executeur_de_requete.fichiers_recus[url_appelee]["file"]
-    assert fichiers_envoyes[0] == "mon_fichier.txt"
-    assert fichiers_envoyes[2] == "text/plain"
+    assert metadata == {
+        "source_url": "https://example.com/test.pdf",
+        "nom_document": "test.pdf",
+    }
 
 
 def test_ne_cree_pas_de_document_si_le_paragraphe_est_trop_court(
@@ -223,6 +205,7 @@ def test_continue_l_indexation_si_un_document_n_est_pas_indexe(
     un_executeur_de_requete,
     une_reponse_attendue_OK,
     une_reponse_attendue_KO,
+    une_reponse_chunk,
     un_chunker_avec_generation_de_page_statique,
 ):
     document_1 = str(fichier_pdf("document_1.pdf").resolve())
@@ -232,6 +215,7 @@ def test_continue_l_indexation_si_un_document_n_est_pas_indexe(
             une_reponse_attendue_OK(
                 une_reponse_document_parametree("1", "document_1.pdf")
             ),
+            une_reponse_attendue_OK(une_reponse_chunk),
             une_reponse_attendue_KO(
                 ReponseDocumentEnErreur("Une erreur", "document_2.pdf")
             ),
@@ -260,12 +244,14 @@ def test_continue_l_indexation_si_un_document_n_est_pas_indexe(
     assert reponses[1].document_en_erreur == "document_2.pdf"
 
 
-def test_continue_l_indexation_si_un_document_n_est_pas_indexe_et_qu_une_erreur_est_levee(
+def test_continue_l_indexation_si_un_chunk_n_est_pas_ajoute_a_un_document_suite_a_une_erreur(
     une_reponse_document_parametree,
     fichier_pdf,
     un_executeur_de_requete,
     une_reponse_attendue_KO,
     une_reponse_attendue_OK,
+    une_reponse_chunk,
+    une_reponse_chunk_en_erreur,
     un_chunker_avec_generation_de_page_statique,
 ):
     document_1 = str(fichier_pdf("document_1.pdf").resolve())
@@ -275,9 +261,11 @@ def test_continue_l_indexation_si_un_document_n_est_pas_indexe_et_qu_une_erreur_
             une_reponse_attendue_OK(
                 une_reponse_document_parametree("1", "document_1.pdf")
             ),
-            une_reponse_attendue_KO(
-                ReponseDocumentEnErreur("Erreur de traitement", "document_2.pdf"),
+            une_reponse_attendue_OK(une_reponse_chunk),
+            une_reponse_attendue_OK(
+                une_reponse_document_parametree("2", "document_2.pdf")
             ),
+            une_reponse_attendue_KO(une_reponse_chunk_en_erreur),
         ]
     )
     multi_processeur = MultiProcesseurDeTest()
@@ -300,4 +288,51 @@ def test_continue_l_indexation_si_un_document_n_est_pas_indexe_et_qu_une_erreur_
     assert len(reponses) == 2
     assert reponses[0].id == "1"
     assert "Erreur de traitement" in reponses[1].detail
+    assert reponses[1].document_en_erreur == "document_2.pdf"
+
+
+def test_continue_l_indexation_si_un_document_n_est_pas_indexe_suite_a_une_erreur(
+    une_reponse_document_parametree,
+    fichier_pdf,
+    un_executeur_de_requete,
+    une_reponse_attendue_KO,
+    une_reponse_attendue_OK,
+    une_reponse_chunk,
+    une_reponse_chunk_en_erreur,
+    un_chunker_avec_generation_de_page_statique,
+):
+    document_1 = str(fichier_pdf("document_1.pdf").resolve())
+    document_2 = str(fichier_pdf("document_2.pdf").resolve())
+    executeur_de_requete = un_executeur_de_requete(
+        [
+            une_reponse_attendue_OK(
+                une_reponse_document_parametree("1", "document_1.pdf")
+            ),
+            une_reponse_attendue_OK(une_reponse_chunk),
+            une_reponse_attendue_OK(
+                une_reponse_document_parametree("2", "document_2.pdf")
+            ),
+            une_reponse_attendue_KO(une_reponse_chunk_en_erreur, "Erreur JSON"),
+        ]
+    )
+    multi_processeur = MultiProcesseurDeTest()
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        un_chunker_avec_generation_de_page_statique().construis(),
+        executeur_de_requete,
+        multi_processeur,
+    )
+
+    reponses = indexeur.ajoute_documents(
+        [
+            (DocumentPDF(document_1, "https://example.com/document_1.pdf")),
+            DocumentPDF(document_2, "https://example.com/document_2.pdf"),
+        ],
+        "12345",
+    )
+
+    assert len(reponses) == 2
+    assert reponses[0].id == "1"
+    assert "Erreur JSON" in reponses[1].detail
     assert reponses[1].document_en_erreur == "document_2.pdf"

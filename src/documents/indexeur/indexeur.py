@@ -67,9 +67,25 @@ class ReponseDocumentEnErreur(NamedTuple):
 type ReponseDocument = Union[ReponseDocumentEnSucces, ReponseDocumentEnErreur]
 
 
+class ReponseChunkEnSucces(NamedTuple):
+    id: str
+
+
+class DetailErreur(NamedTuple):
+    msg: str
+    type: str
+
+
+class ReponseChunkEnErreur(NamedTuple):
+    detail: list[DetailErreur]
+
+
+type ReponseChunk = Union[ReponseChunkEnSucces, ReponseChunkEnErreur]
+
+
 class Indexeur(ABC):
     @abstractmethod
     def ajoute_documents(
-        self, documents: list[DocumentAIndexer], id_collection: str | None
+        self, documents: list[DocumentAIndexer], id_collection: str
     ) -> list[ReponseDocument]:
         pass
