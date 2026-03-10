@@ -35,6 +35,10 @@ from documents.indexeur.indexeur import (
     ReponseDocument,
     ReponseDocumentEnSucces,
     DocumentAIndexer,
+    ReponseChunk,
+    ReponseChunkEnSucces,
+    ReponseChunkEnErreur,
+    DetailErreur,
 )
 from documents.page import Page
 from documents.pdf.document_pdf import Position, PagePDF, BlocPagePDF
@@ -83,6 +87,20 @@ def une_reponse_document() -> ReponseDocument:
         collection_id="12345",
         created_at="2024-01-01T00:00:00Z",
         updated_at="2024-01-01T00:00:00Z",
+    )
+
+
+@pytest.fixture
+def une_reponse_chunk() -> ReponseChunk:
+    return ReponseChunkEnSucces(
+        id="chunk123",
+    )
+
+
+@pytest.fixture
+def une_reponse_chunk_en_erreur() -> ReponseChunk:
+    return ReponseChunkEnErreur(
+        detail=[DetailErreur(msg="Erreur de traitement", type="TypeErreur")]
     )
 
 

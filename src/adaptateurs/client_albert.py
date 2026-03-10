@@ -43,7 +43,7 @@ class ClientAlbert(ABC):
     ):
         self.url = url
         self.client_openai = OpenAI(base_url=url, api_key=cle_api)
-        self.id_collection: str | None = None
+        self.id_collection: str = ""
         self.indexeur = indexeur
         self.executeur_de_requete = executeur_de_requete
         self.executeur_de_requete.initialise(cle_api)

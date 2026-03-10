@@ -24,6 +24,9 @@ from documents.indexeur.indexeur import (
     ReponseDocument,
     ReponseDocumentEnSucces,
     ReponseDocumentEnErreur,
+    ReponseChunkEnSucces,
+    ReponseChunk,
+    ReponseChunkEnErreur,
 )
 from evaluation.lanceur_deepeval import EvaluateurDeepeval
 from infra.executeur_requete import ExecuteurDeRequete
@@ -242,13 +245,13 @@ def evaluateur_de_test() -> EvaluateurDeepevalTest:
 
 
 class ReponseAttendueAbstraite:
-    def __init__(self, reponse: ReponseDocument):
+    def __init__(self, reponse: ReponseDocument | ReponseChunk):
         super().__init__()
-        self.reponse_document = reponse
+        self.reponse_attendue = reponse
 
 
 class ReponseAttendueOK(ReponseAttendueAbstraite):
-    def __init__(self, reponse: ReponseDocumentEnSucces):
+    def __init__(self, reponse: ReponseDocumentEnSucces | ReponseChunkEnSucces):
         super().__init__(reponse)
 
     @property
@@ -257,12 +260,14 @@ class ReponseAttendueOK(ReponseAttendueAbstraite):
 
     @property
     def reponse(self) -> dict:
-        return self.reponse_document._asdict()
+        return self.reponse_attendue._asdict()
 
 
 class ReponseAttendueKO(ReponseAttendueAbstraite):
     def __init__(
-        self, reponse: ReponseDocumentEnErreur, leve_une_erreur: str | None = None
+        self,
+        reponse: ReponseDocumentEnErreur | ReponseChunkEnErreur,
+        leve_une_erreur: str | None = None,
     ):
         super().__init__(reponse)
         self.leve_une_erreur = leve_une_erreur
@@ -275,7 +280,7 @@ class ReponseAttendueKO(ReponseAttendueAbstraite):
     def reponse(self) -> dict:
         if self.leve_une_erreur is not None:
             raise RuntimeError(self.leve_une_erreur)
-        return self.reponse_document._asdict()
+        return self.reponse_attendue._asdict()
 
 
 class ReponseCreationCollectionOK:
@@ -341,8 +346,15 @@ class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
 
     def poste(self, url: str, payload: dict, fichiers: Optional[dict]) -> Response:
         reponse = Mock()
-        reponse.status_code = self.reponse_attendue[self.index_courant].status_code
-        reponse.json.return_value = self.reponse_attendue[self.index_courant].reponse
+        reponse_attendue = self.reponse_attendue[self.index_courant]
+        reponse.status_code = reponse_attendue.status_code
+        if (
+            isinstance(reponse_attendue, ReponseAttendueKO)
+            and reponse_attendue.leve_une_erreur is not None
+        ):
+            reponse.json.side_effect = RuntimeError(reponse_attendue.leve_une_erreur)
+        else:
+            reponse.json.return_value = reponse_attendue.reponse
         if fichiers is not None:
             self.fichiers_recus[url] = fichiers
         self.payload_recu[url] = payload
@@ -370,21 +382,26 @@ def un_executeur_de_requete() -> Callable[
 
 
 @pytest.fixture
-def une_reponse_attendue_OK() -> Callable[[ReponseDocumentEnSucces], ReponseAttendueOK]:
-    def _une_reponse_document(
-        reponse_document: ReponseDocumentEnSucces,
+def une_reponse_attendue_OK() -> Callable[
+    [ReponseDocumentEnSucces | ReponseChunkEnSucces], ReponseAttendueOK
+]:
+    def _une_reponse_OK(
+        reponse_ok: ReponseDocumentEnSucces | ReponseChunkEnSucces,
     ) -> ReponseAttendueOK:
-        return ReponseAttendueOK(reponse_document)
+        return ReponseAttendueOK(reponse_ok)
 
-    return _une_reponse_document
+    return _une_reponse_OK
 
 
 @pytest.fixture
-def une_reponse_attendue_KO() -> Callable[[ReponseDocumentEnErreur], ReponseAttendueKO]:
+def une_reponse_attendue_KO() -> Callable[
+    [ReponseDocumentEnErreur | ReponseChunkEnErreur, Optional[str]], ReponseAttendueKO
+]:
     def _une_reponse_document(
-        reponse_document: ReponseDocumentEnErreur,
+        reponse_document: ReponseDocumentEnErreur | ReponseChunkEnErreur,
+        leve_une_erreur: Optional[str] = None,
     ) -> ReponseAttendueKO:
-        return ReponseAttendueKO(reponse_document)
+        return ReponseAttendueKO(reponse_document, leve_une_erreur)
 
     return _une_reponse_document
 

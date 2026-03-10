@@ -79,12 +79,12 @@ def test_mappe_un_json_vers_un_document_distant(json_documents_distant):
 
     assert documents == {
         "un_fichier.pdf": {
-            'chemin': None,
+            "chemin": None,
             "type": "PDF",
             "url": "https://un-pdf-distant.local/un_fichier.pdf",
         },
         "une_page.html": {
-            'chemin': None,
+            "chemin": None,
             "type": "HTML",
             "url": "https://une-page-distante.local/une_page.html",
         },

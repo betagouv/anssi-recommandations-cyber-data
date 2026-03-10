@@ -21,7 +21,7 @@ class Document:
     def metadata(self, page) -> dict:
         return {
             "source_url": self.url,
-            "page": page.numero_page,
+            "page": page.numero_page if page.numero_page is not None else 0,
             "nom_document": self.nom_document,
         }
 
