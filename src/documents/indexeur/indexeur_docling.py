@@ -160,23 +160,31 @@ class IndexeurDocling(Indexeur):
                 tous_les_blocs = list(
                     filter(lambda bloc: len(bloc.texte) > 1, page.blocs)
                 )
-                payload_chunks = {
-                    "chunks": list(
-                        map(lambda bloc: _en_payload(page, bloc), tous_les_blocs)
-                    )
-                }
-                reponse_chunk = self.executeur_de_requete.poste(
-                    f"{self.url}/documents/{resultat['id']}/chunks",
-                    payload_chunks,
-                    None,
-                )
+                it = iter(tous_les_blocs)
+                while True:
+                    sous_ensemble_de_blocs = list(islice(it, 64))
+                    if not sous_ensemble_de_blocs:
+                        break
 
-                resultat_chunk = reponse_chunk.json()
-                if reponse_chunk.status_code != 201:
-                    resultat_indexation = ReponseDocumentEnErreur(
-                        detail=resultat_chunk.get("detail")[0].msg,
-                        document_en_erreur=nom_du_document,
+                    payload_chunks = {
+                        "chunks": list(
+                            map(lambda bloc: _en_payload(page, bloc), sous_ensemble_de_blocs)
+                        )
+                    }
+                    reponse_chunk = self.executeur_de_requete.poste(
+                        f"{self.url}/documents/{resultat['id']}/chunks",
+                        payload_chunks,
+                        None,
                     )
+
+                    resultat_chunk = reponse_chunk.json()
+                    if reponse_chunk.status_code != 201:
+                        resultat_indexation = ReponseDocumentEnErreur(
+                            detail=resultat_chunk.get("detail")[0].msg,
+                            document_en_erreur=nom_du_document,
+                        )
+                        break
+                if isinstance(resultat_indexation, ReponseDocumentEnErreur):
                     break
 
             reponses.append(resultat_indexation)

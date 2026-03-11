@@ -15,7 +15,7 @@ def test_client_albert_initialise_correctement():
         client.executeur_de_requete.session.headers["Authorization"]
         == "Bearer test-key"
     )
-    assert client.id_collection is None
+    assert client.id_collection == ""
 
 
 def test_client_albert_cree_collection(

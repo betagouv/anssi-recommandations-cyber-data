@@ -340,11 +340,13 @@ class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
         self.payload_recu: dict[str, dict] = {}
         self.fichiers_recus: dict[str, dict] = {}
         self.index_courant = 0
+        self.nombre_appels = 0
 
     def initialise(self, clef_api: str):
         pass
 
     def poste(self, url: str, payload: dict, fichiers: Optional[dict]) -> Response:
+        self.nombre_appels += 1
         reponse = Mock()
         reponse_attendue = self.reponse_attendue[self.index_courant]
         reponse.status_code = reponse_attendue.status_code
@@ -362,6 +364,7 @@ class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
         return reponse
 
     def recupere(self, url):
+        self.nombre_appels += 1
         reponse = Mock()
         reponse.status_code = self.reponse_attendue[self.index_courant].status_code
         reponse.json.return_value = self.reponse_attendue[self.index_courant].reponse
