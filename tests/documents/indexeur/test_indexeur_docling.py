@@ -336,3 +336,42 @@ def test_continue_l_indexation_si_un_document_n_est_pas_indexe_suite_a_une_erreu
     assert reponses[0].id == "1"
     assert "Erreur JSON" in reponses[1].detail
     assert reponses[1].document_en_erreur == "document_2.pdf"
+
+
+
+def test_decoupe_les_chunks_par_paquet_de_64(
+        une_reponse_document_parametree,
+        fichier_pdf,
+        un_executeur_de_requete,
+        une_reponse_attendue_KO,
+        une_reponse_attendue_OK,
+        une_reponse_chunk,
+        une_reponse_chunk_en_erreur,
+        un_chunker_avec_generation_de_page_statique,
+):
+    document_1 = str(fichier_pdf("document_1.pdf").resolve())
+    executeur_de_requete = un_executeur_de_requete(
+        [
+            une_reponse_attendue_OK(
+                une_reponse_document_parametree("1", "document_1.pdf")
+            ),
+            une_reponse_attendue_OK(une_reponse_chunk),
+        ]
+    )
+    multi_processeur = MultiProcesseurDeTest()
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        un_chunker_avec_generation_de_page_statique().avec_un_nombre_de_blocs(65).construis(),
+        executeur_de_requete,
+        multi_processeur,
+    )
+
+    indexeur.ajoute_documents(
+        [
+            (DocumentPDF(document_1, "https://example.com/document_1.pdf")),
+        ],
+        "12345",
+    )
+
+    assert executeur_de_requete.nombre_appels == 3

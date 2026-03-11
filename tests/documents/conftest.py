@@ -517,16 +517,17 @@ def un_convertisseur_avec_un_titre_et_un_texte() -> Callable[
 
 
 class GenerateurDePagesStatique(GenerateurDePages):
-    def __init__(self, numero_page: int = 0, contenu: str = "Un contenu"):
+    def __init__(self, numero_page: int = 0, contenu: str = "Un contenu", nombre_de_blocs: int = 1):
         super().__init__()
         self.numero_page = numero_page
         self.contenu = contenu
+        self.nombre_de_blocs = nombre_de_blocs
 
     def genere(self, elements_filtres: ElementsFiltres) -> dict[int, Page]:
         resultat: dict[int, Page] = {
             self.numero_page: PagePDF(
                 self.numero_page,
-                [BlocPagePDF(self.contenu, Position(x=0, y=0, hauteur=0, largeur=0))],
+                [BlocPagePDF(self.contenu, Position(x=i * 10, y=0, hauteur=0, largeur=0)) for i in range(0, self.nombre_de_blocs)],
             ),
         }
         return resultat
@@ -557,9 +558,14 @@ class ConstructeurDeChunker:
         self.type_fichier = TypeFichier.PDF
         self.numero_page = 0
         self.contenu_page = "Un contenu"
+        self.nombre_de_blocs = 1
 
     def avec_le_contenu(self, contenu: str):
         self.contenu_page = contenu
+        return self
+
+    def avec_un_nombre_de_blocs(self, nombre_de_blocs: int):
+        self.nombre_de_blocs = nombre_de_blocs
         return self
 
     def a_la_page(self, numero_page: int):
@@ -576,7 +582,7 @@ class ConstructeurDeChunker:
 
     def construis(self) -> ChunkerDeTest:
         generateur_de_pages_statique = GenerateurDePagesStatique(
-            numero_page=self.numero_page, contenu=self.contenu_page
+            numero_page=self.numero_page, contenu=self.contenu_page, nombre_de_blocs=self.nombre_de_blocs
         )
         return ChunkerDeTest(
             nom_fichier=self.nom_fichier,
