@@ -3,40 +3,38 @@ from deepeval.metrics import (
 )
 
 from evaluation.deepeval.lanceur_deepeval import LanceurEvaluationDeepeval
-from journalisation.experience import (
-    EntrepotExperienceMemoire,
-)
+from journalisation.evaluation import EntrepotEvaluationMemoire
 
 
 def test_evalue_un_jeu_de_donnees(
     resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test
 ):
-    entrepot_experience = EntrepotExperienceMemoire()
-    lanceur_experience = LanceurEvaluationDeepeval(
-        entrepot_experience, evaluateur_de_test
+    entrepot_evaluation = EntrepotEvaluationMemoire()
+    lanceur_evaluation = LanceurEvaluationDeepeval(
+        entrepot_evaluation, evaluateur_de_test
     )
 
-    id_experience = lanceur_experience.lance_l_experience(
+    id_evaluation = lanceur_evaluation.lance_l_evaluation(
         resultat_collecte_mqc_avec_deux_resultats._chemin_courant
     )
 
-    experience_creee = entrepot_experience.lit(id_experience)
-    assert experience_creee.metriques[0]["bon_nom_document_en_contexte_2"] == 1
-    assert experience_creee.metriques[0]["bon_numero_page_en_contexte_2"] == 0
-    assert experience_creee.metriques[0]["score_numero_page_en_contexte_2"] == 0.7
-    assert experience_creee.metriques[0]["hallucination"] == 0.6
+    evaluation_creee = entrepot_evaluation.lit(id_evaluation)
+    assert evaluation_creee.metriques[0]["bon_nom_document_en_contexte_2"] == 1
+    assert evaluation_creee.metriques[0]["bon_numero_page_en_contexte_2"] == 0
+    assert evaluation_creee.metriques[0]["score_numero_page_en_contexte_2"] == 0.7
+    assert evaluation_creee.metriques[0]["hallucination"] == 0.6
 
 
 def test_evalue_un_jeu_de_donnees_avec_des_cas_de_test(
     resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test
 ):
-    entrepot_experience = EntrepotExperienceMemoire()
+    entrepot_evaluation = EntrepotEvaluationMemoire()
 
     evaluateur_deepeval = evaluateur_de_test
-    lanceur_experience = LanceurEvaluationDeepeval(
-        entrepot_experience, evaluateur_deepeval
+    lanceur_evaluation = LanceurEvaluationDeepeval(
+        entrepot_evaluation, evaluateur_deepeval
     )
-    lanceur_experience.lance_l_experience(
+    lanceur_evaluation.lance_l_evaluation(
         resultat_collecte_mqc_avec_deux_resultats._chemin_courant
     )
 
@@ -59,13 +57,13 @@ def test_evalue_un_jeu_de_donnees_avec_des_cas_de_test(
 def test_evalue_un_jeu_de_donnees_avec_les_metriques_deepeval(
     resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test
 ):
-    entrepot_experience = EntrepotExperienceMemoire()
+    entrepot_evaluation = EntrepotEvaluationMemoire()
 
     evaluateur_deepeval = evaluateur_de_test
-    lanceur_experience = LanceurEvaluationDeepeval(
-        entrepot_experience, evaluateur_deepeval
+    lanceur_evaluation = LanceurEvaluationDeepeval(
+        entrepot_evaluation, evaluateur_deepeval
     )
-    lanceur_experience.lance_l_experience(
+    lanceur_evaluation.lance_l_evaluation(
         resultat_collecte_mqc_avec_deux_resultats._chemin_courant
     )
 
@@ -84,13 +82,13 @@ def test_evalue_un_jeu_de_donnees_avec_les_metriques_deepeval(
 def test_evalue_un_jeu_de_donnees_avec_les_metriques_personnalisees(
     resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test
 ):
-    entrepot_experience = EntrepotExperienceMemoire()
+    entrepot_evaluation = EntrepotEvaluationMemoire()
 
     evaluateur_deepeval = evaluateur_de_test
-    lanceur_experience = LanceurEvaluationDeepeval(
-        entrepot_experience, evaluateur_deepeval
+    lanceur_evaluation = LanceurEvaluationDeepeval(
+        entrepot_evaluation, evaluateur_deepeval
     )
-    lanceur_experience.lance_l_experience(
+    lanceur_evaluation.lance_l_evaluation(
         resultat_collecte_mqc_avec_deux_resultats._chemin_courant
     )
 
@@ -129,18 +127,18 @@ def test_evalue_un_jeu_de_donnees_avec_les_metriques_personnalisees(
 def test_evalue_un_jeu_de_donnees_et_retourne_le_numero_de_ligne(
     resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test
 ):
-    entrepot_experience = EntrepotExperienceMemoire()
-    lanceur_experience = LanceurEvaluationDeepeval(
-        entrepot_experience, evaluateur_de_test
+    entrepot_evaluation = EntrepotEvaluationMemoire()
+    lanceur_evaluation = LanceurEvaluationDeepeval(
+        entrepot_evaluation, evaluateur_de_test
     )
 
-    id_experience = lanceur_experience.lance_l_experience(
+    id_evaluation = lanceur_evaluation.lance_l_evaluation(
         resultat_collecte_mqc_avec_deux_resultats._chemin_courant
     )
 
-    experience_creee = entrepot_experience.lit(id_experience)
-    assert experience_creee.metriques[0]["numero_ligne"] == 0
-    assert experience_creee.metriques[1]["numero_ligne"] == 1
+    evaluation_creee = entrepot_evaluation.lit(id_evaluation)
+    assert evaluation_creee.metriques[0]["numero_ligne"] == 0
+    assert evaluation_creee.metriques[1]["numero_ligne"] == 1
 
 
 def les_metriques_portent_le_nom_aux_indices(

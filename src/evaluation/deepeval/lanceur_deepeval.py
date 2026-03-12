@@ -31,7 +31,7 @@ from evaluation.deepeval.metriques_personnalisees.de_deepeval.metrique_score_num
     MetriquesScoreNumeropage,
 )
 from infra.lecteur_csv import LecteurCSV
-from journalisation.experience import EntrepotExperience, Experience
+from journalisation.evaluation import EntrepotEvaluation, Evaluation
 
 
 class EvaluateurDeepeval(ABC):
@@ -45,16 +45,16 @@ class EvaluateurDeepeval(ABC):
 class LanceurEvaluationDeepeval(LanceurEvaluation):
     def __init__(
         self,
-        entrepot_experience: EntrepotExperience,
+        entrepot_evaluation: EntrepotEvaluation,
         evaluateur_deepeval: EvaluateurDeepeval,
     ):
         super().__init__()
         self.client_deepeval_albert = ClientDeepEvalAlbert()
-        self.entrepot_experience = entrepot_experience
+        self.entrepot_evaluation = entrepot_evaluation
         self.evaluateur_deepeval = evaluateur_deepeval
 
-    def lance_l_experience(self, fichier_csv: Path) -> int | str | None:
-        id_experience = str(uuid.uuid4())
+    def lance_l_evaluation(self, fichier_csv: Path) -> int | str | None:
+        id_evaluation = str(uuid.uuid4())
         donnees = self.__charge_donnees_depuis_fichier_csv(fichier_csv)
         cas_de_test = self.__cree_liste_cas_de_test_deepeval(donnees)
         tous_les_resultats = self.__evalue_les_cas_de_test(cas_de_test)
@@ -65,8 +65,8 @@ class LanceurEvaluationDeepeval(LanceurEvaluation):
                 tous_les_resultats,
             )
         )
-        self.entrepot_experience.persiste(Experience(id_experience, scores_deepeval))
-        return id_experience
+        self.entrepot_evaluation.persiste(Evaluation(id_evaluation, scores_deepeval))
+        return id_evaluation
 
     @staticmethod
     def __cree_liste_cas_de_test_deepeval(

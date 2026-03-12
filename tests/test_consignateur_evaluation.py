@@ -1,16 +1,15 @@
 from adaptateurs.journal import TypeEvenement, AdaptateurJournalMemoire
 from infra.memoire.ecrivain import EcrivainSortieDeTest
 from journalisation.consignateur_evaluation import consigne_evaluation
-
-from journalisation.experience import Experience, EntrepotExperienceMemoire
+from journalisation.evaluation import EntrepotEvaluationMemoire, Evaluation
 
 
 def test_consigne_evenement_suite_recuperation_fichier_sortie_evaluation(
     resultat_collecte_mqc_avec_deux_resultats,
 ) -> None:
-    entrepot_experience = EntrepotExperienceMemoire()
-    entrepot_experience.persiste(
-        Experience(
+    entrepot_evaluation = EntrepotEvaluationMemoire()
+    entrepot_evaluation.persiste(
+        Evaluation(
             id_experimentation=1,
             metriques=[
                 {
@@ -25,7 +24,7 @@ def test_consigne_evenement_suite_recuperation_fichier_sortie_evaluation(
 
     consigne_evaluation(
         1,
-        entrepot_experience,
+        entrepot_evaluation,
         adaptateur_journal,
         resultat_collecte_mqc_avec_deux_resultats._chemin_courant,
     )
@@ -43,9 +42,9 @@ def test_consigne_evenement_suite_recuperation_fichier_sortie_evaluation(
 def test_consigne_les_evenements_suite_recuperation_fichier_sortie_evaluation(
     resultat_collecte_mqc_avec_deux_resultats,
 ) -> None:
-    entrepot_experience = EntrepotExperienceMemoire()
-    entrepot_experience.persiste(
-        Experience(
+    entrepot_evaluation = EntrepotEvaluationMemoire()
+    entrepot_evaluation.persiste(
+        Evaluation(
             id_experimentation=2,
             metriques=[
                 {
@@ -65,7 +64,7 @@ def test_consigne_les_evenements_suite_recuperation_fichier_sortie_evaluation(
 
     consigne_evaluation(
         2,
-        entrepot_experience,
+        entrepot_evaluation,
         adaptateur_journal,
         resultat_collecte_mqc_avec_deux_resultats._chemin_courant,
     )
@@ -87,9 +86,9 @@ def test_consigne_les_evenements_suite_recuperation_fichier_sortie_evaluation(
 def test_consigne_les_evenements_extrait_dynamiquement_le_nom_des_colonnes(
     resultat_collecte_mqc_avec_deux_resultats,
 ) -> None:
-    entrepot_experience = EntrepotExperienceMemoire()
-    entrepot_experience.persiste(
-        Experience(
+    entrepot_evaluation = EntrepotEvaluationMemoire()
+    entrepot_evaluation.persiste(
+        Evaluation(
             id_experimentation=1,
             metriques=[
                 {
@@ -104,7 +103,7 @@ def test_consigne_les_evenements_extrait_dynamiquement_le_nom_des_colonnes(
 
     consigne_evaluation(
         1,
-        entrepot_experience,
+        entrepot_evaluation,
         adaptateur_journal,
         resultat_collecte_mqc_avec_deux_resultats._chemin_courant,
     )
@@ -116,10 +115,10 @@ def test_consigne_les_evenements_extrait_dynamiquement_le_nom_des_colonnes(
 
 
 def test_ne_consigne_pas_si_pas_d_evaluation() -> None:
-    entrepot_experience = EntrepotExperienceMemoire()
+    entrepot_evaluation = EntrepotEvaluationMemoire()
     adaptateur_journal: AdaptateurJournalMemoire = AdaptateurJournalMemoire()
 
-    consigne_evaluation(1, entrepot_experience, adaptateur_journal, None)
+    consigne_evaluation(1, entrepot_evaluation, adaptateur_journal, None)
 
     les_evenements = adaptateur_journal.les_evenements()
     assert len(les_evenements) == 0
@@ -128,9 +127,9 @@ def test_ne_consigne_pas_si_pas_d_evaluation() -> None:
 def test_ferme_la_connexion_apres_un_enregistrement(
     resultat_collecte_mqc_avec_deux_resultats,
 ) -> None:
-    entrepot_experience = EntrepotExperienceMemoire()
-    entrepot_experience.persiste(
-        Experience(
+    entrepot_evaluation = EntrepotEvaluationMemoire()
+    entrepot_evaluation.persiste(
+        Evaluation(
             id_experimentation=2,
             metriques=[
                 {
@@ -150,7 +149,7 @@ def test_ferme_la_connexion_apres_un_enregistrement(
 
     consigne_evaluation(
         2,
-        entrepot_experience,
+        entrepot_evaluation,
         adaptateur_journal,
         resultat_collecte_mqc_avec_deux_resultats._chemin_courant,
     )
@@ -167,9 +166,9 @@ def test_consigne_les_questions_reponses(
     contenu_complet = en_tete + premiere_ligne + seconde_ligne
     ecrivain_sortie_de_test = EcrivainSortieDeTest(contenu_complet)
     ecrivain_sortie_de_test.ecris_contenu()
-    entrepot_experience = EntrepotExperienceMemoire()
-    entrepot_experience.persiste(
-        Experience(
+    entrepot_evaluation = EntrepotEvaluationMemoire()
+    entrepot_evaluation.persiste(
+        Evaluation(
             id_experimentation=1,
             metriques=[
                 {
@@ -189,7 +188,7 @@ def test_consigne_les_questions_reponses(
 
     consigne_evaluation(
         1,
-        entrepot_experience,
+        entrepot_evaluation,
         adaptateur_journal,
         ecrivain_sortie_de_test._chemin_courant,
     )

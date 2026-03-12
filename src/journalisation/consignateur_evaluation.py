@@ -1,20 +1,21 @@
 from pathlib import Path
+
 from adaptateurs.journal import (
     AdaptateurJournal,
     Donnees,
     TypeEvenement,
 )
 from infra.lecteur_csv import LecteurCSV
-from journalisation.experience import EntrepotExperience
+from journalisation.evaluation import EntrepotEvaluation
 
 
 def consigne_evaluation(
-    id_experience: int | str,
-    entrepot_experience: EntrepotExperience,
+    id_evaluation: int | str,
+    entrepot_evaluation: EntrepotEvaluation,
     adaptateur_journal: AdaptateurJournal,
     fichier_questions_reponses: Path | None,
 ) -> None:
-    resultat_evaluation = entrepot_experience.lit(id_experience)
+    resultat_evaluation = entrepot_evaluation.lit(id_evaluation)
 
     if resultat_evaluation is not None and fichier_questions_reponses is not None:
         lecteur_csv = LecteurCSV(fichier_questions_reponses)
