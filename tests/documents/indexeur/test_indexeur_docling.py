@@ -162,7 +162,7 @@ def test_les_informations_de_creation_de_document_sont_passees_a_la_requete(
     url_appelee = "http://albert.local/documents"
     assert executeur_de_requete.payload_recu[url_appelee] is not None
     assert executeur_de_requete.payload_recu[url_appelee]["collection_id"] == 12345
-    assert executeur_de_requete.payload_recu[url_appelee]["chunker"] == "NoSplitter"
+    assert executeur_de_requete.payload_recu[url_appelee]["disable_chunking"]
     metadata = json.loads(executeur_de_requete.payload_recu[url_appelee]["metadata"])
     assert metadata == {
         "source_url": "https://example.com/test.pdf",
@@ -338,16 +338,15 @@ def test_continue_l_indexation_si_un_document_n_est_pas_indexe_suite_a_une_erreu
     assert reponses[1].document_en_erreur == "document_2.pdf"
 
 
-
 def test_decoupe_les_chunks_par_paquet_de_64(
-        une_reponse_document_parametree,
-        fichier_pdf,
-        un_executeur_de_requete,
-        une_reponse_attendue_KO,
-        une_reponse_attendue_OK,
-        une_reponse_chunk,
-        une_reponse_chunk_en_erreur,
-        un_chunker_avec_generation_de_page_statique,
+    une_reponse_document_parametree,
+    fichier_pdf,
+    un_executeur_de_requete,
+    une_reponse_attendue_KO,
+    une_reponse_attendue_OK,
+    une_reponse_chunk,
+    une_reponse_chunk_en_erreur,
+    un_chunker_avec_generation_de_page_statique,
 ):
     document_1 = str(fichier_pdf("document_1.pdf").resolve())
     executeur_de_requete = un_executeur_de_requete(
@@ -362,7 +361,9 @@ def test_decoupe_les_chunks_par_paquet_de_64(
     indexeur = IndexeurDocling(
         "http://albert.local",
         "une_clef",
-        un_chunker_avec_generation_de_page_statique().avec_un_nombre_de_blocs(65).construis(),
+        un_chunker_avec_generation_de_page_statique()
+        .avec_un_nombre_de_blocs(65)
+        .construis(),
         executeur_de_requete,
         multi_processeur,
     )

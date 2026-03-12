@@ -126,7 +126,7 @@ class IndexeurDocling(Indexeur):
                 "metadata": json.dumps(
                     {"source_url": document.url, "nom_document": document.nom_document}
                 ),
-                "chunker": "NoSplitter",
+                "disable_chunking": True,
             }
             reponse_document = self.executeur_de_requete.poste(
                 f"{self.url}/documents", payload, {}
@@ -168,7 +168,10 @@ class IndexeurDocling(Indexeur):
 
                     payload_chunks = {
                         "chunks": list(
-                            map(lambda bloc: _en_payload(page, bloc), sous_ensemble_de_blocs)
+                            map(
+                                lambda bloc: _en_payload(page, bloc),
+                                sous_ensemble_de_blocs,
+                            )
                         )
                     }
                     reponse_chunk = self.executeur_de_requete.poste(

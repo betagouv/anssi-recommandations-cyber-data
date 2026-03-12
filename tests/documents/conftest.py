@@ -517,7 +517,12 @@ def un_convertisseur_avec_un_titre_et_un_texte() -> Callable[
 
 
 class GenerateurDePagesStatique(GenerateurDePages):
-    def __init__(self, numero_page: int = 0, contenu: str = "Un contenu", nombre_de_blocs: int = 1):
+    def __init__(
+        self,
+        numero_page: int = 0,
+        contenu: str = "Un contenu",
+        nombre_de_blocs: int = 1,
+    ):
         super().__init__()
         self.numero_page = numero_page
         self.contenu = contenu
@@ -527,7 +532,12 @@ class GenerateurDePagesStatique(GenerateurDePages):
         resultat: dict[int, Page] = {
             self.numero_page: PagePDF(
                 self.numero_page,
-                [BlocPagePDF(self.contenu, Position(x=i * 10, y=0, hauteur=0, largeur=0)) for i in range(0, self.nombre_de_blocs)],
+                [
+                    BlocPagePDF(
+                        self.contenu, Position(x=i * 10, y=0, hauteur=0, largeur=0)
+                    )
+                    for i in range(0, self.nombre_de_blocs)
+                ],
             ),
         }
         return resultat
@@ -582,7 +592,9 @@ class ConstructeurDeChunker:
 
     def construis(self) -> ChunkerDeTest:
         generateur_de_pages_statique = GenerateurDePagesStatique(
-            numero_page=self.numero_page, contenu=self.contenu_page, nombre_de_blocs=self.nombre_de_blocs
+            numero_page=self.numero_page,
+            contenu=self.contenu_page,
+            nombre_de_blocs=self.nombre_de_blocs,
         )
         return ChunkerDeTest(
             nom_fichier=self.nom_fichier,
