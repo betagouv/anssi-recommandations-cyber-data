@@ -402,8 +402,10 @@ class ClientAlbertReformulationDeTest(ClientAlbertReformulation):
     def __init__(self, reformulations: list[dict[str, str]]):
         super().__init__()
         self._reformulations = reformulations
+        self.prompt_fourni = ""
 
-    def reformule_la_question(self, question: str) -> str:
+    def reformule_la_question(self, prompt: str, question) -> str:
+        self.prompt_fourni = prompt
         return list(filter(lambda q: q["question"] == question, self._reformulations))[
             0
         ]["question_reformulee"]

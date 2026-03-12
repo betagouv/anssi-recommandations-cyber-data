@@ -15,7 +15,7 @@ def test_reformule_la_question(un_client_albert):
         )
         .construis()
     )
-    resultat = EvaluateurReformulation(client_albert).evalue([question])
+    resultat = EvaluateurReformulation(client_albert, "Prompt").evalue([question])
 
     assert len(resultat) == 1
     assert resultat[0].question == "Question ?"
@@ -40,7 +40,7 @@ def test_reformule_toutes_les_questions(un_client_albert):
         )
         .construis()
     )
-    resultat = EvaluateurReformulation(client_albert).evalue(
+    resultat = EvaluateurReformulation(client_albert, "Prompt").evalue(
         [premiere_question, deuxieme_question]
     )
 
@@ -48,3 +48,20 @@ def test_reformule_toutes_les_questions(un_client_albert):
     assert resultat[1].question == "Question 2 ?"
     assert resultat[1].question_reformulee == "Question 2 reformulée ?"
     assert resultat[1].reformulation_ideale == "Question 2 idéale reformulée ?"
+
+
+def test_appelle_le_client_avec_le_prompt(un_client_albert):
+    question = QuestionAEvaluer(
+        question="Question ?", reformulation_ideale="Question idéale reformulée ?"
+    )
+    client_albert = (
+        un_client_albert()
+        .retourne_la_reformulation_pour_la_question(
+            "Question reformulée ?", "Question ?"
+        )
+        .construis()
+    )
+
+    EvaluateurReformulation(client_albert, "Un prompt fourni").evalue([question])
+
+    assert client_albert.prompt_fourni == "Un prompt fourni"
