@@ -21,3 +21,30 @@ def test_reformule_la_question(un_client_albert):
     assert resultat[0].question == "Question ?"
     assert resultat[0].question_reformulee == "Question reformulée ?"
     assert resultat[0].reformulation_ideale == "Question idéale reformulée ?"
+
+
+def test_reformule_toutes_les_questions(un_client_albert):
+    premiere_question = QuestionAEvaluer(
+        question="Question ?", reformulation_ideale="Question idéale reformulée ?"
+    )
+    deuxieme_question = QuestionAEvaluer(
+        question="Question 2 ?", reformulation_ideale="Question 2 idéale reformulée ?"
+    )
+    client_albert = (
+        un_client_albert()
+        .retourne_la_reformulation_pour_la_question(
+            "Question reformulée ?", "Question ?"
+        )
+        .retourne_la_reformulation_pour_la_question(
+            "Question 2 reformulée ?", "Question 2 ?"
+        )
+        .construis()
+    )
+    resultat = EvaluateurReformulation(client_albert).evalue(
+        [premiere_question, deuxieme_question]
+    )
+
+    assert len(resultat) == 2
+    assert resultat[1].question == "Question 2 ?"
+    assert resultat[1].question_reformulee == "Question 2 reformulée ?"
+    assert resultat[1].reformulation_ideale == "Question 2 idéale reformulée ?"
