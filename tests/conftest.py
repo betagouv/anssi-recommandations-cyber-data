@@ -10,7 +10,10 @@ from deepeval.test_case import LLMTestCase
 from deepeval.tracing.api import MetricData
 from requests import Response
 
-from adaptateurs.clients_albert import ReponseCollectionAlbert
+from adaptateurs.clients_albert import (
+    ReponseCollectionAlbert,
+    ClientAlbertReformulation,
+)
 from configuration import (
     Configuration,
     MQC,
@@ -393,3 +396,37 @@ def une_reponse_de_recuperation_de_collection_OK() -> Callable[
 @pytest.fixture
 def une_reponse_de_recuperation_de_collection_KO() -> ReponseRecuperationCollectionKO:
     return ReponseRecuperationCollectionKO()
+
+
+class ClientAlbertReformulationDeTest(ClientAlbertReformulation):
+    def __init__(self, reformulations: list[dict[str, str]]):
+        super().__init__()
+        self._reformulations = reformulations
+
+    def reformule_la_question(self, question: str) -> str:
+        return self._reformulations[0]["question_reformulee"]
+
+
+class ConstructeurClientAlbertReformulation:
+    def __init__(self):
+        super().__init__()
+        self.reformulations = []
+
+    def construis(self) -> ClientAlbertReformulationDeTest:
+        return ClientAlbertReformulationDeTest(self.reformulations)
+
+    def retourne_la_reformulation_pour_la_question(
+        self, question_reformulee: str, question: str
+    ):
+        self.reformulations.append(
+            {"question": question, "question_reformulee": question_reformulee}
+        )
+        return self
+
+
+@pytest.fixture
+def un_client_albert() -> Callable[[], ConstructeurClientAlbertReformulation]:
+    def _un_client_albert() -> ConstructeurClientAlbertReformulation:
+        return ConstructeurClientAlbertReformulation()
+
+    return _un_client_albert
