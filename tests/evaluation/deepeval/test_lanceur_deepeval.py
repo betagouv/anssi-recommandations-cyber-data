@@ -1,9 +1,10 @@
-from evaluation.lanceur_deepeval import LanceurExperienceDeepeval
-from journalisation.experience import (
-    EntrepotExperienceMemoire,
-)
 from deepeval.metrics import (
     BaseMetric,
+)
+
+from evaluation.deepeval.lanceur_deepeval import LanceurEvaluationDeepeval
+from journalisation.experience import (
+    EntrepotExperienceMemoire,
 )
 
 
@@ -11,7 +12,7 @@ def test_evalue_un_jeu_de_donnees(
     resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test
 ):
     entrepot_experience = EntrepotExperienceMemoire()
-    lanceur_experience = LanceurExperienceDeepeval(
+    lanceur_experience = LanceurEvaluationDeepeval(
         entrepot_experience, evaluateur_de_test
     )
 
@@ -32,7 +33,7 @@ def test_evalue_un_jeu_de_donnees_avec_des_cas_de_test(
     entrepot_experience = EntrepotExperienceMemoire()
 
     evaluateur_deepeval = evaluateur_de_test
-    lanceur_experience = LanceurExperienceDeepeval(
+    lanceur_experience = LanceurEvaluationDeepeval(
         entrepot_experience, evaluateur_deepeval
     )
     lanceur_experience.lance_l_experience(
@@ -61,7 +62,7 @@ def test_evalue_un_jeu_de_donnees_avec_les_metriques_deepeval(
     entrepot_experience = EntrepotExperienceMemoire()
 
     evaluateur_deepeval = evaluateur_de_test
-    lanceur_experience = LanceurExperienceDeepeval(
+    lanceur_experience = LanceurEvaluationDeepeval(
         entrepot_experience, evaluateur_deepeval
     )
     lanceur_experience.lance_l_experience(
@@ -86,7 +87,7 @@ def test_evalue_un_jeu_de_donnees_avec_les_metriques_personnalisees(
     entrepot_experience = EntrepotExperienceMemoire()
 
     evaluateur_deepeval = evaluateur_de_test
-    lanceur_experience = LanceurExperienceDeepeval(
+    lanceur_experience = LanceurEvaluationDeepeval(
         entrepot_experience, evaluateur_deepeval
     )
     lanceur_experience.lance_l_experience(
@@ -129,7 +130,7 @@ def test_evalue_un_jeu_de_donnees_et_retourne_le_numero_de_ligne(
     resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test
 ):
     entrepot_experience = EntrepotExperienceMemoire()
-    lanceur_experience = LanceurExperienceDeepeval(
+    lanceur_experience = LanceurEvaluationDeepeval(
         entrepot_experience, evaluateur_de_test
     )
 
