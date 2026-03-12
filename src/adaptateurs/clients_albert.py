@@ -66,3 +66,9 @@ class ClientAlbertIndexation(ABC):
     @abstractmethod
     def attribue_collection(self, id_collection: str) -> bool:
         pass
+
+
+class ClientAlbertReformulation(ABC):
+    @abstractmethod
+    def reformule_la_question(self, question: str) -> str:
+        pass
