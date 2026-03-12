@@ -8,10 +8,10 @@ import respx
 
 from adaptateurs.journal import AdaptateurJournalMemoire, TypeEvenement
 from configuration import Configuration
-from evaluation.lanceur_deepeval import LanceurExperienceDeepeval
+from evaluation.deepeval.lanceur_deepeval import LanceurEvaluationDeepeval
+from evaluation.evaluateur_mqc import evaluateur_mqc
 from infra.memoire.ecrivain import EcrivainSortieDeTest
 from journalisation.experience import EntrepotExperienceMemoire
-from main import main
 from mqc.remplisseur_reponses import (
     ClientMQCHTTPAsync,
     construit_base_url,
@@ -38,10 +38,10 @@ async def test_execute_la_collecte_des_reponses_pour_creer_le_fichier_de_resulta
     ecrivain_sortie_de_test, sortie = resultat_collecte_mqc()
     entrepot_experience = EntrepotExperienceMemoire()
 
-    lanceur_experience = LanceurExperienceDeepeval(
+    lanceur_experience = LanceurEvaluationDeepeval(
         entrepot_experience, evaluateur_de_test
     )
-    await main(
+    await evaluateur_mqc(
         entree,
         "prefixe",
         ecrivain_sortie_de_test,
@@ -79,11 +79,11 @@ async def test_lance_l_experience_avec_deepeval(
         contenu_fichier_csv_resultat_collecte
     )
     entrepot_experience = EntrepotExperienceMemoire()
-    lanceur_experience = LanceurExperienceDeepeval(
+    lanceur_experience = LanceurEvaluationDeepeval(
         entrepot_experience, evaluateur_de_test
     )
 
-    id_experience_cree = await main(
+    id_experience_cree = await evaluateur_mqc(
         entree,
         "prefixe",
         ecrivain_sortie_de_test,
@@ -125,12 +125,12 @@ async def test_consigne_les_resultats_d_experience(
     ecrivain_sortie_de_test, sortie = resultat_collecte_mqc()
     entrepot_experience = EntrepotExperienceMemoire()
 
-    lanceur_experience = LanceurExperienceDeepeval(
+    lanceur_experience = LanceurEvaluationDeepeval(
         entrepot_experience, evaluateur_de_test
     )
 
     adaptateur_journal: AdaptateurJournalMemoire = AdaptateurJournalMemoire()
-    await main(
+    await evaluateur_mqc(
         entree,
         "prefixe",
         ecrivain_sortie_de_test,

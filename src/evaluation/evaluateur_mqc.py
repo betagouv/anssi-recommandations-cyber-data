@@ -1,10 +1,11 @@
 import asyncio
 import logging
 from pathlib import Path
+
 from adaptateurs.journal import AdaptateurJournal, fabrique_adaptateur_journal
 from configuration import recupere_configuration, Configuration
-from experience.experience import LanceurExperience
-from experience.fabrique_lanceur_experience import fabrique_lanceur_experience
+from evaluation.deepeval.evaluation import LanceurEvaluation
+from evaluation.deepeval.fabrique_lanceur_evaluation import fabrique_lanceur_evaluation
 from journalisation.consignateur_evaluation import consigne_evaluation
 from journalisation.experience import EntrepotExperience, fabrique_entrepot_experience
 from mqc.collecte_reponses_mqc import collecte_reponses_mqc
@@ -14,7 +15,7 @@ from mqc.remplisseur_reponses import ClientMQCHTTPAsync
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
-async def main(
+async def evaluateur_mqc(
     entree_donnees: Path,
     prefixe: str,
     ecrivain_sortie: EcrivainSortie,
@@ -22,7 +23,7 @@ async def main(
     client_mqc: ClientMQCHTTPAsync,
     entrepot_experience: EntrepotExperience,
     journal: AdaptateurJournal,
-    lanceur_experience: LanceurExperience,
+    lanceur_experience: LanceurEvaluation,
 ):
     await collecte_reponses_mqc(
         entree_donnees, prefixe, ecrivain_sortie, nombre_lot, client_mqc
@@ -48,11 +49,11 @@ if __name__ == "__main__":
         racine=Path.cwd(), sous_dossier=sortie, horloge=HorlogeSysteme()
     )
     entrepot_experience = fabrique_entrepot_experience()
-    lanceur_experience = fabrique_lanceur_experience(
+    lanceur_experience = fabrique_lanceur_evaluation(
         la_configuration, entrepot_experience
     )
     asyncio.run(
-        main(
+        evaluateur_mqc(
             entree,
             "collecte_reponses_mqc",
             ecrivain_sortie,

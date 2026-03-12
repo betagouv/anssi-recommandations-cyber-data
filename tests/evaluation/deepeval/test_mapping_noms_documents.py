@@ -1,7 +1,9 @@
+from pathlib import Path
+
 import pandas as pd
 import pytest
-from pathlib import Path
-from evaluation.lance_experience import (
+
+from evaluation.deepeval.dataframe import (
     applique_mapping_noms_documents,
     prepare_dataframe,
 )

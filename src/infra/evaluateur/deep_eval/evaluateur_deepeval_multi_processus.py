@@ -2,12 +2,13 @@ import multiprocessing as mp
 import sys
 from itertools import islice
 from typing import Optional, Generator
+
 from deepeval.evaluate import evaluate, DisplayConfig
 from deepeval.evaluate.types import EvaluationResult
 from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
 
-from evaluation.lanceur_deepeval import EvaluateurDeepeval
+from evaluation.deepeval.lanceur_deepeval import EvaluateurDeepeval
 
 
 def configure_sorties_utf8():

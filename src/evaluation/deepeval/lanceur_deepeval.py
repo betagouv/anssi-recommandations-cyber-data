@@ -14,21 +14,22 @@ from deepeval.metrics import (
     ToxicityMetric,
 )
 from deepeval.test_case import LLMTestCase
-from evaluation.lance_experience import prepare_dataframe
-from evaluation.client_deepeval_albert import ClientDeepEvalAlbert
-from evaluation.metriques_personnalisees.de_deepeval.metrique_bon_nom_document import (
+
+from evaluation.deepeval.client_deepeval_albert import ClientDeepEvalAlbert
+from evaluation.deepeval.dataframe import prepare_dataframe
+from evaluation.deepeval.evaluation import LanceurEvaluation
+from evaluation.deepeval.metriques_personnalisees.de_deepeval.metrique_bon_nom_document import (
     MetriquesBonNomDocuments,
 )
-from evaluation.metriques_personnalisees.de_deepeval.metrique_bons_numeros_pages import (
+from evaluation.deepeval.metriques_personnalisees.de_deepeval.metrique_bons_numeros_pages import (
     MetriquesBonsNumerosPages,
 )
-from evaluation.metriques_personnalisees.de_deepeval.metrique_longueur_reponse import (
+from evaluation.deepeval.metriques_personnalisees.de_deepeval.metrique_longueur_reponse import (
     MetriqueLongueurReponse,
 )
-from evaluation.metriques_personnalisees.de_deepeval.metrique_score_numero_page import (
+from evaluation.deepeval.metriques_personnalisees.de_deepeval.metrique_score_numero_page import (
     MetriquesScoreNumeropage,
 )
-from experience.experience import LanceurExperience
 from infra.lecteur_csv import LecteurCSV
 from journalisation.experience import EntrepotExperience, Experience
 
@@ -41,7 +42,7 @@ class EvaluateurDeepeval(ABC):
         pass
 
 
-class LanceurExperienceDeepeval(LanceurExperience):
+class LanceurEvaluationDeepeval(LanceurEvaluation):
     def __init__(
         self,
         entrepot_experience: EntrepotExperience,

@@ -1,12 +1,14 @@
-import pytest
 from typing import Optional, Union
+
+import pytest
 from deepeval.evaluate.types import EvaluationResult, TestResult
 from deepeval.metrics import (
     BaseMetric,
 )
 from deepeval.test_case import LLMTestCase
 from deepeval.tracing.api import MetricData
-from evaluation.lanceur_deepeval import EvaluateurDeepeval
+
+from evaluation.deepeval.lanceur_deepeval import EvaluateurDeepeval
 
 
 class ConstructeurMetricData:
