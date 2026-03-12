@@ -70,5 +70,5 @@ class ClientAlbertIndexation(ABC):
 
 class ClientAlbertReformulation(ABC):
     @abstractmethod
-    def reformule_la_question(self, question: str) -> str:
+    def reformule_la_question(self, prompt: str, question: str) -> str:
         pass

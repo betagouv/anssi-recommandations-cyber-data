@@ -17,8 +17,9 @@ class QuestionAEvaluer:
 
 
 class EvaluateurReformulation:
-    def __init__(self, client_albert: ClientAlbertReformulation):
+    def __init__(self, client_albert: ClientAlbertReformulation, prompt: str):
         super().__init__()
+        self._prompt = prompt
         self._client_albert = client_albert
 
     def evalue(self, questions: list[QuestionAEvaluer]) -> list[ResultatEvaluation]:
@@ -27,7 +28,7 @@ class EvaluateurReformulation:
                 question=question.question,
                 reformulation_ideale=question.reformulation_ideale,
                 question_reformulee=self._client_albert.reformule_la_question(
-                    question.question
+                    self._prompt, question.question
                 ),
             )
             for question in questions
