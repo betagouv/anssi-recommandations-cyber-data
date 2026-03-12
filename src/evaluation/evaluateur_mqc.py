@@ -7,7 +7,7 @@ from configuration import recupere_configuration, Configuration
 from evaluation.deepeval.evaluation import LanceurEvaluation
 from evaluation.deepeval.fabrique_lanceur_evaluation import fabrique_lanceur_evaluation
 from journalisation.consignateur_evaluation import consigne_evaluation
-from journalisation.experience import EntrepotExperience, fabrique_entrepot_experience
+from journalisation.evaluation import EntrepotEvaluation, fabrique_entrepot_evaluation
 from mqc.collecte_reponses_mqc import collecte_reponses_mqc
 from mqc.ecrivain_sortie import HorlogeSysteme, EcrivainSortie
 from mqc.remplisseur_reponses import ClientMQCHTTPAsync
@@ -21,21 +21,21 @@ async def evaluateur_mqc(
     ecrivain_sortie: EcrivainSortie,
     nombre_lot: int,
     client_mqc: ClientMQCHTTPAsync,
-    entrepot_experience: EntrepotExperience,
+    entrepot_evaluation: EntrepotEvaluation,
     journal: AdaptateurJournal,
-    lanceur_experience: LanceurEvaluation,
+    lanceur_evaluation: LanceurEvaluation,
 ):
     await collecte_reponses_mqc(
         entree_donnees, prefixe, ecrivain_sortie, nombre_lot, client_mqc
     )
     fichier_csv = ecrivain_sortie._chemin_courant
     if fichier_csv is not None:
-        id_experience = lanceur_experience.lance_l_experience(fichier_csv)
-        if id_experience is not None:
+        id_evaluation = lanceur_evaluation.lance_l_evaluation(fichier_csv)
+        if id_evaluation is not None:
             consigne_evaluation(
-                id_experience, entrepot_experience, journal, fichier_csv
+                id_evaluation, entrepot_evaluation, journal, fichier_csv
             )
-        return id_experience
+        return id_evaluation
     return None
 
 
@@ -48,9 +48,9 @@ if __name__ == "__main__":
     ecrivain_sortie = EcrivainSortie(
         racine=Path.cwd(), sous_dossier=sortie, horloge=HorlogeSysteme()
     )
-    entrepot_experience = fabrique_entrepot_experience()
-    lanceur_experience = fabrique_lanceur_evaluation(
-        la_configuration, entrepot_experience
+    entrepot_evaluation = fabrique_entrepot_evaluation()
+    lanceur_evaluation = fabrique_lanceur_evaluation(
+        la_configuration, entrepot_evaluation
     )
     asyncio.run(
         evaluateur_mqc(
@@ -59,8 +59,8 @@ if __name__ == "__main__":
             ecrivain_sortie,
             la_configuration.parametres_deepeval.taille_de_lot_collecte_mqc,
             client,
-            entrepot_experience,
+            entrepot_evaluation,
             fabrique_adaptateur_journal(),
-            lanceur_experience,
+            lanceur_evaluation,
         )
     )

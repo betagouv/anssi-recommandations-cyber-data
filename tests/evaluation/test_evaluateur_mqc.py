@@ -11,7 +11,7 @@ from configuration import Configuration
 from evaluation.deepeval.lanceur_deepeval import LanceurEvaluationDeepeval
 from evaluation.evaluateur_mqc import evaluateur_mqc
 from infra.memoire.ecrivain import EcrivainSortieDeTest
-from journalisation.experience import EntrepotExperienceMemoire
+from journalisation.evaluation import EntrepotEvaluationMemoire
 from mqc.remplisseur_reponses import (
     ClientMQCHTTPAsync,
     construit_base_url,
@@ -36,10 +36,10 @@ async def test_execute_la_collecte_des_reponses_pour_creer_le_fichier_de_resulta
     )
     entree = cree_fichier_csv_avec_du_contenu("Question type\nA?\n", tmp_path)
     ecrivain_sortie_de_test, sortie = resultat_collecte_mqc()
-    entrepot_experience = EntrepotExperienceMemoire()
+    entrepot_evaluation = EntrepotEvaluationMemoire()
 
-    lanceur_experience = LanceurEvaluationDeepeval(
-        entrepot_experience, evaluateur_de_test
+    lanceur_evaluation = LanceurEvaluationDeepeval(
+        entrepot_evaluation, evaluateur_de_test
     )
     await evaluateur_mqc(
         entree,
@@ -47,9 +47,9 @@ async def test_execute_la_collecte_des_reponses_pour_creer_le_fichier_de_resulta
         ecrivain_sortie_de_test,
         1,
         ClientMQCHTTPAsync(cfg=configuration.mqc),
-        EntrepotExperienceMemoire(),
+        EntrepotEvaluationMemoire(),
         AdaptateurJournalMemoire(),
-        lanceur_experience,
+        lanceur_evaluation,
     )
 
     assert sortie.exists()
@@ -59,7 +59,7 @@ async def test_execute_la_collecte_des_reponses_pour_creer_le_fichier_de_resulta
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_lance_l_experience_avec_deepeval(
+async def test_lance_l_evaluation_avec_deepeval(
     tmp_path: Path,
     configuration: Configuration,
     cree_fichier_csv_avec_du_contenu,
@@ -78,24 +78,24 @@ async def test_lance_l_experience_avec_deepeval(
     ecrivain_sortie_de_test = EcrivainSortieDeTest(
         contenu_fichier_csv_resultat_collecte
     )
-    entrepot_experience = EntrepotExperienceMemoire()
-    lanceur_experience = LanceurEvaluationDeepeval(
-        entrepot_experience, evaluateur_de_test
+    entrepot_evaluation = EntrepotEvaluationMemoire()
+    lanceur_evaluation = LanceurEvaluationDeepeval(
+        entrepot_evaluation, evaluateur_de_test
     )
 
-    id_experience_cree = await evaluateur_mqc(
+    id_evaluation_cree = await evaluateur_mqc(
         entree,
         "prefixe",
         ecrivain_sortie_de_test,
         1,
         ClientMQCHTTPAsync(cfg=configuration.mqc),
-        entrepot_experience,
+        entrepot_evaluation,
         AdaptateurJournalMemoire(),
-        lanceur_experience,
+        lanceur_evaluation,
     )
 
-    assert isinstance(id_experience_cree, str) is True
-    assert est_uuid_valide(id_experience_cree) is True
+    assert isinstance(id_evaluation_cree, str) is True
+    assert est_uuid_valide(id_evaluation_cree) is True
 
 
 def est_uuid_valide(uuid_a_tester):
@@ -108,7 +108,7 @@ def est_uuid_valide(uuid_a_tester):
 
 @respx.mock
 @pytest.mark.asyncio
-async def test_consigne_les_resultats_d_experience(
+async def test_consigne_les_resultats_d_evaluation(
     tmp_path: Path,
     configuration: Configuration,
     cree_fichier_csv_avec_du_contenu,
@@ -123,10 +123,10 @@ async def test_consigne_les_resultats_d_experience(
     )
     entree = cree_fichier_csv_avec_du_contenu("Question type\nA?\n", tmp_path)
     ecrivain_sortie_de_test, sortie = resultat_collecte_mqc()
-    entrepot_experience = EntrepotExperienceMemoire()
+    entrepot_evaluation = EntrepotEvaluationMemoire()
 
-    lanceur_experience = LanceurEvaluationDeepeval(
-        entrepot_experience, evaluateur_de_test
+    lanceur_evaluation = LanceurEvaluationDeepeval(
+        entrepot_evaluation, evaluateur_de_test
     )
 
     adaptateur_journal: AdaptateurJournalMemoire = AdaptateurJournalMemoire()
@@ -136,9 +136,9 @@ async def test_consigne_les_resultats_d_experience(
         ecrivain_sortie_de_test,
         1,
         ClientMQCHTTPAsync(cfg=configuration.mqc),
-        entrepot_experience,
+        entrepot_evaluation,
         adaptateur_journal,
-        lanceur_experience,
+        lanceur_evaluation,
     )
 
     assert (

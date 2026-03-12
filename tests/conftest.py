@@ -31,55 +31,12 @@ from documents.indexeur.indexeur import (
 from evaluation.deepeval.lanceur_deepeval import EvaluateurDeepeval
 from infra.executeur_requete import ExecuteurDeRequete
 from infra.memoire.ecrivain import EcrivainSortieDeTest
-from journalisation.experience import (
-    EntrepotExperienceMemoire,
-    Experience,
-    EntrepotExperience,
+from journalisation.evaluation import (
+    EntrepotEvaluation,
+    EntrepotEvaluationMemoire,
+    Evaluation,
 )
 from mqc.ecrivain_sortie import EcrivainSortie
-
-
-@pytest.fixture
-def une_experience() -> dict:
-    return {
-        "id": 42,
-        "name": "Experience Test",
-        "created_at": "2025-10-06T15:45:00Z",
-        "experiment_status": "running_metrics",
-        "experiment_set_id": 1,
-        "num_try": 8,
-        "num_success": 7,
-        "num_observation_try": 40,
-        "num_observation_success": 38,
-        "num_metrics": 3,
-        "readme": "Test readme",
-        "judge_model": {"model": "albert"},
-        "model": {"name": "albert-large"},
-        "dataset": {"id": 10},
-        "with_vision": False,
-        "results": [
-            {
-                "created_at": "2025-10-09T14:48:35.428847",
-                "experiment_id": 42,
-                "id": 125,
-                "metric_name": "hallucination",
-                "metric_status": "running",
-                "num_success": 0,
-                "num_try": 0,
-                "observation_table": [
-                    {
-                        "id": 1001,
-                        "created_at": "2025-10-09T14:48:35.428847",
-                        "score": 0.8,
-                        "observation": "test",
-                        "num_line": 0,
-                        "error_msg": None,
-                        "execution_time": 5,
-                    }
-                ],
-            }
-        ],
-    }
 
 
 @pytest.fixture()
@@ -177,10 +134,10 @@ def resultat_collecte_mqc_avec_deux_resultats() -> EcrivainSortie:
 
 
 @pytest.fixture
-def resultat_experience() -> EntrepotExperience:
-    entrepot_experience = EntrepotExperienceMemoire()
-    entrepot_experience.persiste(
-        Experience(
+def resultat_evaluation() -> EntrepotEvaluation:
+    entrepot_evaluation = EntrepotEvaluationMemoire()
+    entrepot_evaluation.persiste(
+        Evaluation(
             id_experimentation=1,
             metriques=[
                 {
@@ -191,7 +148,7 @@ def resultat_experience() -> EntrepotExperience:
             ],
         )
     )
-    return entrepot_experience
+    return entrepot_evaluation
 
 
 class ConstructeurMetricData:
