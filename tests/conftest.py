@@ -10,7 +10,7 @@ from deepeval.test_case import LLMTestCase
 from deepeval.tracing.api import MetricData
 from requests import Response
 
-from adaptateurs.client_albert import ReponseCollectionAlbert
+from adaptateurs.clients_albert import ReponseCollectionAlbert
 from configuration import (
     Configuration,
     MQC,

@@ -1,5 +1,5 @@
-from adaptateurs.client_albert import ReponseCollectionAlbert
-from adaptateurs.client_albert_reel import ClientAlbertReel
+from adaptateurs.client_albert_indexation_reel import ClientAlbertIndexationReel
+from adaptateurs.clients_albert import ReponseCollectionAlbert
 from documents.indexeur.indexeur import Indexeur, DocumentAIndexer, ReponseDocument
 from documents.indexeur.indexeur_albert import IndexeurBaseVectorielleAlbert
 from documents.pdf.document_pdf import DocumentPDF
@@ -8,7 +8,9 @@ from documents.pdf.document_pdf import DocumentPDF
 def test_client_albert_initialise_correctement():
     url = "https://test.api"
 
-    client = ClientAlbertReel(url, "test-key", IndexeurBaseVectorielleAlbert(url))
+    client = ClientAlbertIndexationReel(
+        url, "test-key", IndexeurBaseVectorielleAlbert(url)
+    )
 
     assert str(client.client_openai.base_url) == "https://test.api"
     assert (
@@ -32,7 +34,7 @@ def test_client_albert_cree_collection(
         documents=1,
     )
 
-    client = ClientAlbertReel(
+    client = ClientAlbertIndexationReel(
         url,
         "test-key",
         IndexeurBaseVectorielleAlbert(url),
@@ -60,7 +62,7 @@ def test_attribue_id_collection_au_client_albert(
         updated_at="2023-01-01T00:00:00Z",
         documents=1,
     )
-    client = ClientAlbertReel(
+    client = ClientAlbertIndexationReel(
         "https://test.api",
         "test-key",
         IndexeurBaseVectorielleAlbert("https://test.api"),
@@ -79,7 +81,7 @@ def test_attribue_id_collection_au_client_albert(
 def test_client_albert_verifie_collection_n_existe_pas(
     un_executeur_de_requete, une_reponse_de_recuperation_de_collection_KO
 ):
-    client = ClientAlbertReel(
+    client = ClientAlbertIndexationReel(
         "https://test.api",
         "test-key",
         IndexeurBaseVectorielleAlbert("https://test.api"),
@@ -119,7 +121,7 @@ def test_client_albert_ajoute_documents(
         updated_at="2023-01-01T00:00:00Z",
         documents=1,
     )
-    client = ClientAlbertReel(
+    client = ClientAlbertIndexationReel(
         "https://test.api",
         "test-key",
         indexeur_de_test,

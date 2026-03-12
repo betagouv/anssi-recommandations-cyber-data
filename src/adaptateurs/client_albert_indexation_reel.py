@@ -1,8 +1,12 @@
-from adaptateurs.client_albert import ClientAlbert, PayloadCollection, ReponseCollection
+from adaptateurs.clients_albert import (
+    ClientAlbertIndexation,
+    ReponseCollection,
+    PayloadCollection,
+)
 from documents.indexeur.indexeur import DocumentAIndexer, ReponseDocument
 
 
-class ClientAlbertReel(ClientAlbert):
+class ClientAlbertIndexationReel(ClientAlbertIndexation):
     def cree_collection(self, nom: str, description: str) -> ReponseCollection:
         payload = PayloadCollection(name=nom, description=description)
         response = self.executeur_de_requete.poste(
