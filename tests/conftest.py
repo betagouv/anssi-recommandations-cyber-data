@@ -404,7 +404,9 @@ class ClientAlbertReformulationDeTest(ClientAlbertReformulation):
         self._reformulations = reformulations
 
     def reformule_la_question(self, question: str) -> str:
-        return self._reformulations[0]["question_reformulee"]
+        return list(filter(lambda q: q["question"] == question, self._reformulations))[
+            0
+        ]["question_reformulee"]
 
 
 class ConstructeurClientAlbertReformulation:
