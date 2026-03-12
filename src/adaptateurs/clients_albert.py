@@ -33,7 +33,7 @@ class ReponseCollectionAlbert(NamedTuple):
     updated_at: str
 
 
-class ClientAlbert(ABC):
+class ClientAlbertIndexation(ABC):
     def __init__(
         self,
         url: str,
