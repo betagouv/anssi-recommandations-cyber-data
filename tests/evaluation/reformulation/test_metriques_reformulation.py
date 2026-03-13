@@ -4,7 +4,7 @@ from evaluation.reformulation.evaluation import (
 )
 
 
-def test_evalue_la_metrique_suppression_parasite(
+def test_evalue_les_metriques_de_reformulation(
     evaluateur_de_test_avec_metriques,
     un_client_albert,
 ):
@@ -23,12 +23,18 @@ def test_evalue_la_metrique_suppression_parasite(
         client_albert, "Prompt", evaluateur_de_test_avec_metriques
     ).evalue([question])
 
-    assert evaluateur_de_test_avec_metriques.nombre_metriques_soumise == 1
-    assert len(evaluateur_de_test_avec_metriques.metriques_deepeval_soumises) == 1
-    assert (
-        evaluateur_de_test_avec_metriques.metriques_deepeval_soumises[0].__name__
-        == "MetriqueSuppressionParasites"
+    assert evaluateur_de_test_avec_metriques.nombre_metriques_soumise == 4
+
+    metriques_soumises = (
+        evaluateur_de_test_avec_metriques.metriques_deepeval_soumises
+        + evaluateur_de_test_avec_metriques.metriques_personnalisees_soumises
     )
+    assert [metrique.__name__ for metrique in metriques_soumises] == [
+        "MetriqueSuppressionParasites",
+        "MetriqueConservationContraintes",
+        "MetriqueAutoportance",
+        "MetriqueFideliteMetier",
+    ]
 
 
 def test_evalue_les_cas_de_tests(

@@ -6,6 +6,15 @@ from deepeval.test_case import LLMTestCase
 
 from adaptateurs.clients_albert import ClientAlbertReformulation
 from evaluation.deepeval_adaptateur.lanceur_deepeval import EvaluateurDeepeval
+from evaluation.reformulation.metriques.metrique_autoportance import (
+    MetriqueAutoportance,
+)
+from evaluation.reformulation.metriques.metrique_conservation_contraintes import (
+    MetriqueConservationContraintes,
+)
+from evaluation.reformulation.metriques.metrique_fidelite_metier import (
+    MetriqueFideliteMetier,
+)
 from evaluation.reformulation.metriques.metrique_suppression_parasites import (
     MetriqueSuppressionParasites,
 )
@@ -61,7 +70,12 @@ class EvaluateurReformulation:
                     expected_output=question.reformulation_ideale,
                 )
             ],
-            metrics=[MetriqueSuppressionParasites()],
+            metrics=[
+                MetriqueSuppressionParasites(),
+                MetriqueConservationContraintes(),
+                MetriqueAutoportance(),
+                MetriqueFideliteMetier(),
+            ],
         )
         return list(
             chain.from_iterable(
