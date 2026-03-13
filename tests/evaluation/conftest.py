@@ -48,32 +48,36 @@ class EvaluateurDeepevalTest(EvaluateurDeepeval):
             self.nombre_metriques_soumise = len(self.metriques_deepeval_soumises) + len(
                 self.metriques_personnalisees_soumises
             )
-        metrique_bon_document_en_contexte_2 = self.metriques_personnalisees_soumises[3]
-        metrique_bon_numero_page_en_contexte_2 = self.metriques_personnalisees_soumises[
-            8
-        ]
-        metrique_score_bon_document_en_contexte_2 = (
-            self.metriques_personnalisees_soumises[13]
-        )
-        metrique_hallucination = self.metriques_deepeval_soumises[0]
-        metriques = [
-            ConstructeurMetricData.construis(
-                nom=metrique_bon_document_en_contexte_2.__name__,
-                score=1,
-            ),
-            ConstructeurMetricData.construis(
-                nom=metrique_bon_numero_page_en_contexte_2.__name__,
-                score=0,
-            ),
-            ConstructeurMetricData.construis(
-                nom=metrique_score_bon_document_en_contexte_2.__name__,
-                score=0.7,
-            ),
-            ConstructeurMetricData.construis(
-                nom=metrique_hallucination.__name__,
-                score=0.6,
-            ),
-        ]
+        metriques = []
+        if len(self.metriques_personnalisees_soumises) > 0:
+            metrique_bon_document_en_contexte_2 = (
+                self.metriques_personnalisees_soumises[3]
+            )
+            metrique_bon_numero_page_en_contexte_2 = (
+                self.metriques_personnalisees_soumises[8]
+            )
+            metrique_score_bon_document_en_contexte_2 = (
+                self.metriques_personnalisees_soumises[13]
+            )
+            metrique_hallucination = self.metriques_deepeval_soumises[0]
+            metriques = [
+                ConstructeurMetricData.construis(
+                    nom=metrique_bon_document_en_contexte_2.__name__,
+                    score=1,
+                ),
+                ConstructeurMetricData.construis(
+                    nom=metrique_bon_numero_page_en_contexte_2.__name__,
+                    score=0,
+                ),
+                ConstructeurMetricData.construis(
+                    nom=metrique_score_bon_document_en_contexte_2.__name__,
+                    score=0.7,
+                ),
+                ConstructeurMetricData.construis(
+                    nom=metrique_hallucination.__name__,
+                    score=0.6,
+                ),
+            ]
         results = []
         for test_case in test_cases:
             results.append(
@@ -93,5 +97,5 @@ class EvaluateurDeepevalTest(EvaluateurDeepeval):
 
 
 @pytest.fixture
-def evaluateur_de_test() -> EvaluateurDeepevalTest:
+def evaluateur_de_test_avec_metriques() -> EvaluateurDeepevalTest:
     return EvaluateurDeepevalTest()

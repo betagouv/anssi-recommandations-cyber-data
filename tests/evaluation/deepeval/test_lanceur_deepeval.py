@@ -7,11 +7,11 @@ from journalisation.evaluation import EntrepotEvaluationMemoire
 
 
 def test_evalue_un_jeu_de_donnees(
-    resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test
+    resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test_avec_metriques
 ):
     entrepot_evaluation = EntrepotEvaluationMemoire()
     lanceur_evaluation = LanceurEvaluationDeepeval(
-        entrepot_evaluation, evaluateur_de_test
+        entrepot_evaluation, evaluateur_de_test_avec_metriques
     )
 
     id_evaluation = lanceur_evaluation.lance_l_evaluation(
@@ -26,11 +26,11 @@ def test_evalue_un_jeu_de_donnees(
 
 
 def test_evalue_un_jeu_de_donnees_avec_des_cas_de_test(
-    resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test
+    resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test_avec_metriques
 ):
     entrepot_evaluation = EntrepotEvaluationMemoire()
 
-    evaluateur_deepeval = evaluateur_de_test
+    evaluateur_deepeval = evaluateur_de_test_avec_metriques
     lanceur_evaluation = LanceurEvaluationDeepeval(
         entrepot_evaluation, evaluateur_deepeval
     )
@@ -55,11 +55,11 @@ def test_evalue_un_jeu_de_donnees_avec_des_cas_de_test(
 
 
 def test_evalue_un_jeu_de_donnees_avec_les_metriques_deepeval(
-    resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test
+    resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test_avec_metriques
 ):
     entrepot_evaluation = EntrepotEvaluationMemoire()
 
-    evaluateur_deepeval = evaluateur_de_test
+    evaluateur_deepeval = evaluateur_de_test_avec_metriques
     lanceur_evaluation = LanceurEvaluationDeepeval(
         entrepot_evaluation, evaluateur_deepeval
     )
@@ -80,11 +80,11 @@ def test_evalue_un_jeu_de_donnees_avec_les_metriques_deepeval(
 
 
 def test_evalue_un_jeu_de_donnees_avec_les_metriques_personnalisees(
-    resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test
+    resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test_avec_metriques
 ):
     entrepot_evaluation = EntrepotEvaluationMemoire()
 
-    evaluateur_deepeval = evaluateur_de_test
+    evaluateur_deepeval = evaluateur_de_test_avec_metriques
     lanceur_evaluation = LanceurEvaluationDeepeval(
         entrepot_evaluation, evaluateur_deepeval
     )
@@ -125,11 +125,11 @@ def test_evalue_un_jeu_de_donnees_avec_les_metriques_personnalisees(
 
 
 def test_evalue_un_jeu_de_donnees_et_retourne_le_numero_de_ligne(
-    resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test
+    resultat_collecte_mqc_avec_deux_resultats, evaluateur_de_test_avec_metriques
 ):
     entrepot_evaluation = EntrepotEvaluationMemoire()
     lanceur_evaluation = LanceurEvaluationDeepeval(
-        entrepot_evaluation, evaluateur_de_test
+        entrepot_evaluation, evaluateur_de_test_avec_metriques
     )
 
     id_evaluation = lanceur_evaluation.lance_l_evaluation(
