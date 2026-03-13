@@ -1,11 +1,11 @@
 from deepeval.metrics import GEval
 from deepeval.test_case import LLMTestCaseParams
 
-from evaluation.deepeval.client_deepeval_albert import ClientDeepEvalAlbert
+from evaluation.deepeval_adaptateur.client_deepeval_albert import ClientDeepEvalAlbert
 
 
 class MetriqueSuppressionParasites(GEval):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__(
             name="MetriqueSuppressionParasites",
             criteria=(

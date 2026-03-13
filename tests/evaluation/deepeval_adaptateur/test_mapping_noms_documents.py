@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from evaluation.deepeval.dataframe import (
+from evaluation.deepeval_adaptateur.dataframe import (
     applique_mapping_noms_documents,
     prepare_dataframe,
 )

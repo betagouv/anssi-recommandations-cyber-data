@@ -41,13 +41,18 @@ if __name__ == "__main__":
     )
     session = requests.Session()
     prompt = session.get(args.url_prompt)
-    resultat = lance_evaluation(
+    resultats = lance_evaluation(
         client_albert,
         prompt.text,
         [
             QuestionAEvaluer(
                 "Qu’est-ce qu’une attaque DDOS ?", "Qu’est-ce qu’une attaque DDOS ?"
-            )
+            ),
+            QuestionAEvaluer(
+                "C'est quoi MesQuestionsCyber", "Qu’est-ce que MesQuestionsCyber ?"
+            ),
         ],
     )
-    print(f"RESULTAT : {resultat}")
+    print(
+        f"RESULTAT : {[resultat.resultats[0].metrics_data[0].score for resultat in resultats if resultat.resultats[0].metrics_data]}"
+    )

@@ -31,7 +31,7 @@ from documents.indexeur.indexeur import (
     ReponseChunk,
     ReponseChunkEnErreur,
 )
-from evaluation.deepeval.lanceur_deepeval import EvaluateurDeepeval
+from evaluation.deepeval_adaptateur.lanceur_deepeval import EvaluateurDeepeval
 from infra.executeur_requete import ExecuteurDeRequete
 from infra.memoire.ecrivain import EcrivainSortieDeTest
 from journalisation.evaluation import (
