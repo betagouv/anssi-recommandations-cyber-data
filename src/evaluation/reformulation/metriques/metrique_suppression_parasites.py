@@ -1,4 +1,5 @@
 from deepeval.metrics import GEval
+from deepeval.metrics.g_eval import Rubric
 from deepeval.test_case import LLMTestCaseParams
 
 from evaluation.deepeval_adaptateur.client_deepeval_albert import ClientDeepEvalAlbert
@@ -10,43 +11,50 @@ class MetriqueSuppressionParasites(GEval):
             name="MetriqueSuppressionParasites",
             criteria=(
                 """
-                        Tu es un juge expert en nettoyage de texte.
-                        
-                        Ta mission est d'évaluer si la sortie nettoie correctement les éléments parasites
-                        présents dans le texte d'entrée, tout en conservant fidèlement l'information utile.
-                        
-                        Règles de jugement :
-                        1. Les éléments parasites doivent être supprimés.
-                        2. L'information utile et pertinente doit être conservée.
-                        3. Aucun contenu nouveau ne doit être ajouté.
-                        4. La reformulation doit rester minimale : on préfère supprimer le bruit, pas réécrire tout le texte.
-                        5. Si la sortie supprime une information utile, la note doit baisser fortement.
-                        6. Si la sortie conserve encore beaucoup de parasites, la note doit baisser fortement.
-                        7. Si la sortie invente, généralise ou résume au-delà du nécessaire, la note doit baisser.
-                        
-                        Définition des éléments parasites :
-                        - répétitions inutiles
-                        - hésitations
-                        - tics de langage
-                        - bruit de transcription
-                        - balises, métadonnées ou artefacts techniques
-                        - fragments sans valeur informative
-                        - remplissage non pertinent
-                        
-                        Tu dois retourner un JSON strict avec ce format exact :
-                        {{
-                          "score": <nombre entre 0 et 1>,
-                          "reason": "<explication courte, factuelle et précise>"
-                        }}
-                        
-                        Consignes de scoring :
-                        - 1.0 = suppression excellente des parasites, conservation fidèle du contenu utile
-                        - 0.7 à 0.9 = bon nettoyage avec défauts mineurs
-                        - 0.4 à 0.6 = nettoyage partiel ou quelques pertes d'information
-                        - 0.1 à 0.3 = nettoyage faible ou pertes importantes
-                        - 0.0 = sortie inutilisable, hallucination, ou suppression du contenu important
-                        """
+                Tu es un juge expert en reformulation de question RAG pour l'ANSSI.
+                Tu notes uniquement la suppression des éléments parasites dans la reformulation.
+
+                Élément parasite = hésitation, tic de langage, répétition vide, bruit de transcription,
+                artefact technique (balise, métadonnée), fragment hors sujet ou sans valeur informative.
+
+                Important:
+                - N'évalue pas ici l'autoportance, la fidélité métier, ni la conservation de toutes les contraintes.
+                - Ne pénalise pas les différences de style, de ponctuation, de casse, ni les reformulations lexicales.
+                - Si l'Input contient peu ou pas de parasites, une reformulation propre doit recevoir une note élevée.
+                - Pénalise surtout les parasites de l'Input qui restent, ou les nouveaux parasites introduits.
+                - Les écarts de sens mineurs sans parasite relèvent surtout d'autres métriques et doivent peu impacter celle-ci.
+                """
             ),
+            evaluation_steps=[
+                "Repère dans 'Input' les segments parasites qui n'apportent aucune information utile à la recherche RAG.",
+                "Vérifie que 'Actual Output' supprime ces segments parasites et n'introduit pas de nouveau bruit parasite.",
+                "Mesure prioritairement le taux de suppression des parasites (critère dominant du score).",
+                "Si l'Input contient peu ou pas de parasites, attribue une note élevée à une sortie propre et concise.",
+                "Utilise 'Expected Output' comme repère indicatif de nettoyage, sans imposer une correspondance mot à mot.",
+                "Donne un score final uniquement sur la qualité de suppression des parasites.",
+            ],
+            rubric=[
+                Rubric(
+                    score_range=(0, 3),
+                    expected_outcome=(
+                        "Niveau faible: suppression insuffisante des parasites (nombreux parasites conservés "
+                        "ou bruit parasite ajouté)."
+                    ),
+                ),
+                Rubric(
+                    score_range=(4, 7),
+                    expected_outcome=(
+                        "Niveau moyen: nettoyage partiel à correct, avec encore quelques parasites résiduels."
+                    ),
+                ),
+                Rubric(
+                    score_range=(10, 10),
+                    expected_outcome=(
+                        "Niveau élevé: suppression très bonne à excellente des parasites, sortie propre et concise. "
+                        "Cas sans parasite en entrée: sortie propre attendue dans cette plage."
+                    ),
+                ),
+            ],
             evaluation_params=[
                 LLMTestCaseParams.INPUT,
                 LLMTestCaseParams.ACTUAL_OUTPUT,
