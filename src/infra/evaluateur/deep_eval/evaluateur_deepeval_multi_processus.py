@@ -8,7 +8,7 @@ from deepeval.evaluate.types import EvaluationResult
 from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
 
-from evaluation.deepeval.lanceur_deepeval import EvaluateurDeepeval
+from evaluation.deepeval_adaptateur.lanceur_deepeval import EvaluateurDeepeval
 
 
 def configure_sorties_utf8():

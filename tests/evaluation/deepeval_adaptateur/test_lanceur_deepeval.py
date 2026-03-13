@@ -2,7 +2,7 @@ from deepeval.metrics import (
     BaseMetric,
 )
 
-from evaluation.deepeval.lanceur_deepeval import LanceurEvaluationDeepeval
+from evaluation.deepeval_adaptateur.lanceur_deepeval import LanceurEvaluationDeepeval
 from journalisation.evaluation import EntrepotEvaluationMemoire
 
 

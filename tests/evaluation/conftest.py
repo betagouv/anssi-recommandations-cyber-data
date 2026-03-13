@@ -8,7 +8,7 @@ from deepeval.metrics import (
 from deepeval.test_case import LLMTestCase
 from deepeval.tracing.api import MetricData
 
-from evaluation.deepeval.lanceur_deepeval import EvaluateurDeepeval
+from evaluation.deepeval_adaptateur.lanceur_deepeval import EvaluateurDeepeval
 
 
 class ConstructeurMetricData:

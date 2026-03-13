@@ -4,8 +4,10 @@ from pathlib import Path
 
 from adaptateurs.journal import AdaptateurJournal, fabrique_adaptateur_journal
 from configuration import recupere_configuration, Configuration
-from evaluation.deepeval.evaluation import LanceurEvaluation
-from evaluation.deepeval.fabrique_lanceur_evaluation import fabrique_lanceur_evaluation
+from evaluation.deepeval_adaptateur.evaluation import LanceurEvaluation
+from evaluation.deepeval_adaptateur.fabrique_lanceur_evaluation import (
+    fabrique_lanceur_evaluation,
+)
 from journalisation.consignateur_evaluation import consigne_evaluation
 from journalisation.evaluation import EntrepotEvaluation, fabrique_entrepot_evaluation
 from mqc.collecte_reponses_mqc import collecte_reponses_mqc

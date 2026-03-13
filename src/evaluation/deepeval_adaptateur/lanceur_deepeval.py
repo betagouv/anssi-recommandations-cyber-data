@@ -15,19 +15,19 @@ from deepeval.metrics import (
 )
 from deepeval.test_case import LLMTestCase
 
-from evaluation.deepeval.client_deepeval_albert import ClientDeepEvalAlbert
-from evaluation.deepeval.dataframe import prepare_dataframe
-from evaluation.deepeval.evaluation import LanceurEvaluation
-from evaluation.deepeval.metriques_personnalisees.de_deepeval.metrique_bon_nom_document import (
+from evaluation.deepeval_adaptateur.client_deepeval_albert import ClientDeepEvalAlbert
+from evaluation.deepeval_adaptateur.dataframe import prepare_dataframe
+from evaluation.deepeval_adaptateur.evaluation import LanceurEvaluation
+from evaluation.deepeval_adaptateur.metriques_personnalisees.de_deepeval.metrique_bon_nom_document import (
     MetriquesBonNomDocuments,
 )
-from evaluation.deepeval.metriques_personnalisees.de_deepeval.metrique_bons_numeros_pages import (
+from evaluation.deepeval_adaptateur.metriques_personnalisees.de_deepeval.metrique_bons_numeros_pages import (
     MetriquesBonsNumerosPages,
 )
-from evaluation.deepeval.metriques_personnalisees.de_deepeval.metrique_longueur_reponse import (
+from evaluation.deepeval_adaptateur.metriques_personnalisees.de_deepeval.metrique_longueur_reponse import (
     MetriqueLongueurReponse,
 )
-from evaluation.deepeval.metriques_personnalisees.de_deepeval.metrique_score_numero_page import (
+from evaluation.deepeval_adaptateur.metriques_personnalisees.de_deepeval.metrique_score_numero_page import (
     MetriquesScoreNumeropage,
 )
 from infra.lecteur_csv import LecteurCSV
