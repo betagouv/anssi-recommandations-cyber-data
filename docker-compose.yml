@@ -1,0 +1,35 @@
+services:
+  mqc-data-frontend:
+    build:
+      context: ui
+    command: bash -c "pnpm run dev"
+    networks:
+      - mqc-network
+    working_dir: /usr/src/app
+    volumes:
+      - ./ui:/usr/src/app
+      - /usr/src/app/node_modules # On ne monte pas le node_modules de l’hôte
+      - dist-front:/usr/src/app/dist
+
+  mqc-data-backend:
+    build:
+      context: .
+    command: python src/main.py
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - dist-front:/app/ui/dist
+    ports:
+      - '3007:3001'
+    networks:
+      - mqc-network
+    depends_on:
+      - mqc-data-frontend
+
+networks:
+  mqc-network:
+
+volumes:
+  dist-front:
+    driver: local

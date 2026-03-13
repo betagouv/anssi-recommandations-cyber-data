@@ -21,6 +21,7 @@ from configuration import (
     Albert,
     BaseDeDonnees,
     IndexeurDocument,
+    MQCData,
 )
 from configuration import ParametresEvaluation
 from documents.indexeur.indexeur import (
@@ -74,6 +75,7 @@ def configuration() -> Configuration:
         base_de_donnees_journal=base_de_donnees,
         parametres_deepeval=parametres_deepeval,
         msc=MSC(url="http://msc.local", chemin_guides="/guides"),
+        mqc_data=MQCData(max_requetes_par_minute=10, hote="mqc.local", port=5672),
     )
 
 
