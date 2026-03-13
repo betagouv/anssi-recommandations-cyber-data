@@ -1,0 +1,21 @@
+{
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "types": ["svelte", "vite/client"],
+    "noEmit": true,
+    /**
+     * On vérifie les types JS dans les fichiers `.svelte` et `.js` par défaut.
+     * Il faut désactiver checkJs si on veut utiliser des types dynamiques en JS.
+     * Notez que mettre allowJs à false n'empêche pas l'utilisation de JS dans
+     * les fichiers `.svelte`.
+     */
+    "allowJs": true,
+    "checkJs": true,
+    "moduleDetection": "force"
+  },
+  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "vite.d.ts"]
+}

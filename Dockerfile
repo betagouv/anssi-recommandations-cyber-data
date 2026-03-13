@@ -1,12 +1,18 @@
-#checkov:skip=CKV_DOCKER_2:Healthcheck géré par l'orchestrateur
-#checkov:skip=CKV_DOCKER_3:Utilisateur défini dans l'image de base
-FROM ghcr.io/betagouv/lab-anssi-evalap@sha256:3f34b938eab7affea49b2b67c95e823263c27f02339f580e2ba4a3eb1b86f02c
+#checkov:skip=CKV_DOCKER_2:Uniquement utilisé en local pour le dev
+#checkov:skip=CKV_DOCKER_3:Uniquement utilisé en local pour le dev
+FROM docker.io/python:3.13.5
 
-ENV TZ=Europe/Paris
-ENV ENV=prod
-ENV PORT=8080
-ENV POSTGRES_URL=postgresql://${POSTGRESQL_ADDON_USER}:${POSTGRESQL_ADDON_PASSWORD}@${POSTGRESQL_ADDON_HOST}:${POSTGRESQL_ADDON_PORT}
+RUN mkdir /app
+WORKDIR /app
 
-EXPOSE 8000
+VOLUME /app
+# Pour s'assurer que le `.venv` du conteneur ne soit pas écrasé par l'absence de `.venv` de l'hôte.
+VOLUME /app/.venv
 
-CMD ["supervisord", "-n", "-c", "/app/supervisord.conf", "-l", "/tmp/supervisord.log", "-e", "debug"]
+COPY pyproject.toml uv.lock ./
+
+ENV PATH="/app/.venv/bin:$PATH"
+
+RUN pip install uv && \
+      uv venv && \
+      uv sync
