@@ -59,17 +59,21 @@ if __name__ == "__main__":
         ],
     )
     for resultat in resultats:
+        print("=" * 80)
+        print(f"Question originale    : {resultat.question}")
+        print(f"Question reformulée   : {resultat.question_reformulee}")
+        print(f"Reformulation idéale  : {resultat.reformulation_ideale}")
+        print()
         if resultat.resultats[0].metrics_data:
-            score_normalise = resultat.resultats[0].metrics_data[0].score
-            score_sur_dix = (
-                round(float(score_normalise) * 10, 1)
-                if score_normalise is not None
-                else None
-            )
-            print("=" * 80)
-            print(f"Question originale    : {resultat.question}")
-            print(f"Question reformulée   : {resultat.question_reformulee}")
-            print(f"Reformulation idéale  : {resultat.reformulation_ideale}")
-            print(f"Score (0-1)           : {score_normalise}")
-            print(f"Score (/10)           : {score_sur_dix}")
-            print()
+            for metric_data in resultat.resultats[0].metrics_data:
+                score_normalise = metric_data.score
+                score_sur_dix = (
+                    round(float(score_normalise) * 10, 1)
+                    if score_normalise is not None
+                    else None
+                )
+                print(f"  Métrique: {metric_data.name}")
+                print(f"  Score (0-1): {score_normalise}")
+                print(f"  Score (/10): {score_sur_dix}")
+                print()
+        print()

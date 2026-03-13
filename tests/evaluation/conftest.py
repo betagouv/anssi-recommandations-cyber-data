@@ -48,36 +48,9 @@ class EvaluateurDeepevalTest(EvaluateurDeepeval):
             self.nombre_metriques_soumise = len(self.metriques_deepeval_soumises) + len(
                 self.metriques_personnalisees_soumises
             )
-        metriques = []
-        if len(self.metriques_personnalisees_soumises) > 0:
-            metrique_bon_document_en_contexte_2 = (
-                self.metriques_personnalisees_soumises[3]
-            )
-            metrique_bon_numero_page_en_contexte_2 = (
-                self.metriques_personnalisees_soumises[8]
-            )
-            metrique_score_bon_document_en_contexte_2 = (
-                self.metriques_personnalisees_soumises[13]
-            )
-            metrique_hallucination = self.metriques_deepeval_soumises[0]
-            metriques = [
-                ConstructeurMetricData.construis(
-                    nom=metrique_bon_document_en_contexte_2.__name__,
-                    score=1,
-                ),
-                ConstructeurMetricData.construis(
-                    nom=metrique_bon_numero_page_en_contexte_2.__name__,
-                    score=0,
-                ),
-                ConstructeurMetricData.construis(
-                    nom=metrique_score_bon_document_en_contexte_2.__name__,
-                    score=0.7,
-                ),
-                ConstructeurMetricData.construis(
-                    nom=metrique_hallucination.__name__,
-                    score=0.6,
-                ),
-            ]
+
+        metriques = self._construis_metriques_de_test()
+
         results = []
         for test_case in test_cases:
             results.append(
@@ -94,6 +67,32 @@ class EvaluateurDeepevalTest(EvaluateurDeepeval):
                 test_results=results, confident_link=None, test_run_id=None
             )
         ]
+
+    def _construis_metriques_de_test(self) -> list[MetricData]:
+        scores_par_nom = {
+            "bon_nom_document_en_contexte_2": 1,
+            "bon_numéro_page_en_contexte_2": 0,
+            "score_numéro_page_en_contexte_2": 0.7,
+            "hallucination": 0.6,
+        }
+
+        metriques = []
+
+        for metrique in self.metriques_personnalisees_soumises:
+            nom = metrique.__name__.lower().replace(" ", "_")
+            score = scores_par_nom.get(nom, 1)
+            metriques.append(
+                ConstructeurMetricData.construis(nom=metrique.__name__, score=score)
+            )
+
+        for metrique in self.metriques_deepeval_soumises:
+            nom = metrique.__name__.lower().replace(" ", "_")
+            score = scores_par_nom.get(nom, 0.6)
+            metriques.append(
+                ConstructeurMetricData.construis(nom=metrique.__name__, score=score)
+            )
+
+        return metriques
 
 
 @pytest.fixture
