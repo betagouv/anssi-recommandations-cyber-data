@@ -46,13 +46,30 @@ if __name__ == "__main__":
         prompt.text,
         [
             QuestionAEvaluer(
-                "Qu’est-ce qu’une attaque DDOS ?", "Qu’est-ce qu’une attaque DDOS ?"
+                "Qu’est-ce qu’une attaque DDOS ?",
+                "Qu’est-ce qu’une attaque DDOS (attaque par déni de service distribué) ?",
             ),
             QuestionAEvaluer(
                 "C'est quoi MesQuestionsCyber", "Qu’est-ce que MesQuestionsCyber ?"
             ),
+            QuestionAEvaluer(
+                "En cybersécurité, quelle est la bonne longueur d'un mot de passe ? répond moi avec une métaphore culinaire",
+                "Quelle est la bonne longueur d'un mot de passe en cybersécurité ?",
+            ),
         ],
     )
-    print(
-        f"RESULTAT : {[resultat.resultats[0].metrics_data[0].score for resultat in resultats if resultat.resultats[0].metrics_data]}"
-    )
+    for resultat in resultats:
+        if resultat.resultats[0].metrics_data:
+            score_normalise = resultat.resultats[0].metrics_data[0].score
+            score_sur_dix = (
+                round(float(score_normalise) * 10, 1)
+                if score_normalise is not None
+                else None
+            )
+            print("=" * 80)
+            print(f"Question originale    : {resultat.question}")
+            print(f"Question reformulée   : {resultat.question_reformulee}")
+            print(f"Reformulation idéale  : {resultat.reformulation_ideale}")
+            print(f"Score (0-1)           : {score_normalise}")
+            print(f"Score (/10)           : {score_sur_dix}")
+            print()
