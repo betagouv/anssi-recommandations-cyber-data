@@ -27,7 +27,7 @@ async def test_execute_la_collecte_des_reponses_pour_creer_le_fichier_de_resulta
     cree_fichier_csv_avec_du_contenu,
     reponse_avec_paragraphes,
     resultat_collecte_mqc,
-    evaluateur_de_test,
+    evaluateur_de_test_simple,
 ):
     base = construit_base_url(configuration.mqc)
     chemin = formate_route_pose_question(configuration.mqc)
@@ -39,7 +39,7 @@ async def test_execute_la_collecte_des_reponses_pour_creer_le_fichier_de_resulta
     entrepot_evaluation = EntrepotEvaluationMemoire()
 
     lanceur_evaluation = LanceurEvaluationDeepeval(
-        entrepot_evaluation, evaluateur_de_test
+        entrepot_evaluation, evaluateur_de_test_simple
     )
     await evaluateur_mqc(
         entree,
@@ -64,7 +64,7 @@ async def test_lance_l_evaluation_avec_deepeval(
     configuration: Configuration,
     cree_fichier_csv_avec_du_contenu,
     reponse_avec_paragraphes,
-    evaluateur_de_test,
+    evaluateur_de_test_simple,
 ):
     base = construit_base_url(configuration.mqc)
     chemin = formate_route_pose_question(configuration.mqc)
@@ -80,7 +80,7 @@ async def test_lance_l_evaluation_avec_deepeval(
     )
     entrepot_evaluation = EntrepotEvaluationMemoire()
     lanceur_evaluation = LanceurEvaluationDeepeval(
-        entrepot_evaluation, evaluateur_de_test
+        entrepot_evaluation, evaluateur_de_test_simple
     )
 
     id_evaluation_cree = await evaluateur_mqc(
@@ -114,7 +114,7 @@ async def test_consigne_les_resultats_d_evaluation(
     cree_fichier_csv_avec_du_contenu,
     reponse_avec_paragraphes,
     resultat_collecte_mqc,
-    evaluateur_de_test,
+    evaluateur_de_test_simple,
 ):
     base = construit_base_url(configuration.mqc)
     chemin = formate_route_pose_question(configuration.mqc)
@@ -126,7 +126,7 @@ async def test_consigne_les_resultats_d_evaluation(
     entrepot_evaluation = EntrepotEvaluationMemoire()
 
     lanceur_evaluation = LanceurEvaluationDeepeval(
-        entrepot_evaluation, evaluateur_de_test
+        entrepot_evaluation, evaluateur_de_test_simple
     )
 
     adaptateur_journal: AdaptateurJournalMemoire = AdaptateurJournalMemoire()
