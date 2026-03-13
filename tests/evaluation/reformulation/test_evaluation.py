@@ -1,3 +1,5 @@
+from deepeval.evaluate.types import TestResult
+
 from evaluation.reformulation.evaluation import (
     QuestionAEvaluer,
     EvaluateurReformulation,
@@ -69,3 +71,25 @@ def test_appelle_le_client_avec_le_prompt(un_client_albert, evaluateur_de_test_s
     ).evalue([question])
 
     assert client_albert.prompt_fourni == "Un prompt fourni"
+
+
+def test_ajoute_les_resultats_des_evaluations(
+    evaluateur_de_test_avec_metriques,
+    un_client_albert,
+):
+    question = QuestionAEvaluer(
+        question="Question ?", reformulation_ideale="Question idéale reformulée ?"
+    )
+    client_albert = (
+        un_client_albert()
+        .retourne_la_reformulation_pour_la_question(
+            "Question reformulée ?", "Question ?"
+        )
+        .construis()
+    )
+    resultat = EvaluateurReformulation(
+        client_albert, "Prompt", evaluateur_de_test_avec_metriques
+    ).evalue([question])
+
+    assert len(resultat[0].resultats) == 1
+    assert isinstance(resultat[0].resultats[0], TestResult)
