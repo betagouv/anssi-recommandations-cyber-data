@@ -200,7 +200,7 @@ class EvaluateurDeepevalTest(EvaluateurDeepeval):
 
 
 @pytest.fixture
-def evaluateur_de_test() -> EvaluateurDeepevalTest:
+def evaluateur_de_test_simple() -> EvaluateurDeepevalTest:
     return EvaluateurDeepevalTest()
 
 
