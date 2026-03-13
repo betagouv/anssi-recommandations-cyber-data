@@ -10,7 +10,9 @@ from evaluation.reformulation.evaluation import (
     QuestionAEvaluer,
     ResultatEvaluation,
 )
-from infra.evaluateur.deep_eval.evaluateur_deepeval_multi_processus import EvaluateurDeepevalMultiProcessus
+from infra.evaluateur.deep_eval.evaluateur_deepeval_multi_processus import (
+    EvaluateurDeepevalMultiProcessus,
+)
 
 
 def lance_evaluation(
@@ -18,7 +20,9 @@ def lance_evaluation(
     prompt: str,
     questions: list[QuestionAEvaluer],
 ) -> list[ResultatEvaluation]:
-    return EvaluateurReformulation(client_albert, prompt, EvaluateurDeepevalMultiProcessus()).evalue(questions=questions)
+    return EvaluateurReformulation(
+        client_albert, prompt, EvaluateurDeepevalMultiProcessus()
+    ).evalue(questions=questions)
 
 
 if __name__ == "__main__":
