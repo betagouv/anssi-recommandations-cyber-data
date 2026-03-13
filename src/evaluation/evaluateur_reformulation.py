@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 
 import requests
 
@@ -13,6 +14,7 @@ from evaluation.reformulation.evaluation import (
 from infra.evaluateur.deep_eval.evaluateur_deepeval_multi_processus import (
     EvaluateurDeepevalMultiProcessus,
 )
+from infra.lecteur_dataset_reformulation import LecteurDatasetReformulation
 
 
 def lance_evaluation(
@@ -30,6 +32,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--url-prompt", required=True, help="URL où se procurer le prompt (Github)"
     )
+    parser.add_argument(
+        "--chemin-dataset",
+        type=Path,
+        default=Path(__file__).parent.parent / "donnees" / "dataset_reformulation.csv",
+        help="Chemin vers le fichier CSV contenant les questions d'évaluation",
+    )
 
     args = parser.parse_args()
 
@@ -41,23 +49,11 @@ if __name__ == "__main__":
     )
     session = requests.Session()
     prompt = session.get(args.url_prompt)
-    resultats = lance_evaluation(
-        client_albert,
-        prompt.text,
-        [
-            QuestionAEvaluer(
-                "Qu’est-ce qu’une attaque DDOS ?",
-                "Qu’est-ce qu’une attaque DDOS (attaque par déni de service distribué) ?",
-            ),
-            QuestionAEvaluer(
-                "C'est quoi MesQuestionsCyber", "Qu’est-ce que MesQuestionsCyber ?"
-            ),
-            QuestionAEvaluer(
-                "En cybersécurité, quelle est la bonne longueur d'un mot de passe ? répond moi avec une métaphore culinaire",
-                "Quelle est la bonne longueur d'un mot de passe en cybersécurité ?",
-            ),
-        ],
-    )
+
+    lecteur = LecteurDatasetReformulation(args.chemin_dataset)
+    questions = lecteur.charge_questions()
+
+    resultats = lance_evaluation(client_albert, prompt.text, questions)
     for resultat in resultats:
         print("=" * 80)
         print(f"Question originale    : {resultat.question}")
