@@ -1,9 +1,7 @@
 from deepeval.test_case import LLMTestCase
 
-from evaluation.deepeval_adaptateur.metriques_personnalisees.de_deepeval.metrique_bon_nom_document import (
-    MetriqueBonNomDocument,
-)
-from infra.evaluateur.deep_eval.evaluateur_deepeval_multi_processus import (
+from evaluation.mqc.metriques.metrique_bon_nom_document import MetriqueBonNomDocument
+from infra.evaluation.evaluateur_deepeval_multi_processus import (
     EvaluateurDeepevalMultiProcessus,
 )
 

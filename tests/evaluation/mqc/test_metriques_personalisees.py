@@ -1,17 +1,14 @@
 from deepeval.test_case import LLMTestCase
-
-from evaluation.deepeval_adaptateur.metriques_personnalisees.de_deepeval.metrique_bon_nom_document import (
+from evaluation.mqc.metriques.metrique_bon_nom_document import (
     MetriqueBonNomDocument,
     MetriquesBonNomDocuments,
 )
-from evaluation.deepeval_adaptateur.metriques_personnalisees.de_deepeval.metrique_bons_numeros_pages import (
+from evaluation.mqc.metriques.metrique_bons_numeros_pages import (
     MetriqueBonNumeroPage,
     MetriquesBonsNumerosPages,
 )
-from evaluation.deepeval_adaptateur.metriques_personnalisees.de_deepeval.metrique_longueur_reponse import (
-    MetriqueLongueurReponse,
-)
-from evaluation.deepeval_adaptateur.metriques_personnalisees.de_deepeval.metrique_score_numero_page import (
+from evaluation.mqc.metriques.metrique_longueur_reponse import MetriqueLongueurReponse
+from evaluation.mqc.metriques.metrique_score_numero_page import (
     MetriqueScoreNumeropage,
     MetriquesScoreNumeropage,
 )

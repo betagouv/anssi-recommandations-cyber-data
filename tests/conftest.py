@@ -31,7 +31,8 @@ from documents.indexeur.indexeur import (
     ReponseChunk,
     ReponseChunkEnErreur,
 )
-from evaluation.deepeval_adaptateur.lanceur_deepeval import EvaluateurDeepeval
+from evaluation.evaluateur_deepeval import EvaluateurDeepeval
+from infra.ecrivain_sortie import EcrivainSortie
 from infra.executeur_requete import ExecuteurDeRequete
 from infra.memoire.ecrivain import EcrivainSortieDeTest
 from journalisation.evaluation import (
@@ -39,7 +40,6 @@ from journalisation.evaluation import (
     EntrepotEvaluationMemoire,
     Evaluation,
 )
-from mqc.ecrivain_sortie import EcrivainSortie
 
 
 @pytest.fixture()

@@ -1,17 +1,18 @@
-from pathlib import Path
-import httpx
 import asyncio
-import respx
+from pathlib import Path
+
+import httpx
 import pytest
+import respx
 
 from configuration import MQC
-from infra.lecteur_csv import LecteurCSV
-from mqc.remplisseur_reponses import (
-    RemplisseurReponses,
-    ClientMQCHTTPAsync,
+from evaluation.mqc.remplisseur_reponses import (
     construit_base_url,
     formate_route_pose_question,
+    ClientMQCHTTPAsync,
+    RemplisseurReponses,
 )
+from infra.lecteur_csv import LecteurCSV
 
 
 def cree_reponse_mock(reponse: str, question: str) -> httpx.Response:
