@@ -103,7 +103,7 @@ def evaluateur_de_test_avec_metriques() -> EvaluateurDeepevalTest:
 
 class BusEvenementDeTest(BusEvenement):
     def __init__(self):
-        super().__init__()
+        super().__init__([])
         self.evenements = []
 
     def publie(self, evenement: Evenement):
