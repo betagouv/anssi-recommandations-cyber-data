@@ -1,8 +1,10 @@
+import uuid
 from dataclasses import dataclass
 from itertools import chain
 
 from deepeval.evaluate.types import TestResult
 from deepeval.test_case import LLMTestCase
+from deepeval.tracing.api import MetricData
 
 from adaptateurs.clients_albert import ClientAlbertReformulation
 from evaluation.evaluateur_deepeval import EvaluateurDeepeval
@@ -18,6 +20,7 @@ from evaluation.reformulation.metriques.metrique_fidelite_metier import (
 from evaluation.reformulation.metriques.metrique_suppression_parasites import (
     MetriqueSuppressionParasites,
 )
+from evenement.bus import BusEvenement, Evenement
 
 
 @dataclass
@@ -34,20 +37,33 @@ class QuestionAEvaluer:
     reformulation_ideale: str
 
 
+@dataclass
+class CorpsResultat:
+    metrique: str
+    score: float
+
+    def __init__(self, resultat: MetricData):
+        super().__init__()
+        self.metrique = resultat.name
+        self.score = resultat.score if resultat.score is not None else 0.0
+
+
 class EvaluateurReformulation:
     def __init__(
         self,
         client_albert: ClientAlbertReformulation,
         prompt: str,
         evaluateur: EvaluateurDeepeval,
+        bus_evenement: BusEvenement,
     ):
         super().__init__()
         self._prompt = prompt
         self._client_albert = client_albert
         self._evaluateur = evaluateur
+        self._bus_evenement = bus_evenement
 
     def evalue(self, questions: list[QuestionAEvaluer]) -> list[ResultatEvaluation]:
-        return [
+        resultats = [
             ResultatEvaluation(
                 question=question.question,
                 reformulation_ideale=question.reformulation_ideale,
@@ -58,6 +74,26 @@ class EvaluateurReformulation:
             )
             for question in questions
         ]
+        id_evalualtion = uuid.uuid4()
+        for resultat in resultats:
+            self._bus_evenement.publie(
+                Evenement(
+                    type="EVALUATION_REFORMULATION_TERMINEE",
+                    corps={
+                        "id_evaluation": id_evalualtion,
+                        "question": resultat.question,
+                        "reformulation_ideale": resultat.reformulation_ideale,
+                        "question_reformulee": resultat.question_reformulee,
+                        "resultat": [
+                            CorpsResultat(res).__dict__
+                            for res in resultat.resultats[0].metrics_data
+                        ]
+                        if resultat.resultats[0].metrics_data is not None
+                        else [],
+                    },
+                )
+            )
+        return resultats
 
     def _execute_les_cas_de_test(self, question: QuestionAEvaluer) -> list[TestResult]:
         resultats_evaluation = self._evaluateur.evaluate(

@@ -1,12 +1,13 @@
-from configuration import recupere_configuration, BaseDeDonnees
-import psycopg2.extras
+import datetime
 from abc import ABC, abstractmethod
 from enum import StrEnum
-from pydantic import BaseModel, ConfigDict
-import psycopg2
-from psycopg2.extensions import connection
-import datetime
 
+import psycopg2
+import psycopg2.extras
+from psycopg2.extensions import connection
+from pydantic import BaseModel, ConfigDict
+
+from configuration import recupere_configuration, BaseDeDonnees
 from infra.connexion_base_de_donnees import avec_connexion
 
 
@@ -15,6 +16,7 @@ class Donnees(BaseModel):
 
 
 class TypeEvenement(StrEnum):
+    EVALUATION_REFORMULATION_TERMINEE = "EVALUATION_REFORMULATION_TERMINEE"
     EVALUATION_CALCULEE = "EVALUATION_CALCULEE"
 
 

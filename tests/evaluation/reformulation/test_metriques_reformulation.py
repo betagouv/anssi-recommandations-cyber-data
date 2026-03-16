@@ -5,8 +5,7 @@ from evaluation.reformulation.evaluation import (
 
 
 def test_evalue_les_metriques_de_reformulation(
-    evaluateur_de_test_avec_metriques,
-    un_client_albert,
+    evaluateur_de_test_avec_metriques, un_client_albert, un_bus_d_evenement
 ):
     question = QuestionAEvaluer(
         question="Question ?", reformulation_ideale="Question idéale reformulée ?"
@@ -20,7 +19,7 @@ def test_evalue_les_metriques_de_reformulation(
     )
 
     EvaluateurReformulation(
-        client_albert, "Prompt", evaluateur_de_test_avec_metriques
+        client_albert, "Prompt", evaluateur_de_test_avec_metriques, un_bus_d_evenement
     ).evalue([question])
 
     assert evaluateur_de_test_avec_metriques.nombre_metriques_soumise == 4
@@ -38,8 +37,7 @@ def test_evalue_les_metriques_de_reformulation(
 
 
 def test_evalue_les_cas_de_tests(
-    evaluateur_de_test_avec_metriques,
-    un_client_albert,
+    evaluateur_de_test_avec_metriques, un_client_albert, un_bus_d_evenement
 ):
     premiere_question = QuestionAEvaluer(
         question="Question ?", reformulation_ideale="Question idéale reformulée ?"
@@ -59,7 +57,7 @@ def test_evalue_les_cas_de_tests(
     )
 
     EvaluateurReformulation(
-        client_albert, "Prompt", evaluateur_de_test_avec_metriques
+        client_albert, "Prompt", evaluateur_de_test_avec_metriques, un_bus_d_evenement
     ).evalue([premiere_question, deuxieme_question])
 
     assert len(evaluateur_de_test_avec_metriques.cas_de_test_executes) == 2
