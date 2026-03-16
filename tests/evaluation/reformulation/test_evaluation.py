@@ -122,21 +122,30 @@ def test_emets_l_evenement_EVALUATION_REFORMULATION_TERMINEE(
 
     assert len(bus_evenement.evenements) == 1
     assert bus_evenement.evenements[0].type == "EVALUATION_REFORMULATION_TERMINEE"
-    assert bus_evenement.evenements[0].corps["question"] == "Question ?"
+    assert bus_evenement.evenements[0].corps.question == "Question ?"
     assert (
-        bus_evenement.evenements[0].corps["reformulation_ideale"]
+        bus_evenement.evenements[0].corps.reformulation_ideale
         == "Question idéale reformulée ?"
     )
     assert (
-        bus_evenement.evenements[0].corps["question_reformulee"]
-        == "Question reformulée ?"
+        bus_evenement.evenements[0].corps.question_reformulee == "Question reformulée ?"
     )
-    assert bus_evenement.evenements[0].corps["resultat"] == [
-        {"metrique": "MetriqueFideliteMetier", "score": 1.0},
-        {"metrique": "MetriqueSuppressionParasites", "score": 0.6},
-        {"metrique": "MetriqueConservationContraintes", "score": 0.6},
-        {"metrique": "MetriqueAutoportance", "score": 0.6},
-    ]
+    assert bus_evenement.evenements[0].corps.resultat[0].__dict__ == {
+        "metrique": "MetriqueFideliteMetier",
+        "score": 1.0,
+    }
+    assert bus_evenement.evenements[0].corps.resultat[1].__dict__ == {
+        "metrique": "MetriqueSuppressionParasites",
+        "score": 0.6,
+    }
+    assert bus_evenement.evenements[0].corps.resultat[2].__dict__ == {
+        "metrique": "MetriqueConservationContraintes",
+        "score": 0.6,
+    }
+    assert bus_evenement.evenements[0].corps.resultat[3].__dict__ == {
+        "metrique": "MetriqueAutoportance",
+        "score": 0.6,
+    }
 
 
 def test_emets_autant_d_evenements_que_de_reformulations(
@@ -166,6 +175,6 @@ def test_emets_autant_d_evenements_que_de_reformulations(
 
     assert len(bus_evenement.evenements) == 2
     assert (
-        bus_evenement.evenements[0].corps["id_evaluation"]
-        == bus_evenement.evenements[1].corps["id_evaluation"]
+        bus_evenement.evenements[0].corps.id_evaluation
+        == bus_evenement.evenements[1].corps.id_evaluation
     )

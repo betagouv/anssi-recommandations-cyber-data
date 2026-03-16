@@ -1,11 +1,14 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Generic, TypeVar
+
+T_Evenement = TypeVar("T_Evenement")
 
 
 @dataclass
-class Evenement:
+class Evenement(ABC, Generic[T_Evenement]):
     type: str
-    corps: dict
+    corps: T_Evenement
 
 
 class ConsommateurEvenement(ABC):

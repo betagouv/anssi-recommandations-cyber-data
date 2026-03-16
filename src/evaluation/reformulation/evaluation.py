@@ -4,10 +4,14 @@ from itertools import chain
 
 from deepeval.evaluate.types import TestResult
 from deepeval.test_case import LLMTestCase
-from deepeval.tracing.api import MetricData
 
 from adaptateurs.clients_albert import ClientAlbertReformulation
 from evaluation.evaluateur_deepeval import EvaluateurDeepeval
+from evaluation.reformulation.evenements.evenements_publies import (
+    EvenementEvaluationReformulationEffectuee,
+    CorpsEvenementEvaluationReformulationEffectuee,
+    CorpsResultat,
+)
 from evaluation.reformulation.metriques.metrique_autoportance import (
     MetriqueAutoportance,
 )
@@ -20,7 +24,7 @@ from evaluation.reformulation.metriques.metrique_fidelite_metier import (
 from evaluation.reformulation.metriques.metrique_suppression_parasites import (
     MetriqueSuppressionParasites,
 )
-from evenement.bus import BusEvenement, Evenement
+from evenement.bus import BusEvenement
 
 
 @dataclass
@@ -35,17 +39,6 @@ class ResultatEvaluation:
 class QuestionAEvaluer:
     question: str
     reformulation_ideale: str
-
-
-@dataclass
-class CorpsResultat:
-    metrique: str
-    score: float
-
-    def __init__(self, resultat: MetricData):
-        super().__init__()
-        self.metrique = resultat.name
-        self.score = resultat.score if resultat.score is not None else 0.0
 
 
 class EvaluateurReformulation:
@@ -77,20 +70,19 @@ class EvaluateurReformulation:
         id_evalualtion = uuid.uuid4()
         for resultat in resultats:
             self._bus_evenement.publie(
-                Evenement(
-                    type="EVALUATION_REFORMULATION_TERMINEE",
-                    corps={
-                        "id_evaluation": id_evalualtion,
-                        "question": resultat.question,
-                        "reformulation_ideale": resultat.reformulation_ideale,
-                        "question_reformulee": resultat.question_reformulee,
-                        "resultat": [
-                            CorpsResultat(res).__dict__
+                EvenementEvaluationReformulationEffectuee(
+                    corps=CorpsEvenementEvaluationReformulationEffectuee(
+                        id_evaluation=id_evalualtion,
+                        question=resultat.question,
+                        reformulation_ideale=resultat.reformulation_ideale,
+                        question_reformulee=resultat.question_reformulee,
+                        resultat=[
+                            CorpsResultat(res)
                             for res in resultat.resultats[0].metrics_data
                         ]
                         if resultat.resultats[0].metrics_data is not None
                         else [],
-                    },
+                    ),
                 )
             )
         return resultats
