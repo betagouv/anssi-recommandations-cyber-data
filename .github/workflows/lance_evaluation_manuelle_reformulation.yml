@@ -15,13 +15,13 @@ jobs:
         shell: bash
         run: npm install -g clever-tools
 
-      - name: Démarre l’évaluation
+      - name: Démarre l'évaluation
         env:
           CLEVER_SECRET: ${{ secrets.CLEVER_CLOUD_SECRET }}
           CLEVER_TOKEN: ${{ secrets.CLEVER_CLOUD_TOKEN }}
           ID_APP: ${{ secrets.CLEVER_CLOUD_ID_APP }}
           ID_ORGANISATION: ${{ secrets.CLEVER_CLOUD_ID_ORGANISATION }}
-          CC_RUN_COMMAND: uv run python src/evaluation/evaluateur_reformulation.py --url-prompt "https://raw.githubusercontent.com/betagouv/anssi-recommandations-cyber/refs/heads/main/templates/prompt_reformulation.txt" --chemin-dataset "donnees/dataset_reformulation.csv"
         run: |
           clever link -o="$ID_ORGANISATION" "$ID_APP"
+          clever env set CC_RUN_COMMAND "PYTHONPATH=src uv run python src/evaluation/evaluateur_reformulation.py --url-prompt 'https://raw.githubusercontent.com/betagouv/anssi-recommandations-cyber/refs/heads/main/templates/prompt_reformulation.txt' --chemin-dataset 'donnees/dataset_reformulation.csv'"
           clever restart --quiet --exit-on deploy-start
