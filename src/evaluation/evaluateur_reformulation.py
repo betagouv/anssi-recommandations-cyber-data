@@ -11,10 +11,10 @@ from evaluation.reformulation.evaluation import (
     QuestionAEvaluer,
     ResultatEvaluation,
 )
+from evenement.fabrique_bus_evenements import fabrique_bus_evenements
 from infra.evaluation.evaluateur_deepeval_multi_processus import (
     EvaluateurDeepevalMultiProcessus,
 )
-from infra.evenement.bus import BusEvenementMemoire
 from infra.lecteur_dataset_reformulation import LecteurDatasetReformulation
 
 
@@ -24,7 +24,7 @@ def lance_evaluation(
     questions: list[QuestionAEvaluer],
 ) -> list[ResultatEvaluation]:
     return EvaluateurReformulation(
-        client_albert, prompt, EvaluateurDeepevalMultiProcessus(), BusEvenementMemoire()
+        client_albert, prompt, EvaluateurDeepevalMultiProcessus(), fabrique_bus_evenements()
     ).evalue(questions=questions)
 
 
