@@ -4,13 +4,7 @@ from infra.lecteur_dataset_reformulation import LecteurDatasetReformulation
 
 
 def test_lit_le_dataset_de_reformulation():
-    chemin = (
-        Path(__file__).parent.parent.parent
-        / "src"
-        / "donnees"
-        / "dataset_reformulation.csv"
-    )
-
+    chemin = Path("tests/infra/dataset_reformulation_de_test.csv")
     lecteur = LecteurDatasetReformulation(chemin)
     questions = lecteur.charge_questions()
 
