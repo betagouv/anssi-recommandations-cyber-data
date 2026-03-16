@@ -2,7 +2,7 @@ from deepeval.metrics import GEval
 from deepeval.metrics.g_eval import Rubric
 from deepeval.test_case import LLMTestCaseParams
 
-from evaluation.deepeval_adaptateur.client_deepeval_albert import ClientDeepEvalAlbert
+from evaluation.mqc.client_deepeval_albert import ClientDeepEvalAlbert
 
 
 class MetriqueAutoportance(GEval):

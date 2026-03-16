@@ -1,13 +1,9 @@
 import csv
-import datetime as dt
 import re
 from pathlib import Path
 from typing import Union
 
-
-class HorlogeSysteme:
-    def aujourd_hui(self) -> str:
-        return str(dt.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+from infra.horloge import HorlogeSysteme
 
 
 class EcrivainSortie:

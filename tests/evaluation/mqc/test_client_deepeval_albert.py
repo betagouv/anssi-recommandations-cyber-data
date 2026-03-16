@@ -3,7 +3,7 @@ from unittest.mock import patch
 import httpx
 from deepeval.metrics.faithfulness.schema import Truths
 
-from evaluation.deepeval_adaptateur.client_deepeval_albert import ClientDeepEvalAlbert
+from evaluation.mqc.client_deepeval_albert import ClientDeepEvalAlbert
 
 
 class ClientDeepEvalAlbertDeTest(ClientDeepEvalAlbert):

@@ -1,9 +1,7 @@
 import unicodedata
 import uuid
-from abc import ABC, abstractmethod
 from itertools import chain
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 from deepeval.evaluate.types import EvaluationResult, TestResult
@@ -15,31 +13,18 @@ from deepeval.metrics import (
 )
 from deepeval.test_case import LLMTestCase
 
-from evaluation.deepeval_adaptateur.client_deepeval_albert import ClientDeepEvalAlbert
-from evaluation.deepeval_adaptateur.dataframe import prepare_dataframe
-from evaluation.deepeval_adaptateur.evaluation import LanceurEvaluation
-from evaluation.deepeval_adaptateur.metriques_personnalisees.de_deepeval.metrique_bon_nom_document import (
-    MetriquesBonNomDocuments,
-)
-from evaluation.deepeval_adaptateur.metriques_personnalisees.de_deepeval.metrique_bons_numeros_pages import (
+from evaluation.evaluateur_deepeval import EvaluateurDeepeval
+from evaluation.mqc.client_deepeval_albert import ClientDeepEvalAlbert
+from evaluation.mqc.dataframe import prepare_dataframe
+from evaluation.mqc.evaluation import LanceurEvaluation
+from evaluation.mqc.metriques.metrique_bon_nom_document import MetriquesBonNomDocuments
+from evaluation.mqc.metriques.metrique_bons_numeros_pages import (
     MetriquesBonsNumerosPages,
 )
-from evaluation.deepeval_adaptateur.metriques_personnalisees.de_deepeval.metrique_longueur_reponse import (
-    MetriqueLongueurReponse,
-)
-from evaluation.deepeval_adaptateur.metriques_personnalisees.de_deepeval.metrique_score_numero_page import (
-    MetriquesScoreNumeropage,
-)
+from evaluation.mqc.metriques.metrique_longueur_reponse import MetriqueLongueurReponse
+from evaluation.mqc.metriques.metrique_score_numero_page import MetriquesScoreNumeropage
 from infra.lecteur_csv import LecteurCSV
 from journalisation.evaluation import EntrepotEvaluation, Evaluation
-
-
-class EvaluateurDeepeval(ABC):
-    @abstractmethod
-    def evaluate(
-        self, test_cases: list[LLMTestCase], metrics: Optional[list[BaseMetric]] = None
-    ) -> list[EvaluationResult]:
-        pass
 
 
 class LanceurEvaluationDeepeval(LanceurEvaluation):

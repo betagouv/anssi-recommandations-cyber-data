@@ -5,7 +5,7 @@ from deepeval.evaluate.types import TestResult
 from deepeval.test_case import LLMTestCase
 
 from adaptateurs.clients_albert import ClientAlbertReformulation
-from evaluation.deepeval_adaptateur.lanceur_deepeval import EvaluateurDeepeval
+from evaluation.evaluateur_deepeval import EvaluateurDeepeval
 from evaluation.reformulation.metriques.metrique_autoportance import (
     MetriqueAutoportance,
 )

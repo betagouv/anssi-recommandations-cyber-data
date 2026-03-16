@@ -4,7 +4,7 @@ from deepeval.test_case import LLMTestCase
 
 
 class MetriqueScoreNumeropage(BaseMetric):
-    def __init__(self, numero_page_reponse_bot: str):
+    def __init__(self, numero_page_reponse_bot: str) -> None:
         super().__init__()
         self.numero_page_reponse_bot = numero_page_reponse_bot
         self.numero_page_verite_terrain = "numero_page_verite_terrain"

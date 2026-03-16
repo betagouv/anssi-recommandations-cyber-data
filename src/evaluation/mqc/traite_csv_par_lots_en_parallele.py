@@ -1,12 +1,9 @@
 import logging
 from pathlib import Path
 
+from evaluation.mqc.remplisseur_reponses import ClientMQCHTTPAsync, RemplisseurReponses
+from infra.ecrivain_sortie import EcrivainSortie
 from infra.lecteur_csv import LecteurCSV
-from mqc.ecrivain_sortie import EcrivainSortie
-from mqc.remplisseur_reponses import (
-    ClientMQCHTTPAsync,
-    RemplisseurReponses,
-)
 
 
 async def traite_csv_par_lots_en_parallele(

@@ -1,8 +1,10 @@
 from pathlib import Path
 
-from mqc.ecrivain_sortie import EcrivainSortie
-from mqc.remplisseur_reponses import ClientMQCHTTPAsync
-from mqc.traite_csv_par_lots_en_parallele import traite_csv_par_lots_en_parallele
+from evaluation.mqc.remplisseur_reponses import ClientMQCHTTPAsync
+from evaluation.mqc.traite_csv_par_lots_en_parallele import (
+    traite_csv_par_lots_en_parallele,
+)
+from infra.ecrivain_sortie import EcrivainSortie
 
 
 async def collecte_reponses_mqc(

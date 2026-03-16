@@ -8,15 +8,15 @@ import respx
 
 from adaptateurs.journal import AdaptateurJournalMemoire, TypeEvenement
 from configuration import Configuration
-from evaluation.deepeval_adaptateur.lanceur_deepeval import LanceurEvaluationDeepeval
 from evaluation.evaluateur_mqc import evaluateur_mqc
-from infra.memoire.ecrivain import EcrivainSortieDeTest
-from journalisation.evaluation import EntrepotEvaluationMemoire
-from mqc.remplisseur_reponses import (
-    ClientMQCHTTPAsync,
+from evaluation.mqc.lanceur_deepeval import LanceurEvaluationDeepeval
+from evaluation.mqc.remplisseur_reponses import (
     construit_base_url,
     formate_route_pose_question,
+    ClientMQCHTTPAsync,
 )
+from infra.memoire.ecrivain import EcrivainSortieDeTest
+from journalisation.evaluation import EntrepotEvaluationMemoire
 
 
 @respx.mock

@@ -4,15 +4,16 @@ from pathlib import Path
 
 from adaptateurs.journal import AdaptateurJournal, fabrique_adaptateur_journal
 from configuration import recupere_configuration, Configuration
-from evaluation.deepeval_adaptateur.evaluation import LanceurEvaluation
-from evaluation.deepeval_adaptateur.fabrique_lanceur_evaluation import (
+from evaluation.mqc.collecte_reponses_mqc import collecte_reponses_mqc
+from evaluation.mqc.evaluation import LanceurEvaluation
+from evaluation.mqc.fabrique_lanceur_evaluation import (
     fabrique_lanceur_evaluation,
 )
+from evaluation.mqc.remplisseur_reponses import ClientMQCHTTPAsync
+from infra.ecrivain_sortie import EcrivainSortie
+from infra.horloge import HorlogeSysteme
 from journalisation.consignateur_evaluation import consigne_evaluation
 from journalisation.evaluation import EntrepotEvaluation, fabrique_entrepot_evaluation
-from mqc.collecte_reponses_mqc import collecte_reponses_mqc
-from mqc.ecrivain_sortie import HorlogeSysteme, EcrivainSortie
-from mqc.remplisseur_reponses import ClientMQCHTTPAsync
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 

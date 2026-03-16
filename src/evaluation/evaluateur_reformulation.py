@@ -11,7 +11,7 @@ from evaluation.reformulation.evaluation import (
     QuestionAEvaluer,
     ResultatEvaluation,
 )
-from infra.evaluateur.deep_eval.evaluateur_deepeval_multi_processus import (
+from infra.evaluation.evaluateur_deepeval_multi_processus import (
     EvaluateurDeepevalMultiProcessus,
 )
 from infra.lecteur_dataset_reformulation import LecteurDatasetReformulation

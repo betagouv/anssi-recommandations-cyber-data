@@ -5,14 +5,15 @@ import pytest
 import respx
 
 from configuration import MQC
-from infra.lecteur_csv import LecteurCSV
-from mqc.ecrivain_sortie import HorlogeSysteme, EcrivainSortie
-from mqc.remplisseur_reponses import (
+from evaluation.mqc.remplisseur_reponses import (
+    RemplisseurReponses,
     construit_base_url,
     formate_route_pose_question,
     ClientMQCHTTPAsync,
-    RemplisseurReponses,
 )
+from infra.ecrivain_sortie import EcrivainSortie
+from infra.horloge import HorlogeSysteme
+from infra.lecteur_csv import LecteurCSV
 
 
 def initialise(
