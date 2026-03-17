@@ -12,7 +12,6 @@ def test_client_albert_initialise_correctement():
         url, "test-key", IndexeurBaseVectorielleAlbert(url)
     )
 
-    assert str(client.client_openai.base_url) == "https://test.api"
     assert (
         client.executeur_de_requete.session.headers["Authorization"]
         == "Bearer test-key"

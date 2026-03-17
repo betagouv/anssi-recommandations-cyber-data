@@ -49,8 +49,6 @@ def main():
     args = parser.parse_args()
 
     client = fabrique_client_albert()
-    print(f"Client Albert créé avec URL: {client.client_openai.base_url}")
-
     client.cree_collection(args.nom, args.description)
     print(f"Collection créée avec ID: {client.id_collection}")
     guides_anssi = collecte_guides_anssi()

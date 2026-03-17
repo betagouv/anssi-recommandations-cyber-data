@@ -24,7 +24,10 @@ def lance_evaluation(
     questions: list[QuestionAEvaluer],
 ) -> list[ResultatEvaluation]:
     return EvaluateurReformulation(
-        client_albert, prompt, EvaluateurDeepevalMultiProcessus(), fabrique_bus_evenements()
+        client_albert,
+        prompt,
+        EvaluateurDeepevalMultiProcessus(),
+        fabrique_bus_evenements(),
     ).evalue(questions=questions)
 
 

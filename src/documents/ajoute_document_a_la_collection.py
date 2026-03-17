@@ -25,8 +25,6 @@ def main():
     args = parser.parse_args()
 
     client = fabrique_client_albert()
-    print(f"Client Albert créé avec URL: {client.client_openai.base_url}")
-
     if not client.attribue_collection(args.id_collection):
         print(f"Erreur: Collection avec l'ID {args.id_collection} n'existe pas")
         return
