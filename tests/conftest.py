@@ -1,14 +1,12 @@
 import os
 from pathlib import Path
 from typing import Callable, Optional, Union
-from unittest.mock import Mock
 
 import pytest
 from deepeval.evaluate.types import EvaluationResult, TestResult
 from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
 from deepeval.tracing.api import MetricData
-from requests import Response
 
 from adaptateurs.clients_albert import (
     ReponseCollectionAlbert,
@@ -25,17 +23,26 @@ from configuration import (
 )
 from configuration import ParametresEvaluation
 from documents.indexeur.indexeur import (
-    ReponseDocument,
     ReponseDocumentEnSucces,
     ReponseDocumentEnErreur,
     ReponseChunkEnSucces,
-    ReponseChunk,
     ReponseChunkEnErreur,
 )
 from evaluation.evaluateur_deepeval import EvaluateurDeepeval
+from evenement.bus import BusEvenement, Evenement
 from infra.ecrivain_sortie import EcrivainSortie
-from infra.executeur_requete import ExecuteurDeRequete
 from infra.memoire.ecrivain import EcrivainSortieDeTest
+from infra.memoire.executeur_de_requete_memoire import (
+    ExecuteurDeRequeteDeTest,
+    ReponseAttendueOK,
+    ReponseAttendueKO,
+    ReponseCreationCollectionOK,
+    ReponseRecuperationCollectionOK,
+    ReponseRecuperationCollectionKO,
+    ReponseAttendue,
+    ReponseTexteEnSucces,
+    TypeRequete,
+)
 from journalisation.evaluation import (
     EntrepotEvaluation,
     EntrepotEvaluationMemoire,
@@ -206,134 +213,6 @@ def evaluateur_de_test_simple() -> EvaluateurDeepevalTest:
     return EvaluateurDeepevalTest()
 
 
-class ReponseAttendueAbstraite:
-    def __init__(self, reponse: ReponseDocument | ReponseChunk):
-        super().__init__()
-        self.reponse_attendue = reponse
-
-
-class ReponseAttendueOK(ReponseAttendueAbstraite):
-    def __init__(self, reponse: ReponseDocumentEnSucces | ReponseChunkEnSucces):
-        super().__init__(reponse)
-
-    @property
-    def status_code(self) -> int:
-        return 201
-
-    @property
-    def reponse(self) -> dict:
-        return self.reponse_attendue._asdict()
-
-
-class ReponseAttendueKO(ReponseAttendueAbstraite):
-    def __init__(
-        self,
-        reponse: ReponseDocumentEnErreur | ReponseChunkEnErreur,
-        leve_une_erreur: str | None = None,
-    ):
-        super().__init__(reponse)
-        self.leve_une_erreur = leve_une_erreur
-
-    @property
-    def status_code(self) -> int:
-        return 400
-
-    @property
-    def reponse(self) -> dict:
-        if self.leve_une_erreur is not None:
-            raise RuntimeError(self.leve_une_erreur)
-        return self.reponse_attendue._asdict()
-
-
-class ReponseCreationCollectionOK:
-    def __init__(self, reponse: ReponseCollectionAlbert):
-        super().__init__()
-        self.reponse_collection = reponse
-
-    @property
-    def status_code(self) -> int:
-        return 201
-
-    @property
-    def reponse(self) -> dict:
-        return self.reponse_collection._asdict()
-
-
-class ReponseRecuperationCollectionOK:
-    def __init__(self, reponse: ReponseCollectionAlbert):
-        super().__init__()
-        self.reponse_collection = reponse
-
-    @property
-    def status_code(self) -> int:
-        return 200
-
-    @property
-    def reponse(self) -> dict:
-        return self.reponse_collection._asdict()
-
-
-class ReponseRecuperationCollectionKO:
-    def __init__(self):
-        super().__init__()
-
-    @property
-    def status_code(self) -> int:
-        return 404
-
-    @property
-    def reponse(self) -> dict:
-        return {"message": "La collection n’existe pas"}
-
-
-ReponseAttendue = Union[
-    ReponseAttendueOK,
-    ReponseAttendueKO,
-    ReponseCreationCollectionOK,
-    ReponseRecuperationCollectionOK,
-    ReponseRecuperationCollectionKO,
-]
-
-
-class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
-    def __init__(self, reponse_attendue: list[ReponseAttendue]):
-        super().__init__()
-        self.reponse_attendue = reponse_attendue
-        self.payload_recu: dict[str, dict] = {}
-        self.fichiers_recus: dict[str, dict] = {}
-        self.index_courant = 0
-        self.nombre_appels = 0
-
-    def initialise(self, clef_api: str):
-        pass
-
-    def poste(self, url: str, payload: dict, fichiers: Optional[dict]) -> Response:
-        self.nombre_appels += 1
-        reponse = Mock()
-        reponse_attendue = self.reponse_attendue[self.index_courant]
-        reponse.status_code = reponse_attendue.status_code
-        if (
-            isinstance(reponse_attendue, ReponseAttendueKO)
-            and reponse_attendue.leve_une_erreur is not None
-        ):
-            reponse.json.side_effect = RuntimeError(reponse_attendue.leve_une_erreur)
-        else:
-            reponse.json.return_value = reponse_attendue.reponse
-        if fichiers is not None:
-            self.fichiers_recus[url] = fichiers
-        self.payload_recu[url] = payload
-        self.index_courant += 1
-        return reponse
-
-    def recupere(self, url):
-        self.nombre_appels += 1
-        reponse = Mock()
-        reponse.status_code = self.reponse_attendue[self.index_courant].status_code
-        reponse.json.return_value = self.reponse_attendue[self.index_courant].reponse
-        self.index_courant += 1
-        return reponse
-
-
 @pytest.fixture
 def un_executeur_de_requete() -> Callable[
     [list[ReponseAttendue]], ExecuteurDeRequeteDeTest
@@ -348,12 +227,19 @@ def un_executeur_de_requete() -> Callable[
 
 @pytest.fixture
 def une_reponse_attendue_OK() -> Callable[
-    [ReponseDocumentEnSucces | ReponseChunkEnSucces], ReponseAttendueOK
+    [
+        ReponseDocumentEnSucces | ReponseChunkEnSucces | ReponseTexteEnSucces,
+        TypeRequete,
+    ],
+    ReponseAttendueOK,
 ]:
     def _une_reponse_OK(
-        reponse_ok: ReponseDocumentEnSucces | ReponseChunkEnSucces,
+        reponse_ok: ReponseDocumentEnSucces
+        | ReponseChunkEnSucces
+        | ReponseTexteEnSucces,
+        type_requete: TypeRequete = TypeRequete.POST,
     ) -> ReponseAttendueOK:
-        return ReponseAttendueOK(reponse_ok)
+        return ReponseAttendueOK(reponse_ok, type_requete)
 
     return _une_reponse_OK
 
@@ -431,8 +317,25 @@ class ConstructeurClientAlbertReformulation:
 
 
 @pytest.fixture
-def un_client_albert() -> Callable[[], ConstructeurClientAlbertReformulation]:
+def un_client_albert_de_reformulation() -> Callable[
+    [], ConstructeurClientAlbertReformulation
+]:
     def _un_client_albert() -> ConstructeurClientAlbertReformulation:
         return ConstructeurClientAlbertReformulation()
 
     return _un_client_albert
+
+
+class BusEvenementDeTest(BusEvenement):
+    def __init__(self):
+        super().__init__([])
+        self.evenements = []
+
+    def publie(self, evenement: Evenement):
+        self.evenements.append(evenement)
+        super().publie(evenement)
+
+
+@pytest.fixture
+def un_bus_d_evenement() -> BusEvenementDeTest:
+    return BusEvenementDeTest()

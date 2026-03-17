@@ -118,7 +118,7 @@ class IndexeurDocling(Indexeur):
             if not les_blocs_non_vides:
                 return reponses
 
-            self.executeur_de_requete.initialise(self.clef_api)
+            self.executeur_de_requete.initialise_connexion_securisee(self.clef_api)
 
             payload = {
                 "collection_id": int(id_collection),
