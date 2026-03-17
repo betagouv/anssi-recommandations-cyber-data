@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-from openai import OpenAI
 from typing_extensions import NamedTuple
 
 from documents.indexeur.indexeur import Indexeur, DocumentAIndexer, ReponseDocument
@@ -42,7 +41,6 @@ class ClientAlbertIndexation(ABC):
         executeur_de_requete: ExecuteurDeRequete = ExecuteurDeRequete(),
     ):
         self.url = url
-        self.client_openai = OpenAI(base_url=url, api_key=cle_api)
         self.id_collection: str = ""
         self.indexeur = indexeur
         self.executeur_de_requete = executeur_de_requete
