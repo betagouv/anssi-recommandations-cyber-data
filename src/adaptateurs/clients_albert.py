@@ -44,7 +44,7 @@ class ClientAlbertIndexation(ABC):
         self.id_collection: str = ""
         self.indexeur = indexeur
         self.executeur_de_requete = executeur_de_requete
-        self.executeur_de_requete.initialise(cle_api)
+        self.executeur_de_requete.initialise_connexion_securisee(cle_api)
 
     @abstractmethod
     def cree_collection(self, nom: str, description: str) -> ReponseCollection:

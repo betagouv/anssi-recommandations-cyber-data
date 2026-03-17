@@ -10,6 +10,7 @@ from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
+from api.api import api
 from infra.ui_kit.version_ui_kit import version_ui_kit
 
 HEADERS_SECURITE = {
@@ -45,6 +46,8 @@ def fabrique_serveur(
     # Les problèmes de types apparaissants ici sont résolus côté `Starlette`, mais ne semblent pas encore avoir atteint `FastAPI` ;
     # _c.f._ https://github.com/Kludex/starlette/discussions/2451#discussioncomment-14855204 .
     serveur.add_middleware(ProxyHeadersMiddleware, trusted_hosts=["*"])  # type: ignore [arg-type]
+
+    serveur.include_router(api)
 
     for static in ["assets", "fonts", "icons", "images"]:
         serveur.mount(

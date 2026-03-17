@@ -5,13 +5,15 @@ from evaluation.reformulation.evaluation import (
 
 
 def test_evalue_les_metriques_de_reformulation(
-    evaluateur_de_test_avec_metriques, un_client_albert, un_bus_d_evenement
+    evaluateur_de_test_avec_metriques,
+    un_client_albert_de_reformulation,
+    un_bus_d_evenement,
 ):
     question = QuestionAEvaluer(
         question="Question ?", reformulation_ideale="Question idéale reformulée ?"
     )
     client_albert = (
-        un_client_albert()
+        un_client_albert_de_reformulation()
         .retourne_la_reformulation_pour_la_question(
             "Question reformulée ?", "Question ?"
         )
@@ -37,7 +39,9 @@ def test_evalue_les_metriques_de_reformulation(
 
 
 def test_evalue_les_cas_de_tests(
-    evaluateur_de_test_avec_metriques, un_client_albert, un_bus_d_evenement
+    evaluateur_de_test_avec_metriques,
+    un_client_albert_de_reformulation,
+    un_bus_d_evenement,
 ):
     premiere_question = QuestionAEvaluer(
         question="Question ?", reformulation_ideale="Question idéale reformulée ?"
@@ -46,7 +50,7 @@ def test_evalue_les_cas_de_tests(
         question="Question 2 ?", reformulation_ideale="Question 2 idéale reformulée ?"
     )
     client_albert = (
-        un_client_albert()
+        un_client_albert_de_reformulation()
         .retourne_la_reformulation_pour_la_question(
             "Question reformulée ?", "Question ?"
         )

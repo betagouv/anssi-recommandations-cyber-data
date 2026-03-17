@@ -7,13 +7,13 @@ from evaluation.reformulation.evaluation import (
 
 
 def test_reformule_la_question(
-    un_client_albert, evaluateur_de_test_simple, un_bus_d_evenement
+    un_client_albert_de_reformulation, evaluateur_de_test_simple, un_bus_d_evenement
 ):
     question = QuestionAEvaluer(
         question="Question ?", reformulation_ideale="Question idéale reformulée ?"
     )
     client_albert = (
-        un_client_albert()
+        un_client_albert_de_reformulation()
         .retourne_la_reformulation_pour_la_question(
             "Question reformulée ?", "Question ?"
         )
@@ -30,7 +30,7 @@ def test_reformule_la_question(
 
 
 def test_reformule_toutes_les_questions(
-    un_client_albert, evaluateur_de_test_simple, un_bus_d_evenement
+    un_client_albert_de_reformulation, evaluateur_de_test_simple, un_bus_d_evenement
 ):
     premiere_question = QuestionAEvaluer(
         question="Question ?", reformulation_ideale="Question idéale reformulée ?"
@@ -39,7 +39,7 @@ def test_reformule_toutes_les_questions(
         question="Question 2 ?", reformulation_ideale="Question 2 idéale reformulée ?"
     )
     client_albert = (
-        un_client_albert()
+        un_client_albert_de_reformulation()
         .retourne_la_reformulation_pour_la_question(
             "Question reformulée ?", "Question ?"
         )
@@ -59,13 +59,13 @@ def test_reformule_toutes_les_questions(
 
 
 def test_appelle_le_client_avec_le_prompt(
-    un_client_albert, evaluateur_de_test_simple, un_bus_d_evenement
+    un_client_albert_de_reformulation, evaluateur_de_test_simple, un_bus_d_evenement
 ):
     question = QuestionAEvaluer(
         question="Question ?", reformulation_ideale="Question idéale reformulée ?"
     )
     client_albert = (
-        un_client_albert()
+        un_client_albert_de_reformulation()
         .retourne_la_reformulation_pour_la_question(
             "Question reformulée ?", "Question ?"
         )
@@ -80,13 +80,15 @@ def test_appelle_le_client_avec_le_prompt(
 
 
 def test_ajoute_les_resultats_des_evaluations(
-    evaluateur_de_test_avec_metriques, un_client_albert, un_bus_d_evenement
+    evaluateur_de_test_avec_metriques,
+    un_client_albert_de_reformulation,
+    un_bus_d_evenement,
 ):
     question = QuestionAEvaluer(
         question="Question ?", reformulation_ideale="Question idéale reformulée ?"
     )
     client_albert = (
-        un_client_albert()
+        un_client_albert_de_reformulation()
         .retourne_la_reformulation_pour_la_question(
             "Question reformulée ?", "Question ?"
         )
@@ -102,13 +104,15 @@ def test_ajoute_les_resultats_des_evaluations(
 
 
 def test_emets_l_evenement_EVALUATION_REFORMULATION_TERMINEE(
-    evaluateur_de_test_avec_metriques, un_client_albert, un_bus_d_evenement
+    evaluateur_de_test_avec_metriques,
+    un_client_albert_de_reformulation,
+    un_bus_d_evenement,
 ):
     question = QuestionAEvaluer(
         question="Question ?", reformulation_ideale="Question idéale reformulée ?"
     )
     client_albert = (
-        un_client_albert()
+        un_client_albert_de_reformulation()
         .retourne_la_reformulation_pour_la_question(
             "Question reformulée ?", "Question ?"
         )
@@ -149,7 +153,7 @@ def test_emets_l_evenement_EVALUATION_REFORMULATION_TERMINEE(
 
 
 def test_emets_autant_d_evenements_que_de_reformulations(
-    evaluateur_de_test_simple, un_client_albert, un_bus_d_evenement
+    evaluateur_de_test_simple, un_client_albert_de_reformulation, un_bus_d_evenement
 ):
     premiere_question = QuestionAEvaluer(
         question="Question ?", reformulation_ideale="Question idéale reformulée ?"
@@ -158,7 +162,7 @@ def test_emets_autant_d_evenements_que_de_reformulations(
         question="Question 2 ?", reformulation_ideale="Question 2 idéale reformulée ?"
     )
     client_albert = (
-        un_client_albert()
+        un_client_albert_de_reformulation()
         .retourne_la_reformulation_pour_la_question(
             "Question reformulée ?", "Question ?"
         )

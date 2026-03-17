@@ -9,7 +9,6 @@ from deepeval.test_case import LLMTestCase
 from deepeval.tracing.api import MetricData
 
 from evaluation.evaluateur_deepeval import EvaluateurDeepeval
-from evenement.bus import BusEvenement, Evenement
 
 
 class ConstructeurMetricData:
@@ -99,18 +98,3 @@ class EvaluateurDeepevalTest(EvaluateurDeepeval):
 @pytest.fixture
 def evaluateur_de_test_avec_metriques() -> EvaluateurDeepevalTest:
     return EvaluateurDeepevalTest()
-
-
-class BusEvenementDeTest(BusEvenement):
-    def __init__(self):
-        super().__init__([])
-        self.evenements = []
-
-    def publie(self, evenement: Evenement):
-        self.evenements.append(evenement)
-        super().publie(evenement)
-
-
-@pytest.fixture
-def un_bus_d_evenement() -> BusEvenementDeTest:
-    return BusEvenementDeTest()

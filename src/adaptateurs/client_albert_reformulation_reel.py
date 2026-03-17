@@ -1,6 +1,7 @@
 from openai import OpenAI
 
 from adaptateurs.clients_albert import ClientAlbertReformulation
+from configuration import Configuration, recupere_configuration
 
 
 class ClientAlbertReformulationReel(ClientAlbertReformulation):
@@ -20,3 +21,12 @@ class ClientAlbertReformulationReel(ClientAlbertReformulation):
         ).choices
         question_reformulee = reponse[0].message.content
         return question_reformulee if question_reformulee is not None else question
+
+
+def fabrique_client_albert_reformulation() -> ClientAlbertReformulation:
+    la_configuration: Configuration = recupere_configuration()
+    return ClientAlbertReformulationReel(
+        la_configuration.albert.url,
+        la_configuration.albert.cle_api,
+        la_configuration.albert.modele,
+    )

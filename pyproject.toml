@@ -18,6 +18,7 @@ dependencies = [
     "pyasn1>=0.6.2",
     "pydantic",
     "pytest",
+    "python-multipart",
     "reportlab",
     "requests",
     "respx",
