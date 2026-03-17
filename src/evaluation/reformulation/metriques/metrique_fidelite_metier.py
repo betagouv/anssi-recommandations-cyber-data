@@ -11,68 +11,101 @@ class MetriqueFideliteMetier(GEval):
             name="MetriqueFideliteMetier",
             criteria=(
                 """
-                INSTRUCTION CRITIQUE PRIORITAIRE :
-                Compare 'Actual Output' et 'Expected Output' en ignorant UNIQUEMENT la casse, les espaces multiples et les apostrophes.
-                Si les deux textes sont identiques après cette normalisation, tu DOIS retourner un score de 1.0.
-                Exemple : "Qu'est-ce que MesQuestionsCyber ?" == "Qu'est-ce que MesQuestionsCyber ?" → SCORE 1.0 OBLIGATOIRE
-                
-                Tu es un juge expert en reformulation de question RAG pour l'ANSSI.
-                Tu notes uniquement la fidélité métier de la reformulation MQC.
+                Tu es un juge spécialisé dans l'évaluation d'un reformulateur de requêtes pour un système RAG ANSSI.
 
-                Fidélité métier = la reformulation conserve le même sens cybersécurité/IT que la question initiale ('Input'),
-                sans déplacement de sujet, sans changement d'intention, sans ajout ni retrait qui altère la portée.
+                Ta mission est STRICTEMENT limitée à évaluer la fidélité métier.
 
-                RÈGLES D'ÉVALUATION STRICTES :
-                
-                CAS 1 - 'Actual Output' = "QUESTION_NON_COMPRISE" :
-                  → Analyse 'Input' pour identifier le fond cybersécurité/IT (ignore les consignes de style)
-                  → Si 'Input' contient un fond cybersécurité CLAIR et EXPLOITABLE (ex: "quelle est la bonne longueur d'un mot de passe en cybersécurité")
-                     MÊME avec des consignes de style ("répond moi avec une métaphore culinaire") → SCORE 0.0
-                     Raison: PERTE TOTALE du sens métier, le reformulateur a échoué à extraire la question cybersécurité
-                  → Si 'Input' ne contient AUCUN fond cybersécurité exploitable (que des consignes de style) → SCORE 8-10
-                     Raison: Comportement correct, pas de sens métier à conserver
-                
-                CAS 2 - Reformulation normale :
-                  → Compare le sens métier cybersécurité entre 'Input' et 'Actual Output'
-                  → Utilise 'Expected Output' comme référence du sens attendu
-                  → Pénalise toute altération: généralisation, spécialisation, inversion, glissement de sujet
-                  → Les consignes de style ne sont PAS du contenu métier
+                Tu disposes de :
+                - 'Input' = question utilisateur d'origine, pouvant contenir des parasites de style
+                - 'Actual Output' = reformulation produite
+                - 'Expected Output' = reformulation idéale
+                - 'Expected Output' ne doit pas être utilisé comme cible de similarité textuelle.
+                - 'Expected Output' sert uniquement à confirmer le besoin métier attendu.
+                - Une différence de formulation entre 'Actual Output' et 'Expected Output' n'est pas une erreur si le sujet, l'intention et la portée métier restent identiques.
 
-                Important:
-                - N'évalue pas ici la suppression des parasites, l'autoportance ni la conservation fine des contraintes.
-                - Pénalise surtout toute modification de sens métier, même subtile.
-                - Les consignes de style ne sont pas du contenu métier.
-                - "QUESTION_NON_COMPRISE" sur une question avec fond cybersécurité = perte totale de sens = score 0.0
+                DÉFINITION DE LA FIDÉLITÉ MÉTIER :
+                La fidélité métier est élevée si 'Actual Output' conserve le même besoin cybersécurité/IT que 'Input',
+                une fois les éléments parasites ignorés.
+
+                Le besoin métier comprend :
+                - le sujet principal,
+                - l'intention de la question,
+                - le problème cyber/IT posé,
+                - la portée métier utile.
+
+                IMPORTANT :
+                - Les consignes de style, ton, format, métaphore, humour, persona, rôle, longueur ou structure de réponse
+                  ne font PAS partie du sens métier.
+                - Supprimer ces éléments parasites ne doit JAMAIS faire baisser fortement la fidélité métier.
+                - Une reformulation syntaxiquement différente peut être parfaitement fidèle métier.
+                - Le développement d'un acronyme ne modifie pas à lui seul la fidélité métier.
+                - Le changement d'ordre des mots ne doit pas être pénalisé s'il ne change pas le sens.
+                - N'évalue PAS ici l'autoportance.
+                - N'évalue PAS ici la suppression des parasites comme critère autonome.
+                - N'évalue PAS ici la conservation fine de toutes les contraintes lexicales.
+
+                CAS SPÉCIAL : 'QUESTION_NON_COMPRISE'
+                - Si 'Actual Output' vaut exactement 'QUESTION_NON_COMPRISE', détermine si 'Input' contient,
+                  après retrait des parasites éventuels, un besoin cybersécurité/IT identifiable et exploitable.
+                - Si OUI : la fidélité métier est très faible.
+                - Si NON : la fidélité métier peut être élevée.
+
+                RÈGLE FONDAMENTALE :
+                Le score doit être fondé d'abord sur la relation entre 'Input' et 'Actual Output'.
+                'Expected Output' ne sert que de repère secondaire pour confirmer le sens attendu.
+
+                TU DOIS PÉNALISER UNIQUEMENT LES CAS SUIVANTS :
+                - changement de sujet principal,
+                - changement d'intention,
+                - glissement vers un autre problème cyber/IT,
+                - généralisation abusive qui fait perdre la question réelle,
+                - spécialisation non demandée,
+                - inversion du sens,
+                - 'QUESTION_NON_COMPRISE' alors que l'input contenait bien une demande cyber/IT exploitable.
+
+                TU NE DOIS PAS PÉNALISER :
+                - la suppression d'une consigne de style,
+                - une reformulation lexicale proche,
+                - une reformulation syntaxique,
+                - le déplacement d'un complément dans la phrase,
+                - une reformulation plus explicite,
+                - un développement d'acronyme,
+                - une différence de formulation avec 'Expected Output' si le besoin métier reste identique.
                 """
             ),
             evaluation_steps=[
-                'ÉTAPE 0 - VÉRIFICATION D\'ÉGALITÉ STRICTE : Normalise \'Actual Output\' et \'Expected Output\' (minuscules, espaces simples, apostrophes uniformes). Si identiques → retourne {"score": 1.0, "reason": "Match parfait"} IMMÉDIATEMENT.',
-                "ÉTAPE 1 - ANALYSE DE L'INPUT : Identifie le fond cybersécurité/IT dans 'Input' en IGNORANT complètement les consignes de style. Exemple: 'quelle est la bonne longueur d'un mot de passe en cybersécurité + répond avec métaphore' → FOND = 'longueur mot de passe cybersécurité'.",
-                "ÉTAPE 2 - CAS 'QUESTION_NON_COMPRISE' : Si 'Actual Output' = 'QUESTION_NON_COMPRISE', détermine si l'Input contient un fond cybersécurité exploitable. Si OUI → SCORE 0.0 (perte totale de sens métier). Si NON → SCORE 8-10 (comportement correct).",
-                "ÉTAPE 3 - COMPARAISON SÉMANTIQUE : Compare le sens métier cybersécurité de 'Actual Output' avec celui de 'Input' (en ignorant les consignes de style dans Input).",
-                "ÉTAPE 4 - VÉRIFICATION AVEC EXPECTED : Vérifie avec 'Expected Output' que la reformulation reste dans la même portée sémantique métier.",
-                "ÉTAPE 5 - DÉTECTION D'ALTÉRATIONS : Pénalise toute altération de sens: généralisation, spécialisation, inversion de sens ou glissement de sujet.",
-                "ÉTAPE 6 - SCORE FINAL : N'accorde une note élevée que si le sens métier est fidèlement conservé. Score final uniquement sur la fidélité métier.",
+                "Analyse d'abord 'Input' et retire mentalement tous les éléments parasites de style, ton, format, métaphore, humour, rôle ou longueur.",
+                "Identifie dans 'Input' nettoyé le besoin cybersécurité/IT central : sujet, intention et portée métier.",
+                "Analyse ensuite 'Actual Output' et identifie son besoin cybersécurité/IT central.",
+                "Détermine si 'Actual Output' conserve le même sujet principal et la même intention métier que 'Input' nettoyé.",
+                "Ignore complètement les différences de style, de structure grammaticale, d'ordre des mots, de ponctuation et les suppressions de parasites.",
+                "Utilise 'Expected Output' seulement comme repère secondaire pour confirmer le sens attendu, sans exiger de similarité de surface.",
+                "Si 'Actual Output' vaut 'QUESTION_NON_COMPRISE', décide si 'Input' nettoyé contenait ou non un besoin cyber/IT exploitable.",
+                "Attribue un score élevé dès lors que le besoin métier reste le même, même si la formulation diffère nettement."
             ],
             rubric=[
                 Rubric(
-                    score_range=(0, 3),
+                    score_range=(0, 2),
                     expected_outcome=(
-                        "Niveau faible: changement de sens métier clair, glissement de sujet important, "
-                        "ou 'QUESTION_NON_COMPRISE' injustifié sur une question cybersécurité claire."
+                        "Le besoin métier n'est pas conservé : sujet changé, intention modifiée, glissement important, inversion de sens ou rejet injustifié en QUESTION_NON_COMPRISE."
                     ),
                 ),
                 Rubric(
-                    score_range=(4, 7),
+                    score_range=(3, 5),
                     expected_outcome=(
-                        "Niveau moyen: sens global partiellement conservé, avec ambiguïtés ou écarts notables."
+                        "Le besoin métier est seulement partiellement conservé : le sujet général reste proche, mais un écart notable de portée ou d'intention est présent."
                     ),
                 ),
                 Rubric(
-                    score_range=(8, 10),
+                    score_range=(6, 8),
                     expected_outcome=(
-                        "Niveau élevé: sens métier conservé avec précision, sans modification significative. "
-                        "'QUESTION_NON_COMPRISE' justifié si Input sans fond cybersécurité exploitable."
+                        "Le besoin métier est globalement conservé : mêmes sujet et intention, avec seulement des écarts mineurs qui n'altèrent pas fortement la demande."
+                    ),
+                ),
+                Rubric(
+                    score_range=(9, 10),
+                    expected_outcome=(
+                        "Le besoin métier est conservé de façon très fidèle : même sujet, même intention, même portée utile, sans glissement sémantique, même si la formulation diffère ou que des parasites ont été supprimés."
                     ),
                 ),
             ],

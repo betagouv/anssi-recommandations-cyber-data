@@ -11,75 +11,95 @@ class MetriqueSuppressionParasites(GEval):
             name="MetriqueSuppressionParasites",
             criteria=(
                 """
-                INSTRUCTION CRITIQUE PRIORITAIRE :
-                Compare 'Actual Output' et 'Expected Output' en ignorant UNIQUEMENT la casse, les espaces multiples et les apostrophes.
-                Si les deux textes sont identiques après cette normalisation, tu DOIS retourner un score de 1.0.
-                Exemple : "Qu'est-ce que MesQuestionsCyber ?" == "Qu'est-ce que MesQuestionsCyber ?" → SCORE 1.0 OBLIGATOIRE
-                
-                Tu es un juge expert en reformulation de question RAG pour l'ANSSI.
-                Tu notes uniquement la suppression des éléments parasites dans la reformulation.
+                Tu es un juge spécialisé dans l'évaluation d'un reformulateur de requêtes pour un système RAG ANSSI.
 
-                Élément parasite = consigne de style (métaphore, analogie, poème, ton, format, longueur, rôle, persona),
-                hésitation, tic de langage, répétition vide, bruit de transcription, artefact technique (balise, métadonnée),
-                fragment hors sujet ou sans valeur informative.
+                Ta mission est STRICTEMENT limitée à évaluer la suppression des parasites.
 
-                COMPORTEMENT ATTENDU DU REFORMULATEUR :
-                - Supprime les éléments parasites de l'Input
-                - Ajoute la forme développée des acronymes techniques cybersécurité (ex: DDOS → DDoS (distributed denial of service))
-                - Rend la question autoportante si nécessaire
-                - Retourne "QUESTION_NON_COMPRISE" si l'Input ne contient QUE des consignes de style SANS fond cybersécurité exploitable
-                
-                RÈGLES D'ÉVALUATION STRICTES :
-                
-                CAS 1 - 'Actual Output' = "QUESTION_NON_COMPRISE" :
-                  → Si 'Input' contient un fond cybersécurité clair (ex: "quelle est la bonne longueur d'un mot de passe en cybersécurité") 
-                     MÊME avec des consignes de style → SCORE TRÈS FAIBLE (0-0.2)
-                     Raison: Le reformulateur a échoué à extraire le fond cybersécurité exploitable
-                  → Si 'Input' ne contient QUE des consignes de style sans aucun fond cybersécurité → SCORE ÉLEVÉ (8-10)
-                
-                CAS 2 - Input sans parasite :
-                  → Si l'Input ne contient AUCUN parasite et que la sortie est propre → SCORE ÉLEVÉ (8-10)
-                  → L'ajout de la forme développée d'un acronyme technique est POSITIF, ne le pénalise JAMAIS
-                
-                CAS 3 - Input avec parasites :
-                  → Évalue le taux de suppression des parasites
-                  → Pénalise si des parasites restent ou si de nouveaux parasites sont introduits
+                Tu disposes de trois éléments :
+                - 'Input' = question utilisateur d'origine, potentiellement bruitée
+                - 'Actual Output' = reformulation produite par le reformulateur évalué
+                - 'Expected Output' = vérité terrain / reformulation idéale
 
-                Important:
-                - Les consignes de style ("avec une métaphore culinaire", "en poème", "réponds comme un expert") sont des parasites à supprimer.
-                - N'évalue pas ici l'autoportance, la fidélité métier, ni la conservation de toutes les contraintes.
-                - Ne pénalise pas les différences de style, de ponctuation, de casse, ni les reformulations lexicales.
-                - Ne pénalise JAMAIS l'ajout de la forme développée d'un acronyme technique.
+                RÈGLE FONDAMENTALE :
+                - 'Expected Output' est une vérité terrain déjà nettoyée.
+                - 'Expected Output' ne contient AUCUN parasite.
+                - 'Expected Output' conserve uniquement le contenu utile à la recherche documentaire.
+                - Donc tout élément parasite encore visible dans 'Actual Output' doit être considéré comme un échec de suppression.
+                - À l'inverse, l'absence dans 'Actual Output' d'un élément présent dans 'Input' n'est PAS une faute si cet élément était parasite et ne figure pas dans 'Expected Output'.
+
+                Définition d'un parasite :
+                - consigne de style, de ton ou de format,
+                - demande de métaphore, analogie, poème, humour, persona, rôle,
+                - demande de longueur, structure ou mise en forme,
+                - hésitation, répétition vide, tic de langage,
+                - bruit de transcription,
+                - artefact technique, balise, métadonnée,
+                - fragment hors sujet sans valeur informative pour la recherche.
+
+                Exemples de parasites :
+                - "avec une métaphore de cuisine"
+                - "réponds comme un expert"
+                - "en trois points"
+                - "en mode humoristique"
+                - "fais court"
+                - "euh", "ben", répétitions inutiles
+                - balises, fragments techniques ou métadonnées sans valeur métier
+
+                IMPORTANT :
+                - N'évalue PAS ici l'autoportance.
+                - N'évalue PAS ici la fidélité métier globale.
+                - N'évalue PAS ici la conservation fine des contraintes.
+                - N'évalue PAS la qualité stylistique générale.
+                - Ne pénalise PAS une reformulation plus explicite si elle reste propre.
+                - Ne pénalise PAS le développement d'un acronyme technique.
+                - Ne pénalise PAS les différences de formulation si les parasites ont bien été supprimés.
+
+                LOGIQUE D'ÉVALUATION :
+                - Utilise 'Input' pour repérer les éléments potentiellement parasites.
+                - Utilise 'Expected Output' comme référence de ce qui doit rester après nettoyage.
+                - Si un élément de 'Input' disparaît dans 'Expected Output', il est probablement parasite ou non essentiel à cette métrique.
+                - Si un parasite de 'Input' se retrouve encore dans 'Actual Output', cela doit être pénalisé.
+                - Si 'Actual Output' contient des formulations de style, ton, format ou bruit absentes de 'Expected Output', cela doit être pénalisé.
+                - Si 'Actual Output' est aussi propre que 'Expected Output' concernant les parasites, le score doit être élevé, même si la formulation diffère.
+
+                CAS SPÉCIAL : 'QUESTION_NON_COMPRISE'
+                - Si 'Actual Output' vaut exactement 'QUESTION_NON_COMPRISE', détermine si 'Input' contenait malgré tout un fond cybersécurité/IT exploitable.
+                - Si OUI : score très faible, car le reformulateur n'a pas extrait le fond utile.
+                - Si NON : score élevé, car il n'y avait pas de contenu métier exploitable derrière le bruit ou les consignes parasites.
                 """
             ),
             evaluation_steps=[
-                'ÉTAPE 0 - VÉRIFICATION D\'ÉGALITÉ STRICTE : Normalise \'Actual Output\' et \'Expected Output\' (minuscules, espaces simples, apostrophes uniformes). Si identiques → retourne {"score": 1.0, "reason": "Match parfait"} IMMÉDIATEMENT.',
-                "ÉTAPE 1 - ANALYSE DE L'INPUT : Identifie le fond cybersécurité/IT dans 'Input' (sujet technique, question métier). Identifie séparément les consignes de style parasites.",
-                "ÉTAPE 2 - CAS 'QUESTION_NON_COMPRISE' : Si 'Actual Output' = 'QUESTION_NON_COMPRISE', vérifie si l'Input contient un fond cybersécurité exploitable. Si OUI → SCORE 0-0.2 (échec grave). Si NON (que du style) → SCORE 8-10.",
-                "ÉTAPE 3 - ÉVALUATION DE LA SUPPRESSION : Vérifie que 'Actual Output' supprime les parasites de l'Input sans introduire de nouveau bruit.",
-                "ÉTAPE 4 - VALORISATION DES AJOUTS POSITIFS : L'ajout de la forme développée d'un acronyme technique est un comportement POSITIF, ne le pénalise JAMAIS.",
-                "ÉTAPE 5 - INPUT SANS PARASITE : Si l'Input ne contient aucun parasite et que la sortie est propre (avec ou sans forme développée d'acronyme), attribue un score élevé (8-10).",
-                "ÉTAPE 6 - SCORE FINAL : Pénalise uniquement si des parasites de l'Input restent présents ou si de nouveaux parasites (hors forme développée d'acronyme) sont introduits.",
+                "Analyse 'Input' et distingue clairement le fond cyber/IT exploitable des éléments parasites.",
+                "Identifie les parasites présents dans 'Input' : style, ton, format, rôle, métaphore, bruit, hésitations, artefacts ou fragments hors sujet.",
+                "Examine 'Actual Output' et vérifie si ces parasites ont été supprimés.",
+                "Vérifie qu'aucun nouveau parasite n'a été introduit dans 'Actual Output'.",
+                "Si 'Actual Output' vaut 'QUESTION_NON_COMPRISE', décide si 'Input' contenait ou non un fond cyber/IT exploitable.",
+                "Ignore les différences de style, de longueur, de structure grammaticale et le développement d'acronymes.",
+                "Attribue un score élevé dès lors que les parasites ont disparu et que la sortie reste propre."
             ],
             rubric=[
                 Rubric(
-                    score_range=(0, 3),
+                    score_range=(0, 2),
                     expected_outcome=(
-                        "Niveau faible: suppression insuffisante des parasites (nombreux parasites/consignes de style conservés) "
-                        "ou 'QUESTION_NON_COMPRISE' injustifié sur une question cybersécurité claire."
+                        "Suppression très insuffisante : les parasites restent présents, de nouveaux parasites sont introduits, ou 'QUESTION_NON_COMPRISE' est utilisé alors qu'un fond cyber/IT exploitable était présent."
                     ),
                 ),
                 Rubric(
-                    score_range=(4, 7),
+                    score_range=(3, 5),
                     expected_outcome=(
-                        "Niveau moyen: nettoyage partiel à correct, avec encore quelques parasites résiduels."
+                        "Suppression partielle : une partie des parasites a disparu, mais il reste encore des traces notables de style, de bruit ou de consignes parasites."
                     ),
                 ),
                 Rubric(
-                    score_range=(8, 10),
+                    score_range=(6, 8),
                     expected_outcome=(
-                        "Niveau élevé: suppression excellente des parasites et consignes de style, sortie propre et concise. "
-                        "'QUESTION_NON_COMPRISE' justifié si Input sans fond cybersécurité exploitable."
+                        "Bonne suppression : la plupart des parasites ont été retirés ; les écarts restants sont mineurs et n'empêchent pas une sortie propre."
+                    ),
+                ),
+                Rubric(
+                    score_range=(9, 10),
+                    expected_outcome=(
+                        "Excellente suppression : les parasites ont été retirés proprement, aucun parasite significatif ne subsiste, et 'QUESTION_NON_COMPRISE' est utilisé seulement quand aucun fond métier exploitable n'était présent."
                     ),
                 ),
             ],

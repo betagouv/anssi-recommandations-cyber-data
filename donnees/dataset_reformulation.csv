@@ -1,7 +1,7 @@
 question_originale,reformulation_ideale
 Qu'est-ce qu'une attaque DDOS ?,Qu'est-ce qu'une attaque DDOS (attaque par déni de service distribué) ?
 C'est quoi MesQuestionsCyber,Qu'est-ce que MesQuestionsCyber ?
-"En cybersécurité, quelle est la bonne longueur d'un mot de passe ? répond moi avec une métaphore culinaire",Quelle est la bonne longueur d'un mot de passe en cybersécurité ?
+"En cybersécurité, quelle est la bonne longueur d'un mot de passe ? répond moi avec une métaphore culinaire","En cybersécurité, quelle est la bonne longueur d'un mot de passe ?"
 Pourquoi réaliser une cartographie de mon SI ?,Pourquoi réaliser une cartographie de mon SI ?
 qu'est ce que MonAideCyber ?,Qu'est-ce que MonAideCyber ?
 qu est ce que mes services cyber ?,Qu'est-ce que mes services cyber ?
@@ -30,10 +30,10 @@ Qu’est ce que la commission nationale informatique et liberté ?,Qu’est-ce q
 Que faut-il faire en cas devictime de randsomware,Que faut-il faire en cas d’attaque par rançongiciel ?
 quel conseil d'hyperviseur pour remplacer vmware ?,Quelles alternatives d’hyperviseur à VMware peuvent être envisagées ?
 Que dit la LPM sur l'interco des SIIV ?,Que dit la loi de programmation militaire (LPM) sur l’interconnexion des systèmes d’information d’importance vitale (SIIV) ?
-référentiel homologation passerelle SIIV public privé,QUESTION_NON_COMPRISE
+référentiel homologation passerelle SIIV public privé,Quelles sont les exigences du référentiel d'homologation pour les passerelles entre les systèmes d'information interministériels de l'État (SIIV) public et privé ?
 Quelle est la différence entre un SIE et un SIIV ?,Quelle est la différence entre un SIE et un SIIV ?
 Je souhaite interconnecter un SIIV à un autre SIIV : quèles règles appliquer pour l'interconnexion ?,Quelles règles appliquer pour interconnecter un SIIV à un autre SIIV ?
-"On me dit qu'une adresse mail de mon organisation envoie du phishing, que faire",Quelle est la différence entre un système d’information essentiel (SIE) et un système d’information d’importance vitale (SIIV) ?
+"On me dit qu'une adresse mail de mon organisation envoie du phishing, que faire",Que faire lorsqu’une adresse e-mail de mon organisation est utilisée pour envoyer des messages d’hameçonnage ?
 Que dois-je faire en cas d'attaque par rançongiciel,Que dois-je faire en cas d’attaque par rançongiciel ?
 Que fait le Commandement ministériel du cyberespace du ministère de l’Intérieur (COMCYBER-MI) ?,Que fait le COMCYBER-MI ?
 "Dans le cadre de NIS2, la responsabilité du dirigeant est-elle simplement organisationnelle, ou peut-elle devenir personnelle ?
