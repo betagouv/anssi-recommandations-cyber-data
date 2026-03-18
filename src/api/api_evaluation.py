@@ -2,7 +2,7 @@ import csv
 import uuid
 from io import TextIOWrapper
 
-from fastapi import APIRouter, UploadFile
+from fastapi import APIRouter, UploadFile, HTTPException
 from fastapi.params import Depends, File, Form
 from pydantic import BaseModel, AnyHttpUrl
 
@@ -49,6 +49,11 @@ async def reformulation(
     executeur_de_requete.initialise_connexion()
     reponse = executeur_de_requete.recupere(str(url_prompt))
     prompt = reponse.text
+    if reponse.status_code != 200:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Prompt introuvable à l’adresse : {url_prompt}",
+        )
     evaluation_en_cours = service_evaluation.lance_reformulation(
         client_albert, bus_evenement, prompt, questions
     )
