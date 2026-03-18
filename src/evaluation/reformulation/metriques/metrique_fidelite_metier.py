@@ -81,7 +81,7 @@ class MetriqueFideliteMetier(GEval):
                 "Ignore complètement les différences de style, de structure grammaticale, d'ordre des mots, de ponctuation et les suppressions de parasites.",
                 "Utilise 'Expected Output' seulement comme repère secondaire pour confirmer le sens attendu, sans exiger de similarité de surface.",
                 "Si 'Actual Output' vaut 'QUESTION_NON_COMPRISE', décide si 'Input' nettoyé contenait ou non un besoin cyber/IT exploitable.",
-                "Attribue un score élevé dès lors que le besoin métier reste le même, même si la formulation diffère nettement."
+                "Attribue un score élevé dès lors que le besoin métier reste le même, même si la formulation diffère nettement.",
             ],
             rubric=[
                 Rubric(

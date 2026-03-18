@@ -61,7 +61,7 @@ class MetriqueAutoportance(GEval):
                 "Utilise 'Input' pour vérifier si la question d'origine contenait une dépendance contextuelle qui aurait dû être explicitée dans 'Actual Output'.",
                 "Utilise 'Expected Output' seulement comme repère secondaire sur le niveau d'explicitation attendu, sans pénaliser une formulation autonome mais différente.",
                 "Ignore les différences de style, de longueur, de richesse lexicale et de formulation interrogative.",
-                "Attribue un score élevé dès lors que 'Actual Output' est compréhensible et exploitable seul."
+                "Attribue un score élevé dès lors que 'Actual Output' est compréhensible et exploitable seul.",
             ],
             rubric=[
                 Rubric(

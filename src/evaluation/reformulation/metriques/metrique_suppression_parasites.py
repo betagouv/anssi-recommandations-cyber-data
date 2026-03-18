@@ -75,7 +75,7 @@ class MetriqueSuppressionParasites(GEval):
                 "Vérifie qu'aucun nouveau parasite n'a été introduit dans 'Actual Output'.",
                 "Si 'Actual Output' vaut 'QUESTION_NON_COMPRISE', décide si 'Input' contenait ou non un fond cyber/IT exploitable.",
                 "Ignore les différences de style, de longueur, de structure grammaticale et le développement d'acronymes.",
-                "Attribue un score élevé dès lors que les parasites ont disparu et que la sortie reste propre."
+                "Attribue un score élevé dès lors que les parasites ont disparu et que la sortie reste propre.",
             ],
             rubric=[
                 Rubric(

@@ -80,7 +80,7 @@ class MetriqueConservationContraintes(GEval):
                 "Ignore complètement les différences de style, de ponctuation, d'ordre des mots, de casse et de structure grammaticale.",
                 "Ne pénalise pas une reformulation qui ajoute une expansion correcte d'acronyme ou une précision équivalente.",
                 "Pénalise seulement les pertes réelles de contrainte, les généralisations abusives, les remplacements vagues ou les ajouts incompatibles avec l'input et l'attendu.",
-                "Attribue un score élevé dès lors que les contraintes utiles issues de l'input et confirmées par l'attendu sont conservées en substance dans 'Actual Output', même si leur forme textuelle diffère."
+                "Attribue un score élevé dès lors que les contraintes utiles issues de l'input et confirmées par l'attendu sont conservées en substance dans 'Actual Output', même si leur forme textuelle diffère.",
             ],
             rubric=[
                 Rubric(
