@@ -1,3 +1,4 @@
+import uuid
 from pathlib import Path
 
 import pytest
@@ -17,7 +18,10 @@ from adaptateurs.journal import (
     AdaptateurJournalMemoire,
 )
 from evaluation.evaluateur_deepeval import EvaluateurDeepeval
-from evaluation.evaluation_en_cours import EntrepotEvaluationEnCoursMemoire
+from evaluation.evaluation_en_cours import (
+    EntrepotEvaluationEnCoursMemoire,
+    EvaluationEnCours,
+)
 from evaluation.reformulation.evaluation import QuestionAEvaluer
 from evaluation.service_evaluation import ServiceEvaluation, fabrique_service_evaluation
 from evenement.bus import BusEvenement
@@ -53,10 +57,11 @@ class ServiceEvaluationDeTest(ServiceEvaluation):
         prompt: str,
         questions: list[QuestionAEvaluer],
         evaluateur: EvaluateurDeepeval = EvaluateurDeepevalTest(),
-    ):
+    ) -> EvaluationEnCours:
         self.evaluation_reformulation_lancee = True
         self.questions_evaluees = questions
         self.prompt_recu = prompt
+        return EvaluationEnCours(uuid.uuid4(), len(questions))
 
 
 class ConstructeurServeur:
