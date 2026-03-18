@@ -27,6 +27,9 @@ def test_lance_une_evaluation_de_reformulation_retourne_201(un_serveur_de_test_c
     )
 
     assert reponse.status_code == 201
+    contenu_reponse = reponse.json()
+    assert contenu_reponse["id"] is not None
+    assert contenu_reponse["nombre_questions"] == 1
 
 
 def test_lance_une_evaluation_de_reformulation_avec_les_questions_fournies(

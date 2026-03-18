@@ -1,9 +1,10 @@
 import csv
+import uuid
 from io import TextIOWrapper
 
 from fastapi import APIRouter, UploadFile
 from fastapi.params import Depends, File, Form
-from pydantic import AnyHttpUrl
+from pydantic import BaseModel, AnyHttpUrl
 
 from adaptateurs.client_albert_reformulation_reel import (
     fabrique_client_albert_reformulation,
@@ -16,6 +17,11 @@ from evenement.fabrique_bus_evenements import fabrique_bus_evenements
 from infra.executeur_requete import ExecuteurDeRequete, fabrique_executeur_de_requete
 
 api_evaluation = APIRouter(prefix="/evaluation")
+
+
+class ReponseEvaluationEnCours(BaseModel):
+    id: uuid.UUID
+    nombre_questions: int
 
 
 @api_evaluation.post(
@@ -31,7 +37,7 @@ async def reformulation(
     bus_evenement: BusEvenement = Depends(fabrique_bus_evenements),  # type: ignore[assignment]
     service_evaluation: ServiceEvaluation = Depends(fabrique_service_evaluation),  # type: ignore[assignment]
     executeur_de_requete: ExecuteurDeRequete = Depends(fabrique_executeur_de_requete),  # type: ignore[assignment]
-):
+) -> ReponseEvaluationEnCours:
     lecteur_csv = csv.DictReader(TextIOWrapper(file.file, encoding="utf-8"))
     questions = [
         QuestionAEvaluer(
@@ -43,6 +49,9 @@ async def reformulation(
     executeur_de_requete.initialise_connexion()
     reponse = executeur_de_requete.recupere(str(url_prompt))
     prompt = reponse.text
-    service_evaluation.lance_reformulation(
+    evaluation_en_cours = service_evaluation.lance_reformulation(
         client_albert, bus_evenement, prompt, questions
+    )
+    return ReponseEvaluationEnCours(
+        id=evaluation_en_cours.id, nombre_questions=len(questions)
     )
