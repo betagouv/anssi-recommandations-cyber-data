@@ -42,6 +42,7 @@ from infra.memoire.executeur_de_requete_memoire import (
     ReponseAttendue,
     ReponseTexteEnSucces,
     TypeRequete,
+    ReponseTexteEnErreur,
 )
 from journalisation.evaluation import (
     EntrepotEvaluation,
@@ -246,13 +247,21 @@ def une_reponse_attendue_OK() -> Callable[
 
 @pytest.fixture
 def une_reponse_attendue_KO() -> Callable[
-    [ReponseDocumentEnErreur | ReponseChunkEnErreur, Optional[str]], ReponseAttendueKO
+    [
+        ReponseDocumentEnErreur | ReponseChunkEnErreur | ReponseTexteEnErreur,
+        Optional[str],
+        TypeRequete,
+    ],
+    ReponseAttendueKO,
 ]:
     def _une_reponse_document(
-        reponse_document: ReponseDocumentEnErreur | ReponseChunkEnErreur,
+        reponse_document: ReponseDocumentEnErreur
+        | ReponseChunkEnErreur
+        | ReponseTexteEnErreur,
         leve_une_erreur: Optional[str] = None,
+        type_requete: TypeRequete = TypeRequete.POST,
     ) -> ReponseAttendueKO:
-        return ReponseAttendueKO(reponse_document, leve_une_erreur)
+        return ReponseAttendueKO(reponse_document, leve_une_erreur, type_requete)
 
     return _une_reponse_document
 

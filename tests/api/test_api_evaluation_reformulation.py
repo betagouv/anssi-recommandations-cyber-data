@@ -2,7 +2,11 @@ import io
 
 from fastapi.testclient import TestClient
 
-from infra.memoire.executeur_de_requete_memoire import ReponseTexteEnSucces, TypeRequete
+from infra.memoire.executeur_de_requete_memoire import (
+    ReponseTexteEnSucces,
+    TypeRequete,
+    ReponseTexteEnErreur,
+)
 
 
 def toto():
@@ -71,3 +75,27 @@ def test_lance_une_evaluation_de_reformulation_avec_le_prompt_attendu(
 
     assert executeur_de_requete.url_appelee == "https://une-url.com/"
     assert service_evaluation.prompt_recu == "Prompt attendu"
+
+
+def test_retourne_404_si_le_prompt_ne_peut_pas_etre_recupere(
+    un_serveur_de_test_complet, un_executeur_de_requete, une_reponse_attendue_KO
+):
+    executeur_de_requete = un_executeur_de_requete(
+        [une_reponse_attendue_KO(ReponseTexteEnErreur(), None, TypeRequete.GET)]
+    )
+    (serveur, _, _, service_evaluation) = un_serveur_de_test_complet(
+        executeur_de_requete
+    )
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.post(
+        "/api/evaluation/reformulation",
+        data={"url_prompt": "https://une-url.com"},
+        files=toto(),
+    )
+
+    assert reponse.status_code == 404
+    assert (
+        reponse.json()["detail"]
+        == "Prompt introuvable à l’adresse : https://une-url.com/"
+    )

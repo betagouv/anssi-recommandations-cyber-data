@@ -20,7 +20,11 @@ class ReponseTexteEnSucces(NamedTuple):
     texte: str
 
 
-type ReponseTexte = Union[ReponseTexteEnSucces]
+class ReponseTexteEnErreur(NamedTuple):
+    pass
+
+
+type ReponseTexte = Union[ReponseTexteEnSucces, ReponseTexteEnErreur]
 
 
 class TypeRequete(StrEnum):
@@ -63,15 +67,17 @@ class ReponseAttendueOK(ReponseAttendueAbstraite):
 class ReponseAttendueKO(ReponseAttendueAbstraite):
     def __init__(
         self,
-        reponse: ReponseDocumentEnErreur | ReponseChunkEnErreur,
+        reponse: ReponseDocumentEnErreur | ReponseChunkEnErreur | ReponseTexteEnErreur,
         leve_une_erreur: str | None = None,
+        type_requete: TypeRequete = TypeRequete.POST,
     ):
         super().__init__(reponse)
         self.leve_une_erreur = leve_une_erreur
+        self.type_requete = type_requete
 
     @property
     def status_code(self) -> int:
-        return 400
+        return 400 if self.type_requete == TypeRequete.POST else 404
 
     @property
     def reponse(self) -> dict:
