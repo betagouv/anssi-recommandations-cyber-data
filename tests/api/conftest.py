@@ -1,6 +1,9 @@
 from pathlib import Path
 
 import pytest
+from deepeval.evaluate.types import EvaluationResult
+from deepeval.metrics import BaseMetric
+from deepeval.test_case import LLMTestCase
 from fastapi import FastAPI
 from typing_extensions import Callable, Dict, Optional
 
@@ -13,8 +16,10 @@ from adaptateurs.journal import (
     fabrique_adaptateur_journal,
     AdaptateurJournalMemoire,
 )
+from evaluation.evaluateur_deepeval import EvaluateurDeepeval
+from evaluation.evaluation_en_cours import EntrepotEvaluationEnCoursMemoire
 from evaluation.reformulation.evaluation import QuestionAEvaluer
-from evaluation.service_evaluation import ServiceEvaluation
+from evaluation.service_evaluation import ServiceEvaluation, fabrique_service_evaluation
 from evenement.bus import BusEvenement
 from evenement.fabrique_bus_evenements import fabrique_bus_evenements
 from infra.executeur_requete import fabrique_executeur_de_requete
@@ -27,9 +32,16 @@ from infra.memoire.executeur_de_requete_memoire import (
 from serveur import fabrique_serveur
 
 
+class EvaluateurDeepevalTest(EvaluateurDeepeval):
+    def evaluate(
+        self, test_cases: list[LLMTestCase], metrics: Optional[list[BaseMetric]] = None
+    ) -> list[EvaluationResult]:
+        return []
+
+
 class ServiceEvaluationDeTest(ServiceEvaluation):
     def __init__(self):
-        super().__init__()
+        super().__init__(EntrepotEvaluationEnCoursMemoire())
         self.prompt_recu = None
         self.evaluation_reformulation_lancee = False
         self.questions_evaluees = []
@@ -40,6 +52,7 @@ class ServiceEvaluationDeTest(ServiceEvaluation):
         bus_evenement: BusEvenement,
         prompt: str,
         questions: list[QuestionAEvaluer],
+        evaluateur: EvaluateurDeepeval = EvaluateurDeepevalTest(),
     ):
         self.evaluation_reformulation_lancee = True
         self.questions_evaluees = questions
@@ -76,7 +89,7 @@ class ConstructeurServeur:
         return self
 
     def avec_un_service_evaluation(self, service_evaluation: ServiceEvaluationDeTest):
-        self._dependances[ServiceEvaluation] = lambda: service_evaluation
+        self._dependances[fabrique_service_evaluation] = lambda: service_evaluation
         return self
 
     def avec_un_executeur_de_requete(
