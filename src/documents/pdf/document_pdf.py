@@ -37,7 +37,9 @@ class GenerateurDePagesPDF(GenerateurDePages):
     def __genere(chunk: BaseChunk) -> GenerationDePage:
         def _cree_page(numero_page: int, texte: str, position: Position) -> Page:
             page = PagePDF(numero_page=numero_page)
-            page.ajoute_bloc(BlocPagePDF(texte=texte, position=position))
+            page.ajoute_bloc(
+                BlocPagePDF(texte=texte, position=position, numero_page=numero_page)
+            )
             return page
 
         def _genere() -> tuple[NumeroPage, CreationDePage, CreationDeBlocPage]:
@@ -46,7 +48,9 @@ class GenerateurDePagesPDF(GenerateurDePages):
             return (
                 numero_page,
                 lambda: _cree_page(numero_page, chunk.text, position),
-                lambda: BlocPagePDF(texte=chunk.text, position=position),
+                lambda: BlocPagePDF(
+                    texte=chunk.text, position=position, numero_page=numero_page
+                ),
             )
 
         return _genere
@@ -137,7 +141,12 @@ class PagePDF(Page[BlocPagePDF]):
         for indice, position in enumerate(les_positions_ordonnees):
             if bloc.position == position:
                 self.blocs.insert(
-                    indice, BlocPagePDF(texte=bloc.texte, position=bloc.position)
+                    indice,
+                    BlocPagePDF(
+                        texte=bloc.texte,
+                        position=bloc.position,
+                        numero_page=bloc.numero_page,
+                    ),
                 )
 
         self._fusionne_les_entetes_avec_leur_contenu()
@@ -153,6 +162,7 @@ class PagePDF(Page[BlocPagePDF]):
                     BlocPagePDF(
                         texte=f"{courant.texte}\n{suivant.texte}",
                         position=courant.position,
+                        numero_page=courant.numero_page,
                     )
                 )
                 i += 1
@@ -161,6 +171,7 @@ class PagePDF(Page[BlocPagePDF]):
                     BlocPagePDF(
                         texte=f"{courant.texte}\n{suivant.texte}",
                         position=courant.position,
+                        numero_page=courant.numero_page,
                     )
                 )
                 i += 1

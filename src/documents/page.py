@@ -8,6 +8,7 @@ T_Bloc = TypeVar("T_Bloc", bound="BlocPage")
 @dataclass(frozen=True)
 class BlocPage:
     texte: str
+    numero_page: int | None
 
 
 @dataclass

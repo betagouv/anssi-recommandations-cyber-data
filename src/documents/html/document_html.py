@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
@@ -9,8 +10,9 @@ from documents.indexeur.indexeur import DocumentAIndexer
 from documents.page import BlocPage, Page
 
 
+@dataclass(frozen=True)
 class BlocPageHTML(BlocPage):
-    pass
+    numero_page: int = 0
 
 
 class PageHTML(Page):
