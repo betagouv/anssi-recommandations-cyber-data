@@ -18,6 +18,7 @@ from documents.indexeur.indexeur import (
 )
 from documents.page import BlocPage
 from infra.executeur_requete import ExecuteurDeRequete
+from infra.interval import AdaptateurInterval
 
 for name in (
     "docling",
@@ -156,38 +157,34 @@ class IndexeurDocling(Indexeur):
             def _en_payload(bloc: BlocPage) -> dict:
                 return {"content": bloc.texte, "metadata": document.metadata(bloc)}
 
-            for page in document.pages.values():
-                tous_les_blocs = list(
-                    filter(lambda bloc: len(bloc.texte) > 1, page.blocs)
-                )
-                it = iter(tous_les_blocs)
-                while True:
-                    sous_ensemble_de_blocs = list(islice(it, 64))
-                    if not sous_ensemble_de_blocs:
-                        break
+            it = iter(les_blocs_non_vides)
+            while True:
+                sous_ensemble_de_blocs = list(islice(it, 64))
+                if not sous_ensemble_de_blocs:
+                    break
 
-                    payload_chunks = {
-                        "chunks": list(
-                            map(
-                                lambda bloc: _en_payload(bloc),
-                                sous_ensemble_de_blocs,
-                            )
+                payload_chunks = {
+                    "chunks": list(
+                        map(
+                            lambda bloc: _en_payload(bloc),
+                            sous_ensemble_de_blocs,
                         )
-                    }
-                    reponse_chunk = self.executeur_de_requete.poste(
-                        f"{self.url}/documents/{resultat['id']}/chunks",
-                        payload_chunks,
-                        None,
                     )
+                }
+                reponse_chunk = self.executeur_de_requete.poste(
+                    f"{self.url}/documents/{resultat['id']}/chunks",
+                    payload_chunks,
+                    None,
+                )
 
-                    resultat_chunk = reponse_chunk.json()
-                    if reponse_chunk.status_code != 201:
-                        resultat_indexation = ReponseDocumentEnErreur(
-                            detail=resultat_chunk.get("detail")[0].msg,
-                            document_en_erreur=nom_du_document,
-                        )
-                        break
-                if isinstance(resultat_indexation, ReponseDocumentEnErreur):
+                AdaptateurInterval.pause()
+
+                resultat_chunk = reponse_chunk.json()
+                if reponse_chunk.status_code != 201:
+                    resultat_indexation = ReponseDocumentEnErreur(
+                        detail=resultat_chunk.get("detail")[0].msg,
+                        document_en_erreur=nom_du_document,
+                    )
                     break
 
             reponses.append(resultat_indexation)
