@@ -22,7 +22,7 @@ class ExecuteurDeRequete:
         return self.session.post(f"{url}", json=payload, files=fichiers)
 
     def recupere(self, url) -> Response:
-        return requests.Session().get(url)
+        return self.session.get(url)
 
 
 def fabrique_executeur_de_requete() -> ExecuteurDeRequete:
