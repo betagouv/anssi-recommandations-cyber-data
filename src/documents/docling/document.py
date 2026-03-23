@@ -1,3 +1,7 @@
+from typing import Optional
+
+from docling_core.types import DoclingDocument
+
 from documents.elements_filtres import ElementsFiltres
 from documents.generateur_de_pages import GenerateurDePages
 from documents.page import Page, BlocPage
@@ -26,6 +30,9 @@ class Document:
         }
 
     def genere_les_pages(
-        self, generateur: GenerateurDePages, elements_filtres: ElementsFiltres
+        self,
+        generateur: GenerateurDePages,
+        elements_filtres: ElementsFiltres,
+        document: Optional[DoclingDocument],
     ):
-        self.pages = generateur.genere(elements_filtres)
+        self.pages = generateur.genere(elements_filtres, document)

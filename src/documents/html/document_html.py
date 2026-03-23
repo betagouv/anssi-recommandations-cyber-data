@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
+from docling_core.types import DoclingDocument
 from docling_core.types.doc import DocItemLabel, TableItem, SectionHeaderItem
 
 from documents.elements_filtres import ElementsFiltres
@@ -24,7 +25,9 @@ class PageHTML(Page):
 
 
 class GenerateurDePagesHTML(GenerateurDePages):
-    def genere(self, elements_filtres: ElementsFiltres) -> dict[int, Page]:
+    def genere(
+        self, elements_filtres: ElementsFiltres, document: Optional[DoclingDocument]
+    ) -> dict[int, Page]:
         page = PageHTML()
         les_headers: list[SectionHeaderItem] = list(
             filter(
@@ -35,7 +38,9 @@ class GenerateurDePagesHTML(GenerateurDePages):
         )
         if len(les_headers) == 0:
             page.ajoute_bloc(
-                BlocPageHTML(texte=self.__extrais_contenu_textuel(elements_filtres))
+                BlocPageHTML(
+                    texte=self.__extrais_contenu_textuel(elements_filtres, document)
+                )
             )
         for header in les_headers:
             les_references_enfants = list(map(lambda item: item.cref, header.children))
@@ -47,17 +52,21 @@ class GenerateurDePagesHTML(GenerateurDePages):
             )
             page.ajoute_bloc(
                 BlocPageHTML(
-                    texte=f"{header.text}\n{self.__extrais_contenu_textuel(les_enfants)}"
+                    texte=f"{header.text}\n{self.__extrais_contenu_textuel(les_enfants, document)}"
                 )
             )
         return {0: page}
 
-    def __extrais_contenu_textuel(self, elements_filtres: ElementsFiltres) -> str:
+    def __extrais_contenu_textuel(
+        self, elements_filtres: ElementsFiltres, document: Optional[DoclingDocument]
+    ) -> str:
         les_tableaux: list[TableItem] = list(
             filter(lambda item: isinstance(item, TableItem), elements_filtres)  # type: ignore[arg-type]
         )
         if len(les_tableaux) > 0:
-            return "\n".join(map(lambda item: item.export_to_markdown(), les_tableaux))
+            return "\n".join(
+                map(lambda item: item.export_to_markdown(document), les_tableaux)
+            )
         return "\n".join(map(lambda element: element.text, elements_filtres))  # type: ignore[union-attr]
 
 

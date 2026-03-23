@@ -23,6 +23,7 @@ from docling_core.types.doc import (
     TableData,
     TableCell,
     TitleItem,
+    RichTableCell,
 )
 from docling_core.types.io import DocumentStream
 
@@ -280,6 +281,25 @@ class ConstructeurDeTableItem(ConstructeurDItem):
         )
         return self
 
+    def avec_une_cellule_riche(
+        self, contenu_cellule: str, index_texte: Optional[int] = None
+    ):
+        self.cellules.append(
+            RichTableCell(
+                ref=RefItem(
+                    **{
+                        "$ref": f"#/texts/{index_texte if index_texte is not None else len(self.cellules)}"
+                    }
+                ),
+                text=contenu_cellule,
+                start_row_offset_idx=len(self.cellules),
+                start_col_offset_idx=0,
+                end_row_offset_idx=len(self.cellules) + 1,
+                end_col_offset_idx=1,
+            )
+        )
+        return self
+
     def avec_texte(self, texte: str):
         super().avec_texte(texte)
         self.cellules.append(
@@ -528,7 +548,9 @@ class GenerateurDePagesStatique(GenerateurDePages):
         self.contenu = contenu
         self.nombre_de_blocs = nombre_de_blocs
 
-    def genere(self, elements_filtres: ElementsFiltres) -> dict[int, Page]:
+    def genere(
+        self, elements_filtres: ElementsFiltres, _: Optional[DoclingDocument]
+    ) -> dict[int, Page]:
         resultat: dict[int, Page] = {
             self.numero_page: PagePDF(
                 self.numero_page,
@@ -559,7 +581,9 @@ class ChunkerDeTest(ChunkerDoclingMQC):
 
     def applique(self, document_a_indexer: DocumentAIndexer) -> Document:
         document = Document(document_a_indexer.nom_document, document_a_indexer.url)
-        document.genere_les_pages(self.generateur, [])
+        document.genere_les_pages(
+            self.generateur, [], DoclingDocument(name="test", texts=[])
+        )
         return document
 
 
@@ -613,3 +637,15 @@ def un_chunker_avec_generation_de_page_statique() -> Callable[
         return ConstructeurDeChunker()
 
     return _chunker_avec_generation_de_page_statique
+
+
+@pytest.fixture
+def resultat_conversion() -> ConversionResult:
+    return ConversionResult(
+        document=DoclingDocument(name="test", texts=[]),
+        input=InputDocument(
+            format=InputFormat.HTML,
+            backend=HTMLDocumentBackend,  # type: ignore[type-abstract]
+            path_or_stream=Path(),
+        ),
+    )
