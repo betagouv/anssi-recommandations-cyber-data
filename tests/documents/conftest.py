@@ -534,7 +534,9 @@ class GenerateurDePagesStatique(GenerateurDePages):
                 self.numero_page,
                 [
                     BlocPagePDF(
-                        self.contenu, Position(x=i * 10, y=0, hauteur=0, largeur=0)
+                        texte=self.contenu,
+                        position=Position(x=i * 10, y=0, hauteur=0, largeur=0),
+                        numero_page=self.numero_page,
                     )
                     for i in range(0, self.nombre_de_blocs)
                 ],
