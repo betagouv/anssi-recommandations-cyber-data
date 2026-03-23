@@ -47,7 +47,10 @@ def test_document_pdf_cree_correctement():
     assert doc.url == "https://example.com/fichier.pdf"
 
 
-def test_document_peut_ajouter_un_bloc_dans_une_page(un_constructeur_de_text_item):
+def test_document_peut_ajouter_un_bloc_dans_une_page(
+    un_constructeur_de_text_item,
+    resultat_conversion,
+):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
 
@@ -60,6 +63,7 @@ def test_document_peut_ajouter_un_bloc_dans_une_page(un_constructeur_de_text_ite
             .avec_texte("Une page")
             .construis()
         ],
+        resultat_conversion.document,
     )
 
     assert len(document.pages) == 1
@@ -71,6 +75,7 @@ def test_document_peut_ajouter_un_bloc_dans_une_page(un_constructeur_de_text_ite
 
 def test_document_peut_ajouter_deux_blocs_sur_une_meme_page(
     un_constructeur_de_text_item,
+    resultat_conversion,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
@@ -90,6 +95,7 @@ def test_document_peut_ajouter_deux_blocs_sur_une_meme_page(
             .avec_texte("Un paragraphe")
             .construis(),
         ],
+        resultat_conversion.document,
     )
 
     assert len(document.pages) == 1
@@ -97,7 +103,10 @@ def test_document_peut_ajouter_deux_blocs_sur_une_meme_page(
     assert document.pages[1].blocs[1].texte == "[TEXTE] Un paragraphe"
 
 
-def test_document_reordonne_lorsque_l_on_ajoute_un_bloc(un_constructeur_de_text_item):
+def test_document_reordonne_lorsque_l_on_ajoute_un_bloc(
+    un_constructeur_de_text_item,
+    resultat_conversion,
+):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
     position_bloc_2 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
@@ -116,6 +125,7 @@ def test_document_reordonne_lorsque_l_on_ajoute_un_bloc(un_constructeur_de_text_
             .avec_texte("Un paragraphe en première position")
             .construis(),
         ],
+        resultat_conversion.document,
     )
 
     assert len(document.pages) == 1
@@ -129,6 +139,7 @@ def test_document_reordonne_lorsque_l_on_ajoute_un_bloc(un_constructeur_de_text_
 
 def test_document_fusionne_un_titre_avec_son_contenu(
     un_constructeur_d_element_filtrable,
+    resultat_conversion,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
@@ -171,6 +182,7 @@ def test_document_fusionne_un_titre_avec_son_contenu(
             .avec_texte("1.1 Sous-titre.")
             .construis(),
         ],
+        resultat_conversion.document,
     )
 
     assert len(document.pages[1].blocs) == 3
@@ -184,6 +196,7 @@ def test_document_fusionne_un_titre_avec_son_contenu(
 
 def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommandations(
     un_constructeur_d_element_filtrable,
+    resultat_conversion,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
@@ -226,6 +239,7 @@ def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommanda
             .avec_texte("Recommandation 2.")
             .construis(),
         ],
+        resultat_conversion.document,
     )
 
     assert len(document.pages[1].blocs) == 1
@@ -237,6 +251,7 @@ def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommanda
 
 def test_document_fusionne_tous_les_contenus_d_un_sous_titre(
     un_constructeur_d_element_filtrable,
+    resultat_conversion,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
     position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
@@ -272,6 +287,7 @@ def test_document_fusionne_tous_les_contenus_d_un_sous_titre(
             .avec_texte("Paragraphe 3.")
             .construis(),
         ],
+        resultat_conversion.document,
     )
 
     assert len(document.pages[1].blocs) == 1
@@ -283,6 +299,7 @@ def test_document_fusionne_tous_les_contenus_d_un_sous_titre(
 
 def test_document_fusionne_les_recommandations_pour_un_titre(
     un_constructeur_d_element_filtrable,
+    resultat_conversion,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
 
@@ -320,6 +337,7 @@ def test_document_fusionne_les_recommandations_pour_un_titre(
             .avec_texte("Recommandation 2.")
             .construis(),
         ],
+        resultat_conversion.document,
     )
 
     assert len(document.pages[1].blocs) == 1
@@ -331,6 +349,7 @@ def test_document_fusionne_les_recommandations_pour_un_titre(
 
 def test_document_fusionne_les_recommandations_pour_un_sous_titre(
     un_constructeur_d_element_filtrable,
+    resultat_conversion,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
 
@@ -368,6 +387,7 @@ def test_document_fusionne_les_recommandations_pour_un_sous_titre(
             .avec_texte("Recommandation 2.")
             .construis(),
         ],
+        resultat_conversion.document,
     )
 
     assert len(document.pages[1].blocs) == 1
@@ -379,6 +399,7 @@ def test_document_fusionne_les_recommandations_pour_un_sous_titre(
 
 def test_document_fusionne_les_tableaux_pour_un_titre(
     un_constructeur_d_element_filtrable,
+    resultat_conversion,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
 
@@ -416,6 +437,7 @@ def test_document_fusionne_les_tableaux_pour_un_titre(
             .avec_texte("Un autre texte.")
             .construis(),
         ],
+        resultat_conversion.document,
     )
 
     assert len(document.pages[1].blocs) == 1
@@ -427,6 +449,7 @@ def test_document_fusionne_les_tableaux_pour_un_titre(
 
 def test_document_fusionne_les_tableaux_pour_un_sous_titre(
     un_constructeur_d_element_filtrable,
+    resultat_conversion,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
 
@@ -464,6 +487,7 @@ def test_document_fusionne_les_tableaux_pour_un_sous_titre(
             .avec_texte("Un autre texte.")
             .construis(),
         ],
+        resultat_conversion.document,
     )
 
     assert len(document.pages[1].blocs) == 1

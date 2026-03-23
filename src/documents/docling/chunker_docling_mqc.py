@@ -27,5 +27,9 @@ class ChunkerDoclingMQC(ChunkerDocling):
         )
         elements_filtres = filtre_les_resultats(resultat_conversion)
         document = Document(document_a_indexer.nom_document, document_a_indexer.url)
-        document.genere_les_pages(document_a_indexer.generateur, elements_filtres)
+        document.genere_les_pages(
+            document_a_indexer.generateur,
+            elements_filtres,
+            resultat_conversion.document,
+        )
         return document

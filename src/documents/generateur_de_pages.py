@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Callable
+from typing import Callable, Optional
+
+from docling_core.types import DoclingDocument
 
 from documents.elements_filtres import ElementsFiltres
 from documents.page import Page, BlocPage
@@ -15,5 +17,7 @@ type GenerationDePage = Callable[
 
 class GenerateurDePages(ABC):
     @abstractmethod
-    def genere(self, elements_filtres: ElementsFiltres) -> dict[int, Page]:
+    def genere(
+        self, elements_filtres: ElementsFiltres, document: Optional[DoclingDocument]
+    ) -> dict[int, Page]:
         pass

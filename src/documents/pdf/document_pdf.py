@@ -1,9 +1,10 @@
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast, NamedTuple, Union
+from typing import cast, NamedTuple, Union, Optional
 
 from docling_core.transforms.chunker import BaseChunk, DocMeta
+from docling_core.types import DoclingDocument
 
 from documents.elements_filtres import ElementsFiltres
 from documents.generateur_de_pages import (
@@ -19,7 +20,9 @@ from documents.pdf.extrais_les_chunks import extrais_les_chunks
 
 
 class GenerateurDePagesPDF(GenerateurDePages):
-    def genere(self, elements_filtres: ElementsFiltres) -> dict[int, Page]:
+    def genere(
+        self, elements_filtres: ElementsFiltres, _: Optional[DoclingDocument]
+    ) -> dict[int, Page]:
         resultat: dict[int, Page] = {}
 
         for chunk in extrais_les_chunks(elements_filtres):
