@@ -31,6 +31,7 @@ from documents.indexeur.indexeur import (
 from evaluation.evaluateur_deepeval import EvaluateurDeepeval
 from evenement.bus import BusEvenement, Evenement
 from infra.ecrivain_sortie import EcrivainSortie
+from infra.interval import Interval
 from infra.memoire.ecrivain import EcrivainSortieDeTest
 from infra.memoire.executeur_de_requete_memoire import (
     ExecuteurDeRequeteDeTest,
@@ -348,3 +349,8 @@ class BusEvenementDeTest(BusEvenement):
 @pytest.fixture
 def un_bus_d_evenement() -> BusEvenementDeTest:
     return BusEvenementDeTest()
+
+
+@pytest.fixture(autouse=True)
+def frise_interval() -> None:
+    Interval.frise()
