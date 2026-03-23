@@ -1,6 +1,6 @@
 from documents.elements_filtres import ElementsFiltres
 from documents.generateur_de_pages import GenerateurDePages
-from documents.page import Page
+from documents.page import Page, BlocPage
 
 
 class Document:
@@ -18,10 +18,10 @@ class Document:
     def url(self):
         return self._url
 
-    def metadata(self, page) -> dict:
+    def metadata(self, bloc: BlocPage) -> dict:
         return {
             "source_url": self.url,
-            "page": page.numero_page if page.numero_page is not None else 0,
+            "page": bloc.numero_page if bloc.numero_page is not None else 0,
             "nom_document": self.nom_document,
         }
 

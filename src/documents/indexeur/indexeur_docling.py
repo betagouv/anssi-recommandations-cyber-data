@@ -16,7 +16,7 @@ from documents.indexeur.indexeur import (
     ReponseDocumentEnErreur,
     ReponseDocumentEnSucces,
 )
-from documents.page import BlocPage, Page
+from documents.page import BlocPage
 from infra.executeur_requete import ExecuteurDeRequete
 
 for name in (
@@ -153,8 +153,8 @@ class IndexeurDocling(Indexeur):
                 )
             )
 
-            def _en_payload(page: Page, bloc: BlocPage) -> dict:
-                return {"content": bloc.texte, "metadata": document.metadata(page)}
+            def _en_payload(bloc: BlocPage) -> dict:
+                return {"content": bloc.texte, "metadata": document.metadata(bloc)}
 
             for page in document.pages.values():
                 tous_les_blocs = list(
@@ -169,7 +169,7 @@ class IndexeurDocling(Indexeur):
                     payload_chunks = {
                         "chunks": list(
                             map(
-                                lambda bloc: _en_payload(page, bloc),
+                                lambda bloc: _en_payload(bloc),
                                 sous_ensemble_de_blocs,
                             )
                         )
