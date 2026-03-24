@@ -2,3 +2,6 @@
 
 minimumReleaseAge: 10080 # 7 jours (exprimé en minutes)
 preferFrozenLockfile: true
+
+minimumReleaseAgeExclude:
+  - flatted@3.4.2

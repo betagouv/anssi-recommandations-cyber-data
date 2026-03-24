@@ -49,5 +49,10 @@
   },
   "dependencies": {
     "@lab-anssi/ui-kit": "^1.44.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "flatted": "^3.4.2"
+    }
   }
 }
