@@ -174,5 +174,77 @@
   "CERT-FR - Points de contrôle Active Directory": {
     "type": "HTML",
     "url": "https://www.cert.ssi.gouv.fr/dur/CERTFR-2020-DUR-001/"
+  },
+  "CERT-FR - Fiche réflexe - Fuite de données - Endiguement": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-008-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Fuite de données - Qualification": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-007-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Compromission d'un tiers - Endiguement": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-006-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Compromission d'un tiers - Qualification": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-005-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Compromission d'un tenant Azure - Endiguement": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-004-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Compromission d'un tenant Azure - Qualification": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-003-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Compromission d'un équipement de bordure réseau - Endiguement": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-002-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Compromission d'un équipement de bordure réseau - Qualification": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-001-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Déni de service réseau - Endiguement": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-010-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Déni de service réseau - Qualification": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-009-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Défiguration de site web - Endiguement": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-008-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Défiguration de site web - Qualification": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-007-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Compromission système - Endiguement": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-006-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Compromission système - Qualification": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-005-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Compromission d'un compte de messagerie - Endiguement": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-004-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Compromission d'un compte de messagerie - Qualification": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-003-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Chiffrement en cours - Endiguement": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-002-1.pdf"
+  },
+  "CERT-FR - Fiche réflexe - Chiffrement en cours - Qualification": {
+    "type": "PDF",
+    "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-001-1.pdf"
   }
 }
