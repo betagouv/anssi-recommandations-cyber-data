@@ -158,5 +158,21 @@
   "CERT-FR - Secteur du cloud - État de la menace informatique": {
     "type": "PDF",
     "url": "https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-001.pdf"
+  },
+  "CERT-FR - Recommandations à destination des acteurs du secteur de l’énergie et de l’eau": {
+    "type": "HTML",
+    "url": "https://www.cert.ssi.gouv.fr/dur/CERTFR-2025-DUR-003/"
+  },
+  "CERT-FR - 10 bonnes pratiques pour l’utilisation des téléphones mobiles": {
+    "type": "PDF",
+    "url": "https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-DUR-001.pdf"
+  },
+  "CERT-FR - Classe de vulnérabilités en environnement Active Directory": {
+    "type": "HTML",
+    "url": "https://www.cert.ssi.gouv.fr/dur/CERTFR-2021-DUR-001/"
+  },
+  "CERT-FR - Points de contrôle Active Directory": {
+    "type": "HTML",
+    "url": "https://www.cert.ssi.gouv.fr/dur/CERTFR-2020-DUR-001/"
   }
 }
