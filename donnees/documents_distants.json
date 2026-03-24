@@ -118,6 +118,45 @@
     "type": "HTML",
     "url": "https://demainspecialiste.cyber.gouv.fr/cyber-en-jeux/",
     "chemin": "demainspecialiste.cyber.gouv.fr_cyber-en-jeux.html"
+  },
+  "CERT-FR - IA générative face aux attaques informatiques": {
+    "type": "PDF",
+    "url": "https://www.cert.ssi.gouv.fr/uploads/CERTFR-2026-CTI-001.pdf"
+  },
+  "CERT-FR - Téléphones mobiles : État de la menace depuis 2015": {
+    "type": "PDF",
+    "url": "https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-012.pdf"
+  },
+  "CERT-FR - Opération ENDGAME de novembre 2025": {
+    "type": "HTML",
+    "url": "https://www.cert.ssi.gouv.fr/cti/CERTFR-2025-CTI-011/"
+  },
+  "CERT-FR - Campagne de notifications de menace envoyée par Apple": {
+    "type": "HTML",
+    "url": "https://www.cert.ssi.gouv.fr/cti/CERTFR-2025-CTI-010/"
+  },
+  "CERT-FR - Opération ENDGAME 2025": {
+    "type": "HTML",
+    "url": "https://www.cert.ssi.gouv.fr/cti/CERTFR-2025-CTI-008/"
+  },
+  "CERT-FR - Ciblage et compromission d'entités françaises au moyen du mode opératoire d'attaque APT28": {
+    "type": "PDF",
+    "url": "https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-006.pdf"
+  },
+  "CERT-FR - Transports urbains - État de la menace informatique": {
+    "type": "PDF",
+    "url": "https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-005.pdf"
+  },
+  "CERT-FR - Panorama de la cybermenace 2024": {
+    "type": "PDF",
+    "url": "https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-003.pdf"
+  },
+  "CERT-FR - Collectivités territoriales - Synthèse de la menace": {
+    "type": "PDF",
+    "url": "https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-002.pdf"
+  },
+  "CERT-FR - Secteur du cloud - État de la menace informatique": {
+    "type": "PDF",
+    "url": "https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-001.pdf"
   }
-
 }
