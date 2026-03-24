@@ -1,49 +1,23 @@
-from jeopardy.client_albert_jeopardy import (
-    ClientAlbertJeopardy,
-    ReponseCreationCollection,
-    RequeteCreationDocumentAlbert,
-)
-from jeopardy.collecteur import Document, CollecteurDeQuestions
+from jeopardy.collecteur import CollecteurDeQuestions, Chunk
 
 
-class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
-    def __init__(self):
-        super().__init__()
-        self.collection_creee = False
-        self.document_cree = None
-        self._identifiant_de_collection = None
-        self.collection_attendue = None
-
-    def cree_collection(self) -> ReponseCreationCollection:
-        self.collection_creee = True
-        return ReponseCreationCollection(id=self._identifiant_de_collection)
-
-    def ajoute_document(
-        self, identifiant_collection: str, document: RequeteCreationDocumentAlbert
-    ):
-        self.document_cree = document
-        self.collection_attendue = identifiant_collection
-
-    def avec_un_identifiant_de_collection(self, identifiant_collection: str):
-        self._identifiant_de_collection = identifiant_collection
-        return self
-
-
-def test_cree_une_collection():
-    client_albert = ClientAlbertJeopardyDeTest()
+def test_cree_une_collection(un_client_albert_de_test):
+    client_albert = un_client_albert_de_test()
 
     CollecteurDeQuestions(client_albert).collecte([])
 
     assert client_albert.collection_creee
 
 
-def test_ajoute_un_document_a_la_collection():
-    client_albert = ClientAlbertJeopardyDeTest().avec_un_identifiant_de_collection(
+def test_ajoute_un_document_a_la_collection(
+    un_constructeur_de_document, un_client_albert_de_test
+):
+    client_albert = un_client_albert_de_test().avec_un_identifiant_de_collection(
         "collection-123"
     )
 
     CollecteurDeQuestions(client_albert).collecte(
-        [(Document({"Un document indexé": {"id": "doc-123"}}))]
+        [un_constructeur_de_document().construis()]
     )
 
     assert client_albert.collection_attendue == "collection-123"
@@ -54,3 +28,47 @@ def test_ajoute_un_document_a_la_collection():
             "id_document": "doc-123",
         }
     }
+
+
+def test_recupere_les_questions(un_constructeur_de_document, un_client_albert_de_test):
+    client_albert = (
+        un_client_albert_de_test()
+        .avec_un_identifiant_de_collection("collection-123")
+        .qui_retourne_les_questions_generees(
+            ["premiere question ?", "seconde question ?"]
+        )
+    )
+    CollecteurDeQuestions(client_albert).collecte(
+        [
+            un_constructeur_de_document()
+            .ajoute_chunk(Chunk(contenu="le contenu", id=0, numero_page=42))
+            .construis(),
+        ]
+    )
+
+    assert len(client_albert.questions_generees) == 2
+    assert client_albert.questions_generees[0] == "premiere question ?"
+    assert client_albert.questions_generees[1] == "seconde question ?"
+
+
+def test_recupere_les_questions_pour_un_chunk_donne(
+    un_constructeur_de_document, un_client_albert_de_test
+):
+    client_albert = (
+        un_client_albert_de_test()
+        .avec_un_identifiant_de_collection("collection-123")
+        .qui_retourne_les_questions_generees(
+            ["premiere question ?", "seconde question ?"]
+        )
+    )
+    CollecteurDeQuestions(client_albert).collecte(
+        [
+            un_constructeur_de_document()
+            .ajoute_chunk(Chunk(contenu="le premier contenu", id=0, numero_page=42))
+            .ajoute_chunk(Chunk(contenu="le second contenu", id=1, numero_page=4))
+            .construis(),
+        ]
+    )
+
+    assert client_albert.chunks_fournis[0] == "le premier contenu"
+    assert client_albert.chunks_fournis[1] == "le second contenu"

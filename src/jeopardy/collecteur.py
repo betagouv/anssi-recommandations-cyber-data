@@ -1,13 +1,29 @@
+from typing import NamedTuple, Any
+
 from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
     RequeteCreationDocumentAlbert,
 )
 
 
+class Chunk(NamedTuple):
+    contenu: str
+    id: int
+    numero_page: int
+
+
 class Document:
-    def __init__(self, data: dict[str, dict[str, str]]):
+    def __init__(self, data: dict[str, dict[str, Any]]):
         self.nom_document = list(data.keys())[0]
         self.id_document = data[self.nom_document]["id"]
+        self.chunks: list[Chunk] = list(
+            map(
+                lambda c: Chunk(
+                    contenu=c["contenu"], id=c["id"], numero_page=c["numero_page"]
+                ),
+                data[self.nom_document]["chunks"],
+            )
+        )
 
 
 class CollecteurDeQuestions:
@@ -21,6 +37,8 @@ class CollecteurDeQuestions:
             self.client_albert.ajoute_document(
                 reponse_creation_collection.id, _en_document_albert(document)
             )
+            for chunk in document.chunks:
+                self.client_albert.genere_question(chunk.contenu)
 
 
 def _en_document_albert(document: Document) -> RequeteCreationDocumentAlbert:
