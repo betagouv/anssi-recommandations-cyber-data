@@ -24,3 +24,7 @@ class ClientAlbertJeopardy(ABC):
         self, identifiant_collection: str, document: RequeteCreationDocumentAlbert
     ):
         pass
+
+    @abstractmethod
+    def genere_question(self, contenu: str) -> list[str]:
+        pass
