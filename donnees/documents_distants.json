@@ -79,9 +79,16 @@
     "type": "HTML",
     "url": "https://www.cnil.fr/fr/le-cadre-national/la-loi-informatique-et-libertes#article87"
   },
+  "CNIL - Règlement Européen": {
+    "type": "HTML",
+    "url": "https://www.cnil.fr/fr/reglement-europeen-protection-donnees"
+  },
+  "CNIL - Tables Informatique et Libertés": {
+    "type": "PDF",
+    "url": "https://www.cnil.fr/sites/default/files/2026-03/tables_il.pdf"
+  },
   "SecNumCloud - Référentiel exigences": {
     "type": "PDF",
     "url": "https://cyber.gouv.fr/documents/388/secnumcloud-referentiel-exigences-v3.2.pdf"
-
   }
 }
