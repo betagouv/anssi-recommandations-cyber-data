@@ -27,9 +27,10 @@ class Document:
 
 
 class CollecteurDeQuestions:
-    def __init__(self, client_albert: ClientAlbertJeopardy):
+    def __init__(self, client_albert: ClientAlbertJeopardy, prompt: str):
         super().__init__()
         self.client_albert = client_albert
+        self.prompt = prompt
 
     def collecte(self, documents: list[Document]):
         reponse_creation_collection = self.client_albert.cree_collection()
@@ -38,7 +39,7 @@ class CollecteurDeQuestions:
                 reponse_creation_collection.id, _en_document_albert(document)
             )
             for chunk in document.chunks:
-                self.client_albert.genere_question(chunk.contenu)
+                self.client_albert.genere_question(self.prompt, chunk.contenu)
 
 
 def _en_document_albert(document: Document) -> RequeteCreationDocumentAlbert:

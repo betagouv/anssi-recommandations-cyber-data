@@ -26,5 +26,5 @@ class ClientAlbertJeopardy(ABC):
         pass
 
     @abstractmethod
-    def genere_question(self, contenu: str) -> list[str]:
+    def genere_question(self, prompt: str, contenu: str) -> list[str]:
         pass

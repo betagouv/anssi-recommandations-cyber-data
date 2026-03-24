@@ -48,10 +48,12 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self._identifiant_de_collection = None
         self.collection_attendue = None
         self.chunks_fournis: list[str] = []
+        self.prompt_passe: str = ""
 
-    def genere_question(self, contenu: str) -> list[str]:
+    def genere_question(self, prompt: str, contenu: str) -> list[str]:
         self.questions_generees = self._reponses_questions_generees
         self.chunks_fournis.append(contenu)
+        self.prompt_passe = prompt
         return self._reponses_questions_generees
 
     def cree_collection(self) -> ReponseCreationCollection:
