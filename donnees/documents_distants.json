@@ -90,5 +90,34 @@
   "SecNumCloud - Référentiel exigences": {
     "type": "PDF",
     "url": "https://cyber.gouv.fr/documents/388/secnumcloud-referentiel-exigences-v3.2.pdf"
+  },
+  "NIS2 - Référentiel": {
+    "type": "PDF",
+    "url": "https://messervices.cyber.gouv.fr/documents-ressources/20260317_NIS_V2_ReCyF_v2.5.pdf"
+  },
+  "ANSSI - Panorama de la cyber menace": {
+    "type": "PDF",
+    "url": "https://www.cert.ssi.gouv.fr/uploads/CERTFR-2026-CTI-002.pdf"
+  },
+  "MSC - Proposition de valeur": {
+    "type": "HTML",
+    "url": "https://messervices.cyber.gouv.fr/",
+    "chemin": "messervices.cyber.gouv.fr_.html"
+  },
+  "NIS2 - Proposition de valeur": {
+    "type": "HTML",
+    "url": "https://messervices.cyber.gouv.fr/nis2",
+    "chemin": "messervices.cyber.gouv.fr_nis2.html"
+  },
+  "DSC - Proposition de valeur": {
+    "type": "HTML",
+    "url": "https://demainspecialiste.cyber.gouv.fr/",
+    "chemin": "demainspecialiste.cyber.gouv.fr_.html"
+  },
+  "DSC - Cyber En Jeux": {
+    "type": "HTML",
+    "url": "https://demainspecialiste.cyber.gouv.fr/cyber-en-jeux/",
+    "chemin": "demainspecialiste.cyber.gouv.fr_cyber-en-jeux.html"
   }
+
 }
