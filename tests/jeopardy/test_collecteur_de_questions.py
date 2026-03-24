@@ -4,7 +4,7 @@ from jeopardy.collecteur import CollecteurDeQuestions, Chunk
 def test_cree_une_collection(un_client_albert_de_test):
     client_albert = un_client_albert_de_test()
 
-    CollecteurDeQuestions(client_albert).collecte([])
+    CollecteurDeQuestions(client_albert, "Prompt").collecte([])
 
     assert client_albert.collection_creee
 
@@ -16,7 +16,7 @@ def test_ajoute_un_document_a_la_collection(
         "collection-123"
     )
 
-    CollecteurDeQuestions(client_albert).collecte(
+    CollecteurDeQuestions(client_albert, "Prompt").collecte(
         [un_constructeur_de_document().construis()]
     )
 
@@ -38,7 +38,7 @@ def test_recupere_les_questions(un_constructeur_de_document, un_client_albert_de
             ["premiere question ?", "seconde question ?"]
         )
     )
-    CollecteurDeQuestions(client_albert).collecte(
+    CollecteurDeQuestions(client_albert, "Prompt").collecte(
         [
             un_constructeur_de_document()
             .ajoute_chunk(Chunk(contenu="le contenu", id=0, numero_page=42))
@@ -61,7 +61,7 @@ def test_recupere_les_questions_pour_un_chunk_donne(
             ["premiere question ?", "seconde question ?"]
         )
     )
-    CollecteurDeQuestions(client_albert).collecte(
+    CollecteurDeQuestions(client_albert, "Prompt").collecte(
         [
             un_constructeur_de_document()
             .ajoute_chunk(Chunk(contenu="le premier contenu", id=0, numero_page=42))
@@ -72,3 +72,24 @@ def test_recupere_les_questions_pour_un_chunk_donne(
 
     assert client_albert.chunks_fournis[0] == "le premier contenu"
     assert client_albert.chunks_fournis[1] == "le second contenu"
+
+
+def test_verifie_qu_on_passe_un_prompt_a_notre_generateur_de_questions(
+    un_constructeur_de_document, un_client_albert_de_test
+):
+    client_albert = (
+        un_client_albert_de_test()
+        .avec_un_identifiant_de_collection("collection-123")
+        .qui_retourne_les_questions_generees(
+            ["premiere question ?", "seconde question ?"]
+        )
+    )
+    CollecteurDeQuestions(client_albert, "mon prompt").collecte(
+        [
+            un_constructeur_de_document()
+            .ajoute_chunk(Chunk(contenu="le premier contenu", id=0, numero_page=42))
+            .construis(),
+        ]
+    )
+
+    assert client_albert.prompt_passe == "mon prompt"
