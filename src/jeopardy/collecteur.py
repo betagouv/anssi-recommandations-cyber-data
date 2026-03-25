@@ -32,8 +32,15 @@ class CollecteurDeQuestions:
         self.client_albert = client_albert
         self.prompt = prompt
 
-    def collecte(self, documents: list[Document]):
-        reponse_creation_collection = self.client_albert.cree_collection()
+    def collecte(
+        self,
+        nom_collection: str,
+        description_collection: str,
+        documents: list[Document],
+    ):
+        reponse_creation_collection = self.client_albert.cree_collection(
+            f"Jeopardy : {nom_collection}", f"Jeopardy : {description_collection}"
+        )
         for document in documents:
             self.client_albert.ajoute_document(
                 reponse_creation_collection.id, _en_document_albert(document)

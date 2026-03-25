@@ -41,6 +41,8 @@ def un_constructeur_de_document() -> Callable[[], ConstructeurDeDocument]:
 class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
     def __init__(self):
         super().__init__()
+        self.description_collection_passe = None
+        self.nom_collection_passe = None
         self._reponses_questions_generees = []
         self.questions_generees = []
         self.collection_creee = False
@@ -56,8 +58,12 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self.prompt_passe = prompt
         return self._reponses_questions_generees
 
-    def cree_collection(self) -> ReponseCreationCollection:
+    def cree_collection(
+        self, nom_collection, description_collection
+    ) -> ReponseCreationCollection:
         self.collection_creee = True
+        self.nom_collection_passe = nom_collection
+        self.description_collection_passe = description_collection
         return ReponseCreationCollection(id=self._identifiant_de_collection)
 
     def ajoute_document(
