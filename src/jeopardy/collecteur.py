@@ -1,5 +1,8 @@
-from typing import NamedTuple, TypedDict
+from dataclasses import dataclass
+from itertools import islice
+from typing import NamedTuple, TypedDict, Generator
 
+from documents.docling.multi_processeur import Multiprocesseur
 from jeopardy.questions import EntrepotQuestionGeneree, QuestionGeneree
 from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
@@ -8,14 +11,14 @@ from jeopardy.client_albert_jeopardy import (
 
 
 class ChunkSource(TypedDict):
-    id: str
+    id: int
     contenu: str
     numero_page: int
 
 
 class Chunk(NamedTuple):
     contenu: str
-    id: str
+    id: int
     numero_page: int
 
 
@@ -38,17 +41,25 @@ class Document:
             )
 
 
+@dataclass
+class ChunksAAjouter:
+    chunks: list[Chunk]
+    id_document: str
+
+
 class CollecteurDeQuestions:
     def __init__(
         self,
         client_albert: ClientAlbertJeopardy,
         prompt: str,
         entrepot_questions_generees: EntrepotQuestionGeneree,
+        multi_processeur: Multiprocesseur = Multiprocesseur(),
     ):
         super().__init__()
         self.client_albert = client_albert
         self.prompt = prompt
         self.entrepot_questions_generees = entrepot_questions_generees
+        self.multi_processeur = multi_processeur
 
     def collecte(
         self,
@@ -62,28 +73,49 @@ class CollecteurDeQuestions:
         self.client_albert.ajoute_document(
             reponse_creation_collection.id, _en_document_albert(document)
         )
+
+        def decoupe_la_liste_de_documents(
+            iterable: list[Chunk],
+        ) -> Generator[ChunksAAjouter]:
+            it = iter(iterable)
+            i = 0
+            while True:
+                sous_ensemble = list(islice(it, 10))
+                if not sous_ensemble:
+                    break
+                yield ChunksAAjouter(
+                    chunks=sous_ensemble, id_document=document.id_document
+                )
+                i = i + 1
+
+        self.multi_processeur.execute(
+            self._genere_questions,
+            decoupe_la_liste_de_documents(document.chunks),
+        )
+
         # on fait une liste de 45K chunks
         # on slice la liste par paquets de 10
         # on invoque le multi-process
         # on se retrouve avec 225K questions
-        for chunk in (
-            document.chunks
-        ):  # Entre quelques chunks et plusieurs milliers de chunks par document
-            questions = self.client_albert.genere_questions(self.prompt, chunk.contenu)
-            for question in questions:
+        # Explode des questions
+        # On persiste toutes les questions (en mémoire)
+        # Appeler Albert pour ajouter les questions au document (N questions * N chunks * N documents)
+
+    def _genere_questions(self, chunks_a_ajouter: ChunksAAjouter) -> None:
+        for chunk in chunks_a_ajouter.chunks:
+            liste_questions = self.client_albert.genere_questions(
+                self.prompt, chunk.contenu
+            )
+            for question in liste_questions:
                 self.entrepot_questions_generees.persiste(
                     QuestionGeneree(
                         contenu=question,
                         contenu_origine=chunk.contenu,
-                        id_document=document.id_document,
+                        id_document=chunks_a_ajouter.id_document,
                         id_chunk=chunk.id,
                         numero_page=chunk.numero_page,
                     )
                 )
-
-            # Explode des questions
-            # On persiste toutes les questions (en mémoire)
-        # Appeler Albert pour ajouter les questions au document (N questions * N chunks * N documents)
 
 
 def _en_document_albert(document: Document) -> RequeteCreationDocumentAlbert:

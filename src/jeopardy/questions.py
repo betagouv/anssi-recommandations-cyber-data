@@ -7,7 +7,7 @@ class QuestionGeneree:
     contenu: str
     contenu_origine: str
     id_document: str
-    id_chunk: str
+    id_chunk: int
     numero_page: int
 
 
