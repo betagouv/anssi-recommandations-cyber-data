@@ -1,4 +1,10 @@
-from typing import NamedTuple, Any
+from typing import NamedTuple, TypedDict
+
+
+class ChunkSource(TypedDict):
+    id: str
+    contenu: str
+    numero_page: int
 
 from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
@@ -8,22 +14,25 @@ from jeopardy.client_albert_jeopardy import (
 
 class Chunk(NamedTuple):
     contenu: str
-    id: int
+    id: str
     numero_page: int
 
 
 class Document:
-    def __init__(self, data: dict[str, dict[str, Any]]):
+    def __init__(self, data: dict[str, dict[str, str | list[ChunkSource]]]):
         self.nom_document = list(data.keys())[0]
-        self.id_document = data[self.nom_document]["id"]
-        self.chunks: list[Chunk] = list(
-            map(
-                lambda c: Chunk(
-                    contenu=c["contenu"], id=c["id"], numero_page=c["numero_page"]
-                ),
-                data[self.nom_document]["chunks"],
+        document_data = data[self.nom_document]
+        self.id_document = document_data["id"]
+        chunks = document_data["chunks"]
+        if isinstance(chunks, list):
+            self.chunks: list[Chunk] = list(
+                map(
+                    lambda c: Chunk(
+                        contenu=c["contenu"], id=c["id"], numero_page=c["numero_page"]
+                    ),
+                    chunks,
+                )
             )
-        )
 
 
 class CollecteurDeQuestions:

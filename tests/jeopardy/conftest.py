@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from typing import Any
 
 import pytest
 
@@ -18,7 +17,7 @@ class ConstructeurDeDocument:
         self.metadonnees = {"a": "b"}
         self.clef = "Un document indexé"
         self.identifiant_document = "doc-123"
-        self.chunks: list[dict[str, dict[str, Any]]] = []
+        self.chunks = []
 
     def construis(self) -> Document:
         return Document(
@@ -26,7 +25,13 @@ class ConstructeurDeDocument:
         )
 
     def ajoute_chunk(self, chunk: Chunk):
-        self.chunks.append(chunk._asdict())
+        self.chunks.append(
+            {
+                "id": chunk.id,
+                "contenu": chunk.contenu,
+                "numero_page": chunk.numero_page,
+            }
+        )
         return self
 
 
@@ -49,8 +54,8 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self.document_cree = None
         self._identifiant_de_collection = None
         self.collection_attendue = None
-        self.chunks_fournis: list[str] = []
-        self.prompt_passe: str = ""
+        self.chunks_fournis = []
+        self.prompt_passe = ""
 
     def genere_question(self, prompt: str, contenu: str) -> list[str]:
         self.questions_generees = self._reponses_questions_generees
