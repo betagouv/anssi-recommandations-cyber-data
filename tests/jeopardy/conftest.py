@@ -8,6 +8,7 @@ from jeopardy.client_albert_jeopardy import (
     RequeteCreationDocumentAlbert,
 )
 from jeopardy.collecteur import Document, Chunk
+from jeopardy.questions import EntrepotQuestionGenereeMemoire
 
 
 class ConstructeurDeDocument:
@@ -57,7 +58,7 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self.chunks_fournis = []
         self.prompt_passe = ""
 
-    def genere_question(self, prompt: str, contenu: str) -> list[str]:
+    def genere_questions(self, prompt: str, contenu: str) -> list[str]:
         self.questions_generees = self._reponses_questions_generees
         self.chunks_fournis.append(contenu)
         self.prompt_passe = prompt
@@ -92,3 +93,8 @@ def un_client_albert_de_test() -> Callable[[], ClientAlbertJeopardyDeTest]:
         return ClientAlbertJeopardyDeTest()
 
     return constructeur
+
+
+@pytest.fixture
+def un_entrepot_memoire() -> EntrepotQuestionGenereeMemoire:
+    return EntrepotQuestionGenereeMemoire()
