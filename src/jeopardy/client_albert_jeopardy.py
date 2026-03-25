@@ -16,7 +16,9 @@ class ReponseCreationCollection:
 
 class ClientAlbertJeopardy(ABC):
     @abstractmethod
-    def cree_collection(self) -> ReponseCreationCollection:
+    def cree_collection(
+        self, nom_collection, description_collection
+    ) -> ReponseCreationCollection:
         pass
 
     @abstractmethod
