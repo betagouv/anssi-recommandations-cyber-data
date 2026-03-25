@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
@@ -30,3 +32,14 @@ class ClientAlbertJeopardy(ABC):
     @abstractmethod
     def genere_questions(self, prompt: str, contenu: str) -> list[str]:
         pass
+
+
+class ErreurClientAlbertJeopardy(Exception):
+    """Erreur levée lors d'un échange avec Albert."""
+
+
+@dataclass(frozen=True)
+class ConfigurationJeopardy:
+    base_url: str
+    cle_api: str
+    modele_generation: str = "mistral-medium-2508"

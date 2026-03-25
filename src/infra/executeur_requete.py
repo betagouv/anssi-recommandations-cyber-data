@@ -13,8 +13,9 @@ class ExecuteurDeRequete:
         self.session = requests.Session()
 
     def initialise_connexion_securisee(self, clef_api: str):
-        self.initialise_connexion()
-        self.session.headers = {"Authorization": f"Bearer {clef_api}"}
+        if self.session is None:
+            self.initialise_connexion()
+            self.session.headers = {"Authorization": f"Bearer {clef_api}"}  # type: ignore[attr-defined]
 
     def poste(self, url: str, payload: dict, fichiers: Optional[dict]) -> Response:
         if fichiers is not None:
