@@ -5,6 +5,7 @@ from typing_extensions import NamedTuple, Optional
 
 from documents.docling.chunker_docling import ChunkerDocling
 from documents.docling.chunker_docling_mqc import ChunkerDoclingMQC
+from jeopardy.client_albert_jeopardy import ConfigurationJeopardy
 
 
 class MQC(NamedTuple):
@@ -59,6 +60,7 @@ class Configuration(NamedTuple):
     parametres_deepeval: ParametresEvaluation
     msc: MSC
     mqc_data: MQCData
+    jeopardy: ConfigurationJeopardy
 
 
 def recupere_configuration_postgres() -> BaseDeDonnees | None:
@@ -118,6 +120,12 @@ def recupere_configuration() -> Configuration:
         chemin_guides=os.getenv("MSC_CHEMIN_GUIDES", "documents-guides"),
     )
 
+    configuration_jeopardy = ConfigurationJeopardy(
+        base_url=albert.url,
+        cle_api=albert.cle_api,
+        modele_generation=os.getenv("ALBERT_MODELE_JEOPARDY", "mistral-medium-2508"),
+    )
+
     return Configuration(
         mqc=configuration_mqc,
         albert=albert,
@@ -125,4 +133,5 @@ def recupere_configuration() -> Configuration:
         parametres_deepeval=parametres_deepeval,
         msc=configuration_msc,
         mqc_data=configuration_mqc_data,
+        jeopardy=configuration_jeopardy,
     )

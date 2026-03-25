@@ -45,6 +45,7 @@ from infra.memoire.executeur_de_requete_memoire import (
     TypeRequete,
     ReponseTexteEnErreur,
 )
+from jeopardy.client_albert_jeopardy import ConfigurationJeopardy
 from journalisation.evaluation import (
     EntrepotEvaluation,
     EntrepotEvaluationMemoire,
@@ -85,6 +86,11 @@ def configuration() -> Configuration:
         parametres_deepeval=parametres_deepeval,
         msc=MSC(url="http://msc.local", chemin_guides="/guides"),
         mqc_data=MQCData(max_requetes_par_minute=10, hote="mqc.local", port=5672),
+        jeopardy=ConfigurationJeopardy(
+            cle_api=albert.cle_api,
+            modele_generation="mistral-medium-2508",
+            base_url=albert.url,
+        ),
     )
 
 
