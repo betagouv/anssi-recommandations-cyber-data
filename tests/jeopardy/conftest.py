@@ -35,6 +35,12 @@ class ConstructeurDeDocument:
         )
         return self
 
+    def ajoute_nombre_de_chunks(self, nombre_de_chunks: int):
+        for i, chunk in enumerate(range(nombre_de_chunks)):
+            c = Chunk(contenu=f"le contenu numero {i}", id=i, numero_page=42)
+            self.ajoute_chunk(c)
+        return self
+
 
 @pytest.fixture
 def un_constructeur_de_document() -> Callable[[], ConstructeurDeDocument]:
