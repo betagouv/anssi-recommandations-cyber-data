@@ -76,6 +76,9 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self.chunks_fournis = []
         self.prompt_passe = ""
         self.appels_ajout_chunks = []
+        self.identifiant_collection_lu = None
+        self.identifiant_document_lu = None
+        self._chunks_par_document: dict[str, list[dict]] = {}
 
     def genere_questions(self, prompt: str, contenu: str) -> list[str]:
         self.questions_generees = self._reponses_questions_generees
@@ -97,12 +100,6 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self.document_cree = document
         self.collection_attendue = identifiant_collection
         return ReponseCreationDocument(id=self._identifiant_document_cree)
-
-    def ajoute_document(
-        self, identifiant_collection: str, document: RequeteCreationDocumentAlbert
-    ) -> None:
-        self.document_ajoute = document
-        self.collection_attendue = identifiant_collection
 
     def avec_un_identifiant_de_collection(self, identifiant_collection: str):
         self._identifiant_de_collection = identifiant_collection
@@ -127,6 +124,20 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
                 requete=requete,
             )
         )
+
+    def liste_ids_documents_de_collection(
+        self, identifiant_collection: str
+    ) -> list[str]:
+        self.identifiant_collection_lu = identifiant_collection
+        return list(self._chunks_par_document.keys())
+
+    def recupere_chunks_document(self, id_document: str) -> list[dict]:
+        self.identifiant_document_lu = id_document
+        return self._chunks_par_document.get(id_document, [])
+
+    def avec_les_chunks_du_document(self, id_document: str, chunks: list[dict]):
+        self._chunks_par_document[id_document] = chunks
+        return self
 
 
 @pytest.fixture

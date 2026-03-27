@@ -35,12 +35,6 @@ class ClientAlbertJeopardy(ABC):
         pass
 
     @abstractmethod
-    def ajoute_document(
-        self, identifiant_collection: str, document: RequeteCreationDocumentAlbert
-    ) -> None:
-        pass
-
-    @abstractmethod
     def genere_questions(self, prompt: str, contenu: str) -> list[str]:
         pass
 
@@ -52,6 +46,10 @@ class ClientAlbertJeopardy(ABC):
     ):
         pass
 
+    @abstractmethod
+    def recupere_chunks_document(self, id_document: str) -> list[dict]:
+        pass
+
 
 class ErreurClientAlbertJeopardy(Exception):
     """Erreur levée lors d'un échange avec Albert."""
@@ -61,7 +59,7 @@ class ErreurClientAlbertJeopardy(Exception):
 class ConfigurationJeopardy:
     base_url: str
     cle_api: str
-    modele_generation: str = "mistral-medium-2508"
+    modele_generation: str = "openai/gpt-oss-120b"
 
 
 @dataclass
