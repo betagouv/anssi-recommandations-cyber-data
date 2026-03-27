@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from dataclasses import dataclass
 
 import pytest
 
@@ -7,6 +8,7 @@ from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
     ReponseCreationCollection,
     RequeteCreationDocumentAlbert,
+    RequeteAjoutChunksDansDocumentAlbert,
 )
 from jeopardy.collecteur import Document, Chunk
 from jeopardy.questions import EntrepotQuestionGenereeMemoire
@@ -51,6 +53,12 @@ def un_constructeur_de_document() -> Callable[[], ConstructeurDeDocument]:
     return constructeur
 
 
+@dataclass
+class AppelAjoutChunks:
+    identifiant_collection: str
+    requete: RequeteAjoutChunksDansDocumentAlbert
+
+
 class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
     def __init__(self):
         super().__init__()
@@ -64,6 +72,7 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self.collection_attendue = None
         self.chunks_fournis = []
         self.prompt_passe = ""
+        self.appels_ajout_chunks = []
 
     def genere_questions(self, prompt: str, contenu: str) -> list[str]:
         self.questions_generees = self._reponses_questions_generees
@@ -93,6 +102,18 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self._reponses_questions_generees = questions_generees
         return self
 
+    def ajoute_chunks_dans_document(
+        self,
+        identifiant_collection: str,
+        requete: RequeteAjoutChunksDansDocumentAlbert,
+    ):
+        self.appels_ajout_chunks.append(
+            AppelAjoutChunks(
+                identifiant_collection=identifiant_collection,
+                requete=requete,
+            )
+        )
+
 
 @pytest.fixture
 def un_client_albert_de_test() -> Callable[[], ClientAlbertJeopardyDeTest]:
@@ -106,6 +127,7 @@ def un_client_albert_de_test() -> Callable[[], ClientAlbertJeopardyDeTest]:
 def un_entrepot_memoire() -> EntrepotQuestionGenereeMemoire:
     return EntrepotQuestionGenereeMemoire()
 
+
 class MultiProcesseurDeTest(Multiprocesseur):
     def __init__(self):
         self.a_ete_appele = False
@@ -116,6 +138,7 @@ class MultiProcesseurDeTest(Multiprocesseur):
         for chunk in iterable:
             resultats.append(func(chunk))
         return resultats
+
 
 @pytest.fixture()
 def un_multiprocesseur() -> MultiProcesseurDeTest:

@@ -43,3 +43,9 @@ class ConfigurationJeopardy:
     base_url: str
     cle_api: str
     modele_generation: str = "mistral-medium-2508"
+
+
+@dataclass
+class RequeteAjoutChunksDansDocumentAlbert:
+    id_document: str
+    chunks: list[dict[str, Any]]
