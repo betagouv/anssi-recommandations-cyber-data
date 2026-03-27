@@ -5,7 +5,6 @@ from typing import NamedTuple, TypedDict, Generator
 from documents.docling.multi_processeur import Multiprocesseur
 from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
-    RequeteCreationDocumentAlbert,
 )
 from jeopardy.questions import EntrepotQuestionGeneree, QuestionGeneree
 
@@ -63,17 +62,8 @@ class CollecteurDeQuestions:
 
     def collecte(
         self,
-        nom_collection: str,
-        description_collection: str,
-        document: Document,
+            document: Document,
     ):
-        reponse_creation_collection = self.client_albert.cree_collection(
-            f"Jeopardy : {nom_collection}", f"Jeopardy : {description_collection}"
-        )
-        print(f"ID de la collection créée : {reponse_creation_collection.id}")
-        self.client_albert.ajoute_document(
-            reponse_creation_collection.id, _en_document_albert(document)
-        )
 
         def decoupe_la_liste_de_documents(
             iterable: list[Chunk],
@@ -94,17 +84,7 @@ class CollecteurDeQuestions:
             decoupe_la_liste_de_documents(document.chunks),
         )
 
-        for questions_generees in resultats:
-            for question_generee in questions_generees:
-                self.entrepot_questions_generees.persiste(question_generee)
-
-        # on fait une liste de 45K chunks
-        # on slice la liste par paquets de 10
-        # on invoque le multi-process
-        # on se retrouve avec 225K questions
-        # Explode des questions
-        # On persiste toutes les questions (en mémoire)
-        # Appeler Albert pour ajouter les questions au document (N questions * N chunks * N documents)
+        [self.entrepot_questions_generees.persiste(q) for qs in resultats for q in qs]
 
     def _genere_questions(
         self, chunks_a_ajouter: ChunksAAjouter
@@ -129,13 +109,4 @@ class CollecteurDeQuestions:
         return questions_generees
 
 
-def _en_document_albert(document: Document) -> RequeteCreationDocumentAlbert:
-    return RequeteCreationDocumentAlbert(
-        name=document.nom_document,
-        metadata={
-            "source": {
-                "nom_document": document.nom_document,
-                "id_document": document.id_document,
-            }
-        },
-    )
+
