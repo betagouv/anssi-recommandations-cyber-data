@@ -95,7 +95,9 @@ def main():
     client_albert = ClientAlbertJeopardyReel(configuration)
     entrepot_questions = EntrepotQuestionGenereeMemoire()
 
-    ServiceJepoardy(client_albert, entrepot_questions).jeopardyse(arguments.nom_collection, arguments.description_collection, document)
+    ServiceJepoardy(client_albert, entrepot_questions).jeopardyse(
+        arguments.nom_collection, arguments.description_collection, document
+    )
     questions = entrepot_questions.tous()
 
     print(f"Document traité : {document.nom_document}")

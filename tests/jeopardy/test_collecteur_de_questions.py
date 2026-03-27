@@ -7,7 +7,10 @@ DESCRIPTION_COLLECTION = "Description"
 
 
 def test_recupere_les_questions(
-    un_constructeur_de_document, un_client_albert_de_test, un_entrepot_memoire, un_multiprocesseur
+    un_constructeur_de_document,
+    un_client_albert_de_test,
+    un_entrepot_memoire,
+    un_multiprocesseur,
 ):
     client_albert = (
         un_client_albert_de_test()
@@ -31,7 +34,10 @@ def test_recupere_les_questions(
 
 
 def test_recupere_les_questions_pour_un_chunk_donne(
-    un_constructeur_de_document, un_client_albert_de_test, un_entrepot_memoire, un_multiprocesseur
+    un_constructeur_de_document,
+    un_client_albert_de_test,
+    un_entrepot_memoire,
+    un_multiprocesseur,
 ):
     client_albert = (
         un_client_albert_de_test()
@@ -55,7 +61,10 @@ def test_recupere_les_questions_pour_un_chunk_donne(
 
 
 def test_verifie_qu_on_passe_un_prompt_a_notre_generateur_de_questions(
-    un_constructeur_de_document, un_client_albert_de_test, un_entrepot_memoire, un_multiprocesseur
+    un_constructeur_de_document,
+    un_client_albert_de_test,
+    un_entrepot_memoire,
+    un_multiprocesseur,
 ):
     client_albert = (
         un_client_albert_de_test()

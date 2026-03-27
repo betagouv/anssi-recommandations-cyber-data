@@ -62,9 +62,8 @@ class CollecteurDeQuestions:
 
     def collecte(
         self,
-            document: Document,
+        document: Document,
     ):
-
         def decoupe_la_liste_de_documents(
             iterable: list[Chunk],
         ) -> Generator[ChunksAAjouter, None, None]:
@@ -107,6 +106,3 @@ class CollecteurDeQuestions:
                 )
 
         return questions_generees
-
-
-
