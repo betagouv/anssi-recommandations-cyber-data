@@ -2,6 +2,7 @@ from collections.abc import Callable
 
 import pytest
 
+from documents.docling.multi_processeur import Multiprocesseur
 from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
     ReponseCreationCollection,
@@ -104,3 +105,18 @@ def un_client_albert_de_test() -> Callable[[], ClientAlbertJeopardyDeTest]:
 @pytest.fixture
 def un_entrepot_memoire() -> EntrepotQuestionGenereeMemoire:
     return EntrepotQuestionGenereeMemoire()
+
+class MultiProcesseurDeTest(Multiprocesseur):
+    def __init__(self):
+        self.a_ete_appele = False
+
+    def execute(self, func, iterable) -> list:
+        self.a_ete_appele = True
+        resultats = []
+        for chunk in iterable:
+            resultats.append(func(chunk))
+        return resultats
+
+@pytest.fixture()
+def un_multiprocesseur() -> MultiProcesseurDeTest:
+    return MultiProcesseurDeTest()

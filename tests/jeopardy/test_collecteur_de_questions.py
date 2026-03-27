@@ -1,4 +1,3 @@
-from documents.docling.multi_processeur import Multiprocesseur
 from jeopardy.collecteur import CollecteurDeQuestions, Chunk
 from jeopardy.questions import EntrepotQuestionGenereeMemoire
 
@@ -7,76 +6,8 @@ NOM_COLLECTION = "Collection"
 DESCRIPTION_COLLECTION = "Description"
 
 
-class MultiProcesseurDeTest(Multiprocesseur):
-    def __init__(self):
-        self.a_ete_appele = False
-
-    def execute(self, func, iterable) -> list:
-        self.a_ete_appele = True
-        resultats = []
-        for chunk in iterable:
-            resultats.append(func(chunk))
-        return resultats
-
-
-def test_cree_une_collection(
-    un_constructeur_de_document, un_client_albert_de_test, un_entrepot_memoire
-):
-    client_albert = un_client_albert_de_test()
-
-    CollecteurDeQuestions(
-        client_albert, PROMPT, un_entrepot_memoire, MultiProcesseurDeTest()
-    ).collecte(
-        NOM_COLLECTION,
-        DESCRIPTION_COLLECTION,
-        un_constructeur_de_document().construis(),
-    )
-
-    assert client_albert.collection_creee
-
-
-def test_cree_une_collection_en_donnant_un_nom_et_une_description(
-    un_constructeur_de_document, un_client_albert_de_test, un_entrepot_memoire
-):
-    client_albert = un_client_albert_de_test()
-
-    CollecteurDeQuestions(
-        client_albert, "Prompt", un_entrepot_memoire, MultiProcesseurDeTest()
-    ).collecte(
-        "Ma collection", "Ma description", un_constructeur_de_document().construis()
-    )
-
-    assert client_albert.nom_collection_passe == "Jeopardy : Ma collection"
-    assert client_albert.description_collection_passe == "Jeopardy : Ma description"
-
-
-def test_ajoute_un_document_a_la_collection(
-    un_constructeur_de_document, un_client_albert_de_test, un_entrepot_memoire
-):
-    client_albert = un_client_albert_de_test().avec_un_identifiant_de_collection(
-        "collection-123"
-    )
-
-    CollecteurDeQuestions(
-        client_albert, "Prompt", un_entrepot_memoire, MultiProcesseurDeTest()
-    ).collecte(
-        NOM_COLLECTION,
-        DESCRIPTION_COLLECTION,
-        un_constructeur_de_document().construis(),
-    )
-
-    assert client_albert.collection_attendue == "collection-123"
-    assert client_albert.document_cree is not None
-    assert client_albert.document_cree.metadata == {
-        "source": {
-            "nom_document": "Un document indexé",
-            "id_document": "doc-123",
-        }
-    }
-
-
 def test_recupere_les_questions(
-    un_constructeur_de_document, un_client_albert_de_test, un_entrepot_memoire
+    un_constructeur_de_document, un_client_albert_de_test, un_entrepot_memoire, un_multiprocesseur
 ):
     client_albert = (
         un_client_albert_de_test()
@@ -87,10 +18,8 @@ def test_recupere_les_questions(
     )
 
     CollecteurDeQuestions(
-        client_albert, "Prompt", un_entrepot_memoire, MultiProcesseurDeTest()
+        client_albert, "Prompt", un_entrepot_memoire, un_multiprocesseur
     ).collecte(
-        NOM_COLLECTION,
-        DESCRIPTION_COLLECTION,
         un_constructeur_de_document()
         .ajoute_chunk(Chunk(contenu="le contenu", id=0, numero_page=42))
         .construis(),
@@ -102,7 +31,7 @@ def test_recupere_les_questions(
 
 
 def test_recupere_les_questions_pour_un_chunk_donne(
-    un_constructeur_de_document, un_client_albert_de_test, un_entrepot_memoire
+    un_constructeur_de_document, un_client_albert_de_test, un_entrepot_memoire, un_multiprocesseur
 ):
     client_albert = (
         un_client_albert_de_test()
@@ -113,10 +42,8 @@ def test_recupere_les_questions_pour_un_chunk_donne(
     )
 
     CollecteurDeQuestions(
-        client_albert, "Prompt", un_entrepot_memoire, MultiProcesseurDeTest()
+        client_albert, "Prompt", un_entrepot_memoire, un_multiprocesseur
     ).collecte(
-        NOM_COLLECTION,
-        DESCRIPTION_COLLECTION,
         un_constructeur_de_document()
         .ajoute_chunk(Chunk(contenu="le premier contenu", id=0, numero_page=42))
         .ajoute_chunk(Chunk(contenu="le second contenu", id=1, numero_page=4))
@@ -128,7 +55,7 @@ def test_recupere_les_questions_pour_un_chunk_donne(
 
 
 def test_verifie_qu_on_passe_un_prompt_a_notre_generateur_de_questions(
-    un_constructeur_de_document, un_client_albert_de_test, un_entrepot_memoire
+    un_constructeur_de_document, un_client_albert_de_test, un_entrepot_memoire, un_multiprocesseur
 ):
     client_albert = (
         un_client_albert_de_test()
@@ -139,10 +66,8 @@ def test_verifie_qu_on_passe_un_prompt_a_notre_generateur_de_questions(
     )
 
     CollecteurDeQuestions(
-        client_albert, "mon prompt", un_entrepot_memoire, MultiProcesseurDeTest()
+        client_albert, "mon prompt", un_entrepot_memoire, un_multiprocesseur
     ).collecte(
-        NOM_COLLECTION,
-        DESCRIPTION_COLLECTION,
         un_constructeur_de_document()
         .ajoute_chunk(Chunk(contenu="le premier contenu", id=0, numero_page=42))
         .construis(),
@@ -152,7 +77,7 @@ def test_verifie_qu_on_passe_un_prompt_a_notre_generateur_de_questions(
 
 
 def test_persiste_les_questions_generees(
-    un_constructeur_de_document, un_client_albert_de_test
+    un_constructeur_de_document, un_client_albert_de_test, un_multiprocesseur
 ):
     client_albert = (
         un_client_albert_de_test()
@@ -169,8 +94,8 @@ def test_persiste_les_questions_generees(
     entrepot_questions_generees = EntrepotQuestionGenereeMemoire()
 
     CollecteurDeQuestions(
-        client_albert, "Prompt", entrepot_questions_generees, MultiProcesseurDeTest()
-    ).collecte(NOM_COLLECTION, DESCRIPTION_COLLECTION, document)
+        client_albert, "Prompt", entrepot_questions_generees, un_multiprocesseur
+    ).collecte(document)
 
     toutes_les_questions = entrepot_questions_generees.tous()
     assert len(toutes_les_questions) == 2
@@ -187,7 +112,7 @@ def test_persiste_les_questions_generees(
 
 
 def test_traite_les_chunks_en_parallele(
-    un_constructeur_de_document, un_client_albert_de_test
+    un_constructeur_de_document, un_client_albert_de_test, un_multiprocesseur
 ):
     client_albert = (
         un_client_albert_de_test()
@@ -198,10 +123,10 @@ def test_traite_les_chunks_en_parallele(
     )
     document = un_constructeur_de_document().ajoute_nombre_de_chunks(11).construis()
     entrepot_questions_generees = EntrepotQuestionGenereeMemoire()
-    multi_processeur = MultiProcesseurDeTest()
+    multi_processeur = un_multiprocesseur
 
     CollecteurDeQuestions(
         client_albert, "Prompt", entrepot_questions_generees, multi_processeur
-    ).collecte(NOM_COLLECTION, DESCRIPTION_COLLECTION, document)
+    ).collecte(document)
 
     assert multi_processeur.a_ete_appele
