@@ -8,7 +8,9 @@ from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
     ConfigurationJeopardy,
     ReponseCreationCollection,
+    ReponseCreationDocument,
     RequeteCreationDocumentAlbert,
+    RequeteAjoutChunksDansDocumentAlbert,
 )
 
 
@@ -39,6 +41,22 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
         identifiant = corps.get("id")
         return ReponseCreationCollection(id=identifiant)
 
+    def cree_document(
+        self, identifiant_collection: str, document: RequeteCreationDocumentAlbert
+    ) -> ReponseCreationDocument:
+        url = f"{self._configuration.base_url}/documents"
+        payload = {
+            "collection_id": int(identifiant_collection),
+            "name": document.name,
+            "metadata": document.metadata,
+            "disable_chunking": True,
+        }
+
+        self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
+        reponse = self._executeur_de_requete.poste(url, payload, fichiers=None)
+        corps = reponse.json()
+        return ReponseCreationDocument(id=str(corps.get("id")))
+
     def ajoute_document(
         self, identifiant_collection: str, document: RequeteCreationDocumentAlbert
     ) -> None:
@@ -50,7 +68,6 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
             "name": document.name,
             "metadata": document.metadata,
         }
-
         self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
         self._executeur_de_requete.poste(url, payload, fichiers=None)
 
@@ -75,3 +92,18 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
         json_reponse: dict[str, Any | None] = json.loads(contenu_reponse)
         payload_questions = json_reponse.get("questions")
         return payload_questions if payload_questions is not None else []
+
+    def ajoute_chunks_dans_document(
+        self,
+        identifiant_collection: str,
+        requete: RequeteAjoutChunksDansDocumentAlbert,
+    ) -> None:
+        url = (
+            f"{self._configuration.base_url}/collections/"
+            f"{identifiant_collection}/documents/{requete.id_document}/chunks"
+        )
+        payload = {
+            "chunks": requete.chunks,
+        }
+        self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
+        self._executeur_de_requete.poste(url, payload, fichiers=None)

@@ -7,6 +7,7 @@ from documents.docling.multi_processeur import Multiprocesseur
 from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
     ReponseCreationCollection,
+    ReponseCreationDocument,
     RequeteCreationDocumentAlbert,
     RequeteAjoutChunksDansDocumentAlbert,
 )
@@ -69,7 +70,9 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self.collection_creee = False
         self.document_cree = None
         self._identifiant_de_collection = None
+        self._identifiant_document_cree = "doc-cree-123"
         self.collection_attendue = None
+        self.document_ajoute = None
         self.chunks_fournis = []
         self.prompt_passe = ""
         self.appels_ajout_chunks = []
@@ -88,14 +91,25 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self.description_collection_passe = description_collection
         return ReponseCreationCollection(id=self._identifiant_de_collection)
 
+    def cree_document(
+        self, identifiant_collection: str, document: RequeteCreationDocumentAlbert
+    ) -> ReponseCreationDocument:
+        self.document_cree = document
+        self.collection_attendue = identifiant_collection
+        return ReponseCreationDocument(id=self._identifiant_document_cree)
+
     def ajoute_document(
         self, identifiant_collection: str, document: RequeteCreationDocumentAlbert
-    ):
-        self.document_cree = document
+    ) -> None:
+        self.document_ajoute = document
         self.collection_attendue = identifiant_collection
 
     def avec_un_identifiant_de_collection(self, identifiant_collection: str):
         self._identifiant_de_collection = identifiant_collection
+        return self
+
+    def avec_un_identifiant_de_document_cree(self, identifiant_document: str):
+        self._identifiant_document_cree = identifiant_document
         return self
 
     def qui_retourne_les_questions_generees(self, questions_generees: list[str]):

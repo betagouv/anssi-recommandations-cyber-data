@@ -76,6 +76,7 @@ def test_ajoute_un_chunk_par_question_generee_dans_le_document(
     client_albert = (
         un_client_albert_de_test()
         .avec_un_identifiant_de_collection("collection-123")
+        .avec_un_identifiant_de_document_cree("doc-albert-456")
         .qui_retourne_les_questions_generees(
             ["premiere question ?", "seconde question ?"]
         )
@@ -102,7 +103,7 @@ def test_ajoute_un_chunk_par_question_generee_dans_le_document(
     assert len(client_albert.appels_ajout_chunks) == 1
     assert len(appel.requete.chunks) == 2
     assert appel.identifiant_collection == "collection-123"
-    assert appel.requete.id_document == "doc-123"
+    assert appel.requete.id_document == "doc-albert-456"
     assert appel.requete.chunks[0]["contenu"] == "premiere question ?"
     assert appel.requete.chunks[1]["contenu"] == "seconde question ?"
 

@@ -26,6 +26,8 @@ class ServiceJepoardy:
         self._client_albert = client_albert
         self._prompt = prompt
         self._multi_processeur = multi_processeur
+        self._identifiant_collection_en_cours: str | None = None
+        self._id_document_en_cours: str | None = None
 
     def jeopardyse(
         self, nom_collection: str, description_collection: str, document: Document
@@ -36,8 +38,7 @@ class ServiceJepoardy:
         reponse_creation_collection = self._client_albert.cree_collection(
             f"Jeopardy : {nom_collection}", f"Jeopardy : {description_collection}"
         )
-        print(f"ID de la collection créée : {reponse_creation_collection.id}")
-        self._client_albert.ajoute_document(
+        reponse_creation_document = self._client_albert.cree_document(
             reponse_creation_collection.id, _en_document_albert(document)
         )
         collecteur = CollecteurDeQuestions(
@@ -53,28 +54,33 @@ class ServiceJepoardy:
 
         questions_generees = self._entrepot_questions.tous()
 
-        def ajoute_un_paquet_de_questions(
-            paquet_de_questions: list[QuestionGeneree],
-        ) -> None:
-            self._client_albert.ajoute_chunks_dans_document(
-                identifiant_collection=reponse_creation_collection.id,
-                requete=RequeteAjoutChunksDansDocumentAlbert(
-                    id_document=document.id_document,
-                    chunks=[
-                        _en_chunk_albert(question_generee)
-                        for question_generee in paquet_de_questions
-                    ],
-                ),
-            )
+        self._identifiant_collection_en_cours = reponse_creation_collection.id
+        self._id_document_en_cours = reponse_creation_document.id
 
         self._multi_processeur.execute(
-            ajoute_un_paquet_de_questions,
+            self._ajoute_chunks_dans_document,
             _decoupe_en_paquets_de_dix(questions_generees),
         )
-        # PARTIE 1
-        # pour toutes les questions générées, ajouter un chunk par question au document
-        # toujours pareil en splittant la liste et en faisant du multi processeur
-        # en ajoutant une nouvelle méthode ajoute_chunks_dans_document
+
+    def _ajoute_chunks_dans_document(
+        self, paquet_de_questions: list[QuestionGeneree]
+    ) -> None:
+        if (
+            self._identifiant_collection_en_cours is None
+            or self._id_document_en_cours is None
+        ):
+            raise ValueError("Le contexte d'ajout des questions n'est pas initialisé.")
+
+        self._client_albert.ajoute_chunks_dans_document(
+            identifiant_collection=self._identifiant_collection_en_cours,
+            requete=RequeteAjoutChunksDansDocumentAlbert(
+                id_document=self._id_document_en_cours,
+                chunks=[
+                    _en_chunk_albert(question_generee)
+                    for question_generee in paquet_de_questions
+                ],
+            ),
+        )
 
 
 def _en_document_albert(document: Document) -> RequeteCreationDocumentAlbert:

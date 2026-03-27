@@ -16,6 +16,11 @@ class ReponseCreationCollection:
     id: str
 
 
+@dataclass
+class ReponseCreationDocument:
+    id: str
+
+
 class ClientAlbertJeopardy(ABC):
     @abstractmethod
     def cree_collection(
@@ -24,13 +29,27 @@ class ClientAlbertJeopardy(ABC):
         pass
 
     @abstractmethod
+    def cree_document(
+        self, identifiant_collection: str, document: RequeteCreationDocumentAlbert
+    ) -> ReponseCreationDocument:
+        pass
+
+    @abstractmethod
     def ajoute_document(
         self, identifiant_collection: str, document: RequeteCreationDocumentAlbert
-    ):
+    ) -> None:
         pass
 
     @abstractmethod
     def genere_questions(self, prompt: str, contenu: str) -> list[str]:
+        pass
+
+    @abstractmethod
+    def ajoute_chunks_dans_document(
+        self,
+        identifiant_collection: str,
+        requete: RequeteAjoutChunksDansDocumentAlbert,
+    ):
         pass
 
 
