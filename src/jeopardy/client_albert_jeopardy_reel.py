@@ -36,6 +36,7 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
 
         self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
         reponse = self._executeur_de_requete.poste(url, payload, fichiers=None)
+        reponse.raise_for_status()
 
         corps = reponse.json()
         identifiant = corps.get("id")
@@ -48,28 +49,15 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
         payload = {
             "collection_id": int(identifiant_collection),
             "name": document.name,
-            "metadata": document.metadata,
+            "metadata": json.dumps(document.metadata),
             "disable_chunking": True,
         }
 
         self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
-        reponse = self._executeur_de_requete.poste(url, payload, fichiers=None)
+        reponse = self._executeur_de_requete.poste(url, payload, fichiers={})
+        reponse.raise_for_status()
         corps = reponse.json()
         return ReponseCreationDocument(id=str(corps.get("id")))
-
-    def ajoute_document(
-        self, identifiant_collection: str, document: RequeteCreationDocumentAlbert
-    ) -> None:
-        url = (
-            f"{self._configuration.base_url}/collections/"
-            f"{identifiant_collection}/documents"
-        )
-        payload = {
-            "name": document.name,
-            "metadata": document.metadata,
-        }
-        self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
-        self._executeur_de_requete.poste(url, payload, fichiers=None)
 
     def genere_questions(self, prompt: str, contenu: str) -> list[str]:
         url = f"{self._configuration.base_url}/chat/completions"
@@ -85,11 +73,15 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
         }
         self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
         reponse = self._executeur_de_requete.poste(url, payload, fichiers=None)
+        reponse.raise_for_status()
         corps = reponse.json()
         contenu_reponse = (
             corps.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
         )
-        json_reponse: dict[str, Any | None] = json.loads(contenu_reponse)
+        try:
+            json_reponse: dict[str, Any | None] = json.loads(contenu_reponse)
+        except json.JSONDecodeError:
+            return []
         payload_questions = json_reponse.get("questions")
         return payload_questions if payload_questions is not None else []
 
@@ -98,12 +90,45 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
         identifiant_collection: str,
         requete: RequeteAjoutChunksDansDocumentAlbert,
     ) -> None:
-        url = (
-            f"{self._configuration.base_url}/collections/"
-            f"{identifiant_collection}/documents/{requete.id_document}/chunks"
-        )
+        url = f"{self._configuration.base_url}/documents/{requete.id_document}/chunks"
         payload = {
             "chunks": requete.chunks,
         }
         self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
-        self._executeur_de_requete.poste(url, payload, fichiers=None)
+        reponse = self._executeur_de_requete.poste(url, payload, fichiers=None)
+        reponse.raise_for_status()
+
+    def recupere_chunks_document(self, id_document: str) -> list[dict]:
+        limite = 100
+        offset = 0
+        tous_les_chunks: list[dict] = []
+        self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
+
+        while True:
+            url = (
+                f"{self._configuration.base_url}/documents/{id_document}/chunks"
+                f"?limit={limite}&offset={offset}"
+            )
+            reponse = self._executeur_de_requete.recupere(url)
+            reponse.raise_for_status()
+            corps = reponse.json()
+
+            chunks: list[dict] = []
+            if isinstance(corps, dict):
+                data = corps.get("data", [])
+                if isinstance(data, list):
+                    chunks = data
+            elif isinstance(corps, list):
+                chunks = corps
+
+            if not chunks:
+                break
+
+            tous_les_chunks.extend(chunks)
+
+            if len(chunks) < limite:
+                break
+
+            offset += limite
+
+        return tous_les_chunks
