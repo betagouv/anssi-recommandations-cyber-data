@@ -30,37 +30,40 @@ class ServiceJepoardy:
         self._multi_processeur = multi_processeur
 
     def jeopardyse(
-        self, nom_collection: str, description_collection: str, id_document: str
+        self, nom_collection: str, description_collection: str, id_collection: str
     ):
         reponse_creation_collection = self._client_albert.cree_collection(
             f"Jeopardy : {nom_collection}", f"Jeopardy : {description_collection}"
         )
 
-        document_depuis_albert = self._recupere_et_mappe_document_depuis_albert(
-            id_document
-        )
-        reponse_creation_document = self._client_albert.cree_document(
-            reponse_creation_collection.id, _en_document_albert(document_depuis_albert)
+        documents_depuis_albert = self._recupere_et_mappe_collection_depuis_albert(
+            id_collection
         )
 
-        collecteur = CollecteurDeQuestions(
-            client_albert=self._client_albert,
-            prompt=self._prompt,
-            entrepot_questions_generees=self._entrepot_questions,
-            multi_processeur=self._multi_processeur,
-        )
-        collecteur.collecte(document=document_depuis_albert)
-
-        questions_generees = self._entrepot_questions.tous()
-
-        self._multi_processeur.execute(
-            partial(
-                self._ajoute_chunks_dans_document,
+        for document_depuis_albert in documents_depuis_albert:
+            reponse_creation_document = self._client_albert.cree_document(
                 reponse_creation_collection.id,
-                reponse_creation_document.id,
-            ),
-            _decoupe_en_paquets_de_dix(questions_generees),
-        )
+                _en_document_albert(document_depuis_albert),
+            )
+
+            collecteur = CollecteurDeQuestions(
+                client_albert=self._client_albert,
+                prompt=self._prompt,
+                entrepot_questions_generees=self._entrepot_questions,
+                multi_processeur=self._multi_processeur,
+            )
+            collecteur.collecte(document=document_depuis_albert)
+
+            questions_generees = list(self._entrepot_questions.tous())
+
+            self._multi_processeur.execute(
+                partial(
+                    self._ajoute_chunks_dans_document,
+                    reponse_creation_collection.id,
+                    reponse_creation_document.id,
+                ),
+                _decoupe_en_paquets_de_dix(questions_generees),
+            )
 
     def _ajoute_chunks_dans_document(
         self,
@@ -79,16 +82,30 @@ class ServiceJepoardy:
             ),
         )
 
-    def _recupere_et_mappe_document_depuis_albert(self, id_document: str) -> Document:
-        chunks_document = self._client_albert.recupere_chunks_document(id_document)
-        if not chunks_document:
-            raise ValueError(f"Aucun chunk trouve pour le document {id_document}.")
-
-        return _mappe_vers_document(
-            nom_document=f"document-{id_document}",
-            id_document=id_document,
-            chunks_document=chunks_document,
+    def _recupere_et_mappe_collection_depuis_albert(
+        self, id_collection: str
+    ) -> list[Document]:
+        reponse_documents_collection = (
+            self._client_albert.recupere_documents_collection(id_collection)
         )
+        documents: list[Document] = []
+
+        for document_collection in reponse_documents_collection.documents:
+            id_document = document_collection.id
+            chunks_document = self._client_albert.recupere_chunks_document(id_document)
+
+            if not chunks_document:
+                raise ValueError(f"Aucun chunk trouve pour le document {id_document}.")
+
+            documents.append(
+                _mappe_vers_document(
+                    nom_document=document_collection.nom,
+                    id_document=id_document,
+                    chunks_document=chunks_document,
+                )
+            )
+
+        return documents
 
 
 def _en_document_albert(document: Document) -> RequeteCreationDocumentAlbert:

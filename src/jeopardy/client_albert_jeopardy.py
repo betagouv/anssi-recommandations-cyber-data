@@ -50,6 +50,12 @@ class ClientAlbertJeopardy(ABC):
     def recupere_chunks_document(self, id_document: str) -> list[dict]:
         pass
 
+    @abstractmethod
+    def recupere_documents_collection(
+        self, id_collection: str
+    ) -> ReponseDocumentsCollectionOrigine:
+        pass
+
 
 class ErreurClientAlbertJeopardy(Exception):
     """Erreur levée lors d'un échange avec Albert."""
@@ -66,3 +72,16 @@ class ConfigurationJeopardy:
 class RequeteAjoutChunksDansDocumentAlbert:
     id_document: str
     chunks: list[dict[str, Any]]
+
+
+@dataclass
+class ReponseDocumentOrigine:
+    id: str
+    nom: str
+    nombre_chunks: int
+
+
+@dataclass
+class ReponseDocumentsCollectionOrigine:
+    id: str
+    documents: list[ReponseDocumentOrigine]

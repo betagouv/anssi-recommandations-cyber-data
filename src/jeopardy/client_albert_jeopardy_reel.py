@@ -11,6 +11,8 @@ from jeopardy.client_albert_jeopardy import (
     ReponseCreationDocument,
     RequeteCreationDocumentAlbert,
     RequeteAjoutChunksDansDocumentAlbert,
+    ReponseDocumentOrigine,
+    ReponseDocumentsCollectionOrigine,
 )
 
 
@@ -97,6 +99,55 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
         self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
         reponse = self._executeur_de_requete.poste(url, payload, fichiers=None)
         reponse.raise_for_status()
+
+    def recupere_documents_collection(
+        self, id_collection: str
+    ) -> ReponseDocumentsCollectionOrigine:
+        limite = 100
+        offset = 0
+        documents: list[ReponseDocumentOrigine] = []
+        self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
+
+        while True:
+            url = (
+                f"{self._configuration.base_url}/documents"
+                f"?collection_id={int(id_collection)}&limit={limite}&offset={offset}"
+            )
+            reponse = self._executeur_de_requete.recupere(url)
+            reponse.raise_for_status()
+            corps = reponse.json()
+
+            donnees: list[dict] = []
+            if isinstance(corps, dict):
+                data = corps.get("data", [])
+                if isinstance(data, list):
+                    donnees = data
+            elif isinstance(corps, list):
+                donnees = corps
+
+            if not donnees:
+                break
+
+            documents.extend(
+                [
+                    ReponseDocumentOrigine(
+                        id=str(document["id"]),
+                        nom=str(document.get("name", "")),
+                        nombre_chunks=int(document.get("chunk_count", 0)),
+                    )
+                    for document in donnees
+                ]
+            )
+
+            if len(donnees) < limite:
+                break
+
+            offset += limite
+
+        return ReponseDocumentsCollectionOrigine(
+            id=id_collection,
+            documents=documents,
+        )
 
     def recupere_chunks_document(self, id_document: str) -> list[dict]:
         limite = 100
