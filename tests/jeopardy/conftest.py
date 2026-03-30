@@ -10,6 +10,8 @@ from jeopardy.client_albert_jeopardy import (
     ReponseCreationDocument,
     RequeteCreationDocumentAlbert,
     RequeteAjoutChunksDansDocumentAlbert,
+    ReponseDocumentOrigine,
+    ReponseDocumentsCollectionOrigine,
 )
 from jeopardy.collecteur import Document, Chunk
 from jeopardy.questions import EntrepotQuestionGenereeMemoire
@@ -77,6 +79,7 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self.prompt_passe = ""
         self.appels_ajout_chunks = []
         self.identifiant_collection_lu = None
+        self._identifiants_documents = []
         self.identifiant_document_lu = None
         self._chunks_par_document: dict[str, list[dict]] = {}
 
@@ -105,6 +108,12 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self._identifiant_de_collection = identifiant_collection
         return self
 
+    def qui_retourne_une_collection_avec_les_identifiants_de_document(
+        self, identifiants_documents: list[str]
+    ):
+        self._identifiants_documents.extend(identifiants_documents)
+        return self
+
     def avec_un_identifiant_de_document_cree(self, identifiant_document: str):
         self._identifiant_document_cree = identifiant_document
         return self
@@ -130,6 +139,22 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
     ) -> list[str]:
         self.identifiant_collection_lu = identifiant_collection
         return list(self._chunks_par_document.keys())
+
+    def recupere_documents_collection(
+        self, identifiant_collection: str
+    ) -> ReponseDocumentsCollectionOrigine:
+        self.identifiant_collection_lu = identifiant_collection
+        return ReponseDocumentsCollectionOrigine(
+            id=identifiant_collection,
+            documents=[
+                ReponseDocumentOrigine(
+                    id=identifiant,
+                    nom=f"document-{identifiant}",
+                    nombre_chunks=len(self._chunks_par_document.get(identifiant, [])),
+                )
+                for identifiant in self._identifiants_documents
+            ],
+        )
 
     def recupere_chunks_document(self, id_document: str) -> list[dict]:
         self.identifiant_document_lu = id_document

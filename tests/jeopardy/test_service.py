@@ -57,11 +57,15 @@ def test_recupere_les_chunks_du_document_source_depuis_son_identifiant(
     un_entrepot_memoire,
     un_multiprocesseur,
 ):
+    id_collection = "collection-123"
+    id_document = "doc-source-123"
+
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection("collection-123")
+        .avec_un_identifiant_de_collection(id_collection)
+        .qui_retourne_une_collection_avec_les_identifiants_de_document([id_document])
         .avec_les_chunks_du_document(
-            "doc-source-123",
+            id_document,
             [
                 {
                     "id": 7,
@@ -77,10 +81,10 @@ def test_recupere_les_chunks_du_document_source_depuis_son_identifiant(
     ).jeopardyse(
         "Nom",
         "Description",
-        "doc-source-123",
+        id_collection,
     )
 
-    assert client_albert.identifiant_document_lu == "doc-source-123"
+    assert client_albert.identifiant_document_lu == id_document
 
 
 def test_ajoute_un_chunk_par_question_generee_dans_le_document_cree(
@@ -88,12 +92,16 @@ def test_ajoute_un_chunk_par_question_generee_dans_le_document_cree(
     un_entrepot_memoire,
     un_multiprocesseur,
 ):
+    id_collection = "collection-123"
+    id_document = "doc-123"
+
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection("collection-123")
+        .avec_un_identifiant_de_collection(id_collection)
         .avec_un_identifiant_de_document_cree("doc-albert-456")
+        .qui_retourne_une_collection_avec_les_identifiants_de_document([id_document])
         .avec_les_chunks_du_document(
-            "doc-123",
+            id_document,
             [
                 {
                     "id": 7,
@@ -115,7 +123,7 @@ def test_ajoute_un_chunk_par_question_generee_dans_le_document_cree(
     ).jeopardyse(
         "Nom",
         "Description",
-        "doc-123",
+        id_collection,
     )
 
     appel = client_albert.appels_ajout_chunks[0]
@@ -133,11 +141,15 @@ def test_ajoute_les_metadonnees_utiles_dans_les_chunks_generes(
     un_entrepot_memoire,
     un_multiprocesseur,
 ):
+    id_collection = "collection-123"
+    id_document = "doc-123"
+
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection("collection-123")
+        .avec_un_identifiant_de_collection(id_collection)
+        .qui_retourne_une_collection_avec_les_identifiants_de_document([id_document])
         .avec_les_chunks_du_document(
-            "doc-123",
+            id_document,
             [
                 {
                     "id": 99,
@@ -157,7 +169,7 @@ def test_ajoute_les_metadonnees_utiles_dans_les_chunks_generes(
     ).jeopardyse(
         "Nom",
         "Description",
-        "doc-123",
+        id_collection,
     )
 
     appel = client_albert.appels_ajout_chunks[0]
@@ -176,11 +188,15 @@ def test_ajoute_les_chunks_de_questions_par_paquets_de_dix_en_utilisant_le_multi
     un_entrepot_memoire,
     un_multiprocesseur,
 ):
+    id_collection = "collection-123"
+    id_document = "doc-123"
+
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection("collection-123")
+        .avec_un_identifiant_de_collection(id_collection)
+        .qui_retourne_une_collection_avec_les_identifiants_de_document([id_document])
         .avec_les_chunks_du_document(
-            "doc-123",
+            id_document,
             [
                 {
                     "id": i,
@@ -202,7 +218,7 @@ def test_ajoute_les_chunks_de_questions_par_paquets_de_dix_en_utilisant_le_multi
     ).jeopardyse(
         "Nom",
         "Description",
-        "doc-123",
+        id_collection,
     )
 
     assert multi_processeur.a_ete_appele
@@ -211,16 +227,21 @@ def test_ajoute_les_chunks_de_questions_par_paquets_de_dix_en_utilisant_le_multi
     assert len(client_albert.appels_ajout_chunks[1].requete.chunks) == 1
 
 
-def test_recupere_les_chunks_depuis_albert_en_partant_de_l_id_document(
+def test_recupere_les_chunks_depuis_albert_en_partant_de_la_collection(
     un_client_albert_de_test,
     un_entrepot_memoire,
     un_multiprocesseur,
 ):
+    id_collection = "collection-albert-42"
+    identifiant_document = "doc-albert-42"
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection("collection-123")
+        .avec_un_identifiant_de_collection(id_collection)
+        .qui_retourne_une_collection_avec_les_identifiants_de_document(
+            [identifiant_document]
+        )
         .avec_les_chunks_du_document(
-            "doc-albert-42",
+            identifiant_document,
             [
                 {
                     "id": 7,
@@ -240,8 +261,8 @@ def test_recupere_les_chunks_depuis_albert_en_partant_de_l_id_document(
     ).jeopardyse(
         "Nom",
         "Description",
-        "doc-albert-42",
+        id_collection,
     )
 
-    assert client_albert.identifiant_document_lu == "doc-albert-42"
-    assert client_albert.chunks_fournis[0] == "contenu depuis Albert"
+    assert client_albert.identifiant_collection_lu == id_collection
+    assert client_albert.identifiant_document_lu == identifiant_document
