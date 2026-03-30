@@ -5,6 +5,7 @@ from itertools import islice
 from typing import Generator
 
 from documents.docling.multi_processeur import Multiprocesseur
+from infra.interval import Interval
 from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
     RequeteAjoutChunksDansDocumentAlbert,
@@ -81,6 +82,7 @@ class ServiceJepoardy:
                 ],
             ),
         )
+        Interval.pause()
 
     def _recupere_et_mappe_collection_depuis_albert(
         self, id_collection: str
@@ -124,7 +126,7 @@ def _en_chunk_albert(question_generee: QuestionGeneree) -> dict[str, object]:
         "metadata": {
             "source_id_document": question_generee.id_document,
             "source_id_chunk": question_generee.id_chunk,
-            "source_numero_page": question_generee.numero_page,
+            "source_numero_page": question_generee.page,
         },
     }
 
@@ -142,13 +144,13 @@ def _mappe_un_chunk(chunk: dict) -> ChunkSource:
 
     id_chunk = chunk.get("id", source.get("id_chunk", 0))
     contenu = chunk.get("contenu", chunk.get("content", ""))
-    numero_page = source.get("numero_page", 1)
+    numero_page = metadata.get("page", 1)
 
     return ChunkSource(
         {
             "id": int(id_chunk),
             "contenu": str(contenu),
-            "numero_page": int(numero_page),
+            "page": int(numero_page),
         }
     )
 

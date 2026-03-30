@@ -36,14 +36,14 @@ class ConstructeurDeDocument:
             {
                 "id": chunk.id,
                 "contenu": chunk.contenu,
-                "numero_page": chunk.numero_page,
+                "page": chunk.page,
             }
         )
         return self
 
     def ajoute_nombre_de_chunks(self, nombre_de_chunks: int):
         for i, chunk in enumerate(range(nombre_de_chunks)):
-            c = Chunk(contenu=f"le contenu numero {i}", id=i, numero_page=42)
+            c = Chunk(contenu=f"le contenu numero {i}", id=i, page=42)
             self.ajoute_chunk(c)
         return self
 
