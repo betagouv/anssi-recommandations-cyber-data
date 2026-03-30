@@ -24,7 +24,7 @@ def test_recupere_les_questions(
         client_albert, "Prompt", un_entrepot_memoire, un_multiprocesseur
     ).collecte(
         un_constructeur_de_document()
-        .ajoute_chunk(Chunk(contenu="le contenu", id=0, numero_page=42))
+        .ajoute_chunk(Chunk(contenu="le contenu", id=0, page=42))
         .construis(),
     )
 
@@ -51,8 +51,8 @@ def test_recupere_les_questions_pour_un_chunk_donne(
         client_albert, "Prompt", un_entrepot_memoire, un_multiprocesseur
     ).collecte(
         un_constructeur_de_document()
-        .ajoute_chunk(Chunk(contenu="le premier contenu", id=0, numero_page=42))
-        .ajoute_chunk(Chunk(contenu="le second contenu", id=1, numero_page=4))
+        .ajoute_chunk(Chunk(contenu="le premier contenu", id=0, page=42))
+        .ajoute_chunk(Chunk(contenu="le second contenu", id=1, page=4))
         .construis(),
     )
 
@@ -78,7 +78,7 @@ def test_verifie_qu_on_passe_un_prompt_a_notre_generateur_de_questions(
         client_albert, "mon prompt", un_entrepot_memoire, un_multiprocesseur
     ).collecte(
         un_constructeur_de_document()
-        .ajoute_chunk(Chunk(contenu="le premier contenu", id=0, numero_page=42))
+        .ajoute_chunk(Chunk(contenu="le premier contenu", id=0, page=42))
         .construis(),
     )
 
@@ -97,7 +97,7 @@ def test_persiste_les_questions_generees(
     )
     document = (
         un_constructeur_de_document()
-        .ajoute_chunk(Chunk(contenu="le premier contenu", id=0, numero_page=42))
+        .ajoute_chunk(Chunk(contenu="le premier contenu", id=0, page=42))
         .construis()
     )
     entrepot_questions_generees = EntrepotQuestionGenereeMemoire()
@@ -112,12 +112,12 @@ def test_persiste_les_questions_generees(
     assert toutes_les_questions[0].contenu_origine == "le premier contenu"
     assert toutes_les_questions[0].id_document == document.id_document
     assert toutes_les_questions[0].id_chunk == 0
-    assert toutes_les_questions[0].numero_page == 42
+    assert toutes_les_questions[0].page == 42
     assert toutes_les_questions[1].contenu == "seconde question ?"
     assert toutes_les_questions[0].contenu_origine == "le premier contenu"
     assert toutes_les_questions[1].id_document == document.id_document
     assert toutes_les_questions[1].id_chunk == 0
-    assert toutes_les_questions[1].numero_page == 42
+    assert toutes_les_questions[1].page == 42
 
 
 def test_traite_les_chunks_en_parallele(

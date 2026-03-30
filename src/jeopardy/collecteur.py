@@ -12,13 +12,13 @@ from jeopardy.questions import EntrepotQuestionGeneree, QuestionGeneree
 class ChunkSource(TypedDict):
     id: int
     contenu: str
-    numero_page: int
+    page: int
 
 
 class Chunk(NamedTuple):
     contenu: str
     id: int
-    numero_page: int
+    page: int
 
 
 class Document:
@@ -32,9 +32,7 @@ class Document:
         if isinstance(chunks, list):
             self.chunks: list[Chunk] = list(
                 map(
-                    lambda c: Chunk(
-                        contenu=c["contenu"], id=c["id"], numero_page=c["numero_page"]
-                    ),
+                    lambda c: Chunk(contenu=c["contenu"], id=c["id"], page=c["page"]),
                     chunks,
                 )
             )
@@ -101,7 +99,7 @@ class CollecteurDeQuestions:
                         contenu_origine=chunk.contenu,
                         id_document=chunks_a_ajouter.id_document,
                         id_chunk=chunk.id,
-                        numero_page=chunk.numero_page,
+                        page=chunk.page,
                     )
                 )
 

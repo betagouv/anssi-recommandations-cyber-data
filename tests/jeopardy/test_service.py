@@ -154,7 +154,7 @@ def test_ajoute_les_metadonnees_utiles_dans_les_chunks_generes(
                 {
                     "id": 99,
                     "content": "le contenu origine",
-                    "metadata": {"source": {"numero_page": 12}},
+                    "metadata": {"page": 12},
                 }
             ],
         )

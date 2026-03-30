@@ -8,7 +8,7 @@ class QuestionGeneree:
     contenu_origine: str
     id_document: str
     id_chunk: int
-    numero_page: int
+    page: int
 
 
 class EntrepotQuestionGeneree(ABC):

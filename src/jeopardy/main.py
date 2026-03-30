@@ -24,9 +24,9 @@ def _construis_parser() -> argparse.ArgumentParser:
         help="Description de la collection source.",
     )
     parser.add_argument(
-        "--id-document",
+        "--id-collection",
         required=True,
-        help="Identifiant du document Albert source.",
+        help="Identifiant de la collection Albert source.",
     )
     return parser
 
@@ -43,13 +43,13 @@ def main():
     ServiceJepoardy(client_albert, entrepot_questions).jeopardyse(
         arguments.nom_collection,
         arguments.description_collection,
-        arguments.id_document,
+        arguments.id_collection,
     )
     questions = entrepot_questions.tous()
 
     for index, question in enumerate(questions[:20], start=1):
         print(
-            f"{index}. [chunk={question.id_chunk} page={question.numero_page}] {question.contenu}"
+            f"{index}. [chunk={question.id_chunk} page={question.page}] {question.contenu}"
         )
 
 
