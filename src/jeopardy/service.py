@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import partial
 from itertools import islice
 from typing import Generator
 
@@ -27,8 +28,6 @@ class ServiceJepoardy:
         self._client_albert = client_albert
         self._prompt = prompt
         self._multi_processeur = multi_processeur
-        self._identifiant_collection_en_cours: str | None = None
-        self._id_document_en_cours: str | None = None
 
     def jeopardyse(
         self, nom_collection: str, description_collection: str, id_document: str
@@ -53,27 +52,26 @@ class ServiceJepoardy:
         collecteur.collecte(document=document_depuis_albert)
 
         questions_generees = self._entrepot_questions.tous()
-        self._identifiant_collection_en_cours = reponse_creation_collection.id
-        self._id_document_en_cours = reponse_creation_document.id
 
         self._multi_processeur.execute(
-            self._ajoute_chunks_dans_document,
+            partial(
+                self._ajoute_chunks_dans_document,
+                reponse_creation_collection.id,
+                reponse_creation_document.id,
+            ),
             _decoupe_en_paquets_de_dix(questions_generees),
         )
 
     def _ajoute_chunks_dans_document(
-        self, paquet_de_questions: list[QuestionGeneree]
+        self,
+        identifiant_collection: str,
+        identifiant_document: str,
+        paquet_de_questions: list[QuestionGeneree],
     ) -> None:
-        if (
-            self._identifiant_collection_en_cours is None
-            or self._id_document_en_cours is None
-        ):
-            raise ValueError("Le contexte d'ajout des questions n'est pas initialisé.")
-
         self._client_albert.ajoute_chunks_dans_document(
-            identifiant_collection=self._identifiant_collection_en_cours,
+            identifiant_collection=identifiant_collection,
             requete=RequeteAjoutChunksDansDocumentAlbert(
-                id_document=self._id_document_en_cours,
+                id_document=identifiant_document,
                 chunks=[
                     _en_chunk_albert(question_generee)
                     for question_generee in paquet_de_questions
@@ -110,7 +108,6 @@ def _en_chunk_albert(question_generee: QuestionGeneree) -> dict[str, object]:
             "source_id_document": question_generee.id_document,
             "source_id_chunk": question_generee.id_chunk,
             "source_numero_page": question_generee.numero_page,
-            "source_contenu_origine": question_generee.contenu_origine,
         },
     }
 

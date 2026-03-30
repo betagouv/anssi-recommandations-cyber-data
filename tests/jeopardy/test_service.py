@@ -168,7 +168,6 @@ def test_ajoute_les_metadonnees_utiles_dans_les_chunks_generes(
         "source_id_document": "doc-123",
         "source_id_chunk": 99,
         "source_numero_page": 12,
-        "source_contenu_origine": "le contenu origine",
     }
 
 
