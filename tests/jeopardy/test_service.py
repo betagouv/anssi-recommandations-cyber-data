@@ -94,7 +94,6 @@ def test_ajoute_un_chunk_par_question_generee_dans_le_document_cree(
 ):
     id_collection = "collection-123"
     id_document = "doc-123"
-
     client_albert = (
         un_client_albert_de_test()
         .avec_un_identifiant_de_collection(id_collection)
@@ -127,13 +126,55 @@ def test_ajoute_un_chunk_par_question_generee_dans_le_document_cree(
     )
 
     appel = client_albert.appels_ajout_chunks[0]
-
     assert len(client_albert.appels_ajout_chunks) == 1
     assert len(appel.requete.chunks) == 2
     assert appel.identifiant_collection == "collection-123"
     assert appel.requete.id_document == "doc-albert-456"
     assert appel.requete.chunks[0]["content"] == "premiere question ?"
     assert appel.requete.chunks[1]["content"] == "seconde question ?"
+
+
+def test_continue_l_ajout_de_chunks_si_une_erreur_est_levee(
+    un_client_albert_de_test,
+    un_entrepot_memoire,
+    un_multiprocesseur,
+):
+    id_collection = "collection-123"
+    id_document = "doc-123"
+    client_albert = (
+        un_client_albert_de_test()
+        .avec_un_identifiant_de_collection(id_collection)
+        .avec_un_identifiant_de_document_cree("doc-albert-456")
+        .qui_retourne_une_collection_avec_les_identifiants_de_document([id_document])
+        .avec_les_chunks_du_document(
+            id_document,
+            [
+                {
+                    "id": 7,
+                    "content": "contenu source",
+                    "metadata": {"source": {"numero_page": 42}},
+                },
+                {
+                    "id": 8,
+                    "content": "contenu source",
+                    "metadata": {"source": {"numero_page": 42}},
+                },
+            ],
+        )
+        .levant_une_erreur_sur_l_ajout_du_chunk(7)
+        .qui_retourne_les_questions_generees(
+            ["premiere question ?", "seconde question ?"]
+        )
+    )
+
+    ServiceJepoardy(
+        client_albert,
+        un_entrepot_memoire,
+        "Prompt",
+        un_multiprocesseur,
+    ).jeopardyse("Nom", "Description", id_collection, 1)
+
+    assert len(client_albert.appels_ajout_chunks) == 2
 
 
 def test_ajoute_les_metadonnees_utiles_dans_les_chunks_generes(

@@ -31,7 +31,11 @@ class ServiceJepoardy:
         self._multi_processeur = multi_processeur
 
     def jeopardyse(
-        self, nom_collection: str, description_collection: str, id_collection: str
+        self,
+        nom_collection: str,
+        description_collection: str,
+        id_collection: str,
+        taille_paquet_chunks=10,
     ):
         reponse_creation_collection = self._client_albert.cree_collection(
             f"Jeopardy : {nom_collection}", f"Jeopardy : {description_collection}"
@@ -64,7 +68,7 @@ class ServiceJepoardy:
                     reponse_creation_collection.id,
                     reponse_creation_document.id,
                 ),
-                _decoupe_en_paquets_de_dix(questions_generees),
+                _decoupe_en_paquets(questions_generees, taille_paquet_chunks),
             )
 
     def _ajoute_chunks_dans_document(
@@ -73,18 +77,21 @@ class ServiceJepoardy:
         identifiant_document: str,
         paquet_de_questions: list[QuestionGeneree],
     ) -> None:
-        # TODO: Gérer le cas où l’ajout d’un chunk lève une erreur : il faut continuer pour les suivants
-        self._client_albert.ajoute_chunks_dans_document(
-            identifiant_collection=identifiant_collection,
-            requete=RequeteAjoutChunksDansDocumentAlbert(
-                id_document=identifiant_document,
-                chunks=[
-                    _en_chunk_albert(question_generee)
-                    for question_generee in paquet_de_questions
-                ],
-            ),
-        )
-        Interval.pause()
+        try:
+            self._client_albert.ajoute_chunks_dans_document(
+                identifiant_collection=identifiant_collection,
+                requete=RequeteAjoutChunksDansDocumentAlbert(
+                    id_document=identifiant_document,
+                    chunks=[
+                        _en_chunk_albert(question_generee)
+                        for question_generee in paquet_de_questions
+                    ],
+                ),
+            )
+            Interval.pause()
+        except Exception:
+            # TODO: Ajouter du feedback
+            return
 
     def _recupere_et_mappe_collection_depuis_albert(
         self, id_collection: str
@@ -160,13 +167,13 @@ def _mappe_un_chunk(chunk: dict) -> ChunkSource:
     )
 
 
-def _decoupe_en_paquets_de_dix(
-    elements: list[QuestionGeneree],
+def _decoupe_en_paquets(
+    elements: list[QuestionGeneree], taille_paquet
 ) -> Generator[list[QuestionGeneree], None, None]:
     iterateur = iter(elements)
 
     while True:
-        paquet = list(islice(iterateur, 10))
+        paquet = list(islice(iterateur, taille_paquet))
         if not paquet:
             break
         yield paquet
