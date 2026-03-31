@@ -1,4 +1,4 @@
-from jeopardy.service import ServiceJepoardy
+from jeopardy.service import ServiceJeopardy
 
 
 def test_cree_une_collection(
@@ -17,7 +17,7 @@ def test_cree_une_collection(
         ],
     )
 
-    ServiceJepoardy(
+    ServiceJeopardy(
         client_albert, un_entrepot_memoire, "Un prompt", un_multiprocesseur
     ).jeopardyse(
         "Nom",
@@ -44,7 +44,7 @@ def test_cree_une_collection_en_donnant_un_nom_et_une_description(
         ],
     )
 
-    ServiceJepoardy(
+    ServiceJeopardy(
         client_albert, un_entrepot_memoire, "Prompt", un_multiprocesseur
     ).jeopardyse("Ma collection", "Ma description", "doc-123")
 
@@ -76,7 +76,7 @@ def test_recupere_les_chunks_du_document_source_depuis_son_identifiant(
         )
     )
 
-    ServiceJepoardy(
+    ServiceJeopardy(
         client_albert, un_entrepot_memoire, "Prompt", un_multiprocesseur
     ).jeopardyse(
         "Nom",
@@ -114,7 +114,7 @@ def test_ajoute_un_chunk_par_question_generee_dans_le_document_cree(
         )
     )
 
-    ServiceJepoardy(
+    ServiceJeopardy(
         client_albert,
         un_entrepot_memoire,
         "Prompt",
@@ -164,7 +164,7 @@ def test_continue_la_creation_de_documents_en_cas_d_erreur(
         )
     )
 
-    ServiceJepoardy(
+    ServiceJeopardy(
         client_albert,
         un_entrepot_memoire,
         "Prompt",
@@ -211,7 +211,7 @@ def test_continue_l_ajout_de_chunks_si_une_erreur_est_levee(
         )
     )
 
-    ServiceJepoardy(
+    ServiceJeopardy(
         client_albert,
         un_entrepot_memoire,
         "Prompt",
@@ -246,7 +246,7 @@ def test_ajoute_les_metadonnees_utiles_dans_les_chunks_generes(
         .qui_retourne_les_questions_generees(["question generee ?"])
     )
 
-    ServiceJepoardy(
+    ServiceJeopardy(
         client_albert,
         un_entrepot_memoire,
         "Prompt",
@@ -295,7 +295,7 @@ def test_ajoute_les_chunks_de_questions_par_paquets_de_dix_en_utilisant_le_multi
     )
     multi_processeur = un_multiprocesseur
 
-    ServiceJepoardy(
+    ServiceJeopardy(
         client_albert,
         un_entrepot_memoire,
         "Prompt",
@@ -338,7 +338,7 @@ def test_recupere_les_chunks_depuis_albert_en_partant_de_la_collection(
         .qui_retourne_les_questions_generees(["question depuis Albert ?"])
     )
 
-    ServiceJepoardy(
+    ServiceJeopardy(
         client_albert,
         un_entrepot_memoire,
         "Prompt",
@@ -384,7 +384,7 @@ def test_continue_le_traitement_si_une_erreur_survient_lors_de_la_recuperation_d
     )
     entrepot_questions = un_entrepot_memoire
 
-    ServiceJepoardy(
+    ServiceJeopardy(
         client_albert,
         entrepot_questions,
         "Prompt",

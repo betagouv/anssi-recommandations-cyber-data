@@ -4,19 +4,26 @@ from functools import partial
 from itertools import islice
 from typing import Generator
 
+from configuration import recupere_configuration
 from documents.docling.multi_processeur import Multiprocesseur
+from infra.executeur_requete import ExecuteurDeRequete
 from infra.interval import Interval
 from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
     RequeteAjoutChunksDansDocumentAlbert,
     RequeteCreationDocumentAlbert,
 )
+from jeopardy.client_albert_jeopardy_reel import ClientAlbertJeopardyReel
 from jeopardy.collecteur import ChunkSource, CollecteurDeQuestions, Document
 from jeopardy.prompt_generation_question import PROMPT_SYSTEME_GENERATION_QUESTIONS_FR
-from jeopardy.questions import EntrepotQuestionGeneree, QuestionGeneree
+from jeopardy.questions import (
+    EntrepotQuestionGeneree,
+    QuestionGeneree,
+    EntrepotQuestionGenereeMemoire,
+)
 
 
-class ServiceJepoardy:
+class ServiceJeopardy:
     def __init__(
         self,
         client_albert: ClientAlbertJeopardy,
@@ -180,3 +187,11 @@ def _decoupe_en_paquets(
         if not paquet:
             break
         yield paquet
+
+
+def fabrique_service_jeopardy() -> ServiceJeopardy:
+    configuration_jeopardy = recupere_configuration().jeopardy
+    return ServiceJeopardy(
+        ClientAlbertJeopardyReel(configuration_jeopardy, ExecuteurDeRequete()),
+        EntrepotQuestionGenereeMemoire(),
+    )

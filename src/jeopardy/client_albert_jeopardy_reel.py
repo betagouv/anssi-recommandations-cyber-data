@@ -125,9 +125,7 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
     def _recupere_reponse_albert(
         self, offset: int, url: str, mappe: Callable[[dict], Any]
     ) -> list:
-        reponse = self._executeur_de_requete.recupere(
-            (f"{url}&offset={offset}")
-        )
+        reponse = self._executeur_de_requete.recupere((f"{url}&offset={offset}"))
         reponse.raise_for_status()
         corps = reponse.json()
         donnees: list[dict] = []

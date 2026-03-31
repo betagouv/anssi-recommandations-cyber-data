@@ -17,6 +17,7 @@ from adaptateurs.journal import (
     fabrique_adaptateur_journal,
     AdaptateurJournalMemoire,
 )
+from documents.docling.multi_processeur import Multiprocesseur
 from evaluation.evaluateur_deepeval import EvaluateurDeepeval
 from evaluation.evaluation_en_cours import (
     EntrepotEvaluationEnCoursMemoire,
@@ -33,7 +34,30 @@ from infra.memoire.executeur_de_requete_memoire import (
     ReponseTexteEnSucces,
     TypeRequete,
 )
+from jeopardy.client_albert_jeopardy import (
+    ClientAlbertJeopardy,
+    ReponseCreationCollection,
+    RequeteCreationDocumentAlbert,
+    ReponseCreationDocument,
+    RequeteAjoutChunksDansDocumentAlbert,
+    ReponseDocumentsCollectionOrigine,
+    ReponseDocumentOrigine,
+)
+from jeopardy.questions import EntrepotQuestionGenereeMemoire
+from jeopardy.service import ServiceJeopardy, fabrique_service_jeopardy
 from serveur import fabrique_serveur
+
+
+class MultiProcesseurDeTest(Multiprocesseur):
+    def __init__(self):
+        self.a_ete_appele = False
+        self.resultats = []
+
+    def execute(self, func, iterable) -> list:
+        self.a_ete_appele = True
+        for chunk in iterable:
+            self.resultats.append(func(chunk))
+        return self.resultats
 
 
 class EvaluateurDeepevalTest(EvaluateurDeepeval):
@@ -62,6 +86,80 @@ class ServiceEvaluationDeTest(ServiceEvaluation):
         self.questions_evaluees = questions
         self.prompt_recu = prompt
         return EvaluationEnCours(uuid.uuid4(), len(questions))
+
+
+class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
+    def __init__(self):
+        super().__init__()
+        self._identifiant_de_collection = "collection-test"
+        self._identifiant_document = "document-de-test"
+        self._reponses_questions_generees = ["question-de-test"]
+
+    def cree_collection(
+        self, nom_collection, description_collection
+    ) -> ReponseCreationCollection:
+        return ReponseCreationCollection(id=self._identifiant_de_collection)
+
+    def cree_document(
+        self, identifiant_collection: str, document: RequeteCreationDocumentAlbert
+    ) -> ReponseCreationDocument:
+        return ReponseCreationDocument(id=self._identifiant_document)
+
+    def genere_questions(self, prompt: str, contenu: str) -> list[str]:
+        return self._reponses_questions_generees
+
+    def ajoute_chunks_dans_document(
+        self,
+        identifiant_collection: str,
+        requete: RequeteAjoutChunksDansDocumentAlbert,
+    ):
+        pass
+
+    def recupere_chunks_document(self, id_document: str) -> list[dict]:
+        return []
+
+    def recupere_documents_collection(
+        self, identifiant_collection: str
+    ) -> ReponseDocumentsCollectionOrigine:
+        return ReponseDocumentsCollectionOrigine(
+            id=identifiant_collection,
+            documents=[
+                ReponseDocumentOrigine(
+                    id=self._identifiant_document,
+                    nom=f"document-{self._identifiant_document}",
+                    nombre_chunks=0,
+                )
+            ],
+        )
+
+
+class ServiceJeopardyDeTest(ServiceJeopardy):
+    def __init__(self):
+        super().__init__(
+            ClientAlbertJeopardyDeTest(),
+            EntrepotQuestionGenereeMemoire(),
+            "Un prompt",
+            MultiProcesseurDeTest(),
+        )
+        self.description_collection = None
+        self.nom_collection = None
+        self.identifiant_collection_a_jeopardyser = None
+        self.jeopardyse_appele = False
+        self.prompt_recu = None
+        self.evaluation_reformulation_lancee = False
+        self.questions_evaluees = []
+
+    def jeopardyse(
+        self,
+        nom_collection: str,
+        description_collection: str,
+        id_collection: str,
+        taille_paquet_chunks=10,
+    ):
+        self.jeopardyse_appele = True
+        self.identifiant_collection_a_jeopardyser = id_collection
+        self.nom_collection = nom_collection
+        self.description_collection = description_collection
 
 
 class ConstructeurServeur:
@@ -112,6 +210,10 @@ class ConstructeurServeur:
             self._serveur.dependency_overrides[clef] = dependance
         return self._serveur
 
+    def avec_un_service_jeopardy(self, service_jeopardy: ServiceJeopardyDeTest):
+        self._dependances[fabrique_service_jeopardy] = lambda: service_jeopardy
+        return self
+
 
 @pytest.fixture(autouse=True)
 def pages_statiques(tmp_path) -> Path:
@@ -140,14 +242,29 @@ def un_service_evaluation() -> Callable[[], ServiceEvaluationDeTest]:
 
 
 @pytest.fixture()
+def un_service_jeopardy() -> Callable[[], ServiceJeopardyDeTest]:
+    def _un_service_jeopardy():
+        return ServiceJeopardyDeTest()
+
+    return _un_service_jeopardy
+
+
+@pytest.fixture()
 def un_serveur_de_test_complet(
     pages_statiques,
     un_client_albert_de_reformulation,
     un_bus_d_evenement,
     un_service_evaluation,
+    un_service_jeopardy,
 ) -> Callable[
     [Optional[ExecuteurDeRequeteDeTest] | None],
-    tuple[FastAPI, AdaptateurJournalMemoire, BusEvenement, ServiceEvaluationDeTest],
+    tuple[
+        FastAPI,
+        AdaptateurJournalMemoire,
+        BusEvenement,
+        ServiceEvaluationDeTest,
+        ServiceJeopardyDeTest,
+    ],
 ]:
     def _un_serveur_de_test_complet(
         executeur_de_requete_de_test: Optional[ExecuteurDeRequeteDeTest] | None = None,
@@ -163,6 +280,8 @@ def un_serveur_de_test_complet(
         serveur.avec_un_bus_d_evenement(bus_evenement)
         service_evaluation = un_service_evaluation()
         serveur.avec_un_service_evaluation(service_evaluation)
+        service_jeopardy = un_service_jeopardy()
+        serveur.avec_un_service_jeopardy(service_jeopardy)
         executeur_de_requete = (
             ExecuteurDeRequeteDeTest(
                 [ReponseAttendueOK(ReponseTexteEnSucces(texte="OK"), TypeRequete.GET)]
@@ -176,6 +295,7 @@ def un_serveur_de_test_complet(
             adaptateur_journal,
             bus_evenement,
             service_evaluation,
+            service_jeopardy,
         )
 
     return _un_serveur_de_test_complet
