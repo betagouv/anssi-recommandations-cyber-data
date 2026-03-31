@@ -134,17 +134,16 @@ sequenceDiagram
 
 ### Typage d’un chunk de question générée
 ```json
-{
-  "content": "Ma Question ?",
-  "metadata": {
-    "source": {
-      "id_collection": "ID_COLLECTION",
-      "id_document": "ID_DOCUMENT_COLLECTION",
-      "id_chunk": "ID_CHUNK_DOCUMENT_COLLECTION",
-      "contenu_chunk": "CONTENU_DU_CHUNK",
-      "numero_page": "NUMERO_DE_LA_PAGE",
-      "url_document": "URL_DU_DOCUMENT_CIBLE"
-    }
-  }
+{'object': 'chunk',
+  'id': 312,
+  'collection_id': 161145,
+  'document_id': 4076447,
+  'content': 'Ma question ?',
+  'metadata': {
+               'source_id_document': '4065642',
+               'source_id_chunk': 73,
+               'source_numero_page': 17
+              },
+  'created': 1774968050
 }
 ```

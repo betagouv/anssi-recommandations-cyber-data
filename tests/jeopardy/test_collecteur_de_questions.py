@@ -139,3 +139,32 @@ def test_traite_les_chunks_en_parallele(
     ).collecte(document)
 
     assert multi_processeur.a_ete_appele
+
+
+def test_stoppe_l_ajout_de_tous_les_chunks_si_une_erreur_est_levee(
+    un_constructeur_de_document, un_client_albert_de_test, un_multiprocesseur
+):
+    id_collection = "collection-123"
+    client_albert = (
+        un_client_albert_de_test()
+        .avec_un_identifiant_de_collection(id_collection)
+        .levant_une_erreur_sur_la_generation_de_question_pour_le_chunk(
+            "CONTENU_EN_ERREUR"
+        )
+        .qui_retourne_les_questions_generees(
+            ["premiere question ?", "seconde question ?"]
+        )
+    )
+    entrepot_questions_generees = EntrepotQuestionGenereeMemoire()
+    document = (
+        un_constructeur_de_document()
+        .ajoute_nombre_de_chunks(10)
+        .ajoute_chunk(Chunk(id=10, contenu="CONTENU_EN_ERREUR", page=10))
+        .construis()
+    )
+
+    CollecteurDeQuestions(
+        client_albert, "Prompt", entrepot_questions_generees, un_multiprocesseur
+    ).collecte(document)
+
+    assert len(entrepot_questions_generees.tous()) == 0

@@ -178,49 +178,6 @@ def test_continue_la_creation_de_documents_en_cas_d_erreur(
     assert len(client_albert.appels_ajout_chunks) == 1
 
 
-def test_continue_l_ajout_de_chunks_si_une_erreur_est_levee(
-    un_client_albert_de_test,
-    un_entrepot_memoire,
-    un_multiprocesseur,
-):
-    id_collection = "collection-123"
-    id_document = "doc-123"
-    client_albert = (
-        un_client_albert_de_test()
-        .avec_un_identifiant_de_collection(id_collection)
-        .pour_les_documents("doc-albert-456")
-        .qui_retourne_une_collection_avec_les_identifiants_de_document([id_document])
-        .avec_les_chunks_du_document(
-            id_document,
-            [
-                {
-                    "id": 7,
-                    "content": "contenu source",
-                    "metadata": {"source": {"numero_page": 42}},
-                },
-                {
-                    "id": 8,
-                    "content": "contenu source",
-                    "metadata": {"source": {"numero_page": 42}},
-                },
-            ],
-        )
-        .levant_une_erreur_sur_l_ajout_du_chunk(7)
-        .qui_retourne_les_questions_generees(
-            ["premiere question ?", "seconde question ?"]
-        )
-    )
-
-    ServiceJeopardy(
-        client_albert,
-        un_entrepot_memoire,
-        "Prompt",
-        un_multiprocesseur,
-    ).jeopardyse("Nom", "Description", id_collection, 1)
-
-    assert len(client_albert.appels_ajout_chunks) == 2
-
-
 def test_ajoute_les_metadonnees_utiles_dans_les_chunks_generes(
     un_client_albert_de_test,
     un_entrepot_memoire,
@@ -268,7 +225,7 @@ def test_ajoute_les_metadonnees_utiles_dans_les_chunks_generes(
     }
 
 
-def test_ajoute_les_chunks_de_questions_par_paquets_de_dix_en_utilisant_le_multiprocesseur(
+def test_ajoute_les_chunks_de_questions_par_paquets_de_64_en_utilisant_le_multiprocesseur(
     un_client_albert_de_test,
     un_entrepot_memoire,
     un_multiprocesseur,
@@ -288,7 +245,7 @@ def test_ajoute_les_chunks_de_questions_par_paquets_de_dix_en_utilisant_le_multi
                     "content": f"le contenu numero {i}",
                     "metadata": {"source": {"numero_page": 42}},
                 }
-                for i in range(11)
+                for i in range(65)
             ],
         )
         .qui_retourne_les_questions_generees(["question unique ?"])
@@ -308,7 +265,7 @@ def test_ajoute_les_chunks_de_questions_par_paquets_de_dix_en_utilisant_le_multi
 
     assert multi_processeur.a_ete_appele
     assert len(client_albert.appels_ajout_chunks) == 2
-    assert len(client_albert.appels_ajout_chunks[0].requete.chunks) == 10
+    assert len(client_albert.appels_ajout_chunks[0].requete.chunks) == 64
     assert len(client_albert.appels_ajout_chunks[1].requete.chunks) == 1
 
 

@@ -85,7 +85,7 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self._identifiants_documents = []
         self.identifiants_documents_lus = []
         self._chunks_par_document: dict[str, list[dict]] = {}
-        self._ajout_chunk_en_erreur = None
+        self._generation_question_chunk_en_erreur = None
         self._recuperation_chunks_en_erreur_pour_les_documents = []
 
     def cree_collection(
@@ -114,6 +114,11 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         return ReponseCreationDocument(id=identifiant_document)
 
     def genere_questions(self, prompt: str, contenu: str) -> list[str]:
+        if (
+            self._generation_question_chunk_en_erreur is not None
+            and contenu == self._generation_question_chunk_en_erreur
+        ):
+            raise HTTPError("Erreur lors de la génération de questions")
         self.questions_generees = self._reponses_questions_generees
         self.chunks_fournis.append(contenu)
         self.prompt_passe = prompt
@@ -124,20 +129,6 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         identifiant_collection: str,
         requete: RequeteAjoutChunksDansDocumentAlbert,
     ):
-        if (
-            self._ajout_chunk_en_erreur is not None
-            and len(
-                list(
-                    filter(
-                        lambda chunk: chunk["metadata"]["source_id_chunk"]
-                        == self._ajout_chunk_en_erreur,
-                        requete.chunks,
-                    )
-                )
-            )
-            > 0
-        ):
-            raise HTTPError("Erreur lors de l’ajout du chunk")
         self.appels_ajout_chunks.append(
             AppelAjoutChunks(
                 identifiant_collection=identifiant_collection,
@@ -204,8 +195,10 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self._chunks_par_document[id_document] = chunks
         return self
 
-    def levant_une_erreur_sur_l_ajout_du_chunk(self, id_chunk: int):
-        self._ajout_chunk_en_erreur = id_chunk
+    def levant_une_erreur_sur_la_generation_de_question_pour_le_chunk(
+        self, contenu_en_erreur: str
+    ):
+        self._generation_question_chunk_en_erreur = contenu_en_erreur
         return self
 
 
