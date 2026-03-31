@@ -83,6 +83,7 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self._identifiants_documents = []
         self.identifiants_documents_lus = []
         self._chunks_par_document: dict[str, list[dict]] = {}
+        self._ajout_chunk_en_erreur = None
         self._recuperation_chunks_en_erreur_pour_les_documents = []
 
     def cree_collection(
@@ -111,6 +112,20 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         identifiant_collection: str,
         requete: RequeteAjoutChunksDansDocumentAlbert,
     ):
+        if (
+            self._ajout_chunk_en_erreur is not None
+            and len(
+                list(
+                    filter(
+                        lambda chunk: chunk["metadata"]["source_id_chunk"]
+                        == self._ajout_chunk_en_erreur,
+                        requete.chunks,
+                    )
+                )
+            )
+            > 0
+        ):
+            raise HTTPError("Erreur lors de l’ajout du chunk")
         self.appels_ajout_chunks.append(
             AppelAjoutChunks(
                 identifiant_collection=identifiant_collection,
@@ -173,6 +188,10 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self._chunks_par_document[id_document] = chunks
         return self
 
+    def levant_une_erreur_sur_l_ajout_du_chunk(self, id_chunk: int):
+        self._ajout_chunk_en_erreur = id_chunk
+        return self
+
 
 @pytest.fixture
 def un_client_albert_de_test() -> Callable[[], ClientAlbertJeopardyDeTest]:
@@ -190,13 +209,13 @@ def un_entrepot_memoire() -> EntrepotQuestionGenereeMemoire:
 class MultiProcesseurDeTest(Multiprocesseur):
     def __init__(self):
         self.a_ete_appele = False
+        self.resultats = []
 
     def execute(self, func, iterable) -> list:
         self.a_ete_appele = True
-        resultats = []
         for chunk in iterable:
-            resultats.append(func(chunk))
-        return resultats
+            self.resultats.append(func(chunk))
+        return self.resultats
 
 
 @pytest.fixture()
