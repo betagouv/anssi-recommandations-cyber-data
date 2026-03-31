@@ -42,6 +42,7 @@ class ServiceJepoardy:
         )
 
         for document_depuis_albert in documents_depuis_albert:
+            # TODO: Gérer le cas où la création d’un document lève une erreur : il faut continuer pour les suivants
             reponse_creation_document = self._client_albert.cree_document(
                 reponse_creation_collection.id,
                 _en_document_albert(document_depuis_albert),
@@ -72,6 +73,7 @@ class ServiceJepoardy:
         identifiant_document: str,
         paquet_de_questions: list[QuestionGeneree],
     ) -> None:
+        # TODO: Gérer le cas où l’ajout d’un chunk lève une erreur : il faut continuer pour les suivants
         self._client_albert.ajoute_chunks_dans_document(
             identifiant_collection=identifiant_collection,
             requete=RequeteAjoutChunksDansDocumentAlbert(
@@ -93,19 +95,22 @@ class ServiceJepoardy:
         documents: list[Document] = []
 
         for document_collection in reponse_documents_collection.documents:
-            id_document = document_collection.id
-            chunks_document = self._client_albert.recupere_chunks_document(id_document)
-
-            if not chunks_document:
-                raise ValueError(f"Aucun chunk trouve pour le document {id_document}.")
-
-            documents.append(
-                _mappe_vers_document(
-                    nom_document=document_collection.nom,
-                    id_document=id_document,
-                    chunks_document=chunks_document,
+            try:
+                id_document = document_collection.id
+                chunks_document = self._client_albert.recupere_chunks_document(
+                    id_document
                 )
-            )
+
+                documents.append(
+                    _mappe_vers_document(
+                        nom_document=document_collection.nom,
+                        id_document=id_document,
+                        chunks_document=chunks_document,
+                    )
+                )
+            except Exception:
+                # Rajouter du feedback pour dire qu’un document manque
+                continue
 
         return documents
 
