@@ -89,7 +89,6 @@ class CollecteurDeQuestions:
         questions_generees = []
 
         for chunk in chunks_a_ajouter.chunks:
-            # TODO: Gérer le cas où la génération de questions lève une erreur : il faut continuer pour les suivantes
             liste_questions = self.client_albert.genere_questions(
                 self.prompt, chunk.contenu
             )

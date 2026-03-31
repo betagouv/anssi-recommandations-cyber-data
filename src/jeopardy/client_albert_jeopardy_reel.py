@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import Any, Callable
 
 from infra.executeur_requete import ExecuteurDeRequete
 from jeopardy.client_albert_jeopardy import (
@@ -103,83 +103,50 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
     def recupere_documents_collection(
         self, id_collection: str
     ) -> ReponseDocumentsCollectionOrigine:
-        limite = 100
-        offset = 0
-        documents: list[ReponseDocumentOrigine] = []
         self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
 
-        while True:
-            url = (
-                f"{self._configuration.base_url}/documents"
-                f"?collection_id={int(id_collection)}&limit={limite}&offset={offset}"
-            )
-            reponse = self._executeur_de_requete.recupere(url)
-            reponse.raise_for_status()
-            corps = reponse.json()
-
-            donnees: list[dict] = []
-            if isinstance(corps, dict):
-                data = corps.get("data", [])
-                if isinstance(data, list):
-                    donnees = data
-            elif isinstance(corps, list):
-                donnees = corps
-
-            if not donnees:
-                break
-
-            documents.extend(
-                [
-                    ReponseDocumentOrigine(
-                        id=str(document["id"]),
-                        nom=str(document.get("name", "")),
-                        nombre_chunks=int(document.get("chunk_count", 0)),
-                    )
-                    for document in donnees
-                ]
+        def mappe_document(document: dict) -> ReponseDocumentOrigine:
+            return ReponseDocumentOrigine(
+                id=str(document["id"]),
+                nom=str(document.get("name", "")),
+                nombre_chunks=int(document.get("chunk_count", 0)),
             )
 
-            if len(donnees) < limite:
-                break
-
-            offset += limite
-
+        documents = self._recupere_reponse_albert(
+            offset=0,
+            url=f"{self._configuration.base_url}/documents?collection_id={int(id_collection)}&limit=100",
+            mappe=mappe_document,
+        )
         return ReponseDocumentsCollectionOrigine(
             id=id_collection,
             documents=documents,
         )
 
+    def _recupere_reponse_albert(
+        self, offset: int, url: str, mappe: Callable[[dict], Any]
+    ) -> list:
+        reponse = self._executeur_de_requete.recupere(
+            (f"{url}&offset={offset}")
+        )
+        reponse.raise_for_status()
+        corps = reponse.json()
+        donnees: list[dict] = []
+        if isinstance(corps, dict):
+            data = corps.get("data", [])
+            if isinstance(data, list):
+                donnees = data
+        elif isinstance(corps, list):
+            donnees = corps
+        documents = [mappe(document) for document in donnees]
+        if len(donnees) < 100:
+            return documents
+        return documents + self._recupere_reponse_albert(offset + 100, url, mappe)
+
     def recupere_chunks_document(self, id_document: str) -> list[dict]:
-        limite = 100
-        offset = 0
-        tous_les_chunks: list[dict] = []
         self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
-
-        while True:
-            url = (
-                f"{self._configuration.base_url}/documents/{id_document}/chunks"
-                f"?limit={limite}&offset={offset}"
-            )
-            reponse = self._executeur_de_requete.recupere(url)
-            reponse.raise_for_status()
-            corps = reponse.json()
-
-            chunks: list[dict] = []
-            if isinstance(corps, dict):
-                data = corps.get("data", [])
-                if isinstance(data, list):
-                    chunks = data
-            elif isinstance(corps, list):
-                chunks = corps
-
-            if not chunks:
-                break
-
-            tous_les_chunks.extend(chunks)
-
-            if len(chunks) < limite:
-                break
-
-            offset += limite
-
+        tous_les_chunks = self._recupere_reponse_albert(
+            offset=0,
+            url=f"{self._configuration.base_url}/documents/{id_document}/chunks?limit=100",
+            mappe=lambda chunks: chunks,
+        )
         return tous_les_chunks
