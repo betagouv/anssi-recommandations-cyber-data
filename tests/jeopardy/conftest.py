@@ -73,7 +73,9 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self.collection_creee = False
         self.document_cree = None
         self._identifiant_de_collection = None
-        self._identifiant_document_cree = "doc-cree-123"
+        self._indexe_documents_crees_en_cours = 0
+        self._identifiants_documents_crees = ["doc-cree-123"]
+        self._identifiant_ajout_document_en_erreur = None
         self.collection_attendue = None
         self.document_ajoute = None
         self.chunks_fournis = []
@@ -97,9 +99,19 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
     def cree_document(
         self, identifiant_collection: str, document: RequeteCreationDocumentAlbert
     ) -> ReponseCreationDocument:
+        if (
+            self._identifiant_ajout_document_en_erreur is not None
+            and document.metadata["source_id_document"]
+            == self._identifiant_ajout_document_en_erreur
+        ):
+            raise HTTPError("Erreur lors de l’ajout de document")
+        identifiant_document = self._identifiants_documents_crees[
+            self._indexe_documents_crees_en_cours
+        ]
         self.document_cree = document
         self.collection_attendue = identifiant_collection
-        return ReponseCreationDocument(id=self._identifiant_document_cree)
+        self._indexe_documents_crees_en_cours += 1
+        return ReponseCreationDocument(id=identifiant_document)
 
     def genere_questions(self, prompt: str, contenu: str) -> list[str]:
         self.questions_generees = self._reponses_questions_generees
@@ -176,8 +188,12 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         )
         return self
 
-    def avec_un_identifiant_de_document_cree(self, identifiant_document: str):
-        self._identifiant_document_cree = identifiant_document
+    def pour_les_documents(self, identifiant_document: list[str]):
+        self._identifiants_documents_crees = identifiant_document
+        return self
+
+    def levant_une_erreur_sur_l_ajout_du_document(self, identifiant_document: str):
+        self._identifiant_ajout_document_en_erreur = identifiant_document
         return self
 
     def qui_retourne_les_questions_generees(self, questions_generees: list[str]):

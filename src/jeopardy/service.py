@@ -46,30 +46,33 @@ class ServiceJepoardy:
         )
 
         for document_depuis_albert in documents_depuis_albert:
-            # TODO: Gérer le cas où la création d’un document lève une erreur : il faut continuer pour les suivants
-            reponse_creation_document = self._client_albert.cree_document(
-                reponse_creation_collection.id,
-                _en_document_albert(document_depuis_albert),
-            )
-
-            collecteur = CollecteurDeQuestions(
-                client_albert=self._client_albert,
-                prompt=self._prompt,
-                entrepot_questions_generees=self._entrepot_questions,
-                multi_processeur=self._multi_processeur,
-            )
-            collecteur.collecte(document=document_depuis_albert)
-
-            questions_generees = list(self._entrepot_questions.tous())
-
-            self._multi_processeur.execute(
-                partial(
-                    self._ajoute_chunks_dans_document,
+            try:
+                reponse_creation_document = self._client_albert.cree_document(
                     reponse_creation_collection.id,
-                    reponse_creation_document.id,
-                ),
-                _decoupe_en_paquets(questions_generees, taille_paquet_chunks),
-            )
+                    _en_document_albert(document_depuis_albert),
+                )
+
+                collecteur = CollecteurDeQuestions(
+                    client_albert=self._client_albert,
+                    prompt=self._prompt,
+                    entrepot_questions_generees=self._entrepot_questions,
+                    multi_processeur=self._multi_processeur,
+                )
+                collecteur.collecte(document=document_depuis_albert)
+
+                questions_generees = list(self._entrepot_questions.tous())
+
+                self._multi_processeur.execute(
+                    partial(
+                        self._ajoute_chunks_dans_document,
+                        reponse_creation_collection.id,
+                        reponse_creation_document.id,
+                    ),
+                    _decoupe_en_paquets(questions_generees, taille_paquet_chunks),
+                )
+            except Exception:
+                # TODO: ajouter du feedback
+                continue
 
     def _ajoute_chunks_dans_document(
         self,

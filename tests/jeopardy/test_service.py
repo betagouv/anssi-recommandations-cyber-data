@@ -97,7 +97,7 @@ def test_ajoute_un_chunk_par_question_generee_dans_le_document_cree(
     client_albert = (
         un_client_albert_de_test()
         .avec_un_identifiant_de_collection(id_collection)
-        .avec_un_identifiant_de_document_cree("doc-albert-456")
+        .pour_les_documents(["doc-albert-456"])
         .qui_retourne_une_collection_avec_les_identifiants_de_document([id_document])
         .avec_les_chunks_du_document(
             id_document,
@@ -134,6 +134,50 @@ def test_ajoute_un_chunk_par_question_generee_dans_le_document_cree(
     assert appel.requete.chunks[1]["content"] == "seconde question ?"
 
 
+def test_continue_la_creation_de_documents_en_cas_d_erreur(
+    un_client_albert_de_test,
+    un_entrepot_memoire,
+    un_multiprocesseur,
+):
+    id_collection_origine = "collection-123"
+    id_document_origine = "doc-123"
+    client_albert = (
+        un_client_albert_de_test()
+        .avec_un_identifiant_de_collection(id_collection_origine)
+        .pour_les_documents(["doc-jeopardy-123", "doc-jeopardy-456"])
+        .levant_une_erreur_sur_l_ajout_du_document("doc-jeopardy-123")
+        .qui_retourne_une_collection_avec_les_identifiants_de_document(
+            [id_document_origine, "doc-origine-456"]
+        )
+        .avec_les_chunks_du_document(
+            "doc-origine-456",
+            [
+                {
+                    "id": 7,
+                    "content": "contenu source",
+                    "metadata": {"source": {"numero_page": 42}},
+                }
+            ],
+        )
+        .qui_retourne_les_questions_generees(
+            ["premiere question ?", "seconde question ?"]
+        )
+    )
+
+    ServiceJepoardy(
+        client_albert,
+        un_entrepot_memoire,
+        "Prompt",
+        un_multiprocesseur,
+    ).jeopardyse(
+        "Nom",
+        "Description",
+        id_collection_origine,
+    )
+
+    assert len(client_albert.appels_ajout_chunks) == 1
+
+
 def test_continue_l_ajout_de_chunks_si_une_erreur_est_levee(
     un_client_albert_de_test,
     un_entrepot_memoire,
@@ -144,7 +188,7 @@ def test_continue_l_ajout_de_chunks_si_une_erreur_est_levee(
     client_albert = (
         un_client_albert_de_test()
         .avec_un_identifiant_de_collection(id_collection)
-        .avec_un_identifiant_de_document_cree("doc-albert-456")
+        .pour_les_documents("doc-albert-456")
         .qui_retourne_une_collection_avec_les_identifiants_de_document([id_document])
         .avec_les_chunks_du_document(
             id_document,
