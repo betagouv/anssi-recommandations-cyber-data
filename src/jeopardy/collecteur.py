@@ -6,7 +6,11 @@ from documents.docling.multi_processeur import Multiprocesseur
 from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
 )
-from jeopardy.questions import EntrepotQuestionGeneree, QuestionGeneree
+from jeopardy.questions import (
+    EntrepotQuestionGeneree,
+    QuestionGeneree,
+    GenerationQuestionEnErreur,
+)
 
 
 class ChunkSource(TypedDict):
@@ -50,7 +54,7 @@ class CollecteurDeQuestions:
         client_albert: ClientAlbertJeopardy,
         prompt: str,
         entrepot_questions_generees: EntrepotQuestionGeneree,
-        multi_processeur: Multiprocesseur = Multiprocesseur(),
+        multi_processeur: Multiprocesseur = Multiprocesseur(3),
     ):
         super().__init__()
         self.client_albert = client_albert
@@ -80,27 +84,35 @@ class CollecteurDeQuestions:
             self._genere_questions,
             decoupe_la_liste_de_documents(document.chunks),
         )
-
-        [self.entrepot_questions_generees.persiste(q) for qs in resultats for q in qs]
+        contient_des_erreurs = list(
+            filter(lambda x: isinstance(x, GenerationQuestionEnErreur), resultats)
+        )
+        if len(contient_des_erreurs) == 0:
+            [
+                self.entrepot_questions_generees.persiste(q)
+                for qs in resultats
+                for q in qs
+            ]
 
     def _genere_questions(
         self, chunks_a_ajouter: ChunksAAjouter
-    ) -> list[QuestionGeneree]:
+    ) -> list[QuestionGeneree] | GenerationQuestionEnErreur:
         questions_generees = []
-
-        for chunk in chunks_a_ajouter.chunks:
-            liste_questions = self.client_albert.genere_questions(
-                self.prompt, chunk.contenu
-            )
-            for question in liste_questions:
-                questions_generees.append(
-                    QuestionGeneree(
-                        contenu=question,
-                        contenu_origine=chunk.contenu,
-                        id_document=chunks_a_ajouter.id_document,
-                        id_chunk=chunk.id,
-                        page=chunk.page,
-                    )
+        try:
+            for chunk in chunks_a_ajouter.chunks:
+                liste_questions = self.client_albert.genere_questions(
+                    self.prompt, chunk.contenu
                 )
-
+                for question in liste_questions:
+                    questions_generees.append(
+                        QuestionGeneree(
+                            contenu=question,
+                            contenu_origine=chunk.contenu,
+                            id_document=chunks_a_ajouter.id_document,
+                            id_chunk=chunk.id,
+                            page=chunk.page,
+                        )
+                    )
+        except Exception:
+            return GenerationQuestionEnErreur(id_document=chunks_a_ajouter.id_document)
         return questions_generees

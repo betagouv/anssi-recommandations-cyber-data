@@ -11,6 +11,11 @@ class QuestionGeneree:
     page: int
 
 
+@dataclass
+class GenerationQuestionEnErreur:
+    id_document: str
+
+
 class EntrepotQuestionGeneree(ABC):
     @abstractmethod
     def persiste(self, question_generee: QuestionGeneree):

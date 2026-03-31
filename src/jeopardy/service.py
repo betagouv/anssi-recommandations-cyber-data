@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from functools import partial
 from itertools import islice
 from typing import Generator
 
@@ -69,15 +68,15 @@ class ServiceJeopardy:
 
                 questions_generees = list(self._entrepot_questions.tous())
 
-                self._multi_processeur.execute(
-                    partial(
-                        self._ajoute_chunks_dans_document,
-                        reponse_creation_collection.id,
-                        reponse_creation_document.id,
-                    ),
-                    _decoupe_en_paquets(questions_generees, taille_paquet_chunks),
+                self._ajoute_chunks_dans_document(
+                    reponse_creation_collection.id,
+                    reponse_creation_document.id,
+                    questions_generees,
                 )
-            except Exception:
+            except Exception as e:
+                print(
+                    f"Erreur lors de la collecte du document {document_depuis_albert.id_document}: {e}"
+                )
                 # TODO: ajouter du feedback
                 continue
 
@@ -85,20 +84,23 @@ class ServiceJeopardy:
         self,
         identifiant_collection: str,
         identifiant_document: str,
-        paquet_de_questions: list[QuestionGeneree],
+        questions_generees: list[QuestionGeneree],
     ) -> None:
         try:
-            self._client_albert.ajoute_chunks_dans_document(
-                identifiant_collection=identifiant_collection,
-                requete=RequeteAjoutChunksDansDocumentAlbert(
-                    id_document=identifiant_document,
-                    chunks=[
-                        _en_chunk_albert(question_generee)
-                        for question_generee in paquet_de_questions
-                    ],
-                ),
-            )
-            Interval.pause()
+            paquets = _decoupe_en_paquets(questions_generees, 64)
+            for paquet in paquets:
+                print(f"Envoi de {len(paquet)} chunks")
+                self._client_albert.ajoute_chunks_dans_document(
+                    identifiant_collection=identifiant_collection,
+                    requete=RequeteAjoutChunksDansDocumentAlbert(
+                        id_document=identifiant_document,
+                        chunks=[
+                            _en_chunk_albert(question_generee)
+                            for question_generee in paquet
+                        ],
+                    ),
+                )
+                Interval.pause()
         except Exception:
             # TODO: Ajouter du feedback
             return
