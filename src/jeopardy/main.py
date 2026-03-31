@@ -5,7 +5,7 @@ import argparse
 from configuration import recupere_configuration
 from jeopardy.client_albert_jeopardy_reel import ClientAlbertJeopardyReel
 from jeopardy.questions import EntrepotQuestionGenereeMemoire
-from jeopardy.service import ServiceJepoardy
+from jeopardy.service import ServiceJeopardy
 
 
 def _construis_parser() -> argparse.ArgumentParser:
@@ -40,7 +40,7 @@ def main():
     client_albert = ClientAlbertJeopardyReel(configuration)
     entrepot_questions = EntrepotQuestionGenereeMemoire()
 
-    ServiceJepoardy(client_albert, entrepot_questions).jeopardyse(
+    ServiceJeopardy(client_albert, entrepot_questions).jeopardyse(
         arguments.nom_collection,
         arguments.description_collection,
         arguments.id_collection,

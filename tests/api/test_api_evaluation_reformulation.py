@@ -21,7 +21,7 @@ Qu'est-ce qu'une attaque DDOS ?,Qu'est-ce qu'une attaque DDOS (attaque par déni
 
 
 def test_lance_une_evaluation_de_reformulation_retourne_201(un_serveur_de_test_complet):
-    (serveur, _, _, _) = un_serveur_de_test_complet(None)
+    (serveur, _, _, _, _) = un_serveur_de_test_complet(None)
     client: TestClient = TestClient(serveur)
 
     reponse = client.post(
@@ -39,7 +39,7 @@ def test_lance_une_evaluation_de_reformulation_retourne_201(un_serveur_de_test_c
 def test_lance_une_evaluation_de_reformulation_avec_les_questions_fournies(
     un_serveur_de_test_complet,
 ):
-    (serveur, _, _, service_evaluation) = un_serveur_de_test_complet(None)
+    (serveur, _, _, service_evaluation, _) = un_serveur_de_test_complet(None)
     client: TestClient = TestClient(serveur)
 
     client.post(
@@ -62,7 +62,7 @@ def test_lance_une_evaluation_de_reformulation_avec_le_prompt_attendu(
             )
         ]
     )
-    (serveur, _, _, service_evaluation) = un_serveur_de_test_complet(
+    (serveur, _, _, service_evaluation, _) = un_serveur_de_test_complet(
         executeur_de_requete
     )
     client: TestClient = TestClient(serveur)
@@ -83,7 +83,7 @@ def test_retourne_404_si_le_prompt_ne_peut_pas_etre_recupere(
     executeur_de_requete = un_executeur_de_requete(
         [une_reponse_attendue_KO(ReponseTexteEnErreur(), None, TypeRequete.GET)]
     )
-    (serveur, _, _, service_evaluation) = un_serveur_de_test_complet(
+    (serveur, _, _, service_evaluation, _) = un_serveur_de_test_complet(
         executeur_de_requete
     )
     client: TestClient = TestClient(serveur)
