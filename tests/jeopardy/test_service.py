@@ -84,7 +84,7 @@ def test_recupere_les_chunks_du_document_source_depuis_son_identifiant(
         id_collection,
     )
 
-    assert client_albert.identifiant_document_lu == id_document
+    assert client_albert.identifiants_documents_lus == [id_document]
 
 
 def test_ajoute_un_chunk_par_question_generee_dans_le_document_cree(
@@ -265,4 +265,54 @@ def test_recupere_les_chunks_depuis_albert_en_partant_de_la_collection(
     )
 
     assert client_albert.identifiant_collection_lu == id_collection
-    assert client_albert.identifiant_document_lu == identifiant_document
+    assert client_albert.identifiants_documents_lus == [identifiant_document]
+
+
+def test_continue_le_traitement_si_une_erreur_survient_lors_de_la_recuperation_des_chunks_d_un_document(
+    un_client_albert_de_test,
+    un_entrepot_memoire,
+    un_multiprocesseur,
+):
+    id_collection = "collection-albert-42"
+    identifiant_document = "doc-albert-42"
+    identifiant_document_en_erreur = "doc-albert-41"
+    client_albert = (
+        un_client_albert_de_test()
+        .avec_un_identifiant_de_collection(id_collection)
+        .qui_retourne_une_collection_avec_les_identifiants_de_document(
+            [identifiant_document_en_erreur, identifiant_document]
+        )
+        .levant_une_erreur_sur_la_recuperation_des_chunks(
+            identifiant_document_en_erreur
+        )
+        .avec_les_chunks_du_document(
+            identifiant_document,
+            [
+                {
+                    "id": 7,
+                    "content": "contenu depuis Albert",
+                    "metadata": {"source": {"numero_page": 9}},
+                }
+            ],
+        )
+        .qui_retourne_les_questions_generees(["question depuis Albert ?"])
+    )
+    entrepot_questions = un_entrepot_memoire
+
+    ServiceJepoardy(
+        client_albert,
+        entrepot_questions,
+        "Prompt",
+        un_multiprocesseur,
+    ).jeopardyse(
+        "Nom",
+        "Description",
+        id_collection,
+    )
+
+    assert client_albert.identifiant_collection_lu == id_collection
+    assert client_albert.identifiants_documents_lus == [
+        identifiant_document_en_erreur,
+        identifiant_document,
+    ]
+    assert len(entrepot_questions.tous()) == 1

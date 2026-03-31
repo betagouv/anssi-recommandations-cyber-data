@@ -2,6 +2,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 import pytest
+from requests import HTTPError
 
 from documents.docling.multi_processeur import Multiprocesseur
 from jeopardy.client_albert_jeopardy import (
@@ -80,14 +81,9 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self.appels_ajout_chunks = []
         self.identifiant_collection_lu = None
         self._identifiants_documents = []
-        self.identifiant_document_lu = None
+        self.identifiants_documents_lus = []
         self._chunks_par_document: dict[str, list[dict]] = {}
-
-    def genere_questions(self, prompt: str, contenu: str) -> list[str]:
-        self.questions_generees = self._reponses_questions_generees
-        self.chunks_fournis.append(contenu)
-        self.prompt_passe = prompt
-        return self._reponses_questions_generees
+        self._recuperation_chunks_en_erreur_pour_les_documents = []
 
     def cree_collection(
         self, nom_collection, description_collection
@@ -104,23 +100,11 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self.collection_attendue = identifiant_collection
         return ReponseCreationDocument(id=self._identifiant_document_cree)
 
-    def avec_un_identifiant_de_collection(self, identifiant_collection: str):
-        self._identifiant_de_collection = identifiant_collection
-        return self
-
-    def qui_retourne_une_collection_avec_les_identifiants_de_document(
-        self, identifiants_documents: list[str]
-    ):
-        self._identifiants_documents.extend(identifiants_documents)
-        return self
-
-    def avec_un_identifiant_de_document_cree(self, identifiant_document: str):
-        self._identifiant_document_cree = identifiant_document
-        return self
-
-    def qui_retourne_les_questions_generees(self, questions_generees: list[str]):
-        self._reponses_questions_generees = questions_generees
-        return self
+    def genere_questions(self, prompt: str, contenu: str) -> list[str]:
+        self.questions_generees = self._reponses_questions_generees
+        self.chunks_fournis.append(contenu)
+        self.prompt_passe = prompt
+        return self._reponses_questions_generees
 
     def ajoute_chunks_dans_document(
         self,
@@ -134,11 +118,14 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
             )
         )
 
-    def liste_ids_documents_de_collection(
-        self, identifiant_collection: str
-    ) -> list[str]:
-        self.identifiant_collection_lu = identifiant_collection
-        return list(self._chunks_par_document.keys())
+    def recupere_chunks_document(self, id_document: str) -> list[dict]:
+        self.identifiants_documents_lus.append(id_document)
+        if (
+            len(self._recuperation_chunks_en_erreur_pour_les_documents) > 0
+            and id_document in self._recuperation_chunks_en_erreur_pour_les_documents
+        ):
+            raise HTTPError("Erreur de test")
+        return self._chunks_par_document.get(id_document, [])
 
     def recupere_documents_collection(
         self, identifiant_collection: str
@@ -156,9 +143,31 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
             ],
         )
 
-    def recupere_chunks_document(self, id_document: str) -> list[dict]:
-        self.identifiant_document_lu = id_document
-        return self._chunks_par_document.get(id_document, [])
+    def avec_un_identifiant_de_collection(self, identifiant_collection: str):
+        self._identifiant_de_collection = identifiant_collection
+        return self
+
+    def qui_retourne_une_collection_avec_les_identifiants_de_document(
+        self, identifiants_documents: list[str]
+    ):
+        self._identifiants_documents.extend(identifiants_documents)
+        return self
+
+    def levant_une_erreur_sur_la_recuperation_des_chunks(
+        self, identifiant_document: str
+    ):
+        self._recuperation_chunks_en_erreur_pour_les_documents.append(
+            identifiant_document
+        )
+        return self
+
+    def avec_un_identifiant_de_document_cree(self, identifiant_document: str):
+        self._identifiant_document_cree = identifiant_document
+        return self
+
+    def qui_retourne_les_questions_generees(self, questions_generees: list[str]):
+        self._reponses_questions_generees = questions_generees
+        return self
 
     def avec_les_chunks_du_document(self, id_document: str, chunks: list[dict]):
         self._chunks_par_document[id_document] = chunks
