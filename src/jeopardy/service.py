@@ -5,6 +5,8 @@ from typing import Generator
 
 from configuration import recupere_configuration
 from documents.docling.multi_processeur import Multiprocesseur
+from evenement.bus import BusEvenement
+from evenement.fabrique_bus_evenements import fabrique_bus_evenements
 from infra.executeur_requete import ExecuteurDeRequete
 from infra.interval import Interval
 from jeopardy.client_albert_jeopardy import (
@@ -27,6 +29,7 @@ class ServiceJeopardy:
         self,
         client_albert: ClientAlbertJeopardy,
         entrepot_questions: EntrepotQuestionGeneree,
+        bus_evenement: BusEvenement,
         prompt: str = PROMPT_SYSTEME_GENERATION_QUESTIONS_FR,
         multi_processeur: Multiprocesseur = Multiprocesseur(),
     ):
@@ -34,6 +37,7 @@ class ServiceJeopardy:
         self._entrepot_questions = entrepot_questions
         self._client_albert = client_albert
         self._prompt = prompt
+        self._bus_evenement = bus_evenement
         self._multi_processeur = multi_processeur
 
     def jeopardyse(
@@ -62,6 +66,7 @@ class ServiceJeopardy:
                     client_albert=self._client_albert,
                     prompt=self._prompt,
                     entrepot_questions_generees=self._entrepot_questions,
+                    bus_evenement=self._bus_evenement,
                     multi_processeur=self._multi_processeur,
                 )
                 collecteur.collecte(document=document_depuis_albert)
@@ -196,4 +201,5 @@ def fabrique_service_jeopardy() -> ServiceJeopardy:
     return ServiceJeopardy(
         ClientAlbertJeopardyReel(configuration_jeopardy, ExecuteurDeRequete()),
         EntrepotQuestionGenereeMemoire(),
+        fabrique_bus_evenements(),
     )

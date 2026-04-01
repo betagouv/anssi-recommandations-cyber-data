@@ -11,9 +11,8 @@ class QuestionGeneree:
     page: int
 
 
-@dataclass
 class GenerationQuestionEnErreur:
-    id_document: str
+    pass
 
 
 class EntrepotQuestionGeneree(ABC):
