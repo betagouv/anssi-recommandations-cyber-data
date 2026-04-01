@@ -3,8 +3,15 @@ from itertools import islice
 from typing import NamedTuple, TypedDict, Generator
 
 from documents.docling.multi_processeur import Multiprocesseur
+from evenement.bus import BusEvenement
 from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
+)
+from jeopardy.evenements import (
+    CorpsEvenementQuestionsGenerees,
+    EvenementQuestionsGenerees,
+    CorpsEvenementQuestionsGenereesEnErreur,
+    EvenementQuestionsGenereesEnErreur,
 )
 from jeopardy.questions import (
     EntrepotQuestionGeneree,
@@ -54,12 +61,14 @@ class CollecteurDeQuestions:
         client_albert: ClientAlbertJeopardy,
         prompt: str,
         entrepot_questions_generees: EntrepotQuestionGeneree,
-        multi_processeur: Multiprocesseur = Multiprocesseur(3),
+        bus_evenement: BusEvenement,
+        multi_processeur: Multiprocesseur = Multiprocesseur(2),
     ):
         super().__init__()
         self.client_albert = client_albert
         self.prompt = prompt
         self.entrepot_questions_generees = entrepot_questions_generees
+        self.bus_evenement = bus_evenement
         self.multi_processeur = multi_processeur
 
     def collecte(
@@ -84,15 +93,21 @@ class CollecteurDeQuestions:
             self._genere_questions,
             decoupe_la_liste_de_documents(document.chunks),
         )
-        contient_des_erreurs = list(
+        contient_des_erreurs: list[GenerationQuestionEnErreur] = list(
             filter(lambda x: isinstance(x, GenerationQuestionEnErreur), resultats)
         )
         if len(contient_des_erreurs) == 0:
-            [
-                self.entrepot_questions_generees.persiste(q)
-                for qs in resultats
-                for q in qs
-            ]
+            questions_generees = [q for qs in resultats for q in qs]
+            self.bus_evenement.publie(
+                EvenementQuestionsGenerees(
+                    corps=CorpsEvenementQuestionsGenerees(
+                        questions_generees=questions_generees,
+                        id_document=document.id_document,
+                        nombre_chunks_origine=len(document.chunks),
+                    )
+                )
+            )
+            [self.entrepot_questions_generees.persiste(q) for q in questions_generees]
 
     def _genere_questions(
         self, chunks_a_ajouter: ChunksAAjouter
@@ -113,6 +128,13 @@ class CollecteurDeQuestions:
                             page=chunk.page,
                         )
                     )
-        except Exception:
-            return GenerationQuestionEnErreur(id_document=chunks_a_ajouter.id_document)
+        except Exception as e:
+            self.bus_evenement.publie(
+                EvenementQuestionsGenereesEnErreur(
+                    corps=CorpsEvenementQuestionsGenereesEnErreur(
+                        id_document=chunks_a_ajouter.id_document, erreur=str(e)
+                    )
+                )
+            )
+            return GenerationQuestionEnErreur()
         return questions_generees
