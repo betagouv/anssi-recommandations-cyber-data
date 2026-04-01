@@ -114,30 +114,41 @@ Pour une collection donnée, on crée une collection de questions miroir.
 ```mermaid
 sequenceDiagram
     participant S as Service de création de questions
-    participant C as Collection
     participant CollecteurDeQuestions as Collecteur de questions
     participant Albert as Albert
-    
-    S -->> C: Demande les documents et chunks d’une collection
-    C -->> S: Retourne les documents et chunks
-    S -->> CollecteurDeQuestions: Initie une collection de questions
-    CollecteurDeQuestions -->> Albert: Crée la collection de questions
-    Albert -->> CollecteurDeQuestions: Retourne l’identifiant de la collection de questions
-    CollecteurDeQuestions -->> Albert: Demande à Albert de générer N questions pour chaque chunk
+
+<<<<<<< Updated upstream
+=======
+    S -->> Albert: Demande les documents et chunks d’une collection
+    Albert -->> S: Retourne les documents et chunks
+    S -->> Albert: Initie une collection de questions
+    Albert -->> S: Retourne l’identifiant de la collection de questions
+    S -->> S: Pour chaque document
+    S -->> Albert: Crée un document miroir
+    Albert -->> S: Retourne l’identifiant du document miroir
+    S -->> CollecteurDeQuestions: Initie la génération de questions
+    CollecteurDeQuestions -->> Albert: Demande de générer N questions pour chaque chunk en // (2 processus avec 10 demandes de génération par question)
     Albert -->> CollecteurDeQuestions: Retourne les questions générées
-    CollecteurDeQuestions -->> Albert: Ajoute les questions générées (un chunk par question) à la collection de questions
-    CollecteurDeQuestions -->> S: Collection complétée
+    CollecteurDeQuestions -->> S: Récupère les questions générées une fois tous les processus terminés
+    S -->> Albert: Ajoute les questions générées (un chunk par question) à la collection de questions
+    Albert -->> S: Collection complétée
 ```
 
+>>>>>>> Stashed changes
 ### Pistes de réflexion
 - On ne génère pas de question pour des chunks trop petits (e.g : `[TITRE] MESURES CYBER PRÉVENTIVES PRIORITAIRES`)
 
 ### Typage d’un chunk de question générée
 ```json
+<<<<<<< Updated upstream
 {'object': 'chunk',
   'id': 312,
   'collection_id': 161145,
   'document_id': 4076447,
+=======
+{
+  'id': 312,
+>>>>>>> Stashed changes
   'content': 'Ma question ?',
   'metadata': {
                'source_id_document': '4065642',
@@ -146,4 +157,9 @@ sequenceDiagram
               },
   'created': 1774968050
 }
+<<<<<<< Updated upstream
 ```
+=======
+```
+
+>>>>>>> Stashed changes
