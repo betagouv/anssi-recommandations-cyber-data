@@ -427,7 +427,7 @@ def test_publie_sur_le_bus_d_evenement_les_questions_generees(
         id_collection,
     )
 
-    assert len(bus_d_evenement.evenements) == 1
+    assert len(bus_d_evenement.evenements) == 2
     assert bus_d_evenement.evenements[0].type == "QUESTIONS_GENEREES"
     assert len(bus_d_evenement.evenements[0].corps.questions_generees) == len(
         questions_generees

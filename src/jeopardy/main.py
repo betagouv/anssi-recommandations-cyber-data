@@ -48,12 +48,6 @@ def main():
         arguments.description_collection,
         arguments.id_collection,
     )
-    questions = entrepot_questions.tous()
-
-    for index, question in enumerate(questions[:20], start=1):
-        print(
-            f"{index}. [chunk={question.id_chunk} page={question.page}] {question.contenu}"
-        )
 
 
 if __name__ == "__main__":

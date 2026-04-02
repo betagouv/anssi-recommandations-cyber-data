@@ -60,7 +60,7 @@ class CollecteurDeQuestions:
         prompt: str,
         entrepot_questions_generees: EntrepotQuestionGeneree,
         bus_evenement: BusEvenement,
-        multi_processeur: Multiprocesseur = Multiprocesseur(5),
+        multi_processeur: Multiprocesseur = Multiprocesseur(8),
     ):
         super().__init__()
         self.client_albert = client_albert
