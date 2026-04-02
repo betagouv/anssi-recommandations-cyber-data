@@ -385,3 +385,52 @@ def test_continue_le_traitement_si_une_erreur_survient_lors_de_la_recuperation_d
         identifiant_document,
     ]
     assert len(entrepot_questions.tous()) == 1
+
+
+def test_publie_sur_le_bus_d_evenement_les_questions_generees(
+    un_constructeur_de_document,
+    un_client_albert_de_test,
+    un_multiprocesseur,
+    un_bus_d_evenement,
+    un_entrepot_memoire,
+):
+    questions_generees = ["premiere question ?", "seconde question ?"]
+    id_collection = "collection-123"
+    id_document = "doc-123"
+    bus_d_evenement = un_bus_d_evenement
+    client_albert = (
+        un_client_albert_de_test()
+        .avec_un_identifiant_de_collection(id_collection)
+        .qui_retourne_une_collection_avec_les_identifiants_de_document([id_document])
+        .avec_les_chunks_du_document(
+            id_document,
+            [
+                {
+                    "id": 99,
+                    "content": "le contenu origine",
+                    "metadata": {"page": 12},
+                }
+            ],
+        )
+        .qui_retourne_les_questions_generees(questions_generees)
+    )
+
+    ServiceJeopardy(
+        client_albert,
+        un_entrepot_memoire,
+        bus_d_evenement,
+        "Prompt",
+        un_multiprocesseur,
+    ).jeopardyse(
+        "Nom",
+        "Description",
+        id_collection,
+    )
+
+    assert len(bus_d_evenement.evenements) == 1
+    assert bus_d_evenement.evenements[0].type == "QUESTIONS_GENEREES"
+    assert len(bus_d_evenement.evenements[0].corps.questions_generees) == len(
+        questions_generees
+    )
+    assert bus_d_evenement.evenements[0].corps.id_document_origine == id_document
+    assert bus_d_evenement.evenements[0].corps.nombre_chunks_origine == 1

@@ -8,8 +8,6 @@ from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
 )
 from jeopardy.evenements import (
-    CorpsEvenementQuestionsGenerees,
-    EvenementQuestionsGenerees,
     CorpsEvenementQuestionsGenereesEnErreur,
     EvenementQuestionsGenereesEnErreur,
 )
@@ -62,7 +60,7 @@ class CollecteurDeQuestions:
         prompt: str,
         entrepot_questions_generees: EntrepotQuestionGeneree,
         bus_evenement: BusEvenement,
-        multi_processeur: Multiprocesseur = Multiprocesseur(2),
+        multi_processeur: Multiprocesseur = Multiprocesseur(5),
     ):
         super().__init__()
         self.client_albert = client_albert
@@ -98,15 +96,6 @@ class CollecteurDeQuestions:
         )
         if len(contient_des_erreurs) == 0:
             questions_generees = [q for qs in resultats for q in qs]
-            self.bus_evenement.publie(
-                EvenementQuestionsGenerees(
-                    corps=CorpsEvenementQuestionsGenerees(
-                        questions_generees=questions_generees,
-                        id_document=document.id_document,
-                        nombre_chunks_origine=len(document.chunks),
-                    )
-                )
-            )
             [self.entrepot_questions_generees.persiste(q) for q in questions_generees]
 
     def _genere_questions(

@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 
 from configuration import recupere_configuration
+from evenement.fabrique_bus_evenements import fabrique_bus_evenements
 from jeopardy.client_albert_jeopardy_reel import ClientAlbertJeopardyReel
 from jeopardy.questions import EntrepotQuestionGenereeMemoire
 from jeopardy.service import ServiceJeopardy
@@ -40,7 +41,9 @@ def main():
     client_albert = ClientAlbertJeopardyReel(configuration)
     entrepot_questions = EntrepotQuestionGenereeMemoire()
 
-    ServiceJeopardy(client_albert, entrepot_questions).jeopardyse(
+    ServiceJeopardy(
+        client_albert, entrepot_questions, fabrique_bus_evenements()
+    ).jeopardyse(
         arguments.nom_collection,
         arguments.description_collection,
         arguments.id_collection,

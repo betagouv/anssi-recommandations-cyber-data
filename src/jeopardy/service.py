@@ -16,6 +16,14 @@ from jeopardy.client_albert_jeopardy import (
 )
 from jeopardy.client_albert_jeopardy_reel import ClientAlbertJeopardyReel
 from jeopardy.collecteur import ChunkSource, CollecteurDeQuestions, Document
+from jeopardy.evenements import (
+    EvenementJeopardyGenereEnErreur,
+    CorpsEvenementJeopardyGenereEnErreur,
+    CorpsEvenementJeopardyChunkAjouteEnErreur,
+    EvenementJeopardyChunkAjouteEnErreur,
+    EvenementQuestionsGenerees,
+    CorpsEvenementQuestionsGenerees,
+)
 from jeopardy.prompt_generation_question import PROMPT_SYSTEME_GENERATION_QUESTIONS_FR
 from jeopardy.questions import (
     EntrepotQuestionGeneree,
@@ -72,17 +80,31 @@ class ServiceJeopardy:
                 collecteur.collecte(document=document_depuis_albert)
 
                 questions_generees = list(self._entrepot_questions.tous())
-
+                self._bus_evenement.publie(
+                    EvenementQuestionsGenerees(
+                        corps=CorpsEvenementQuestionsGenerees(
+                            questions_generees=questions_generees,
+                            id_document_origine=document_depuis_albert.id_document,
+                            nombre_chunks_origine=len(document_depuis_albert.chunks),
+                            id_collection_jeopardy=reponse_creation_collection.id,
+                            id_document_jeopardy=reponse_creation_document.id,
+                        )
+                    )
+                )
                 self._ajoute_chunks_dans_document(
                     reponse_creation_collection.id,
                     reponse_creation_document.id,
                     questions_generees,
                 )
             except Exception as e:
-                print(
-                    f"Erreur lors de la collecte du document {document_depuis_albert.id_document}: {e}"
+                message_erreur = f"Erreur lors de la collecte du document {document_depuis_albert.id_document}: {e}"
+                self._bus_evenement.publie(
+                    EvenementJeopardyGenereEnErreur(
+                        corps=CorpsEvenementJeopardyGenereEnErreur(
+                            erreur=message_erreur
+                        )
+                    )
                 )
-                # TODO: ajouter du feedback
                 continue
 
     def _ajoute_chunks_dans_document(
@@ -94,7 +116,6 @@ class ServiceJeopardy:
         try:
             paquets = _decoupe_en_paquets(questions_generees, 64)
             for paquet in paquets:
-                print(f"Envoi de {len(paquet)} chunks")
                 self._client_albert.ajoute_chunks_dans_document(
                     identifiant_collection=identifiant_collection,
                     requete=RequeteAjoutChunksDansDocumentAlbert(
@@ -106,8 +127,15 @@ class ServiceJeopardy:
                     ),
                 )
                 Interval.pause()
-        except Exception:
-            # TODO: Ajouter du feedback
+        except Exception as e:
+            message_erreur = f"Erreur lors de l'ajout du chunk au document {identifiant_document} : {e}"
+            self._bus_evenement.publie(
+                EvenementJeopardyChunkAjouteEnErreur(
+                    corps=CorpsEvenementJeopardyChunkAjouteEnErreur(
+                        erreur=message_erreur
+                    )
+                )
+            )
             return
 
     def _recupere_et_mappe_collection_depuis_albert(
