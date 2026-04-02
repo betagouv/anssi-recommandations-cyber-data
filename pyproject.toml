@@ -20,7 +20,7 @@ dependencies = [
     "pytest",
     "python-multipart",
     "reportlab",
-    "requests",
+    "requests>=2.33.0",
     "respx",
     "slowapi",
     "types-reportlab",
