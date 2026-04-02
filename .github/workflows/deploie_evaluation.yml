@@ -1,9 +1,11 @@
-name: Déploie et lance une évaluation
+name: Déploiement
+run-name: Déploiement du commit "${{ github.event.head_commit.message }}"
 permissions: {}
 
 on:
   push:
     branches: [main]
+  workflow_dispatch: # Pour activer le déclenchement manuel
 
 jobs:
   evaluation_mqc:
