@@ -11,6 +11,7 @@ class CorpsEvenementQuestionsGenerees:
     id_document_origine: str
     id_document_jeopardy: str
     nombre_chunks_origine: int
+    temps_traitement: int
 
 
 class EvenementQuestionsGenerees(Evenement):
@@ -47,3 +48,14 @@ class CorpsEvenementJeopardyChunkAjouteEnErreur:
 class EvenementJeopardyChunkAjouteEnErreur(Evenement):
     def __init__(self, corps: CorpsEvenementJeopardyChunkAjouteEnErreur):
         super().__init__(type="JEOPARDY_CHUNK_AJOUTE_EN_ERREUR", corps=corps)
+
+
+@dataclass
+class CorpsEvenementJeopardyChunksAjoutes:
+    chunks: list[QuestionGeneree]
+    temps: int
+
+
+class EvenementJeopardyChunksAjoutes(Evenement):
+    def __init__(self, corps: CorpsEvenementJeopardyChunksAjoutes):
+        super().__init__(type="JEOPARDY_CHUNKS_AJOUTES", corps=corps)

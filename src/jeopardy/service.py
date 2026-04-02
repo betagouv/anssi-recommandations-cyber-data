@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from itertools import islice
 from typing import Generator
 
@@ -23,6 +24,8 @@ from jeopardy.evenements import (
     EvenementJeopardyChunkAjouteEnErreur,
     EvenementQuestionsGenerees,
     CorpsEvenementQuestionsGenerees,
+    EvenementJeopardyChunksAjoutes,
+    CorpsEvenementJeopardyChunksAjoutes,
 )
 from jeopardy.prompt_generation_question import PROMPT_SYSTEME_GENERATION_QUESTIONS_FR
 from jeopardy.questions import (
@@ -39,7 +42,7 @@ class ServiceJeopardy:
         entrepot_questions: EntrepotQuestionGeneree,
         bus_evenement: BusEvenement,
         prompt: str = PROMPT_SYSTEME_GENERATION_QUESTIONS_FR,
-        multi_processeur: Multiprocesseur = Multiprocesseur(),
+        multi_processeur: Multiprocesseur = Multiprocesseur(8),
     ):
         super().__init__()
         self._entrepot_questions = entrepot_questions
@@ -65,6 +68,7 @@ class ServiceJeopardy:
 
         for document_depuis_albert in documents_depuis_albert:
             try:
+                date_debut = time.time()
                 reponse_creation_document = self._client_albert.cree_document(
                     reponse_creation_collection.id,
                     _en_document_albert(document_depuis_albert),
@@ -80,6 +84,9 @@ class ServiceJeopardy:
                 collecteur.collecte(document=document_depuis_albert)
 
                 questions_generees = list(self._entrepot_questions.tous())
+
+                date_fin = time.time()
+                temps = date_fin - date_debut
                 self._bus_evenement.publie(
                     EvenementQuestionsGenerees(
                         corps=CorpsEvenementQuestionsGenerees(
@@ -88,13 +95,23 @@ class ServiceJeopardy:
                             nombre_chunks_origine=len(document_depuis_albert.chunks),
                             id_collection_jeopardy=reponse_creation_collection.id,
                             id_document_jeopardy=reponse_creation_document.id,
+                            temps_traitement=int(temps),
                         )
                     )
                 )
+                date_debut = time.time()
                 self._ajoute_chunks_dans_document(
                     reponse_creation_collection.id,
                     reponse_creation_document.id,
                     questions_generees,
+                )
+                date_fin = time.time()
+                self._bus_evenement.publie(
+                    EvenementJeopardyChunksAjoutes(
+                        corps=CorpsEvenementJeopardyChunksAjoutes(
+                            chunks=questions_generees, temps=int(date_fin - date_debut)
+                        )
+                    )
                 )
             except Exception as e:
                 message_erreur = f"Erreur lors de la collecte du document {document_depuis_albert.id_document}: {e}"
