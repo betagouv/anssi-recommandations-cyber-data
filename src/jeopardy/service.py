@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import time
 from itertools import islice
 from typing import Generator
@@ -50,6 +51,7 @@ class ServiceJeopardy:
         self._prompt = prompt
         self._bus_evenement = bus_evenement
         self._multi_processeur = multi_processeur
+        self._logger = logging.getLogger(__name__)
 
     def jeopardyse(
         self,
@@ -61,10 +63,12 @@ class ServiceJeopardy:
         reponse_creation_collection = self._client_albert.cree_collection(
             f"Jeopardy : {nom_collection}", f"Jeopardy : {description_collection}"
         )
+        self._logger.info(f"Collection créée avec succès : {reponse_creation_collection.id}")
 
         documents_depuis_albert = self._recupere_et_mappe_collection_depuis_albert(
             id_collection
         )
+        self._logger.info(f"Documents récupérés depuis Albert : {len(documents_depuis_albert)}")
 
         for document_depuis_albert in documents_depuis_albert:
             try:
