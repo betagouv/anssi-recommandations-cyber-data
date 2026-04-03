@@ -42,7 +42,7 @@ class ServiceJeopardy:
         entrepot_questions: EntrepotQuestionGeneree,
         bus_evenement: BusEvenement,
         prompt: str = PROMPT_SYSTEME_GENERATION_QUESTIONS_FR,
-        multi_processeur: Multiprocesseur = Multiprocesseur(8),
+        multi_processeur: Multiprocesseur = Multiprocesseur(7),
     ):
         super().__init__()
         self._entrepot_questions = entrepot_questions
