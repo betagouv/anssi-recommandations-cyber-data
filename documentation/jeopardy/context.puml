@@ -1,0 +1,46 @@
+@startuml
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!include ICONURL/devicons/yeoman.puml
+!include ICONURL/font-awesome-5/cogs.puml
+
+!include https://raw.githubusercontent.com/adrianvlupu/C4-PlantUML/latest/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+Enterprise_Boundary(b0, "HyDE") {
+    Person(developer, "Développeur·euse du LAB", "Les développeurs·euses du LAB qui participent à la construction du produit MQC")
+
+
+    Enterprise_Boundary(b1, "MQC-data"){
+        System_Boundary(jobs, "API") {
+            System(SystemAPIMQCData, "API MQC Data")
+        }
+
+        System_Boundary(jeopardy, "Jeopardy") {
+            System_Boundary(b2, "Orchestre la création d’une collection de questions générées") {
+                        System(SystemServiceJeopardy, "Service Jeopardy")
+                    }
+
+            System_Boundary(b4, "Collecte les questions générées") {
+                        System(SystemCollecteurQuestions, "collecteur")
+                    }
+            SystemServiceJeopardy -[#transparent]-> SystemCollecteurQuestions
+        }
+
+    }
+
+
+
+    System_Ext(SystemMQC, "MQC", $sprite="cogs")
+    System_Ext(SystemAlbert, "Albert", $sprite="yeoman")
+
+    Rel(SystemAPIMQCData, SystemServiceJeopardy, "Demande au service d’exécuter la génération de questions")
+    Rel(SystemServiceJeopardy, SystemMQC, "Demande les documents de la collection", "1")
+    Rel(SystemServiceJeopardy,SystemCollecteurQuestions, "Demande la génération de questions pour chaque document", 2)
+    Rel(SystemCollecteurQuestions, SystemAlbert, "Demande à Albert de générer N questions pour chaque paragraphe d’un document", "3")
+    Rel(SystemServiceJeopardy, SystemAlbert,"Crée une nouvelle collection et ajoute pour chaque document les questions générées", "4")
+    Rel(developer, SystemAPIMQCData, "Uses", "HTTPS")
+
+}
+
+@enduml

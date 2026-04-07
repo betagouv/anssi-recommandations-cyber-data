@@ -117,8 +117,6 @@ sequenceDiagram
     participant CollecteurDeQuestions as Collecteur de questions
     participant Albert as Albert
 
-<<<<<<< Updated upstream
-=======
     S -->> Albert: Demande les documents et chunks d’une collection
     Albert -->> S: Retourne les documents et chunks
     S -->> Albert: Initie une collection de questions
@@ -134,21 +132,13 @@ sequenceDiagram
     Albert -->> S: Collection complétée
 ```
 
->>>>>>> Stashed changes
 ### Pistes de réflexion
 - On ne génère pas de question pour des chunks trop petits (e.g : `[TITRE] MESURES CYBER PRÉVENTIVES PRIORITAIRES`)
 
 ### Typage d’un chunk de question générée
 ```json
-<<<<<<< Updated upstream
-{'object': 'chunk',
-  'id': 312,
-  'collection_id': 161145,
-  'document_id': 4076447,
-=======
 {
   'id': 312,
->>>>>>> Stashed changes
   'content': 'Ma question ?',
   'metadata': {
                'source_id_document': '4065642',
@@ -157,9 +147,4 @@ sequenceDiagram
               },
   'created': 1774968050
 }
-<<<<<<< Updated upstream
 ```
-=======
-```
-
->>>>>>> Stashed changes
