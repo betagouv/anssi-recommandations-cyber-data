@@ -31,18 +31,20 @@ Enterprise_Boundary(b0, "Evaluation") {
             System_Boundary(b5, "Consigne l’évaluation") {
                 System(SystemConsigneEvaluation, "Consigne l’évaluation afin de l’exploiter dans Metabase")
             }
+            System(SystemDeepeval, "Deepeval", $sprite="atom")
             SystemRemplisseurReponse -[#transparent]-> SystemEvalueReponses
             SystemEvalueReponses -[#transparent]-> SystemConsigneEvaluation
         }
 
 
         System_Ext(SystemMQC, "MQC", $sprite="yeoman")
-        System_Ext(SystemEvalap, "Evalap", $sprite="atom")
         System_Ext(SystemJournal, "postgresql","Journal", $sprite="postgresql")
     }
 
-    Rel(SystemRemplisseurReponse, SystemMQC, "Pose les questions")
-    Rel(SystemEvalueReponses, SystemEvalap, "Intègre le dataset et crée l’expérience associée")
+    Rel(SystemRemplisseurReponse, SystemMQC, "Pose les questions", "1")
+    Rel(SystemRemplisseurReponse, SystemEvalueReponses, "","2")
+    Rel(SystemEvalueReponses, SystemDeepeval, "Intègre le dataset et crée l’évaluation associée", "3")
+    Rel(SystemEvalueReponses, SystemConsigneEvaluation, "","4")
     Rel(SystemConsigneEvaluation, SystemJournal, "Journalise les résultats de l’expérience")
     BiRel(developer, mqcData, "Uses")
     BiRel(expertCyber, mqcData, "Uses")

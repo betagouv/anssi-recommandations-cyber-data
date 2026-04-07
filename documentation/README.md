@@ -4,7 +4,7 @@
 
 Permet de lancer une évaluation de notre RAG en partant d’une vérité terrain et de comparer les réponses obtenues avec celles attendues.
 
-[Modèle C4](./evaluation/context.puml)
+[Évaluation](./evaluation/README.md)
 
 ## HyDE
 
