@@ -15,7 +15,7 @@ def test_recupere_les_questions(
 ):
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection("collection-123")
+        .avec_un_identifiant_de_collection_jeopardy("collection-123")
         .qui_retourne_les_questions_generees(
             ["premiere question ?", "seconde question ?"]
         )
@@ -47,7 +47,7 @@ def test_recupere_les_questions_pour_un_chunk_donne(
 ):
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection("collection-123")
+        .avec_un_identifiant_de_collection_jeopardy("collection-123")
         .qui_retourne_les_questions_generees(
             ["premiere question ?", "seconde question ?"]
         )
@@ -79,7 +79,7 @@ def test_verifie_qu_on_passe_un_prompt_a_notre_generateur_de_questions(
 ):
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection("collection-123")
+        .avec_un_identifiant_de_collection_jeopardy("collection-123")
         .qui_retourne_les_questions_generees(
             ["premiere question ?", "seconde question ?"]
         )
@@ -108,7 +108,7 @@ def test_persiste_les_questions_generees(
 ):
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection("collection-123")
+        .avec_un_identifiant_de_collection_jeopardy("collection-123")
         .qui_retourne_les_questions_generees(
             ["premiere question ?", "seconde question ?"]
         )
@@ -150,7 +150,7 @@ def test_traite_les_chunks_en_parallele(
 ):
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection("collection-123")
+        .avec_un_identifiant_de_collection_jeopardy("collection-123")
         .qui_retourne_les_questions_generees(
             ["premiere question ?", "seconde question ?"]
         )
@@ -179,7 +179,7 @@ def test_stoppe_l_ajout_de_tous_les_chunks_si_une_erreur_est_levee(
     id_collection = "collection-123"
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection(id_collection)
+        .avec_un_identifiant_de_collection_jeopardy(id_collection)
         .levant_une_erreur_sur_la_generation_de_question_pour_le_chunk(
             "CONTENU_EN_ERREUR"
         )
@@ -215,7 +215,7 @@ def test_publie_sur_le_bus_d_evenement_lorsqu_une_erreur_est_levee(
     id_collection = "collection-123"
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection(id_collection)
+        .avec_un_identifiant_de_collection_jeopardy(id_collection)
         .levant_une_erreur_sur_la_generation_de_question_pour_le_chunk(
             "CONTENU_EN_ERREUR"
         )

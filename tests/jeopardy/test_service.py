@@ -73,7 +73,7 @@ def test_recupere_les_chunks_du_document_source_depuis_son_identifiant(
 
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection(id_collection)
+        .avec_un_identifiant_de_collection_jeopardy(id_collection)
         .qui_retourne_une_collection_avec_les_identifiants_de_document([id_document])
         .avec_les_chunks_du_document(
             id_document,
@@ -112,8 +112,8 @@ def test_ajoute_un_chunk_par_question_generee_dans_le_document_cree(
     id_document = "doc-123"
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection(id_collection)
-        .pour_les_documents(["doc-albert-456"])
+        .avec_un_identifiant_de_collection_jeopardy(id_collection)
+        .pour_les_documents_jeopardy(["doc-albert-456"])
         .qui_retourne_une_collection_avec_les_identifiants_de_document([id_document])
         .avec_les_chunks_du_document(
             id_document,
@@ -150,6 +150,60 @@ def test_ajoute_un_chunk_par_question_generee_dans_le_document_cree(
     assert appel.requete.chunks[0]["content"] == "premiere question ?"
     assert appel.requete.chunks[1]["content"] == "seconde question ?"
 
+def test_ajoute_uniquement_les_chunks_du_document_cible(
+        un_client_albert_de_test,
+        un_entrepot_memoire,
+        un_multiprocesseur,
+        un_bus_d_evenement,
+):
+    id_collection = "collection-123"
+    id_premier_document = "doc-123"
+    id_deuxieme_document = "doc-456"
+    client_albert = (
+        un_client_albert_de_test()
+        .avec_un_identifiant_de_collection_jeopardy(id_collection)
+        .pour_les_documents_jeopardy(["doc-jeopardy-123", "doc-jeopardy-456"])
+        .qui_retourne_une_collection_avec_les_identifiants_de_document([id_premier_document, id_deuxieme_document])
+        .avec_les_chunks_du_document(
+            id_premier_document,
+            [
+                {
+                    "id": 7,
+                    "content": "contenu source",
+                    "metadata": {"source": {"numero_page": 42}},
+                }
+            ],
+        )
+        .avec_les_chunks_du_document(
+            id_deuxieme_document,
+            [
+                {
+                    "id": 7,
+                    "content": "contenu source",
+                    "metadata": {"source": {"numero_page": 42}},
+                }
+            ],
+        )
+        .qui_retourne_les_questions_generees(
+            ["premiere question ?", "seconde question ?"]
+        )
+    )
+
+    ServiceJeopardy(
+        client_albert,
+        un_entrepot_memoire,
+        un_bus_d_evenement,
+        "Prompt",
+        un_multiprocesseur,
+    ).jeopardyse(
+        "Nom",
+        "Description",
+        id_collection,
+    )
+
+    appel = client_albert.appels_ajout_chunks[1]
+    assert len(appel.requete.chunks) == 2
+
 
 def test_continue_la_creation_de_documents_en_cas_d_erreur(
     un_client_albert_de_test,
@@ -161,8 +215,8 @@ def test_continue_la_creation_de_documents_en_cas_d_erreur(
     id_document_origine = "doc-123"
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection(id_collection_origine)
-        .pour_les_documents(["doc-jeopardy-123", "doc-jeopardy-456"])
+        .avec_un_identifiant_de_collection_jeopardy(id_collection_origine)
+        .pour_les_documents_jeopardy(["doc-jeopardy-123", "doc-jeopardy-456"])
         .levant_une_erreur_sur_l_ajout_du_document("doc-jeopardy-123")
         .qui_retourne_une_collection_avec_les_identifiants_de_document(
             [id_document_origine, "doc-origine-456"]
@@ -208,7 +262,7 @@ def test_ajoute_les_metadonnees_utiles_dans_les_chunks_generes(
 
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection(id_collection)
+        .avec_un_identifiant_de_collection_jeopardy(id_collection)
         .qui_retourne_une_collection_avec_les_identifiants_de_document([id_document])
         .avec_les_chunks_du_document(
             id_document,
@@ -257,7 +311,7 @@ def test_ajoute_les_chunks_de_questions_par_paquets_de_64_en_utilisant_le_multip
 
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection(id_collection)
+        .avec_un_identifiant_de_collection_jeopardy(id_collection)
         .qui_retourne_une_collection_avec_les_identifiants_de_document([id_document])
         .avec_les_chunks_du_document(
             id_document,
@@ -302,7 +356,7 @@ def test_recupere_les_chunks_depuis_albert_en_partant_de_la_collection(
     identifiant_document = "doc-albert-42"
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection(id_collection)
+        .avec_un_identifiant_de_collection_jeopardy(id_collection)
         .qui_retourne_une_collection_avec_les_identifiants_de_document(
             [identifiant_document]
         )
@@ -346,7 +400,7 @@ def test_continue_le_traitement_si_une_erreur_survient_lors_de_la_recuperation_d
     identifiant_document_en_erreur = "doc-albert-41"
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection(id_collection)
+        .avec_un_identifiant_de_collection_jeopardy(id_collection)
         .qui_retourne_une_collection_avec_les_identifiants_de_document(
             [identifiant_document_en_erreur, identifiant_document]
         )
@@ -400,7 +454,7 @@ def test_publie_sur_le_bus_d_evenement_les_questions_generees(
     bus_d_evenement = un_bus_d_evenement
     client_albert = (
         un_client_albert_de_test()
-        .avec_un_identifiant_de_collection(id_collection)
+        .avec_un_identifiant_de_collection_jeopardy(id_collection)
         .qui_retourne_une_collection_avec_les_identifiants_de_document([id_document])
         .avec_les_chunks_du_document(
             id_document,

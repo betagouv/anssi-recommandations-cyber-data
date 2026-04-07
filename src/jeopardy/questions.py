@@ -24,14 +24,24 @@ class EntrepotQuestionGeneree(ABC):
     def tous(self) -> list[QuestionGeneree]:
         pass
 
+    @abstractmethod
+    def par_id_document(self, id_document) -> list[QuestionGeneree]:
+        pass
+
 
 class EntrepotQuestionGenereeMemoire(EntrepotQuestionGeneree):
     def __init__(self):
         super().__init__()
-        self.questions_generees = []
+        self.questions_generees: dict[str, list[QuestionGeneree]] = {}
 
     def persiste(self, question_generee: QuestionGeneree):
-        self.questions_generees.append(question_generee)
+        self.questions_generees.setdefault(
+            question_generee.id_document,
+            []
+        ).append(question_generee)
 
     def tous(self) -> list[QuestionGeneree]:
-        return self.questions_generees
+        return [question for questions in self.questions_generees.values() for question in questions]
+
+    def par_id_document(self, id_document) -> list[QuestionGeneree]:
+        return self.questions_generees.get(id_document, [])

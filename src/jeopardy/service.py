@@ -87,7 +87,7 @@ class ServiceJeopardy:
                 )
                 collecteur.collecte(document=document_depuis_albert)
 
-                questions_generees = list(self._entrepot_questions.tous())
+                questions_generees = list(self._entrepot_questions.par_id_document(document_depuis_albert.id_document))
 
                 date_fin = time.time()
                 temps = date_fin - date_debut

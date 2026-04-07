@@ -161,7 +161,7 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
             ],
         )
 
-    def avec_un_identifiant_de_collection(self, identifiant_collection: str):
+    def avec_un_identifiant_de_collection_jeopardy(self, identifiant_collection: str):
         self._identifiant_de_collection = identifiant_collection
         return self
 
@@ -179,7 +179,7 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         )
         return self
 
-    def pour_les_documents(self, identifiant_document: list[str]):
+    def pour_les_documents_jeopardy(self, identifiant_document: list[str]):
         self._identifiants_documents_crees = identifiant_document
         return self
 
@@ -221,6 +221,7 @@ class MultiProcesseurDeTest(Multiprocesseur):
         self.resultats = []
 
     def execute(self, func, iterable) -> list:
+        self.resultats = []
         self.a_ete_appele = True
         for chunk in iterable:
             self.resultats.append(func(chunk))
