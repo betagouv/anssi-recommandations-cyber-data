@@ -44,6 +44,7 @@ from jeopardy.client_albert_jeopardy import (
     ReponseDocumentOrigine,
 )
 from jeopardy.questions import EntrepotQuestionGenereeMemoire
+from jeopardy.service import CollectionEntiere
 from jeopardy.service_jeopardyse_collection_entiere import (
     ServiceJeopardyseCollectionEntiere,
     fabrique_service_jeopardise_collection_entiere,
@@ -154,15 +155,13 @@ class ServiceJeopardyseCollectionEntiereDeTest(ServiceJeopardyseCollectionEntier
 
     def jeopardyse(
         self,
-        nom_collection: str,
-        description_collection: str,
-        id_collection: str,
+        donnees: CollectionEntiere,
         taille_paquet_chunks=10,
     ):
         self.jeopardyse_appele = True
-        self.identifiant_collection_a_jeopardyser = id_collection
-        self.nom_collection = nom_collection
-        self.description_collection = description_collection
+        self.identifiant_collection_a_jeopardyser = donnees.id_collection
+        self.nom_collection = donnees.nom_collection
+        self.description_collection = donnees.description_collection
 
 
 class ConstructeurServeur:

@@ -2,6 +2,7 @@ from fastapi import APIRouter, BackgroundTasks
 from fastapi.params import Depends
 from pydantic import BaseModel
 
+from jeopardy.service import CollectionEntiere
 from jeopardy.service_jeopardyse_collection_entiere import (
     ServiceJeopardyseCollectionEntiere,
     fabrique_service_jeopardise_collection_entiere,
@@ -26,8 +27,10 @@ def jeopardy(
 ):
     background_tasks.add_task(
         service_jeopardy.jeopardyse,
-        requete.nom_collection,
-        requete.description_collection,
-        requete.id_collection,
+        CollectionEntiere(
+            nom_collection=requete.nom_collection,
+            description_collection=requete.description_collection,
+            id_collection=requete.id_collection,
+        ),
     )
     return {"message": "Jeopardy en cours d’exécution..."}
