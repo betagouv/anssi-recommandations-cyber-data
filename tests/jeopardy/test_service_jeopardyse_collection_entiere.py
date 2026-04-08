@@ -1,4 +1,6 @@
-from jeopardy.service import ServiceJeopardy
+from jeopardy.service_jeopardyse_collection_entiere import (
+    ServiceJeopardyseCollectionEntiere,
+)
 
 
 def test_cree_une_collection(
@@ -18,7 +20,7 @@ def test_cree_une_collection(
         ],
     )
 
-    ServiceJeopardy(
+    ServiceJeopardyseCollectionEntiere(
         client_albert,
         un_entrepot_memoire,
         un_bus_d_evenement,
@@ -50,7 +52,7 @@ def test_cree_une_collection_en_donnant_un_nom_et_une_description(
         ],
     )
 
-    ServiceJeopardy(
+    ServiceJeopardyseCollectionEntiere(
         client_albert,
         un_entrepot_memoire,
         un_bus_d_evenement,
@@ -87,7 +89,7 @@ def test_recupere_les_chunks_du_document_source_depuis_son_identifiant(
         )
     )
 
-    ServiceJeopardy(
+    ServiceJeopardyseCollectionEntiere(
         client_albert,
         un_entrepot_memoire,
         un_bus_d_evenement,
@@ -130,7 +132,7 @@ def test_ajoute_un_chunk_par_question_generee_dans_le_document_cree(
         )
     )
 
-    ServiceJeopardy(
+    ServiceJeopardyseCollectionEntiere(
         client_albert,
         un_entrepot_memoire,
         un_bus_d_evenement,
@@ -150,11 +152,12 @@ def test_ajoute_un_chunk_par_question_generee_dans_le_document_cree(
     assert appel.requete.chunks[0]["content"] == "premiere question ?"
     assert appel.requete.chunks[1]["content"] == "seconde question ?"
 
+
 def test_ajoute_uniquement_les_chunks_du_document_cible(
-        un_client_albert_de_test,
-        un_entrepot_memoire,
-        un_multiprocesseur,
-        un_bus_d_evenement,
+    un_client_albert_de_test,
+    un_entrepot_memoire,
+    un_multiprocesseur,
+    un_bus_d_evenement,
 ):
     id_collection = "collection-123"
     id_premier_document = "doc-123"
@@ -163,7 +166,9 @@ def test_ajoute_uniquement_les_chunks_du_document_cible(
         un_client_albert_de_test()
         .avec_un_identifiant_de_collection_jeopardy(id_collection)
         .pour_les_documents_jeopardy(["doc-jeopardy-123", "doc-jeopardy-456"])
-        .qui_retourne_une_collection_avec_les_identifiants_de_document([id_premier_document, id_deuxieme_document])
+        .qui_retourne_une_collection_avec_les_identifiants_de_document(
+            [id_premier_document, id_deuxieme_document]
+        )
         .avec_les_chunks_du_document(
             id_premier_document,
             [
@@ -189,7 +194,7 @@ def test_ajoute_uniquement_les_chunks_du_document_cible(
         )
     )
 
-    ServiceJeopardy(
+    ServiceJeopardyseCollectionEntiere(
         client_albert,
         un_entrepot_memoire,
         un_bus_d_evenement,
@@ -236,7 +241,7 @@ def test_continue_la_creation_de_documents_en_cas_d_erreur(
         )
     )
 
-    ServiceJeopardy(
+    ServiceJeopardyseCollectionEntiere(
         client_albert,
         un_entrepot_memoire,
         un_bus_d_evenement,
@@ -277,7 +282,7 @@ def test_ajoute_les_metadonnees_utiles_dans_les_chunks_generes(
         .qui_retourne_les_questions_generees(["question generee ?"])
     )
 
-    ServiceJeopardy(
+    ServiceJeopardyseCollectionEntiere(
         client_albert,
         un_entrepot_memoire,
         un_bus_d_evenement,
@@ -328,7 +333,7 @@ def test_ajoute_les_chunks_de_questions_par_paquets_de_64_en_utilisant_le_multip
     )
     multi_processeur = un_multiprocesseur
 
-    ServiceJeopardy(
+    ServiceJeopardyseCollectionEntiere(
         client_albert,
         un_entrepot_memoire,
         un_bus_d_evenement,
@@ -373,7 +378,7 @@ def test_recupere_les_chunks_depuis_albert_en_partant_de_la_collection(
         .qui_retourne_les_questions_generees(["question depuis Albert ?"])
     )
 
-    ServiceJeopardy(
+    ServiceJeopardyseCollectionEntiere(
         client_albert,
         un_entrepot_memoire,
         un_bus_d_evenement,
@@ -421,7 +426,7 @@ def test_continue_le_traitement_si_une_erreur_survient_lors_de_la_recuperation_d
     )
     entrepot_questions = un_entrepot_memoire
 
-    ServiceJeopardy(
+    ServiceJeopardyseCollectionEntiere(
         client_albert,
         entrepot_questions,
         un_bus_d_evenement,
@@ -469,7 +474,7 @@ def test_publie_sur_le_bus_d_evenement_les_questions_generees(
         .qui_retourne_les_questions_generees(questions_generees)
     )
 
-    ServiceJeopardy(
+    ServiceJeopardyseCollectionEntiere(
         client_albert,
         un_entrepot_memoire,
         bus_d_evenement,

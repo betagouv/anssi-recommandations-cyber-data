@@ -2,7 +2,10 @@ from fastapi import APIRouter, BackgroundTasks
 from fastapi.params import Depends
 from pydantic import BaseModel
 
-from jeopardy.service import fabrique_service_jeopardy, ServiceJeopardy
+from jeopardy.service_jeopardyse_collection_entiere import (
+    ServiceJeopardyseCollectionEntiere,
+    fabrique_service_jeopardise_collection_entiere,
+)
 
 api_jeopardy = APIRouter(prefix="/jeopardy")
 
@@ -17,7 +20,9 @@ class RequeteJeopardy(BaseModel):
 def jeopardy(
     requete: RequeteJeopardy,
     background_tasks: BackgroundTasks,
-    service_jeopardy: ServiceJeopardy = Depends(fabrique_service_jeopardy),  # type: ignore[assignment]
+    service_jeopardy: ServiceJeopardyseCollectionEntiere = Depends(
+        fabrique_service_jeopardise_collection_entiere
+    ),  # type: ignore[assignment]
 ):
     background_tasks.add_task(
         service_jeopardy.jeopardyse,

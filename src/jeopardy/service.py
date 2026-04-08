@@ -2,41 +2,38 @@ from __future__ import annotations
 
 import logging
 import time
+from abc import ABC, abstractmethod
 from itertools import islice
 from typing import Generator
 
-from configuration import recupere_configuration
 from documents.docling.multi_processeur import Multiprocesseur
 from evenement.bus import BusEvenement
-from evenement.fabrique_bus_evenements import fabrique_bus_evenements
-from infra.executeur_requete import ExecuteurDeRequete
 from infra.interval import Interval
 from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
     RequeteAjoutChunksDansDocumentAlbert,
     RequeteCreationDocumentAlbert,
+    ReponseDocumentOrigine,
 )
-from jeopardy.client_albert_jeopardy_reel import ClientAlbertJeopardyReel
 from jeopardy.collecteur import ChunkSource, CollecteurDeQuestions, Document
 from jeopardy.evenements import (
-    EvenementJeopardyGenereEnErreur,
-    CorpsEvenementJeopardyGenereEnErreur,
     CorpsEvenementJeopardyChunkAjouteEnErreur,
     EvenementJeopardyChunkAjouteEnErreur,
     EvenementQuestionsGenerees,
     CorpsEvenementQuestionsGenerees,
     EvenementJeopardyChunksAjoutes,
     CorpsEvenementJeopardyChunksAjoutes,
+    EvenementJeopardyGenereEnErreur,
+    CorpsEvenementJeopardyGenereEnErreur,
 )
 from jeopardy.prompt_generation_question import PROMPT_SYSTEME_GENERATION_QUESTIONS_FR
 from jeopardy.questions import (
     EntrepotQuestionGeneree,
     QuestionGeneree,
-    EntrepotQuestionGenereeMemoire,
 )
 
 
-class ServiceJeopardy:
+class ServiceJeopardyse(ABC):
     def __init__(
         self,
         client_albert: ClientAlbertJeopardy,
@@ -60,73 +57,22 @@ class ServiceJeopardy:
         id_collection: str,
         taille_paquet_chunks=10,
     ):
-        reponse_creation_collection = self._client_albert.cree_collection(
-            f"Jeopardy : {nom_collection}", f"Jeopardy : {description_collection}"
+        documents, id_collection = self.recupere_les_documents(
+            nom_collection, description_collection, id_collection, taille_paquet_chunks
         )
-        self._logger.info(f"Collection créée avec succès : {reponse_creation_collection.id}")
-
-        documents_depuis_albert = self._recupere_et_mappe_collection_depuis_albert(
-            id_collection
+        self._jeopardyse_les_documents(
+            self._mappe_les_documents(documents), id_collection
         )
-        self._logger.info(f"Documents récupérés depuis Albert : {len(documents_depuis_albert)}")
 
-        for document_depuis_albert in documents_depuis_albert:
-            try:
-                date_debut = time.time()
-                reponse_creation_document = self._client_albert.cree_document(
-                    reponse_creation_collection.id,
-                    _en_document_albert(document_depuis_albert),
-                )
-
-                collecteur = CollecteurDeQuestions(
-                    client_albert=self._client_albert,
-                    prompt=self._prompt,
-                    entrepot_questions_generees=self._entrepot_questions,
-                    bus_evenement=self._bus_evenement,
-                    multi_processeur=self._multi_processeur,
-                )
-                collecteur.collecte(document=document_depuis_albert)
-
-                questions_generees = list(self._entrepot_questions.par_id_document(document_depuis_albert.id_document))
-
-                date_fin = time.time()
-                temps = date_fin - date_debut
-                self._bus_evenement.publie(
-                    EvenementQuestionsGenerees(
-                        corps=CorpsEvenementQuestionsGenerees(
-                            questions_generees=questions_generees,
-                            id_document_origine=document_depuis_albert.id_document,
-                            nombre_chunks_origine=len(document_depuis_albert.chunks),
-                            id_collection_jeopardy=reponse_creation_collection.id,
-                            id_document_jeopardy=reponse_creation_document.id,
-                            temps_traitement=int(temps),
-                        )
-                    )
-                )
-                date_debut = time.time()
-                self._ajoute_chunks_dans_document(
-                    reponse_creation_collection.id,
-                    reponse_creation_document.id,
-                    questions_generees,
-                )
-                date_fin = time.time()
-                self._bus_evenement.publie(
-                    EvenementJeopardyChunksAjoutes(
-                        corps=CorpsEvenementJeopardyChunksAjoutes(
-                            chunks=questions_generees, temps=int(date_fin - date_debut)
-                        )
-                    )
-                )
-            except Exception as e:
-                message_erreur = f"Erreur lors de la collecte du document {document_depuis_albert.id_document}: {e}"
-                self._bus_evenement.publie(
-                    EvenementJeopardyGenereEnErreur(
-                        corps=CorpsEvenementJeopardyGenereEnErreur(
-                            erreur=message_erreur
-                        )
-                    )
-                )
-                continue
+    @abstractmethod
+    def recupere_les_documents(
+        self,
+        nom_collection: str,
+        description_collection: str,
+        id_collection: str,
+        taille_paquet_chunks=10,
+    ):
+        pass
 
     def _ajoute_chunks_dans_document(
         self,
@@ -159,33 +105,104 @@ class ServiceJeopardy:
             )
             return
 
-    def _recupere_et_mappe_collection_depuis_albert(
-        self, id_collection: str
-    ) -> list[Document]:
-        reponse_documents_collection = (
-            self._client_albert.recupere_documents_collection(id_collection)
+    def _jeopardyse_un_document(
+        self, document_depuis_albert: Document, id_collection_jeopardy
+    ):
+        date_debut = time.time()
+        reponse_creation_document = self._client_albert.cree_document(
+            id_collection_jeopardy,
+            _en_document_albert(document_depuis_albert),
         )
+
+        collecteur = CollecteurDeQuestions(
+            client_albert=self._client_albert,
+            prompt=self._prompt,
+            entrepot_questions_generees=self._entrepot_questions,
+            bus_evenement=self._bus_evenement,
+            multi_processeur=self._multi_processeur,
+        )
+        collecteur.collecte(document=document_depuis_albert)
+
+        questions_generees = list(
+            self._entrepot_questions.par_id_document(document_depuis_albert.id_document)
+        )
+
+        date_fin = time.time()
+        temps = date_fin - date_debut
+        self._bus_evenement.publie(
+            EvenementQuestionsGenerees(
+                corps=CorpsEvenementQuestionsGenerees(
+                    questions_generees=questions_generees,
+                    id_document_origine=document_depuis_albert.id_document,
+                    nombre_chunks_origine=len(document_depuis_albert.chunks),
+                    id_collection_jeopardy=id_collection_jeopardy,
+                    id_document_jeopardy=reponse_creation_document.id,
+                    temps_traitement=int(temps),
+                )
+            )
+        )
+        date_debut = time.time()
+        self._ajoute_chunks_dans_document(
+            id_collection_jeopardy,
+            reponse_creation_document.id,
+            questions_generees,
+        )
+        date_fin = time.time()
+        self._bus_evenement.publie(
+            EvenementJeopardyChunksAjoutes(
+                corps=CorpsEvenementJeopardyChunksAjoutes(
+                    chunks=questions_generees, temps=int(date_fin - date_debut)
+                )
+            )
+        )
+
+    def _mappe_un_document(
+        self, document_collection: ReponseDocumentOrigine, id_document: str
+    ) -> Document:
+        chunks_document = self._client_albert.recupere_chunks_document(id_document)
+
+        document = _mappe_vers_document(
+            nom_document=document_collection.nom,
+            id_document=id_document,
+            chunks_document=chunks_document,
+        )
+        return document
+
+    def _mappe_les_documents(
+        self, documents_recuperes: list[ReponseDocumentOrigine]
+    ) -> list[Document]:
         documents: list[Document] = []
 
-        for document_collection in reponse_documents_collection.documents:
+        for document_collection in documents_recuperes:
             try:
                 id_document = document_collection.id
-                chunks_document = self._client_albert.recupere_chunks_document(
-                    id_document
-                )
-
                 documents.append(
-                    _mappe_vers_document(
-                        nom_document=document_collection.nom,
-                        id_document=id_document,
-                        chunks_document=chunks_document,
-                    )
+                    self._mappe_un_document(document_collection, id_document)
                 )
             except Exception:
                 # Rajouter du feedback pour dire qu’un document manque
                 continue
 
         return documents
+
+    def _jeopardyse_les_documents(
+        self, documents_depuis_albert: list[Document], id_collection_jeopardy: str
+    ):
+        for document_depuis_albert in documents_depuis_albert:
+            try:
+                self._jeopardyse_un_document(
+                    document_depuis_albert, id_collection_jeopardy
+                )
+            except Exception as e:
+                message_erreur = f"Erreur lors de la collecte du document {document_depuis_albert.id_document}: {e}"
+                self._bus_evenement.publie(
+                    EvenementJeopardyGenereEnErreur(
+                        corps=CorpsEvenementJeopardyGenereEnErreur(
+                            erreur=message_erreur
+                        )
+                    )
+                )
+                continue
 
 
 def _en_document_albert(document: Document) -> RequeteCreationDocumentAlbert:
@@ -243,12 +260,3 @@ def _decoupe_en_paquets(
         if not paquet:
             break
         yield paquet
-
-
-def fabrique_service_jeopardy() -> ServiceJeopardy:
-    configuration_jeopardy = recupere_configuration().jeopardy
-    return ServiceJeopardy(
-        ClientAlbertJeopardyReel(configuration_jeopardy, ExecuteurDeRequete()),
-        EntrepotQuestionGenereeMemoire(),
-        fabrique_bus_evenements(),
-    )
