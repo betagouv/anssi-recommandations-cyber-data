@@ -13,6 +13,7 @@ from jeopardy.evenements import (
 
 logger = logging.getLogger(__name__)
 
+
 class ConsommateurQuestionGeneree(ConsommateurEvenement):
     def __init__(self):
         super().__init__("QUESTIONS_GENEREES")

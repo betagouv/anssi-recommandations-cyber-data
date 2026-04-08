@@ -44,7 +44,10 @@ from jeopardy.client_albert_jeopardy import (
     ReponseDocumentOrigine,
 )
 from jeopardy.questions import EntrepotQuestionGenereeMemoire
-from jeopardy.service import ServiceJeopardy, fabrique_service_jeopardy
+from jeopardy.service_jeopardyse_collection_entiere import (
+    ServiceJeopardyseCollectionEntiere,
+    fabrique_service_jeopardise_collection_entiere,
+)
 from serveur import fabrique_serveur
 
 
@@ -133,7 +136,7 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         )
 
 
-class ServiceJeopardyDeTest(ServiceJeopardy):
+class ServiceJeopardyseCollectionEntiereDeTest(ServiceJeopardyseCollectionEntiere):
     def __init__(self):
         super().__init__(
             ClientAlbertJeopardyDeTest(),
@@ -210,8 +213,12 @@ class ConstructeurServeur:
             self._serveur.dependency_overrides[clef] = dependance
         return self._serveur
 
-    def avec_un_service_jeopardy(self, service_jeopardy: ServiceJeopardyDeTest):
-        self._dependances[fabrique_service_jeopardy] = lambda: service_jeopardy
+    def avec_un_service_jeopardy(
+        self, service_jeopardy: ServiceJeopardyseCollectionEntiereDeTest
+    ):
+        self._dependances[fabrique_service_jeopardise_collection_entiere] = (
+            lambda: service_jeopardy
+        )
         return self
 
 
@@ -242,9 +249,9 @@ def un_service_evaluation() -> Callable[[], ServiceEvaluationDeTest]:
 
 
 @pytest.fixture()
-def un_service_jeopardy() -> Callable[[], ServiceJeopardyDeTest]:
+def un_service_jeopardy() -> Callable[[], ServiceJeopardyseCollectionEntiereDeTest]:
     def _un_service_jeopardy():
-        return ServiceJeopardyDeTest()
+        return ServiceJeopardyseCollectionEntiereDeTest()
 
     return _un_service_jeopardy
 
@@ -263,7 +270,7 @@ def un_serveur_de_test_complet(
         AdaptateurJournalMemoire,
         BusEvenement,
         ServiceEvaluationDeTest,
-        ServiceJeopardyDeTest,
+        ServiceJeopardyseCollectionEntiereDeTest,
     ],
 ]:
     def _un_serveur_de_test_complet(
