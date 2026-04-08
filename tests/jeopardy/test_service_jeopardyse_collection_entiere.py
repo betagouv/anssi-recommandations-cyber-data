@@ -1,3 +1,4 @@
+from jeopardy.service import CollectionEntiere
 from jeopardy.service_jeopardyse_collection_entiere import (
     ServiceJeopardyseCollectionEntiere,
 )
@@ -27,9 +28,11 @@ def test_cree_une_collection(
         "Un prompt",
         un_multiprocesseur,
     ).jeopardyse(
-        "Nom",
-        "Description",
-        "doc-123",
+        CollectionEntiere(
+            nom_collection="Nom",
+            description_collection="Description",
+            id_collection="doc-123",
+        ),
     )
 
     assert client_albert.collection_creee
@@ -58,7 +61,13 @@ def test_cree_une_collection_en_donnant_un_nom_et_une_description(
         un_bus_d_evenement,
         "Prompt",
         un_multiprocesseur,
-    ).jeopardyse("Ma collection", "Ma description", "doc-123")
+    ).jeopardyse(
+        CollectionEntiere(
+            nom_collection="Ma collection",
+            description_collection="Ma description",
+            id_collection="doc-123",
+        )
+    )
 
     assert client_albert.nom_collection_passe == "Jeopardy : Ma collection"
     assert client_albert.description_collection_passe == "Jeopardy : Ma description"
@@ -96,9 +105,11 @@ def test_recupere_les_chunks_du_document_source_depuis_son_identifiant(
         "Prompt",
         un_multiprocesseur,
     ).jeopardyse(
-        "Nom",
-        "Description",
-        id_collection,
+        CollectionEntiere(
+            nom_collection="Nom",
+            description_collection="Description",
+            id_collection=id_collection,
+        ),
     )
 
     assert client_albert.identifiants_documents_lus == [id_document]
@@ -139,9 +150,11 @@ def test_ajoute_un_chunk_par_question_generee_dans_le_document_cree(
         "Prompt",
         un_multiprocesseur,
     ).jeopardyse(
-        "Nom",
-        "Description",
-        id_collection,
+        CollectionEntiere(
+            nom_collection="Nom",
+            description_collection="Description",
+            id_collection=id_collection,
+        )
     )
 
     appel = client_albert.appels_ajout_chunks[0]
@@ -201,9 +214,11 @@ def test_ajoute_uniquement_les_chunks_du_document_cible(
         "Prompt",
         un_multiprocesseur,
     ).jeopardyse(
-        "Nom",
-        "Description",
-        id_collection,
+        CollectionEntiere(
+            nom_collection="Nom",
+            description_collection="Description",
+            id_collection=id_collection,
+        )
     )
 
     appel = client_albert.appels_ajout_chunks[1]
@@ -248,9 +263,11 @@ def test_continue_la_creation_de_documents_en_cas_d_erreur(
         "Prompt",
         un_multiprocesseur,
     ).jeopardyse(
-        "Nom",
-        "Description",
-        id_collection_origine,
+        CollectionEntiere(
+            nom_collection="Nom",
+            description_collection="Description",
+            id_collection=id_collection_origine,
+        )
     )
 
     assert len(client_albert.appels_ajout_chunks) == 1
@@ -289,9 +306,11 @@ def test_ajoute_les_metadonnees_utiles_dans_les_chunks_generes(
         "Prompt",
         un_multiprocesseur,
     ).jeopardyse(
-        "Nom",
-        "Description",
-        id_collection,
+        CollectionEntiere(
+            nom_collection="Nom",
+            description_collection="Description",
+            id_collection=id_collection,
+        )
     )
 
     appel = client_albert.appels_ajout_chunks[0]
@@ -340,9 +359,11 @@ def test_ajoute_les_chunks_de_questions_par_paquets_de_64_en_utilisant_le_multip
         "Prompt",
         multi_processeur,
     ).jeopardyse(
-        "Nom",
-        "Description",
-        id_collection,
+        CollectionEntiere(
+            nom_collection="Nom",
+            description_collection="Description",
+            id_collection=id_collection,
+        )
     )
 
     assert multi_processeur.a_ete_appele
@@ -385,9 +406,11 @@ def test_recupere_les_chunks_depuis_albert_en_partant_de_la_collection(
         "Prompt",
         un_multiprocesseur,
     ).jeopardyse(
-        "Nom",
-        "Description",
-        id_collection,
+        CollectionEntiere(
+            nom_collection="Nom",
+            description_collection="Description",
+            id_collection=id_collection,
+        ),
     )
 
     assert client_albert.identifiant_collection_lu == id_collection
@@ -433,9 +456,11 @@ def test_continue_le_traitement_si_une_erreur_survient_lors_de_la_recuperation_d
         "Prompt",
         un_multiprocesseur,
     ).jeopardyse(
-        "Nom",
-        "Description",
-        id_collection,
+        CollectionEntiere(
+            nom_collection="Nom",
+            description_collection="Description",
+            id_collection=id_collection,
+        )
     )
 
     assert client_albert.identifiant_collection_lu == id_collection
@@ -481,9 +506,11 @@ def test_publie_sur_le_bus_d_evenement_les_questions_generees(
         "Prompt",
         un_multiprocesseur,
     ).jeopardyse(
-        "Nom",
-        "Description",
-        id_collection,
+        CollectionEntiere(
+            nom_collection="Nom",
+            description_collection="Description",
+            id_collection=id_collection,
+        ),
     )
 
     assert len(bus_d_evenement.evenements) == 2

@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import time
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from itertools import islice
 from typing import Generator
 
@@ -33,6 +34,13 @@ from jeopardy.questions import (
 )
 
 
+@dataclass
+class CollectionEntiere:
+    id_collection: str
+    nom_collection: str
+    description_collection: str
+
+
 class ServiceJeopardyse(ABC):
     def __init__(
         self,
@@ -50,27 +58,17 @@ class ServiceJeopardyse(ABC):
         self._multi_processeur = multi_processeur
         self._logger = logging.getLogger(__name__)
 
-    def jeopardyse(
-        self,
-        nom_collection: str,
-        description_collection: str,
-        id_collection: str,
-        taille_paquet_chunks=10,
-    ):
-        documents, id_collection = self.recupere_les_documents(
-            nom_collection, description_collection, id_collection, taille_paquet_chunks
+    def jeopardyse(self, donnees: CollectionEntiere, taille_paquet_chunks: int = 10):
+        documents, id_collection_jeopardy = self.recupere_les_documents(
+            donnees, taille_paquet_chunks
         )
         self._jeopardyse_les_documents(
-            self._mappe_les_documents(documents), id_collection
+            self._mappe_les_documents(documents), id_collection_jeopardy
         )
 
     @abstractmethod
     def recupere_les_documents(
-        self,
-        nom_collection: str,
-        description_collection: str,
-        id_collection: str,
-        taille_paquet_chunks=10,
+        self, donnees: CollectionEntiere, taille_paquet_chunks=10
     ):
         pass
 
