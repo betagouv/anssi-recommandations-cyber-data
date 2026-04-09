@@ -105,6 +105,13 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
     ) -> ReponseDocumentsCollectionOrigine:
         self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
 
+        documents = self.__recupere_les_documents_d_une_collection(id_collection)
+        return ReponseDocumentsCollectionOrigine(
+            id=id_collection,
+            documents=documents,
+        )
+
+    def __recupere_les_documents_d_une_collection(self, id_collection: str) -> list:
         def mappe_document(document: dict) -> ReponseDocumentOrigine:
             return ReponseDocumentOrigine(
                 id=str(document["id"]),
@@ -117,15 +124,17 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
             url=f"{self._configuration.base_url}/documents?collection_id={int(id_collection)}&limit=100",
             mappe=mappe_document,
         )
-        return ReponseDocumentsCollectionOrigine(
-            id=id_collection,
-            documents=documents,
-        )
+        return documents
 
     def recupere_documents_par_noms(
         self, id_collection: str, noms_documents: list[str]
     ) -> list[ReponseDocumentOrigine]:
-        return []
+        self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
+        documents = self.__recupere_les_documents_d_une_collection(id_collection)
+
+        return [
+            document for document in documents if document.nom in noms_documents
+        ]
 
     def _recupere_reponse_albert(
         self, offset: int, url: str, mappe: Callable[[dict], Any]
