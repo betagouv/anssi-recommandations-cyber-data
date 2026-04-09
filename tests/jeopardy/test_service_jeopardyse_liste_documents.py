@@ -9,9 +9,9 @@ def test_recupere_un_document_source_depuis_son_identifiant(
     un_multiprocesseur,
     un_bus_d_evenement,
 ):
-    id_collection = "collection-123"
+    id_collection_mqc = "mqc"
     nom_document = "anssi-guide-1"
-
+    id_collection_jeopardy = "collection-123"
     client_albert = un_client_albert_de_test().qui_retourne_une_liste_de_documents_lors_de_la_recherche_par_noms(
         [("123456789", nom_document, 2)]
     )
@@ -23,11 +23,15 @@ def test_recupere_un_document_source_depuis_son_identifiant(
         "Prompt",
         un_multiprocesseur,
     ).recupere_les_documents(
-        ListeDeDocuments(id_collection=id_collection, noms_documents=[nom_document]),
+        ListeDeDocuments(
+            id_collection_jeopardy=id_collection_jeopardy,
+            noms_documents=[nom_document],
+            id_collection_mqc=id_collection_mqc,
+        ),
     )
 
     assert client_albert.noms_documents_recuperes == [nom_document]
-    assert client_albert.identifiant_collection_lu == id_collection
+    assert client_albert.identifiant_collection_lu == id_collection_mqc
 
 
 def test_retourne_les_documents_recherches(
@@ -48,7 +52,11 @@ def test_retourne_les_documents_recherches(
         "Prompt",
         un_multiprocesseur,
     ).recupere_les_documents(
-        ListeDeDocuments(id_collection=id_collection, noms_documents=["anssi-guide-1"])
+        ListeDeDocuments(
+            id_collection_jeopardy=id_collection,
+            noms_documents=["anssi-guide-1"],
+            id_collection_mqc="mqc",
+        )
     )
 
     assert identifiant_collection == id_collection
