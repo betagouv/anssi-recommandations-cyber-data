@@ -116,7 +116,7 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
             return ReponseDocumentOrigine(
                 id=str(document["id"]),
                 nom=str(document.get("name", "")),
-                nombre_chunks=int(document.get("chunk_count", 0)),
+                nombre_chunks=int(document.get("chunks", 0)),
             )
 
         documents = self._recupere_reponse_albert(
