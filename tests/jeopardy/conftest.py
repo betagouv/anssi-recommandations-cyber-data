@@ -66,6 +66,8 @@ class AppelAjoutChunks:
 class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
     def __init__(self):
         super().__init__()
+        self.noms_documents_recuperes = []
+        self._documents = []
         self.description_collection_passe = None
         self.nom_collection_passe = None
         self._reponses_questions_generees = []
@@ -161,6 +163,20 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
             ],
         )
 
+    def recupere_documents_par_noms(
+        self, id_collection: str, noms_documents: list[str]
+    ):
+        self.identifiant_collection_lu = id_collection
+        self.noms_documents_recuperes = noms_documents
+        return [
+            ReponseDocumentOrigine(
+                id=id_document,
+                nom=nom_document,
+                nombre_chunks=nombre_chunks,
+            )
+            for (id_document, nom_document, nombre_chunks) in self._documents
+        ]
+
     def avec_un_identifiant_de_collection_jeopardy(self, identifiant_collection: str):
         self._identifiant_de_collection = identifiant_collection
         return self
@@ -169,6 +185,12 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
         self, identifiants_documents: list[str]
     ):
         self._identifiants_documents.extend(identifiants_documents)
+        return self
+
+    def qui_retourne_une_liste_de_documents_lors_de_la_recherche_par_noms(
+        self, documents: list[tuple[str, str, int]]
+    ):
+        self._documents.extend(documents)
         return self
 
     def levant_une_erreur_sur_la_recuperation_des_chunks(

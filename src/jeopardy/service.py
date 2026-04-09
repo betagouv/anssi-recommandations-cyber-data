@@ -41,6 +41,12 @@ class CollectionEntiere:
     description_collection: str
 
 
+@dataclass
+class ListeDeDocuments:
+    id_collection: str
+    noms_documents: list[str]
+
+
 class ServiceJeopardyse(ABC):
     def __init__(
         self,
@@ -58,7 +64,11 @@ class ServiceJeopardyse(ABC):
         self._multi_processeur = multi_processeur
         self._logger = logging.getLogger(__name__)
 
-    def jeopardyse(self, donnees: CollectionEntiere, taille_paquet_chunks: int = 10):
+    def jeopardyse(
+        self,
+        donnees: CollectionEntiere | ListeDeDocuments,
+        taille_paquet_chunks: int = 10,
+    ):
         documents, id_collection_jeopardy = self.recupere_les_documents(
             donnees, taille_paquet_chunks
         )
@@ -68,8 +78,8 @@ class ServiceJeopardyse(ABC):
 
     @abstractmethod
     def recupere_les_documents(
-        self, donnees: CollectionEntiere, taille_paquet_chunks=10
-    ):
+        self, donnees: CollectionEntiere | ListeDeDocuments, taille_paquet_chunks=10
+    ) -> tuple[list[ReponseDocumentOrigine], str]:
         pass
 
     def _ajoute_chunks_dans_document(
