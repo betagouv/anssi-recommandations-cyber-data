@@ -50,6 +50,10 @@ from jeopardy.service_jeopardyse_collection_entiere import (
     ServiceJeopardyseCollectionEntiere,
     fabrique_service_jeopardise_collection_entiere,
 )
+from jeopardy.service_jeopardyse_liste_de_documents import (
+    ServiceJeopardyseDocuments,
+    fabrique_service_jeopardise_documents,
+)
 from serveur import fabrique_serveur
 
 
@@ -171,6 +175,32 @@ class ServiceJeopardyseCollectionEntiereDeTest(ServiceJeopardyseCollectionEntier
         self.description_collection = collection_entiere.description_collection
 
 
+class ServiceJeopardyseDocumentsDeTest(ServiceJeopardyseDocuments):
+    def __init__(self):
+        super().__init__(
+            ClientAlbertJeopardyDeTest(),
+            EntrepotQuestionGenereeMemoire(),
+            None,
+            "Un prompt",
+            MultiProcesseurDeTest(),
+        )
+        self.jeopardyse_documents_appele = False
+        self.identifiant_collection_jeopardy = None
+        self.noms_documents_a_jeopardyser = []
+        self.identifiant_collection_a_jeopardyser = None
+
+    def jeopardyse(
+        self,
+        donnees: CollectionEntiere | ListeDeDocuments,
+        taille_paquet_chunks: int = 10,
+    ):
+        liste_de_documents = cast(ListeDeDocuments, donnees)
+        self.jeopardyse_documents_appele = True
+        self.identifiant_collection_jeopardy = liste_de_documents.id_collection_jeopardy
+        self.noms_documents_a_jeopardyser = liste_de_documents.noms_documents
+        self.identifiant_collection_a_jeopardyser = liste_de_documents.id_collection_mqc
+
+
 class ConstructeurServeur:
     def __init__(
         self,
@@ -219,11 +249,19 @@ class ConstructeurServeur:
             self._serveur.dependency_overrides[clef] = dependance
         return self._serveur
 
-    def avec_un_service_jeopardy(
+    def avec_un_service_jeopardy_de_collection_entiere(
         self, service_jeopardy: ServiceJeopardyseCollectionEntiereDeTest
     ):
         self._dependances[fabrique_service_jeopardise_collection_entiere] = (
             lambda: service_jeopardy
+        )
+        return self
+
+    def avec_un_service_jeopardy_de_documents(
+        self, service_jeopardy_de_documents: ServiceJeopardyseDocumentsDeTest
+    ):
+        self._dependances[fabrique_service_jeopardise_documents] = (
+            lambda: service_jeopardy_de_documents
         )
         return self
 
@@ -255,9 +293,21 @@ def un_service_evaluation() -> Callable[[], ServiceEvaluationDeTest]:
 
 
 @pytest.fixture()
-def un_service_jeopardy() -> Callable[[], ServiceJeopardyseCollectionEntiereDeTest]:
+def un_service_jeopardy_de_collection_entiere() -> Callable[
+    [], ServiceJeopardyseCollectionEntiereDeTest
+]:
     def _un_service_jeopardy():
         return ServiceJeopardyseCollectionEntiereDeTest()
+
+    return _un_service_jeopardy
+
+
+@pytest.fixture()
+def un_service_jeopardy_de_documents() -> Callable[
+    [], ServiceJeopardyseDocumentsDeTest
+]:
+    def _un_service_jeopardy():
+        return ServiceJeopardyseDocumentsDeTest()
 
     return _un_service_jeopardy
 
@@ -268,7 +318,8 @@ def un_serveur_de_test_complet(
     un_client_albert_de_reformulation,
     un_bus_d_evenement,
     un_service_evaluation,
-    un_service_jeopardy,
+    un_service_jeopardy_de_collection_entiere,
+    un_service_jeopardy_de_documents,
 ) -> Callable[
     [Optional[ExecuteurDeRequeteDeTest] | None],
     tuple[
@@ -277,6 +328,7 @@ def un_serveur_de_test_complet(
         BusEvenement,
         ServiceEvaluationDeTest,
         ServiceJeopardyseCollectionEntiereDeTest,
+        ServiceJeopardyseDocumentsDeTest,
     ],
 ]:
     def _un_serveur_de_test_complet(
@@ -293,8 +345,14 @@ def un_serveur_de_test_complet(
         serveur.avec_un_bus_d_evenement(bus_evenement)
         service_evaluation = un_service_evaluation()
         serveur.avec_un_service_evaluation(service_evaluation)
-        service_jeopardy = un_service_jeopardy()
-        serveur.avec_un_service_jeopardy(service_jeopardy)
+        service_jeopardy_de_collection_entiere = (
+            un_service_jeopardy_de_collection_entiere()
+        )
+        serveur.avec_un_service_jeopardy_de_collection_entiere(
+            service_jeopardy_de_collection_entiere
+        )
+        service_jeopardy_de_documents = un_service_jeopardy_de_documents()
+        serveur.avec_un_service_jeopardy_de_documents(service_jeopardy_de_documents)
         executeur_de_requete = (
             ExecuteurDeRequeteDeTest(
                 [ReponseAttendueOK(ReponseTexteEnSucces(texte="OK"), TypeRequete.GET)]
@@ -308,7 +366,8 @@ def un_serveur_de_test_complet(
             adaptateur_journal,
             bus_evenement,
             service_evaluation,
-            service_jeopardy,
+            service_jeopardy_de_collection_entiere,
+            service_jeopardy_de_documents,
         )
 
     return _un_serveur_de_test_complet

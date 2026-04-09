@@ -132,9 +132,7 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
         self._executeur_de_requete.initialise_connexion_securisee(self._cle_api)
         documents = self.__recupere_les_documents_d_une_collection(id_collection)
 
-        return [
-            document for document in documents if document.nom in noms_documents
-        ]
+        return [document for document in documents if document.nom in noms_documents]
 
     def _recupere_reponse_albert(
         self, offset: int, url: str, mappe: Callable[[dict], Any]

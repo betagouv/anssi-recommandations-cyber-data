@@ -43,8 +43,9 @@ class CollectionEntiere:
 
 @dataclass
 class ListeDeDocuments:
-    id_collection: str
+    id_collection_jeopardy: str
     noms_documents: list[str]
+    id_collection_mqc: str
 
 
 class ServiceJeopardyse(ABC):
