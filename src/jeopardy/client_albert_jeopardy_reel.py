@@ -122,6 +122,11 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
             documents=documents,
         )
 
+    def recupere_documents_par_noms(
+        self, id_collection: str, noms_documents: list[str]
+    ) -> list[ReponseDocumentOrigine]:
+        return []
+
     def _recupere_reponse_albert(
         self, offset: int, url: str, mappe: Callable[[dict], Any]
     ) -> list:

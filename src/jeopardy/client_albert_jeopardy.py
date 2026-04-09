@@ -56,6 +56,12 @@ class ClientAlbertJeopardy(ABC):
     ) -> ReponseDocumentsCollectionOrigine:
         pass
 
+    @abstractmethod
+    def recupere_documents_par_noms(
+        self, id_collection: str, noms_documents: list[str]
+    ) -> list[ReponseDocumentOrigine]:
+        pass
+
 
 class ErreurClientAlbertJeopardy(Exception):
     """Erreur levée lors d'un échange avec Albert."""

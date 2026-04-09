@@ -1,5 +1,6 @@
 import uuid
 from pathlib import Path
+from typing import cast
 
 import pytest
 from deepeval.evaluate.types import EvaluationResult
@@ -44,7 +45,7 @@ from jeopardy.client_albert_jeopardy import (
     ReponseDocumentOrigine,
 )
 from jeopardy.questions import EntrepotQuestionGenereeMemoire
-from jeopardy.service import CollectionEntiere
+from jeopardy.service import CollectionEntiere, ListeDeDocuments
 from jeopardy.service_jeopardyse_collection_entiere import (
     ServiceJeopardyseCollectionEntiere,
     fabrique_service_jeopardise_collection_entiere,
@@ -136,6 +137,11 @@ class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
             ],
         )
 
+    def recupere_documents_par_noms(
+        self, id_collection: str, noms_documents: list[str]
+    ) -> list[ReponseDocumentOrigine]:
+        return []
+
 
 class ServiceJeopardyseCollectionEntiereDeTest(ServiceJeopardyseCollectionEntiere):
     def __init__(self):
@@ -155,13 +161,14 @@ class ServiceJeopardyseCollectionEntiereDeTest(ServiceJeopardyseCollectionEntier
 
     def jeopardyse(
         self,
-        donnees: CollectionEntiere,
+        donnees: CollectionEntiere | ListeDeDocuments,
         taille_paquet_chunks=10,
     ):
+        collection_entiere = cast(CollectionEntiere, donnees)
         self.jeopardyse_appele = True
-        self.identifiant_collection_a_jeopardyser = donnees.id_collection
-        self.nom_collection = donnees.nom_collection
-        self.description_collection = donnees.description_collection
+        self.identifiant_collection_a_jeopardyser = collection_entiere.id_collection
+        self.nom_collection = collection_entiere.nom_collection
+        self.description_collection = collection_entiere.description_collection
 
 
 class ConstructeurServeur:
