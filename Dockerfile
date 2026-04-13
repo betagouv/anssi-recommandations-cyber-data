@@ -15,4 +15,4 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 RUN pip install uv && \
       uv venv && \
-      uv sync
+      uv sync --no-dev
