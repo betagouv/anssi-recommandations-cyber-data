@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from typing import Any, Callable
 
 from infra.executeur_requete import ExecuteurDeRequete
@@ -15,6 +16,7 @@ from jeopardy.client_albert_jeopardy import (
     ReponseDocumentsCollectionOrigine,
 )
 
+logger = logging.getLogger(__name__)
 
 class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
     def __init__(
@@ -77,15 +79,19 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
         reponse = self._executeur_de_requete.poste(url, payload, fichiers=None)
         reponse.raise_for_status()
         corps = reponse.json()
-        contenu_reponse = (
-            corps.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-        )
+        question = corps.get("choices", [{}])[0].get("message", {}).get("content", "")
         try:
-            json_reponse: dict[str, Any | None] = json.loads(contenu_reponse)
+            if question is not None:
+                contenu_reponse = (
+                    question.strip()
+                )
+                json_reponse: dict[str, Any | None] = json.loads(contenu_reponse)
+                payload_questions = json_reponse.get("questions")
+                return payload_questions if payload_questions is not None else []
+            return []
         except json.JSONDecodeError:
             return []
-        payload_questions = json_reponse.get("questions")
-        return payload_questions if payload_questions is not None else []
+
 
     def ajoute_chunks_dans_document(
         self,
