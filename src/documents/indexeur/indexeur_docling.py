@@ -182,7 +182,7 @@ class IndexeurDocling(Indexeur):
                 resultat_chunk = reponse_chunk.json()
                 if reponse_chunk.status_code != 201:
                     resultat_indexation = ReponseDocumentEnErreur(
-                        detail=resultat_chunk.get("detail")[0].msg,
+                        detail=str(resultat_chunk),
                         document_en_erreur=nom_du_document,
                     )
                     break
