@@ -63,6 +63,8 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
         if reponse.status_code == 200:
             try:
                 contenu = reponse.json()["choices"][0]["message"]["content"]
+                if contenu is None:
+                    return "{}"
                 _, reponse_nettoyee = separe_reflexion_reponse(contenu)
                 return reponse_nettoyee
             except Exception as exc:
