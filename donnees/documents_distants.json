@@ -246,5 +246,133 @@
   "CERT-FR - Fiche réflexe - Chiffrement en cours - Qualification": {
     "type": "PDF",
     "url": "https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-001-1.pdf"
+  },
+  "PACS_Referentiel-exigences_v1.1_vFR.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/372/PACS_Referentiel-exigences_v1.1_vFR.pdf"
+  },
+  "PASSI_Referentiel-exigences_v2.2.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/375/PASSI_Referentiel-exigences_v2.2.pdf"
+  },
+  "PRIS_Referentiel-exigences_v3.2.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/380/PRIS_Referentiel-exigences_v3.2.pdf"
+  },
+  "pdis_referentiel_v2.01.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/383/pdis_referentiel_v2.01.pdf"
+  },
+  "pdis_referentiel_v2.0_en1.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/384/pdis_referentiel_v2.0_en1.pdf"
+  },
+  "Addendum-au-referentiel-PDIS-v2.0.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/382/Addendum-au-referentiel-PDIS-v2.0.pdf"
+  },
+  "PVID_referentiel-exigences_v1.1.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/386/PVID_referentiel-exigences_v1.1.pdf"
+  },
+  "20220811_np_anssi_eidas_eid-referentielexigences_v1.2.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/387/20220811_np_anssi_eidas_eid-referentielexigences_v1.2.pdf"
+  },
+  "secnumcloud-referentiel-exigences-v3.2.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/388/secnumcloud-referentiel-exigences-v3.2.pdf"
+  },
+  "ANSSI_PAMS_referentiel_v1.1_vFR.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/389/ANSSI_PAMS_referentiel_v1.1_vFR.pdf"
+  },
+  "RGS_v-2-00_Corps_du_texte.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/331/RGS_v-2-00_Corps_du_texte.pdf"
+  },
+  "RGS_v-2-0_A1.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/332/RGS_v-2-0_A1.pdf"
+  },
+  "RGS_v-2-0_A2.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/333/RGS_v-2-0_A2.pdf"
+  },
+  "RGS_v-2-0_A3.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/334/RGS_v-2-0_A3.pdf"
+  },
+  "RGS_v-2-0_A3-errata_horodatage_electronique_v1.0.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/335/RGS_v-2-0_A3-errata_horodatage_electronique_v1.0.pdf"
+  },
+  "RGS_v-2-0_A4.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/336/RGS_v-2-0_A4.pdf"
+  },
+  "RGS_v-2-0_A5.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/337/RGS_v-2-0_A5.pdf"
+  },
+  "anssi-guide-mecanismes_crypto-2.04.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/338/anssi-guide-mecanismes_crypto-2.04.pdf"
+  },
+  "RGS_v-2-0_B2.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/339/RGS_v-2-0_B2.pdf"
+  },
+  "RGS_v-2-0_B3.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/340/RGS_v-2-0_B3.pdf"
+  },
+  "RGS_v-2-0_C.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/341/RGS_v-2-0_C.pdf"
+  },
+  "eidas_psc-qualifies_v1.3_anssi.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/356/eidas_psc-qualifies_v1.3_anssi.pdf"
+  },
+  "eidas_horodatage-qualifie_v1.1_anssi.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/357/eidas_horodatage-qualifie_v1.1_anssi.pdf"
+  },
+  "eidas_delivrance-certificats-qualifies_v1.2_anssi.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/358/eidas_delivrance-certificats-qualifies_v1.2_anssi.pdf"
+  },
+  "eidas_validation-signatures-cachets-qualifies_v1.0_anssi.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/359/eidas_validation-signatures-cachets-qualifies_v1.0_anssi.pdf"
+  },
+  "eidas_conservation-signatures-cachets-qualifies_v1.0_anssi.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/360/eidas_conservation-signatures-cachets-qualifies_v1.0_anssi.pdf"
+  },
+  "eidas_envoi-recommande-electronique-qualifie_v1.0_anssi.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/361/eidas_envoi-recommande-electronique-qualifie_v1.0_anssi.pdf"
+  },
+  "eidas_horodatage-transition-rgs_v1.1_anssi.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/362/eidas_horodatage-transition-rgs_v1.1_anssi.pdf"
+  },
+  "eidas_delivrance-certificats-transition-rgs_v1.1_anssi.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/363/eidas_delivrance-certificats-transition-rgs_v1.1_anssi.pdf"
+  },
+  "eidas-organismesevaluationconformite_v1.1_anssi.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/364/eidas-organismesevaluationconformite_v1.1_anssi.pdf"
+  },
+  "eidas-certificationconformiteqscd_v1.0_anssi.pdf": {
+    "type": "PDF",
+    "url": "https://cyber.gouv.fr/documents/365/eidas-certificationconformiteqscd_v1.0_anssi.pdf"
+  },
+  "Services introduits par la loi pour une République numérique": {
+    "type": "HTML",
+    "url": "https://cyber.gouv.fr/reglementation/reglementation-identite-confiance-numerique/securite-echanges-voie-electronique/services-introduits-par-republique-num%C3%A9rique/"
   }
 }
