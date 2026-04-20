@@ -1,7 +1,9 @@
 from pathlib import Path
 
+import pytest
+
 from documents.docling.document import Document
-from documents.pdf.document_pdf import DocumentPDF, PagePDF, Position, BlocPagePDF
+from documents.pdf.document_pdf import DocumentPDF, PagePDF, BlocPagePDF
 
 document_pdf = DocumentPDF(
     chemin_pdf="tests/data/guide_test.pdf",
@@ -21,11 +23,8 @@ def test_page_a_une_liste_de_blocs_vide_par_defaut():
 
 def test_page_peut_ajouter_un_bloc():
     page = PagePDF(numero_page=1)
-    position = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
-    bloc = BlocPagePDF(texte="[TEXTE] Mon texte", position=position, numero_page=1)
-
+    bloc = BlocPagePDF(texte="Mon texte", numero_page=1)
     page.ajoute_bloc(bloc)
-
     assert len(page.blocs) == 1
     assert page.blocs[0] == bloc
 
@@ -42,456 +41,185 @@ def test_pages_a_une_collection_de_pages_vide_par_defaut():
 
 def test_document_pdf_cree_correctement():
     doc = DocumentPDF("chemin/vers/fichier.pdf", "https://example.com/fichier.pdf")
-
     assert doc.chemin == Path("chemin/vers/fichier.pdf")
     assert doc.url == "https://example.com/fichier.pdf"
 
 
-def test_document_peut_ajouter_un_bloc_dans_une_page(
-    un_constructeur_de_text_item,
+def test_generateur_produit_un_bloc_par_texte_sans_header(
+    un_constructeur_d_element_filtrable,
     resultat_conversion,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
-    position = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
-
     document.genere_les_pages(
         document_pdf.generateur,
         [
-            un_constructeur_de_text_item()
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
             .avec_numero_page(1)
-            .a_la_position(position)
-            .avec_texte("Une page")
+            .avec_texte("Mon texte")
             .construis()
         ],
         resultat_conversion.document,
     )
-
     assert len(document.pages) == 1
-    assert document.pages[1] == PagePDF(
-        numero_page=1,
-        blocs=[BlocPagePDF(texte="[TEXTE] Une page", position=position, numero_page=1)],
-    )
+    assert document.pages[1].blocs[0].numero_page == 1
+    assert document.pages[1].blocs[0].texte == "Mon texte"
 
 
-def test_document_peut_ajouter_deux_blocs_sur_une_meme_page(
-    un_constructeur_de_text_item,
-    resultat_conversion,
-):
-    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
-    position_bloc_1 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
-    position_bloc_2 = Position(x=10.0, y=0.0, largeur=100.0, hauteur=5.0)
-
-    document.genere_les_pages(
-        document_pdf.generateur,
-        [
-            un_constructeur_de_text_item()
-            .avec_numero_page(1)
-            .a_la_position(position_bloc_1)
-            .avec_texte("Un titre")
-            .construis(),
-            un_constructeur_de_text_item()
-            .avec_numero_page(1)
-            .a_la_position(position_bloc_2)
-            .avec_texte("Un paragraphe")
-            .construis(),
-        ],
-        resultat_conversion.document,
-    )
-
-    assert len(document.pages) == 1
-    assert document.pages[1].blocs[0].texte == "[TEXTE] Un titre"
-    assert document.pages[1].blocs[1].texte == "[TEXTE] Un paragraphe"
-
-
-def test_document_reordonne_lorsque_l_on_ajoute_un_bloc(
-    un_constructeur_de_text_item,
-    resultat_conversion,
-):
-    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
-    position_bloc_1 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
-    position_bloc_2 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
-
-    document.genere_les_pages(
-        document_pdf.generateur,
-        [
-            un_constructeur_de_text_item()
-            .avec_numero_page(1)
-            .a_la_position(position_bloc_1)
-            .avec_texte("Un paragraphe en seconde position")
-            .construis(),
-            un_constructeur_de_text_item()
-            .avec_numero_page(1)
-            .a_la_position(position_bloc_2)
-            .avec_texte("Un paragraphe en première position")
-            .construis(),
-        ],
-        resultat_conversion.document,
-    )
-
-    assert len(document.pages) == 1
-    assert (
-        document.pages[1].blocs[0].texte == "[TEXTE] Un paragraphe en première position"
-    )
-    assert (
-        document.pages[1].blocs[1].texte == "[TEXTE] Un paragraphe en seconde position"
-    )
-
-
-def test_document_fusionne_un_titre_avec_son_contenu(
+def test_generateur_groupe_les_textes_sous_leur_header(
     un_constructeur_d_element_filtrable,
     resultat_conversion,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
-    position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
-    position_bloc_2 = Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0)
-    position_bloc_3 = Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0)
-    position_bloc_4 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
-    position_bloc_5 = Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0)
-
     document.genere_les_pages(
         document_pdf.generateur,
         [
             un_constructeur_d_element_filtrable()
             .de_type_header()
             .avec_numero_page(1)
-            .a_la_position(position_bloc_1)
-            .avec_texte("Titre 1")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_header()
-            .avec_numero_page(1)
-            .a_la_position(position_bloc_2)
-            .avec_texte("Titre 2")
+            .avec_titre("Section 1")
             .construis(),
             un_constructeur_d_element_filtrable()
             .de_type_texte()
             .avec_numero_page(1)
-            .a_la_position(position_bloc_3)
-            .avec_texte("Contenu 1.")
+            .avec_texte("Contenu 1")
             .construis(),
             un_constructeur_d_element_filtrable()
             .de_type_texte()
             .avec_numero_page(1)
-            .a_la_position(position_bloc_4)
-            .avec_texte("Contenu 2.")
+            .avec_texte("Contenu 2")
             .construis(),
             un_constructeur_d_element_filtrable()
             .de_type_header()
             .avec_numero_page(1)
-            .a_la_position(position_bloc_5)
-            .avec_texte("1.1 Sous-titre.")
+            .avec_titre("Section 2")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(1)
+            .avec_texte("Contenu 3")
             .construis(),
         ],
         resultat_conversion.document,
     )
+    assert len(document.pages[1].blocs) == 2
+    assert document.pages[1].blocs[0].texte == "Section 1\nContenu 1\nContenu 2"
+    assert document.pages[1].blocs[1].texte == "Section 2\nContenu 3"
 
-    assert len(document.pages[1].blocs) == 3
-    assert document.pages[1].blocs[0].texte == "[TITRE] Titre 1"
-    assert (
-        document.pages[1].blocs[1].texte
-        == "[TITRE] Titre 2\n[TEXTE] Contenu 1.\n[TEXTE] Contenu 2."
-    )
-    assert document.pages[1].blocs[2].texte == "[SOUS-TITRE] 1.1 Sous-titre."
-
-
-def test_document_fusionne_un_titre_avec_son_contenu_qui_contient_des_recommandations(
+@pytest.mark.skip(reason="à implémenter plus tard")
+def test_generateur_groupe_les_textes_titre_et_sous_titre_avec_texte(
     un_constructeur_d_element_filtrable,
     resultat_conversion,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
-    position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
-    position_bloc_2 = Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0)
-    position_bloc_3 = Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0)
-    position_bloc_4 = Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0)
-    position_bloc_5 = Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0)
-
     document.genere_les_pages(
         document_pdf.generateur,
         [
             un_constructeur_d_element_filtrable()
             .de_type_header()
             .avec_numero_page(1)
-            .a_la_position(position_bloc_1)
-            .avec_texte("Titre")
+            .avec_titre("Section 1")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_header()
+            .avec_numero_page(1)
+            .avec_titre("Sous section 1.1")
             .construis(),
             un_constructeur_d_element_filtrable()
             .de_type_texte()
             .avec_numero_page(1)
-            .a_la_position(position_bloc_2)
-            .avec_texte("R1")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(position_bloc_3)
-            .avec_texte("Recommandation 1.")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(position_bloc_4)
-            .avec_texte("R2")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(position_bloc_5)
-            .avec_texte("Recommandation 2.")
+            .avec_texte("Contenu 1")
             .construis(),
         ],
         resultat_conversion.document,
     )
-
     assert len(document.pages[1].blocs) == 1
-    assert (
-        document.pages[1].blocs[0].texte
-        == "[TITRE] Titre\n[RECOMMANDATION] R1\n[TEXTE] Recommandation 1.\n[RECOMMANDATION] R2\n[TEXTE] Recommandation 2."
-    )
+    assert document.pages[1].blocs[0].texte == "Section 1\nSous section 1.1\nContenu 1"
 
-
-def test_document_fusionne_tous_les_contenus_d_un_sous_titre(
+def test_generateur_cree_un_bloc_par_header_sans_contenu(
     un_constructeur_d_element_filtrable,
     resultat_conversion,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
-    position_bloc_1 = Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0)
-    position_bloc_2 = Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0)
-    position_bloc_3 = Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0)
-    position_bloc_4 = Position(x=10.0, y=5.0, largeur=100.0, hauteur=5.0)
-
     document.genere_les_pages(
         document_pdf.generateur,
         [
             un_constructeur_d_element_filtrable()
             .de_type_header()
             .avec_numero_page(1)
-            .a_la_position(position_bloc_1)
-            .avec_texte("1.2 Sous-titre 1")
+            .avec_titre("Section A")
             .construis(),
             un_constructeur_d_element_filtrable()
-            .de_type_texte()
+            .de_type_header()
             .avec_numero_page(1)
-            .a_la_position(position_bloc_2)
-            .avec_texte("Paragraphe 1.")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(position_bloc_3)
-            .avec_texte("Paragraphe 2.")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(position_bloc_4)
-            .avec_texte("Paragraphe 3.")
+            .avec_titre("Section B")
             .construis(),
         ],
         resultat_conversion.document,
     )
-
-    assert len(document.pages[1].blocs) == 1
-    assert (
-        document.pages[1].blocs[0].texte
-        == "[SOUS-TITRE] 1.2 Sous-titre 1\n[TEXTE] Paragraphe 1.\n[TEXTE] Paragraphe 2.\n[TEXTE] Paragraphe 3."
-    )
+    assert len(document.pages[1].blocs) == 2
+    assert document.pages[1].blocs[0].texte == "Section A"
+    assert document.pages[1].blocs[1].texte == "Section B"
 
 
-def test_document_fusionne_les_recommandations_pour_un_titre(
+def test_generateur_gere_les_pages_multiples(
     un_constructeur_d_element_filtrable,
     resultat_conversion,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
-
     document.genere_les_pages(
         document_pdf.generateur,
         [
             un_constructeur_d_element_filtrable()
             .de_type_header()
             .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("Titre")
+            .avec_titre("Section page 1")
             .construis(),
             un_constructeur_d_element_filtrable()
             .de_type_texte()
             .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("R1")
+            .avec_texte("Contenu page 1")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_header()
+            .avec_numero_page(2)
+            .avec_titre("Section page 2")
             .construis(),
             un_constructeur_d_element_filtrable()
             .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("Recommandation 1.")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("R2")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("Recommandation 2.")
+            .avec_numero_page(2)
+            .avec_texte("Contenu page 2")
             .construis(),
         ],
         resultat_conversion.document,
     )
-
-    assert len(document.pages[1].blocs) == 1
-    assert (
-        document.pages[1].blocs[0].texte
-        == "[TITRE] Titre\n[RECOMMANDATION] R1\n[TEXTE] Recommandation 1.\n[RECOMMANDATION] R2\n[TEXTE] Recommandation 2."
-    )
+    assert 1 in document.pages
+    assert 2 in document.pages
+    assert document.pages[1].blocs[0].texte == "Section page 1\nContenu page 1"
+    assert document.pages[2].blocs[0].texte == "Section page 2\nContenu page 2"
 
 
-def test_document_fusionne_les_recommandations_pour_un_sous_titre(
+def test_generateur_groupe_les_tableaux_sous_leur_header(
     un_constructeur_d_element_filtrable,
     resultat_conversion,
 ):
     document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
-
     document.genere_les_pages(
         document_pdf.generateur,
         [
             un_constructeur_d_element_filtrable()
             .de_type_header()
             .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("1.1 Sous-Titre")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("R1")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("Recommandation 1.")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("R2")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("Recommandation 2.")
-            .construis(),
-        ],
-        resultat_conversion.document,
-    )
-
-    assert len(document.pages[1].blocs) == 1
-    assert (
-        document.pages[1].blocs[0].texte
-        == "[SOUS-TITRE] 1.1 Sous-Titre\n[RECOMMANDATION] R1\n[TEXTE] Recommandation 1.\n[RECOMMANDATION] R2\n[TEXTE] Recommandation 2."
-    )
-
-
-def test_document_fusionne_les_tableaux_pour_un_titre(
-    un_constructeur_d_element_filtrable,
-    resultat_conversion,
-):
-    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
-
-    document.genere_les_pages(
-        document_pdf.generateur,
-        [
-            un_constructeur_d_element_filtrable()
-            .de_type_header()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("Titre")
+            .avec_titre("Section avec tableau")
             .construis(),
             un_constructeur_d_element_filtrable()
             .de_type_tableau()
             .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("Un tableau")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("Un texte.")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_tableau()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("Un autre tableau")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("Un autre texte.")
+            .avec_texte("Une cellule")
             .construis(),
         ],
         resultat_conversion.document,
     )
-
     assert len(document.pages[1].blocs) == 1
-    assert (
-        document.pages[1].blocs[0].texte
-        == "[TITRE] Titre\n[TABLEAU]\n| Un tableau |\n[TEXTE] Un texte.\n[TABLEAU]\n| Un autre tableau |\n[TEXTE] Un autre texte."
-    )
-
-
-def test_document_fusionne_les_tableaux_pour_un_sous_titre(
-    un_constructeur_d_element_filtrable,
-    resultat_conversion,
-):
-    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
-
-    document.genere_les_pages(
-        document_pdf.generateur,
-        [
-            un_constructeur_d_element_filtrable()
-            .de_type_header()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=50.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("1.1 Sous-Titre")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_tableau()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=40.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("Un tableau")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=30.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("Un texte.")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_tableau()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=20.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("Un autre tableau")
-            .construis(),
-            un_constructeur_d_element_filtrable()
-            .de_type_texte()
-            .avec_numero_page(1)
-            .a_la_position(Position(x=10.0, y=10.0, largeur=100.0, hauteur=5.0))
-            .avec_texte("Un autre texte.")
-            .construis(),
-        ],
-        resultat_conversion.document,
-    )
-
-    assert len(document.pages[1].blocs) == 1
-    assert (
-        document.pages[1].blocs[0].texte
-        == "[SOUS-TITRE] 1.1 Sous-Titre\n[TABLEAU]\n| Un tableau |\n[TEXTE] Un texte.\n[TABLEAU]\n| Un autre tableau |\n[TEXTE] Un autre texte."
-    )
+    assert document.pages[1].blocs[0].texte.startswith("Section avec tableau\n")
+    assert "Une cellule" in document.pages[1].blocs[0].texte

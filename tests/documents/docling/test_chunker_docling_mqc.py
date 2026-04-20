@@ -13,42 +13,7 @@ def test_retourne_le_document(un_convertisseur_avec_un_texte):
 
     assert len(document.pages) == 1
     assert document.pages[1].numero_page == 1
-    assert document.pages[1].blocs[0].texte == "[TEXTE] Un texte"
-
-
-def test_retourne_le_document_en_tenant_compte_de_l_ordre_des_bbox(
-    un_convertisseur_avec_deux_bbox,
-):
-    document = DocumentPDF(
-        "mon_document_ave_bbox.pdf", url_pdf="http://mon-document-bbox.pdf"
-    )
-
-    document = ChunkerDoclingMQC(un_convertisseur_avec_deux_bbox()).applique(
-        document=document
-    )
-
-    assert len(document.pages) == 1
-    assert document.pages[1].numero_page == 1
-    assert document.pages[1].blocs[0].texte == "[TEXTE] Texte première bbox"
-    assert document.pages[1].numero_page == 1
-    assert document.pages[1].blocs[1].texte == "[TEXTE] Texte seconde bbox"
-
-
-def test_retourne_le_document_et_ordonne_sans_bbox(
-    un_convertisseur_avec_deux_textes_dont_un_sans_bbox,
-):
-    document = DocumentPDF(
-        "mon_document_ave_bbox.pdf", url_pdf="http://mon-document-bbox.pdf"
-    )
-
-    document = ChunkerDoclingMQC(
-        un_convertisseur_avec_deux_textes_dont_un_sans_bbox()
-    ).applique(document=document)
-
-    assert document.pages[1].numero_page == 1
-    assert document.pages[1].blocs[0].texte == "[TEXTE] Texte première bbox"
-    assert document.pages[1].numero_page == 1
-    assert document.pages[1].blocs[1].texte == "[TEXTE] Texte en seconde position"
+    assert document.pages[1].blocs[0].texte == "Un texte"
 
 
 def test_fusionne_entetes_avec_contenu_simple(
@@ -63,10 +28,7 @@ def test_fusionne_entetes_avec_contenu_simple(
     )
 
     assert len(document.pages[1].blocs) == 1
-    assert (
-        document.pages[1].blocs[0].texte
-        == "[TITRE] Titre\n[TEXTE] Contenu du paragraphe."
-    )
+    assert document.pages[1].blocs[0].texte == "Titre\nContenu du paragraphe."
 
 
 def test_le_document_retourne_le_nom_du_document(

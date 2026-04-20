@@ -7,7 +7,7 @@ from typing import Type, Literal, Callable
 from docling.backend.pypdfium2_backend import PyPdfiumDocumentBackend
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.document import ConversionResult
-from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.datamodel.pipeline_options import PdfPipelineOptions, TesseractCliOcrOptions
 from docling.document_converter import (
     DocumentConverter,
     FormatOption,
@@ -34,14 +34,19 @@ class TypeFichier(StrEnum):
 def __initialise_options_pdf(
     options_guides: OptionsGuides | None,
 ) -> tuple[InputFormat, PdfFormatOption]:
-    pipeline_options = PdfPipelineOptions()
-    pipeline_options.do_ocr = True
+    ocr_options = TesseractCliOcrOptions(
+        lang=["auto"],
+        tesseract_cmd=r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+    )
+
+    pipeline_options = PdfPipelineOptions(
+        do_ocr=True, force_full_page_ocr=True, ocr_options=ocr_options
+    )
     pipeline_options.generate_page_images = False
     pipeline_options.images_scale = 3.0
     pipeline_options.generate_picture_images = False
-    pipeline_options.ocr_options.force_full_page_ocr = False
     if options_guides is not None and not options_guides.get("structure_table", True):
-        pipeline_options.do_table_structure = False
+        pipeline_options.do_table_structure = True
     else:
         pipeline_options.do_table_structure = True
     return InputFormat.PDF, PdfFormatOption(

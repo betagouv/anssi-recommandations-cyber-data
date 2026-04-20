@@ -39,12 +39,16 @@ def filtre_les_resultats(
             TableItem,
         ]
     ] = []
-    for text_item in result.document.texts:
-        if _est_un_texte_utile(text_item.text):
-            elements_filtres.append(text_item)
+    for item, _ in result.document.iterate_items():
+        if isinstance(item, TableItem):
+            elements_filtres.append(item)
+        elif isinstance(
+            item,
+            (TitleItem, SectionHeaderItem, ListItem, CodeItem, FormulaItem, TextItem),
+        ):
+            if _est_un_texte_utile(item.text):
+                elements_filtres.append(item)
 
-    for table_item in result.document.tables:
-        elements_filtres.append(table_item)
     return elements_filtres
 
 

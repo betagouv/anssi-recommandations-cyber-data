@@ -8,7 +8,24 @@ from docling.document_converter import ConversionResult
 from docling_core.types import DoclingDocument
 from docling_core.types.doc import TextItem, DocItemLabel, TableItem, TableData
 
+from docling_core.types.doc import GroupItem, RefItem
+
 from documents.docling.filtre_resultat import filtre_les_resultats
+
+
+def _creer_document(texts=None, tables=None):
+    body_ref = RefItem(**{"$ref": "#/body"})
+    texts = [
+        t.model_copy(update={"self_ref": f"#/texts/{i}", "parent": body_ref})
+        for i, t in enumerate(texts or [])
+    ]
+    tables = [
+        t.model_copy(update={"self_ref": f"#/tables/{i}", "parent": body_ref})
+        for i, t in enumerate(tables or [])
+    ]
+    children = [RefItem(**{"$ref": item.self_ref}) for item in texts + tables]
+    body = GroupItem(name="_root_", self_ref="#/body", children=children)
+    return DoclingDocument(name="", texts=texts, tables=tables, body=body)
 
 
 @pytest.mark.parametrize(
@@ -27,11 +44,9 @@ from documents.docling.filtre_resultat import filtre_les_resultats
 )
 def test_est_lisible(_description, texte):
     text = TextItem(text=texte, label=DocItemLabel.TEXT, self_ref="#/test/42", orig="")
-    document = DoclingDocument(name="", texts=[text])
-
     resultats = filtre_les_resultats(
         ConversionResult(
-            document=document,
+            document=_creer_document(texts=[text]),
             input=InputDocument(
                 format=InputFormat.PDF,
                 backend=PdfDocumentBackend,
@@ -40,7 +55,7 @@ def test_est_lisible(_description, texte):
         )
     )
 
-    assert text in resultats
+    assert any(r.text == texte for r in resultats)
 
 
 @pytest.mark.parametrize(
@@ -63,11 +78,9 @@ def test_est_lisible(_description, texte):
 )
 def test_n_est_pas_lisible(_description, texte):
     text = TextItem(text=texte, label=DocItemLabel.TEXT, self_ref="#/test/42", orig="")
-    document = DoclingDocument(name="", texts=[text])
-
     resultats = filtre_les_resultats(
         ConversionResult(
-            document=document,
+            document=_creer_document(texts=[text]),
             input=InputDocument(
                 format=InputFormat.PDF,
                 backend=PdfDocumentBackend,
@@ -76,18 +89,16 @@ def test_n_est_pas_lisible(_description, texte):
         )
     )
 
-    assert text not in resultats
+    assert not any(r.text == texte for r in resultats)
 
 
 def test_ajoute_les_tableaux():
     tableau = TableItem(
         data=TableData(), label=DocItemLabel.TABLE, self_ref="#/test/42"
     )
-    document = DoclingDocument(name="", tables=[tableau])
-
     resultats = filtre_les_resultats(
         ConversionResult(
-            document=document,
+            document=_creer_document(tables=[tableau]),
             input=InputDocument(
                 format=InputFormat.PDF,
                 backend=PdfDocumentBackend,
@@ -96,4 +107,4 @@ def test_ajoute_les_tableaux():
         )
     )
 
-    assert tableau in resultats
+    assert len(resultats) == 1 and isinstance(resultats[0], TableItem)

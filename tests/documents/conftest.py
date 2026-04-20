@@ -17,6 +17,7 @@ from docling_core.types.doc import (
     ProvenanceItem,
     TextItem,
     DocItemLabel,
+    GroupItem,
     SectionHeaderItem,
     RefItem,
     TableItem,
@@ -43,6 +44,21 @@ from documents.indexeur.indexeur import (
 )
 from documents.page import Page
 from documents.pdf.document_pdf import Position, PagePDF, BlocPagePDF
+
+
+def _creer_document(texts=None, tables=None) -> DoclingDocument:
+    body_ref = RefItem(**{"$ref": "#/body"})
+    texts = [
+        t.model_copy(update={"self_ref": f"#/texts/{i}", "parent": body_ref})
+        for i, t in enumerate(texts or [])
+    ]
+    tables = [
+        t.model_copy(update={"self_ref": f"#/tables/{i}", "parent": body_ref})
+        for i, t in enumerate(tables or [])
+    ]
+    children = [RefItem(**{"$ref": item.self_ref}) for item in texts + tables]
+    body = GroupItem(name="_root_", self_ref="#/body", children=children)
+    return DoclingDocument(name="", texts=texts, tables=tables, body=body)
 
 
 @pytest.fixture
@@ -144,7 +160,7 @@ def un_convertisseur_avec_un_texte() -> Callable[[], Type[DocumentConverter]]:
                 prov=[prov],
             )
             return ConversionResult(
-                document=DoclingDocument(name="", texts=[text]),
+                document=_creer_document(texts=[text]),
                 input=InputDocument(
                     format=InputFormat.PDF,
                     backend=PdfDocumentBackend,  # type: ignore[type-abstract]
@@ -191,7 +207,7 @@ def un_convertisseur_de_test() -> Callable[[], Type[DocumentConverter]]:
             )
 
             return ConversionResult(
-                document=DoclingDocument(name="", texts=[text]),
+                document=_creer_document(texts=[text]),
                 input=InputDocument(
                     format=InputFormat.HTML,
                     backend=HTMLDocumentBackend,  # type: ignore[type-abstract]
@@ -215,10 +231,6 @@ class ConstructeurDItem:
 
     def avec_texte(self, texte: str):
         self.texte = texte
-        return self
-
-    def avec_bbox(self, bounding_box: BoundingBox):
-        self.bounding_box = bounding_box
         return self
 
     def avec_numero_page(self, numero_page: int):
@@ -411,89 +423,6 @@ def un_constructeur_d_element_filtrable() -> Callable[
 
 
 @pytest.fixture
-def un_convertisseur_avec_deux_bbox() -> Callable[[], Type[DocumentConverter]]:
-    class ConverterDeTestAvecBbox(DocumentConverter):
-        def convert(
-            self,
-            document: Union[Path, str, DocumentStream],  # TODO review naming
-            headers: Optional[dict[str, str]] = None,
-            raises_on_error: bool = True,
-            max_num_pages: int = sys.maxsize,
-            max_file_size: int = sys.maxsize,
-            page_range: PageRange = (1, 1),
-        ) -> ConversionResult:
-            deuxieme_texte = (
-                ConstructeurDeTextItem()
-                .avec_texte("Texte seconde bbox")
-                .avec_bbox(BoundingBox(l=200.0, t=200.0, r=300.0, b=190.0))
-                .construis()
-            )
-            premier_texte = (
-                ConstructeurDeTextItem()
-                .avec_texte("Texte première bbox")
-                .avec_bbox(BoundingBox(l=100.0, t=300.0, r=300.0, b=290.0))
-                .construis()
-            )
-            return ConversionResult(
-                document=DoclingDocument(
-                    name="", texts=[deuxieme_texte, premier_texte]
-                ),
-                input=InputDocument(
-                    format=InputFormat.PDF,
-                    backend=PdfDocumentBackend,  # type: ignore[type-abstract]
-                    path_or_stream=Path(),
-                ),
-            )
-
-    def _convertisseur() -> Type[DocumentConverter]:
-        return ConverterDeTestAvecBbox
-
-    return _convertisseur
-
-
-@pytest.fixture
-def un_convertisseur_avec_deux_textes_dont_un_sans_bbox() -> Callable[
-    [], Type[DocumentConverter]
-]:
-    class ConverterDeTestAvecBbox(DocumentConverter):
-        def convert(
-            self,
-            document: Union[Path, str, DocumentStream],  # TODO review naming
-            headers: Optional[dict[str, str]] = None,
-            raises_on_error: bool = True,
-            max_num_pages: int = sys.maxsize,
-            max_file_size: int = sys.maxsize,
-            page_range: PageRange = (1, 1),
-        ) -> ConversionResult:
-            deuxieme_texte = (
-                ConstructeurDeTextItem()
-                .avec_texte("Texte en seconde position")
-                .construis()
-            )
-            premier_texte = (
-                ConstructeurDeTextItem()
-                .avec_texte("Texte première bbox")
-                .avec_bbox(BoundingBox(l=100.0, t=300.0, r=300.0, b=290.0))
-                .construis()
-            )
-            return ConversionResult(
-                document=DoclingDocument(
-                    name="", texts=[deuxieme_texte, premier_texte]
-                ),
-                input=InputDocument(
-                    format=InputFormat.PDF,
-                    backend=PdfDocumentBackend,  # type: ignore[type-abstract]
-                    path_or_stream=Path(),
-                ),
-            )
-
-    def _convertisseur() -> Type[DocumentConverter]:
-        return ConverterDeTestAvecBbox
-
-    return _convertisseur
-
-
-@pytest.fixture
 def un_convertisseur_avec_un_titre_et_un_texte() -> Callable[
     [], Type[DocumentConverter]
 ]:
@@ -508,21 +437,15 @@ def un_convertisseur_avec_un_titre_et_un_texte() -> Callable[
             page_range: PageRange = (1, 1),
         ) -> ConversionResult:
             premier_texte = (
-                ConstructeurDeSectionHeaderItem()
-                .avec_titre("Titre")
-                .avec_bbox(BoundingBox(l=100.0, t=300.0, r=300.0, b=290.0))
-                .construis()
+                ConstructeurDeSectionHeaderItem().avec_titre("Titre").construis()
             )
             deuxieme_texte = (
                 ConstructeurDeTextItem()
                 .avec_texte("Contenu du paragraphe.")
-                .avec_bbox(BoundingBox(l=200.0, t=200.0, r=300.0, b=190.0))
                 .construis()
             )
             return ConversionResult(
-                document=DoclingDocument(
-                    name="", texts=[deuxieme_texte, premier_texte]
-                ),
+                document=_creer_document(texts=[premier_texte, deuxieme_texte]),
                 input=InputDocument(
                     format=InputFormat.PDF,
                     backend=PdfDocumentBackend,  # type: ignore[type-abstract]
@@ -557,7 +480,6 @@ class GenerateurDePagesStatique(GenerateurDePages):
                 [
                     BlocPagePDF(
                         texte=self.contenu,
-                        position=Position(x=i * 10, y=0, hauteur=0, largeur=0),
                         numero_page=self.numero_page,
                     )
                     for i in range(0, self.nombre_de_blocs)
