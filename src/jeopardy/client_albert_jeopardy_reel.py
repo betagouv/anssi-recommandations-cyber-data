@@ -18,6 +18,7 @@ from jeopardy.client_albert_jeopardy import (
 
 logger = logging.getLogger(__name__)
 
+
 class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
     def __init__(
         self,
@@ -82,16 +83,13 @@ class ClientAlbertJeopardyReel(ClientAlbertJeopardy):
         question = corps.get("choices", [{}])[0].get("message", {}).get("content", "")
         try:
             if question is not None:
-                contenu_reponse = (
-                    question.strip()
-                )
+                contenu_reponse = question.strip()
                 json_reponse: dict[str, Any | None] = json.loads(contenu_reponse)
                 payload_questions = json_reponse.get("questions")
                 return payload_questions if payload_questions is not None else []
             return []
         except json.JSONDecodeError:
             return []
-
 
     def ajoute_chunks_dans_document(
         self,
