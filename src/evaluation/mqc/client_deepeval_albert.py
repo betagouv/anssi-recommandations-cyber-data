@@ -36,7 +36,7 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
         charge_utile = {
             "model": self.modele,
             "messages": messages,
-            "max_tokens": 800,
+            "max_tokens": 4000,
         }
 
         try:
@@ -49,7 +49,6 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
         except Exception as exc:
             logging.error("Erreur réseau lors de l'appel à Albert : %s", exc)
             raise
-
         if reponse.status_code == 500:
             time.sleep(self.temps_attente)
             logging.info(
@@ -62,8 +61,20 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
 
         if reponse.status_code == 200:
             try:
-                contenu = reponse.json()["choices"][0]["message"]["content"]
+                corps = reponse.json()
+                choix = corps["choices"][0]
+                finish_reason = choix.get("finish_reason")
+                message = choix["message"]
+                if finish_reason and finish_reason != "stop":
+                    logging.warning(
+                        "Albert a terminé avec finish_reason=’%s’", finish_reason
+                    )
+                contenu = message.get("content")
                 if contenu is None:
+                    logging.warning(
+                        "Albert a retourné un contenu None (finish_reason=%s)",
+                        finish_reason,
+                    )
                     return "{}"
                 _, reponse_nettoyee = separe_reflexion_reponse(contenu)
                 return reponse_nettoyee
@@ -80,30 +91,79 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
         **kwargs: Any,
     ) -> Any:
         texte = self._appel_api_albert(prompt)
-
         if schema is None:
             return texte
+        donnees = self._parse_json(texte)
+        return self._instancie_schema(schema, donnees)
 
+    def _parse_json(self, texte: str) -> dict:
         try:
-            donnees = json_repair.loads(texte)
+            return json_repair.loads(texte)
         except json.JSONDecodeError as exc:
             logging.error(
-                "JSON invalide renvoyé par Albert après nettoyage, texte = %s, erreur = %s",
-                texte,
-                exc,
+                "JSON invalide renvoyé par Albert, texte = %s, erreur = %s", texte, exc
             )
             raise
 
+    def _instancie_schema(self, schema: Type[BaseModel], donnees: dict) -> BaseModel:
         try:
             return schema(**donnees)  # type: ignore
         except Exception as exc:
+            nom = getattr(schema, "__name__", repr(schema))
             logging.error(
                 "Impossible d'instancier le schéma %s avec les données %s : %s",
-                getattr(schema, "__name__", repr(schema)),
+                nom,
                 donnees,
                 exc,
             )
-            raise
+            return self._instancie_schema_avec_fallback(schema, donnees, nom, exc)
+
+    def _instancie_schema_avec_fallback(
+        self, schema: Type[BaseModel], donnees: dict, nom: str, exc_originale: Exception
+    ) -> BaseModel:
+        if not donnees:
+            logging.warning(
+                "Le LLM a retourné un contenu vide ({}), schéma %s instancié avec des listes vides",
+                nom,
+            )
+            return schema(
+                **{
+                    name: []
+                    for name, field in schema.model_fields.items()
+                    if getattr(field.annotation, "__origin__", None) is list
+                }
+            )  # type: ignore
+        cleaned = self._filtre_items_invalides(schema, donnees, nom)
+        try:
+            return schema(**cleaned)  # type: ignore
+        except Exception:
+            raise exc_originale
+
+    def _filtre_items_invalides(
+        self, schema: Type[BaseModel], donnees: dict, nom_schema: str
+    ) -> dict:
+        cleaned = dict(donnees)
+        for field_name, field_info in schema.model_fields.items():
+            if getattr(field_info.annotation, "__origin__", None) is not list:
+                continue
+            args = getattr(field_info.annotation, "__args__", ())
+            if not args or not hasattr(args[0], "model_fields"):
+                continue
+            item_type = args[0]
+            items_valides, items_invalides = [], []
+            for item in cleaned.get(field_name, []):
+                (
+                    items_valides if _est_valide(item, item_type) else items_invalides
+                ).append(item)
+            for item in items_invalides:
+                logging.warning(
+                    "Item invalide écarté du champ '%s' (schéma %s) : %s",
+                    field_name,
+                    nom_schema,
+                    item,
+                )
+            cleaned[field_name] = items_valides
+        return cleaned
 
     async def a_generate(
         self,
@@ -115,6 +175,14 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
 
     def get_model_name(self) -> str:
         return self.modele
+
+
+def _est_valide(item: Any, type_: type) -> bool:
+    try:
+        type_(**item) if isinstance(item, dict) else item
+        return True
+    except Exception:
+        return False
 
 
 def separe_reflexion_reponse(
