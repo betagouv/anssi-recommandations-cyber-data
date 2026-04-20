@@ -96,9 +96,10 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
         donnees = self._parse_json(texte)
         return self._instancie_schema(schema, donnees)
 
-    def _parse_json(self, texte: str) -> dict:
+    def _parse_json(self, texte: str) -> dict[str, Any]:
         try:
-            return json_repair.loads(texte)
+            resultat = json_repair.loads(texte)
+            return resultat if isinstance(resultat, dict) else {}
         except json.JSONDecodeError as exc:
             logging.error(
                 "JSON invalide renvoyé par Albert, texte = %s, erreur = %s", texte, exc
@@ -150,7 +151,8 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
             if not args or not hasattr(args[0], "model_fields"):
                 continue
             item_type = args[0]
-            items_valides, items_invalides = [], []
+            items_valides: list[Any] = []
+            items_invalides: list[Any] = []
             for item in cleaned.get(field_name, []):
                 (
                     items_valides if _est_valide(item, item_type) else items_invalides
