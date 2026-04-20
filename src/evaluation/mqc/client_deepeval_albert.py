@@ -103,6 +103,13 @@ class ClientDeepEvalAlbert(DeepEvalBaseLLM):
                 donnees,
                 exc,
             )
+            if not donnees:
+                defaults = {
+                    name: []
+                    for name, field in schema.model_fields.items()
+                    if getattr(field.annotation, "__origin__", None) is list
+                }
+                return schema(**defaults)  # type: ignore
             raise
 
     async def a_generate(
