@@ -1,62 +1,77 @@
-import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast, NamedTuple, Union, Optional
+from typing import NamedTuple, Union, Optional
 
-from docling_core.transforms.chunker import BaseChunk, DocMeta
 from docling_core.types import DoclingDocument
+from docling_core.types.doc import DocItemLabel, TableItem
 
 from documents.elements_filtres import ElementsFiltres
-from documents.generateur_de_pages import (
-    GenerateurDePages,
-    NumeroPage,
-    CreationDePage,
-    CreationDeBlocPage,
-    GenerationDePage,
-)
+from documents.generateur_de_pages import GenerateurDePages
 from documents.indexeur.indexeur import DocumentAIndexer
 from documents.page import Page, BlocPage
-from documents.pdf.extrais_les_chunks import extrais_les_chunks
 
 
 class GenerateurDePagesPDF(GenerateurDePages):
     def genere(
-        self, elements_filtres: ElementsFiltres, _: Optional[DoclingDocument]
+        self, elements_filtres: ElementsFiltres, document: Optional[DoclingDocument]
     ) -> dict[int, Page]:
         resultat: dict[int, Page] = {}
-
-        for chunk in extrais_les_chunks(elements_filtres):
-            try:
-                (numero_page, cree_page, cree_bloc) = self.__genere(chunk)()
-                if resultat.get(numero_page) is None:
-                    resultat[numero_page] = cree_page()
-                else:
-                    resultat[numero_page].ajoute_bloc(cree_bloc())
-            except Exception:
-                continue
-        return resultat
-
-    @staticmethod
-    def __genere(chunk: BaseChunk) -> GenerationDePage:
-        def _cree_page(numero_page: int, texte: str, position: Position) -> Page:
-            page = PagePDF(numero_page=numero_page)
+        bloc_lignes: list[str] = []
+        bloc_page: int = 1
+        dernier_group_ref: str | None = None
+        precedent_etait_header: bool = False
+        def _ajoute_bloc_a_la_page() -> None:
+            if not bloc_lignes:
+                return
+            page = resultat.setdefault(bloc_page, PagePDF(bloc_page))
             page.ajoute_bloc(
-                BlocPagePDF(texte=texte, position=position, numero_page=numero_page)
-            )
-            return page
-
-        def _genere() -> tuple[NumeroPage, CreationDePage, CreationDeBlocPage]:
-            numero_page = cast(DocMeta, chunk.meta).doc_items[0].prov[0].page_no
-            position = extrais_position(chunk)
-            return (
-                numero_page,
-                lambda: _cree_page(numero_page, chunk.text, position),
-                lambda: BlocPagePDF(
-                    texte=chunk.text, position=position, numero_page=numero_page
-                ),
+                BlocPagePDF(
+                    texte="\n".join(bloc_lignes),
+                    numero_page=bloc_page,
+                )
             )
 
-        return _genere
+        for element in elements_filtres:
+            if element.label == DocItemLabel.PAGE_FOOTER:  # type: ignore[union-attr]
+                continue
+
+            numero_page = element.prov[0].page_no if element.prov else bloc_page  # type: ignore[union-attr]
+            est_header = element.label in (  # type: ignore[union-attr]
+                DocItemLabel.SECTION_HEADER,
+                DocItemLabel.TITLE,
+            )
+
+            if est_header:
+                _ajoute_bloc_a_la_page()
+                bloc_lignes = [element.text]  # type: ignore[union-attr]
+                bloc_page = numero_page
+                dernier_group_ref = None
+                precedent_etait_header = True
+            else:
+                est_element_liste = element.label == DocItemLabel.LIST_ITEM  # type: ignore[union-attr]
+                if est_element_liste:
+                    parent_ref = element.parent.cref if element.parent else None  # type: ignore[union-attr]
+                    if (
+                        parent_ref != dernier_group_ref
+                        and not precedent_etait_header
+                        and dernier_group_ref is not None
+                    ):
+                        _ajoute_bloc_a_la_page()
+                        bloc_lignes = []
+                        bloc_page = numero_page
+                    dernier_group_ref = parent_ref
+
+                if isinstance(element, TableItem):
+                    bloc_lignes.append(element.export_to_markdown(document))
+                else:
+                    bloc_lignes.append(getattr(element, "text", "") or "")
+                precedent_etait_header = False
+
+        _ajoute_bloc_a_la_page()
+
+        if not resultat:
+            resultat[1] = PagePDF(1)
+        return resultat
 
 
 class DocumentPDF(DocumentAIndexer):
@@ -114,109 +129,11 @@ class Position(NamedTuple):
     hauteur: float
 
 
-def extrais_position(chunk: BaseChunk) -> Position:
-    try:
-        meta = cast(DocMeta, chunk.meta)
-        bbox = meta.doc_items[0].prov[0].bbox
-        return Position(
-            x=float(bbox.l),
-            y=float(bbox.t),
-            largeur=float(bbox.r - bbox.l),
-            hauteur=float(bbox.b - bbox.t),
-        )
-    except Exception:
-        return Position(x=0.0, y=0.0, largeur=0.0, hauteur=0.0)
-
-
 @dataclass(frozen=True)
 class BlocPagePDF(BlocPage):
-    position: Position
+    pass
 
 
 class PagePDF(Page[BlocPagePDF]):
     def ajoute_bloc(self, bloc: BlocPagePDF) -> None:
-        les_positions = [bloc.position for bloc in self.blocs]
-        les_positions.append(bloc.position)
-        les_positions_ordonnees = [
-            pos
-            for idx, pos in sorted(enumerate(les_positions), key=lambda it: -it[1].y)
-        ]
-        for indice, position in enumerate(les_positions_ordonnees):
-            if bloc.position == position:
-                self.blocs.insert(
-                    indice,
-                    BlocPagePDF(
-                        texte=bloc.texte,
-                        position=bloc.position,
-                        numero_page=bloc.numero_page,
-                    ),
-                )
-
-        self._fusionne_les_entetes_avec_leur_contenu()
-
-    def _fusionne_les_entetes_avec_leur_contenu(self):
-        i = 0
-        blocs_fusionnes = []
-        while i < len(self.blocs):
-            courant = self.blocs[i]
-            suivant = self.blocs[i + 1] if i + 1 < len(self.blocs) else None
-            if self._a_du_contenu_adjacent_au_titre(courant, suivant):
-                blocs_fusionnes.append(
-                    BlocPagePDF(
-                        texte=f"{courant.texte}\n{suivant.texte}",
-                        position=courant.position,
-                        numero_page=courant.numero_page,
-                    )
-                )
-                i += 1
-            elif self._a_du_contenu_adjacent_au_sous_titre(courant, suivant):
-                blocs_fusionnes.append(
-                    BlocPagePDF(
-                        texte=f"{courant.texte}\n{suivant.texte}",
-                        position=courant.position,
-                        numero_page=courant.numero_page,
-                    )
-                )
-                i += 1
-            else:
-                blocs_fusionnes.append(courant)
-            i += 1
-
-        self.blocs = blocs_fusionnes
-
-    def _a_du_contenu_adjacent_au_titre(
-        self, courant: BlocPagePDF, suivant: BlocPagePDF | None
-    ) -> bool:
-        return self.a_du_contenu_adjacent(courant, "[TITRE]", suivant)
-
-    def _a_du_contenu_adjacent_au_sous_titre(
-        self, courant: BlocPagePDF, suivant: BlocPagePDF | None
-    ) -> bool:
-        return self.a_du_contenu_adjacent(courant, "[SOUS-TITRE]", suivant)
-
-    def a_du_contenu_adjacent(
-        self, courant: BlocPagePDF, sous_titre_: str, suivant: BlocPagePDF | None
-    ) -> bool:
-        return (
-            courant.texte.startswith(sous_titre_)
-            and suivant is not None
-            and (
-                suivant.texte.startswith("[TEXTE]")
-                or suivant.texte.startswith("[RECOMMANDATION]")
-                or suivant.texte.startswith("[TABLEAU]")
-            )
-        )
-
-    @staticmethod
-    def _est_entete(texte: str) -> bool:
-        t = (texte or "").strip()
-        if not t:
-            return False
-        if t.endswith((".", "…", "!", "?")):
-            return False
-        tokens = re.findall(r"[A-Za-zÀ-ÖØ-öø-ÿ']+", t)
-        if not (1 <= len(tokens) <= 6):
-            return False
-        if len(t) > 60:
-            return False
-        return True
+        self.blocs.append(bloc)
