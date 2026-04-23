@@ -95,12 +95,14 @@ def recupere_configuration() -> Configuration:
 
     indexeur_document = IndexeurDocument(os.getenv("INDEXEUR", "INDEXEUR_ALBERT"))
     chunker: ChunkerDocling | None = None
+    albert_url = os.getenv("ALBERT_URL", "https://albert.api.etalab.gouv.fr/v1")
+    albert_cle_api = os.getenv("ALBERT_CLE_API", "cle_api")
     if indexeur_document == IndexeurDocument.INDEXEUR_DOCLING:
-        chunker = ChunkerDoclingMQC()
+        chunker = ChunkerDoclingMQC(cle_api=albert_cle_api, url_albert=albert_url)
 
     albert: Albert = Albert(
-        url=os.getenv("ALBERT_URL", "https://albert.api.etalab.gouv.fr/v1"),
-        cle_api=os.getenv("ALBERT_CLE_API", "cle_api"),
+        url=albert_url,
+        cle_api=albert_cle_api,
         indexeur=indexeur_document,
         modele=os.getenv("ALBERT_MODELE", "openweight-medium"),
         chunker=chunker,

@@ -11,8 +11,13 @@ from documents.indexeur.indexeur import DocumentAIndexer
 
 
 class ChunkerDoclingMQC(ChunkerDocling):
-    def __init__(self, converter: Type[DocumentConverter] = DocumentConverter):
-        super().__init__(converter)
+    def __init__(
+        self,
+        converter: Type[DocumentConverter] = DocumentConverter,
+        cle_api: str = "",
+        url_albert: str = "https://albert.api.etalab.gouv.fr/v1",
+    ):
+        super().__init__(converter, cle_api, url_albert)
         self.type_fichier = TypeFichier.TEXTE
 
     def _cree_le_document(
