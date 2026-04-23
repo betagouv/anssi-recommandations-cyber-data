@@ -20,6 +20,7 @@ class GenerateurDePagesPDF(GenerateurDePages):
         bloc_page: int = 1
         dernier_group_ref: str | None = None
         precedent_etait_header: bool = False
+
         def _ajoute_bloc_a_la_page() -> None:
             if not bloc_lignes:
                 return

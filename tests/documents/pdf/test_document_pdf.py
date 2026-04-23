@@ -106,6 +106,7 @@ def test_generateur_groupe_les_textes_sous_leur_header(
     assert document.pages[1].blocs[0].texte == "Section 1\nContenu 1\nContenu 2"
     assert document.pages[1].blocs[1].texte == "Section 2\nContenu 3"
 
+
 @pytest.mark.skip(reason="à implémenter plus tard")
 def test_generateur_groupe_les_textes_titre_et_sous_titre_avec_texte(
     un_constructeur_d_element_filtrable,
@@ -135,6 +136,7 @@ def test_generateur_groupe_les_textes_titre_et_sous_titre_avec_texte(
     )
     assert len(document.pages[1].blocs) == 1
     assert document.pages[1].blocs[0].texte == "Section 1\nSous section 1.1\nContenu 1"
+
 
 def test_generateur_cree_un_bloc_par_header_sans_contenu(
     un_constructeur_d_element_filtrable,
