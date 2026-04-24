@@ -502,7 +502,7 @@ class ChunkerDeTest(ChunkerDoclingMQC):
         self.generateur = generateur
 
     def applique(self, document_a_indexer: DocumentAIndexer) -> Document:
-        document = Document(document_a_indexer.nom_document, document_a_indexer.url)
+        document = Document(document_a_indexer)
         document.genere_les_pages(
             self.generateur, [], DoclingDocument(name="test", texts=[])
         )

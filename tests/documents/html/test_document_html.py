@@ -16,9 +16,8 @@ def test_peut_creer_un_document_avec_du_contenu_issu_d_une_page_html(
 ):
     nom_document = "test.html"
     url_document = "https://mon-document.local/test.html"
-    document = Document(nom_document=nom_document, url=url_document)
-
     document_html = DocumentHTML(nom_document, url_document)
+    document = Document(document_html)
     document.genere_les_pages(
         document_html.generateur,
         [
@@ -41,9 +40,8 @@ def test_peut_creer_un_document_avec_les_differentes_sections(
 ):
     nom_document = "test.html"
     url_document = "https://mon-document.local/test.html"
-    document = Document(nom_document=nom_document, url=url_document)
-
     document_html = DocumentHTML(nom_document, url_document)
+    document = Document(document_html)
     document.genere_les_pages(
         document_html.generateur,
         [
@@ -88,9 +86,8 @@ def test_peut_creer_un_document_avec_les_contenus_adjacents(
 ):
     nom_document = "test.html"
     url_document = "https://mon-document.local/test.html"
-    document = Document(nom_document=nom_document, url=url_document)
-
     document_html = DocumentHTML(nom_document, url_document)
+    document = Document(document_html)
     document.genere_les_pages(
         document_html.generateur,
         [
@@ -127,9 +124,8 @@ def test_peut_creer_un_document_avec_des_tableaux(
 ):
     nom_document = "test.html"
     url_document = "https://mon-document.local/test.html"
-    document = Document(nom_document=nom_document, url=url_document)
-
     document_html = DocumentHTML(nom_document, url_document)
+    document = Document(document_html)
     document.genere_les_pages(
         document_html.generateur,
         [
@@ -175,9 +171,8 @@ def test_peut_creer_un_document_avec_des_tableaux_contenant_des_cellules_riches(
 ):
     nom_document = "test.html"
     url_document = "https://mon-document.local/test.html"
-    document = Document(nom_document=nom_document, url=url_document)
-
     document_html = DocumentHTML(nom_document, url_document)
+    document = Document(document_html)
     en_tetes = (
         un_constructeur_d_element_filtrable()
         .de_type_header()
@@ -247,9 +242,8 @@ def test_peut_créer_un_document_avec_des_tableaux_sous_un_titre(
 ):
     nom_document = "test.html"
     url_document = "https://mon-document.local/test.html"
-    document = Document(nom_document=nom_document, url=url_document)
-
     document_html = DocumentHTML(nom_document, url_document)
+    document = Document(document_html)
     document.genere_les_pages(
         document_html.generateur,
         [

@@ -95,3 +95,8 @@ class DocumentHTML(DocumentAIndexer):
     @property
     def generateur(self) -> GenerateurDePages:
         return GenerateurDePagesHTML()
+
+
+class DocumentReponsesMaitrisees(DocumentHTML):
+    def __init__(self, nom_document: str, chemin: Optional[str] = None):
+        super().__init__(nom_document, "", chemin)

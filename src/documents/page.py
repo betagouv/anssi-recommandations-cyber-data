@@ -19,3 +19,8 @@ class Page(ABC, Generic[T_Bloc]):
     @abstractmethod
     def ajoute_bloc(self, bloc: T_Bloc) -> None:
         pass
+
+    def ajoute_blocs(
+        self, contenus: list[str], numero_page: int, classe_bloc: type[T_Bloc]
+    ) -> None:
+        self.ajoute_bloc(classe_bloc("\n".join(contenus), numero_page))

@@ -10,6 +10,7 @@ from documents.collecte.collecte import (
     collecte_documents_distants,
     mappe_en_document_distant,
 )
+from documents.html.document_html import DocumentReponsesMaitrisees
 from documents.indexeur.indexeur import ReponseDocumentEnErreur, ReponseDocumentEnSucces
 from documents.indexeur.indexeur_albert import IndexeurBaseVectorielleAlbert
 from documents.indexeur.indexeur_docling import IndexeurDocling
@@ -60,7 +61,15 @@ def main():
         f"- Guides ANSSI : {len(guides_anssi)} documents PDF\n"
         f"- Documents distants : {len(documents_distants)} documents"
     )
-    reponses = client.ajoute_documents([*guides_anssi, *documents_distants])
+    reponses = client.ajoute_documents(
+        [
+            *guides_anssi,
+            *documents_distants,
+            DocumentReponsesMaitrisees(
+                "reponses_maitrisees_ANSSI", "chemin/fichier.html)"
+            ),
+        ]
+    )
 
     les_documents_en_erreur = list(
         filter(lambda reponse: isinstance(reponse, ReponseDocumentEnErreur), reponses)

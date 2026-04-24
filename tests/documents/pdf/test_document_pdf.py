@@ -30,12 +30,12 @@ def test_page_peut_ajouter_un_bloc():
 
 
 def test_pages_peut_etre_creee():
-    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
+    document = Document(document_pdf)
     assert document is not None
 
 
 def test_pages_a_une_collection_de_pages_vide_par_defaut():
-    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
+    document = Document(document_pdf)
     assert document.pages == {}
 
 
@@ -49,7 +49,7 @@ def test_generateur_produit_un_bloc_par_texte_sans_header(
     un_constructeur_d_element_filtrable,
     resultat_conversion,
 ):
-    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
+    document = Document(document_pdf)
     document.genere_les_pages(
         document_pdf.generateur,
         [
@@ -70,7 +70,7 @@ def test_generateur_groupe_les_textes_sous_leur_header(
     un_constructeur_d_element_filtrable,
     resultat_conversion,
 ):
-    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
+    document = Document(document_pdf)
     document.genere_les_pages(
         document_pdf.generateur,
         [
@@ -112,7 +112,7 @@ def test_generateur_groupe_les_textes_titre_et_sous_titre_avec_texte(
     un_constructeur_d_element_filtrable,
     resultat_conversion,
 ):
-    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
+    document = Document(document_pdf)
     document.genere_les_pages(
         document_pdf.generateur,
         [
@@ -142,7 +142,7 @@ def test_generateur_cree_un_bloc_par_header_sans_contenu(
     un_constructeur_d_element_filtrable,
     resultat_conversion,
 ):
-    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
+    document = Document(document_pdf)
     document.genere_les_pages(
         document_pdf.generateur,
         [
@@ -168,7 +168,7 @@ def test_generateur_gere_les_pages_multiples(
     un_constructeur_d_element_filtrable,
     resultat_conversion,
 ):
-    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
+    document = Document(document_pdf)
     document.genere_les_pages(
         document_pdf.generateur,
         [
@@ -205,7 +205,7 @@ def test_generateur_groupe_les_tableaux_sous_leur_header(
     un_constructeur_d_element_filtrable,
     resultat_conversion,
 ):
-    document = Document(nom_document=document_pdf.nom_document, url=document_pdf.url)
+    document = Document(document_pdf)
     document.genere_les_pages(
         document_pdf.generateur,
         [
