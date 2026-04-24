@@ -1,18 +1,16 @@
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 
 from docling_core.types import DoclingDocument
 
 from documents.elements_filtres import ElementsFiltres
 from documents.generateur_de_pages import GenerateurDePages
+from documents.indexeur.indexeur import DocumentAIndexer
 from documents.page import Page, BlocPage
-
-if TYPE_CHECKING:
-    from documents.indexeur.indexeur import DocumentAIndexer
 
 
 class Document:
     def __init__(
-        self, document_a_indexer: "DocumentAIndexer", reponse_maitrisee: bool = False
+        self, document_a_indexer: DocumentAIndexer, reponse_maitrisee: bool = False
     ):
         super().__init__()
         self._nom_document = document_a_indexer.nom_document
@@ -36,6 +34,8 @@ class Document:
         }
         if self._reponse_maitrisee:
             metadata["reponse_maitrisee"] = True
+        if hasattr(bloc, "reponse") and bloc.reponse:
+            metadata["reponse"] = bloc.reponse
         return metadata
 
     def genere_les_pages(

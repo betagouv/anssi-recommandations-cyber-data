@@ -97,6 +97,45 @@ class DocumentHTML(DocumentAIndexer):
         return GenerateurDePagesHTML()
 
 
+@dataclass(frozen=True)
+class BlocPageReponse(BlocPage):
+    reponse: str = ""
+    numero_page: int = 0
+
+
+class GenerateurReponsesMaitrisees(GenerateurDePages):
+    def genere(
+        self, elements_filtres: ElementsFiltres, document: Optional[DoclingDocument]
+    ) -> dict[int, Page]:
+        page = PageHTML()
+        les_headers: list[SectionHeaderItem] = list(
+            filter(
+                lambda item: item.label == DocItemLabel.SECTION_HEADER
+                or item.label == DocItemLabel.TITLE,
+                elements_filtres,
+            )
+        )
+        for header in les_headers:
+            les_references_enfants = list(map(lambda item: item.cref, header.children))
+            les_enfants = list(
+                filter(
+                    lambda item: item.self_ref in les_references_enfants,
+                    elements_filtres,
+                )
+            )
+            reponse = "\n".join(map(lambda e: e.text, les_enfants))  # type: ignore[union-attr]
+            page.ajoute_bloc(BlocPageReponse(texte=header.text, reponse=reponse))
+        return {0: page}
+
+
 class DocumentReponsesMaitrisees(DocumentHTML):
     def __init__(self, nom_document: str, chemin: Optional[str] = None):
         super().__init__(nom_document, "", chemin)
+
+    @property
+    def url(self) -> str:
+        return str(self.chemin)
+
+    @property
+    def generateur(self) -> GenerateurDePages:
+        return GenerateurReponsesMaitrisees()

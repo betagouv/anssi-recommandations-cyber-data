@@ -6,11 +6,11 @@ from adaptateurs.client_albert_indexation_reel import ClientAlbertIndexationReel
 from adaptateurs.clients_albert import ClientAlbertIndexation
 from configuration import recupere_configuration, IndexeurDocument
 from documents.collecte.collecte import (
+    collecte_document_maitrise,
     collecte_guides_anssi,
     collecte_documents_distants,
     mappe_en_document_distant,
 )
-from documents.html.document_html import DocumentReponsesMaitrisees
 from documents.indexeur.indexeur import ReponseDocumentEnErreur, ReponseDocumentEnSucces
 from documents.indexeur.indexeur_albert import IndexeurBaseVectorielleAlbert
 from documents.indexeur.indexeur_docling import IndexeurDocling
@@ -45,7 +45,12 @@ def main():
     parser.add_argument(
         "--documents-distants",
         default="donnees/documents_distants.json",
-        help="Fichier json qui spécifie les urls pour les pdf sotckés en dehors de MSS",
+        help="Fichier json qui spécifie les urls pour les pdf stockés en dehors de MSS",
+    )
+    parser.add_argument(
+        "--documents-maitrises",
+        required=False,
+        help="Fichier html qui indique les questions et réponses maîtrisées",
     )
     args = parser.parse_args()
 
@@ -56,18 +61,22 @@ def main():
     documents_distants = collecte_documents_distants(
         mappe_en_document_distant(Path(args.documents_distants))
     )
+    documents_maitrises = (
+        [collecte_document_maitrise(args.documents_maitrises)]
+        if args.documents_maitrises
+        else []
+    )
     print(
         f"Collecte en cours sur la collection {client.id_collection} :\n"
         f"- Guides ANSSI : {len(guides_anssi)} documents PDF\n"
-        f"- Documents distants : {len(documents_distants)} documents"
+        f"- Documents distants : {len(documents_distants)} documents\n"
+        f"- Réponses maîtrisées : {len(documents_maitrises)} document HTML"
     )
     reponses = client.ajoute_documents(
         [
             *guides_anssi,
             *documents_distants,
-            DocumentReponsesMaitrisees(
-                "reponses_maitrisees_ANSSI", "chemin/fichier.html)"
-            ),
+            *documents_maitrises,
         ]
     )
 
