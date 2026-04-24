@@ -25,12 +25,7 @@ class GenerateurDePagesPDF(GenerateurDePages):
             if not bloc_lignes:
                 return
             page = resultat.setdefault(bloc_page, PagePDF(bloc_page))
-            page.ajoute_bloc(
-                BlocPagePDF(
-                    texte="\n".join(bloc_lignes),
-                    numero_page=bloc_page,
-                )
-            )
+            page.ajoute_blocs(bloc_lignes, bloc_page, BlocPagePDF)
 
         for element in elements_filtres:
             if element.label == DocItemLabel.PAGE_FOOTER:  # type: ignore[union-attr]
