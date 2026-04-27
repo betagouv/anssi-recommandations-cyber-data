@@ -2,12 +2,16 @@ from pathlib import Path
 
 from configuration import MSC
 from documents.collecte.collecte import (
+    collecte_document_maitrise,
     collecte_guides_anssi,
     collecte_guide_anssi,
     collecte_documents_distants,
     mappe_en_document_distant,
 )
-from documents.html.document_html import GenerateurDePagesHTML
+from documents.html.document_html import (
+    DocumentReponsesMaitrisees,
+    GenerateurDePagesHTML,
+)
 from documents.pdf.document_pdf import DocumentPDF, GenerateurDePagesPDF
 
 
@@ -110,3 +114,12 @@ def test_retoune_un_document_html_avec_son_chemin():
 
     assert documents[0].url == "https://messervices.cyber.gouv.fr/"
     assert documents[0].chemin == Path("messervices.cyber.gouv.fr")
+
+
+def test_collecte_document_maitrise_retourne_un_document_reponses_maitrisees():
+    chemin = Path("donnees/collection_reponses_maitrisees/faq_reponses_maitrisees.html")
+
+    document = collecte_document_maitrise(chemin)
+
+    assert isinstance(document, DocumentReponsesMaitrisees)
+    assert document.nom_document == "faq_reponses_maitrisees"

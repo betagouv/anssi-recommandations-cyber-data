@@ -62,7 +62,7 @@ def main():
         mappe_en_document_distant(Path(args.documents_distants))
     )
     documents_maitrises = (
-        [collecte_document_maitrise(args.documents_maitrises)]
+        [collecte_document_maitrise(Path(args.documents_maitrises))]
         if args.documents_maitrises
         else []
     )
