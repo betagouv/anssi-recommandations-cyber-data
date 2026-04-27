@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Literal, TypedDict, Optional
 
 from configuration import MSC, recupere_configuration
-from documents.html.document_html import DocumentHTML
+from documents.html.document_html import DocumentHTML, DocumentReponsesMaitrisees
 from documents.indexeur.indexeur import DocumentAIndexer
 from documents.pdf.cree_document_pdf import cree_document_pdf, cree_document_pdf_distant
 from documents.pdf.document_pdf import DocumentPDF
@@ -53,6 +53,10 @@ def mappe_en_document_distant(documents_distants: Path) -> DocumentDistant | Non
         )
         return contenu
     return None
+
+
+def collecte_document_maitrise(chemin: Path) -> DocumentReponsesMaitrisees:
+    return DocumentReponsesMaitrisees(chemin.stem, chemin=str(chemin))
 
 
 def collecte_documents_distants(

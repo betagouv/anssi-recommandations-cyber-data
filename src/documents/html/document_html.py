@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from docling_core.types import DoclingDocument
-from docling_core.types.doc import DocItemLabel, TableItem, SectionHeaderItem
+from docling_core.types.doc import TableItem, SectionHeaderItem, TitleItem
 
 from documents.elements_filtres import ElementsFiltres
 from documents.generateur_de_pages import GenerateurDePages
@@ -29,13 +29,9 @@ class GenerateurDePagesHTML(GenerateurDePages):
         self, elements_filtres: ElementsFiltres, document: Optional[DoclingDocument]
     ) -> dict[int, Page]:
         page = PageHTML()
-        les_headers: list[SectionHeaderItem] = list(
-            filter(
-                lambda item: item.label == DocItemLabel.SECTION_HEADER  # type: ignore[arg-type]
-                or item.label == DocItemLabel.TITLE,
-                elements_filtres,
-            )
-        )
+        les_headers: list[SectionHeaderItem | TitleItem] = [
+            item for item in elements_filtres if isinstance(item, (SectionHeaderItem, TitleItem))
+        ]
         if len(les_headers) == 0:
             page.ajoute_bloc(
                 BlocPageHTML(
@@ -108,13 +104,9 @@ class GenerateurReponsesMaitrisees(GenerateurDePages):
         self, elements_filtres: ElementsFiltres, document: Optional[DoclingDocument]
     ) -> dict[int, Page]:
         page = PageHTML()
-        les_headers: list[SectionHeaderItem] = list(
-            filter(
-                lambda item: item.label == DocItemLabel.SECTION_HEADER
-                or item.label == DocItemLabel.TITLE,
-                elements_filtres,
-            )
-        )
+        les_headers: list[SectionHeaderItem | TitleItem] = [
+            item for item in elements_filtres if isinstance(item, (SectionHeaderItem, TitleItem))
+        ]
         for header in les_headers:
             les_references_enfants = list(map(lambda item: item.cref, header.children))
             les_enfants = list(

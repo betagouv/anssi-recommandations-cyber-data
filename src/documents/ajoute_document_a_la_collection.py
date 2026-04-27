@@ -2,6 +2,7 @@ import argparse
 from pathlib import Path
 
 from documents.collecte.collecte import (
+    collecte_document_maitrise,
     collecte_guide_anssi,
     collecte_documents_distants,
     mappe_en_document_distant,
@@ -21,6 +22,11 @@ def main():
         required=False,
         help="Fichier json qui spécifie les urls pour les pdf sotckés en dehors de MSS",
     )
+    parser.add_argument(
+        "--document-maitrise",
+        required=False,
+        help="Chemin vers le fichier HTML du document de réponses maîtrisées",
+    )
 
     args = parser.parse_args()
 
@@ -38,7 +44,14 @@ def main():
         documents_distants = collecte_documents_distants(
             mappe_en_document_distant(Path(args.documents_distants))
         )
-    reponses = client.ajoute_documents([*guides_anssi, *documents_distants])
+    documents_maitrises = (
+        [collecte_document_maitrise(Path(args.document_maitrise))]
+        if args.document_maitrise
+        else []
+    )
+    reponses = client.ajoute_documents(
+        [*guides_anssi, *documents_distants, *documents_maitrises]
+    )
 
     les_documents_en_erreur = list(
         filter(lambda reponse: isinstance(reponse, ReponseDocumentEnErreur), reponses)
