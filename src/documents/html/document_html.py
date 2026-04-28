@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -7,6 +8,7 @@ from docling_core.types.doc import TableItem, SectionHeaderItem, TitleItem
 
 from documents.elements_filtres import ElementsFiltres
 from documents.generateur_de_pages import GenerateurDePages
+from documents.html.slugifie import slugifie
 from documents.indexeur.indexeur import DocumentAIndexer
 from documents.page import BlocPage, Page
 
@@ -30,7 +32,9 @@ class GenerateurDePagesHTML(GenerateurDePages):
     ) -> dict[int, Page]:
         page = PageHTML()
         les_headers: list[SectionHeaderItem | TitleItem] = [
-            item for item in elements_filtres if isinstance(item, (SectionHeaderItem, TitleItem))
+            item
+            for item in elements_filtres
+            if isinstance(item, (SectionHeaderItem, TitleItem))
         ]
         if len(les_headers) == 0:
             page.ajoute_bloc(
@@ -95,28 +99,40 @@ class DocumentHTML(DocumentAIndexer):
 
 @dataclass(frozen=True)
 class BlocPageReponse(BlocPage):
-    reponse: str = ""
+    id_reponse: str = ""
     numero_page: int = 0
 
 
 class GenerateurReponsesMaitrisees(GenerateurDePages):
+    def __init__(self, chemin_source: Optional[Path] = None):
+        self._chemin_source = chemin_source
+
     def genere(
         self, elements_filtres: ElementsFiltres, document: Optional[DoclingDocument]
     ) -> dict[int, Page]:
         page = PageHTML()
+        mapping: dict[str, str] = {}
         les_headers: list[SectionHeaderItem | TitleItem] = [
-            item for item in elements_filtres if isinstance(item, (SectionHeaderItem, TitleItem))
+            item
+            for item in elements_filtres
+            if isinstance(item, (SectionHeaderItem, TitleItem))
         ]
         for header in les_headers:
-            les_references_enfants = list(map(lambda item: item.cref, header.children))
-            les_enfants = list(
-                filter(
-                    lambda item: item.self_ref in les_references_enfants,
-                    elements_filtres,
-                )
+            id_reponse = slugifie(header.text)
+            les_references_enfants = {item.cref for item in header.children}
+            les_enfants = [
+                item
+                for item in elements_filtres
+                if item.self_ref in les_references_enfants
+            ]
+            reponse = "\n".join(e.text for e in les_enfants)  # type: ignore[union-attr]
+            mapping[id_reponse] = reponse
+            page.ajoute_bloc(BlocPageReponse(texte=header.text, id_reponse=id_reponse))
+        if self._chemin_source is not None:
+            chemin_mapping = self._chemin_source.with_suffix(".mapping.json")
+            chemin_mapping.write_text(
+                json.dumps(mapping, ensure_ascii=False, indent=2), encoding="utf-8"
             )
-            reponse = "\n".join(map(lambda e: e.text, les_enfants))  # type: ignore[union-attr]
-            page.ajoute_bloc(BlocPageReponse(texte=header.text, reponse=reponse))
         return {0: page}
 
 
@@ -130,4 +146,6 @@ class DocumentReponsesMaitrisees(DocumentHTML):
 
     @property
     def generateur(self) -> GenerateurDePages:
-        return GenerateurReponsesMaitrisees()
+        return GenerateurReponsesMaitrisees(
+            chemin_source=Path(self._chemin) if self._chemin else None
+        )
