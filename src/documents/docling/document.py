@@ -34,8 +34,8 @@ class Document:
         }
         if self._reponse_maitrisee:
             metadata["reponse_maitrisee"] = True
-        if hasattr(bloc, "reponse") and bloc.reponse:
-            metadata["reponse"] = bloc.reponse
+        if hasattr(bloc, "id_reponse") and bloc.id_reponse:
+            metadata["id_reponse"] = bloc.id_reponse
         return metadata
 
     def genere_les_pages(

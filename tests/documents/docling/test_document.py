@@ -21,10 +21,11 @@ def test_metadata_contient_reponse_maitrisee_vrai_quand_active():
     assert metadata["reponse_maitrisee"] is True
 
 
-def test_metadata_contient_reponse_quand_bloc_a_un_champ_reponse():
+def test_metadata_contient_id_reponse_quand_bloc_a_un_slug():
     document = Document(_un_document_a_indexer())
-    bloc = BlocPageReponse(texte="Qui est le directeur ?", reponse="Vincent Strubel.")
+    bloc = BlocPageReponse(texte="Qui est le directeur ?", id_reponse="qui-est-le-directeur")
 
     metadata = document.metadata(bloc)
 
-    assert metadata["reponse"] == "Vincent Strubel."
+    assert metadata["id_reponse"] == "qui-est-le-directeur"
+    assert "reponse" not in metadata
