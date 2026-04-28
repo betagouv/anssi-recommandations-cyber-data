@@ -9,4 +9,4 @@ def slugifie(texte: str) -> str:
     sans_speciaux = re.sub(r"[^\w\s-]", "", minuscules, flags=re.UNICODE)
     avec_tirets = re.sub(r"[\s_]+", "-", sans_speciaux)
     propre = re.sub(r"-+", "-", avec_tirets).strip("-")
-    return propre[:80]
+    return propre[:250]
