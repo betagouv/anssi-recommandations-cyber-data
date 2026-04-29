@@ -1,4 +1,5 @@
 import argparse
+import json
 import multiprocessing as mp
 from pathlib import Path
 
@@ -11,7 +12,12 @@ from documents.collecte.collecte import (
     collecte_documents_distants,
     mappe_en_document_distant,
 )
-from documents.indexeur.indexeur import ReponseDocumentEnErreur, ReponseDocumentEnSucces
+from documents.indexeur.indexeur import (
+    ReponseDocument,
+    ReponseDocumentEnErreur,
+    ReponseDocumentEnSucces,
+    ReponseDocumentMaitriseEnSucces,
+)
 from documents.indexeur.indexeur_albert import IndexeurBaseVectorielleAlbert
 from documents.indexeur.indexeur_docling import IndexeurDocling
 
@@ -34,6 +40,15 @@ def fabrique_client_albert() -> ClientAlbertIndexation:
     raise Exception(
         f"Erreur, un indexeur {', '.join([indexeur.name for indexeur in IndexeurDocument])} doit être fourni. L’indexeur configuré est : {config.indexeur}"
     )
+
+
+def ecrit_fichiers_mapping(reponses: list[ReponseDocument]) -> None:
+    for reponse in reponses:
+        if isinstance(reponse, ReponseDocumentMaitriseEnSucces) and reponse.mapping:
+            Path(reponse.chemin_source).with_suffix(".mapping.json").write_text(
+                json.dumps(reponse.mapping, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
 
 
 def main():
@@ -80,11 +95,18 @@ def main():
         ]
     )
 
+    ecrit_fichiers_mapping(reponses)
+
     les_documents_en_erreur = list(
         filter(lambda reponse: isinstance(reponse, ReponseDocumentEnErreur), reponses)
     )
     les_documents_en_succes = list(
-        filter(lambda reponse: isinstance(reponse, ReponseDocumentEnSucces), reponses)
+        filter(
+            lambda reponse: isinstance(
+                reponse, (ReponseDocumentEnSucces, ReponseDocumentMaitriseEnSucces)
+            ),
+            reponses,
+        )
     )
 
     print(

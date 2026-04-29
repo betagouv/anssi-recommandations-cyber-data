@@ -23,7 +23,9 @@ def test_metadata_contient_reponse_maitrisee_vrai_quand_active():
 
 def test_metadata_contient_id_reponse_quand_bloc_a_un_slug():
     document = Document(_un_document_a_indexer())
-    bloc = BlocPageReponse(texte="Qui est le directeur ?", id_reponse="qui-est-le-directeur")
+    bloc = BlocPageReponse(
+        texte="Qui est le directeur ?", id_reponse="qui-est-le-directeur"
+    )
 
     metadata = document.metadata(bloc)
 

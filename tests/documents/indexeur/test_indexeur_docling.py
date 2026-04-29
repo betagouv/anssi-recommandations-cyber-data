@@ -1,7 +1,11 @@
 import json
 
 from documents.docling.multi_processeur import Multiprocesseur
-from documents.indexeur.indexeur import ReponseDocumentEnErreur
+from documents.html.document_html import DocumentReponsesMaitrisees
+from documents.indexeur.indexeur import (
+    ReponseDocumentEnErreur,
+    ReponseDocumentMaitriseEnSucces,
+)
 from documents.indexeur.indexeur_docling import IndexeurDocling
 from documents.pdf.document_pdf import DocumentPDF
 
@@ -376,3 +380,39 @@ def test_decoupe_les_chunks_par_paquet_de_64(
     )
 
     assert executeur_de_requete.nombre_appels == 3
+
+
+def test_retourne_un_mapping_quand_les_blocs_contiennent_des_reponses_maitrisees(
+    une_reponse_document,
+    fichier_pdf,
+    un_executeur_de_requete,
+    une_reponse_attendue_OK,
+    une_reponse_chunk,
+    un_chunker_avec_generation_de_page_statique,
+):
+    chemin_fichier = str(fichier_pdf("reponses.html").resolve())
+    executeur_de_requete = un_executeur_de_requete(
+        [
+            une_reponse_attendue_OK(une_reponse_document),
+            une_reponse_attendue_OK(une_reponse_chunk),
+        ]
+    )
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        un_chunker_avec_generation_de_page_statique()
+        .avec_une_reponse_maitrisee(
+            "qui-est-le-directeur-de-lanssi", "Vincent Strubel."
+        )
+        .construis(),
+        executeur_de_requete,
+        MultiProcesseurDeTest(),
+    )
+    document = DocumentReponsesMaitrisees("reponses", chemin=chemin_fichier)
+
+    reponses = indexeur.ajoute_documents([document], "12345")
+
+    assert len(reponses) == 1
+    assert isinstance(reponses[0], ReponseDocumentMaitriseEnSucces)
+    assert reponses[0].mapping == {"qui-est-le-directeur-de-lanssi": "Vincent Strubel."}
+    assert reponses[0].chemin_source == chemin_fichier

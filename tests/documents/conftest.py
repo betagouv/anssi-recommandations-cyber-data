@@ -42,6 +42,7 @@ from documents.indexeur.indexeur import (
     ReponseChunkEnErreur,
     DetailErreur,
 )
+from documents.html.document_html import BlocPageReponse, PageHTML
 from documents.page import Page
 from documents.pdf.document_pdf import Position, PagePDF, BlocPagePDF
 
@@ -489,6 +490,26 @@ class GenerateurDePagesStatique(GenerateurDePages):
         return resultat
 
 
+class GenerateurDePagesAvecReponseMaitrisee(GenerateurDePages):
+    def __init__(self, id_reponse: str, reponse: str):
+        super().__init__()
+        self.id_reponse = id_reponse
+        self.reponse = reponse
+
+    def genere(
+        self, elements_filtres: ElementsFiltres, _: Optional[DoclingDocument]
+    ) -> dict[int, Page]:
+        page = PageHTML()
+        page.ajoute_bloc(
+            BlocPageReponse(
+                texte=self.id_reponse,
+                id_reponse=self.id_reponse,
+                reponse=self.reponse,
+            )
+        )
+        return {0: page}
+
+
 class ChunkerDeTest(ChunkerDoclingMQC):
     def __init__(
         self,
@@ -538,16 +559,26 @@ class ConstructeurDeChunker:
         self.type_fichier = TypeFichier.TEXTE
         return self
 
+    def avec_une_reponse_maitrisee(self, id_reponse: str, reponse: str):
+        self._generateur_reponse = GenerateurDePagesAvecReponseMaitrisee(
+            id_reponse=id_reponse, reponse=reponse
+        )
+        return self
+
     def construis(self) -> ChunkerDeTest:
-        generateur_de_pages_statique = GenerateurDePagesStatique(
-            numero_page=self.numero_page,
-            contenu=self.contenu_page,
-            nombre_de_blocs=self.nombre_de_blocs,
+        generateur = getattr(
+            self,
+            "_generateur_reponse",
+            GenerateurDePagesStatique(
+                numero_page=self.numero_page,
+                contenu=self.contenu_page,
+                nombre_de_blocs=self.nombre_de_blocs,
+            ),
         )
         return ChunkerDeTest(
             nom_fichier=self.nom_fichier,
             type_fichier=self.type_fichier,
-            generateur=generateur_de_pages_statique,
+            generateur=generateur,
         )
 
 

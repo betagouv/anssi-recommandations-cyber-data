@@ -59,12 +59,24 @@ class ReponseDocumentEnSucces(NamedTuple):
     updated_at: str
 
 
+class ReponseDocumentMaitriseEnSucces(NamedTuple):
+    id: str
+    name: str
+    collection_id: str
+    created_at: str
+    updated_at: str
+    mapping: dict[str, str]
+    chemin_source: str
+
+
 class ReponseDocumentEnErreur(NamedTuple):
     detail: str
     document_en_erreur: str
 
 
-type ReponseDocument = Union[ReponseDocumentEnSucces, ReponseDocumentEnErreur]
+type ReponseDocument = Union[
+    ReponseDocumentEnSucces, ReponseDocumentMaitriseEnSucces, ReponseDocumentEnErreur
+]
 
 
 class ReponseChunkEnSucces(NamedTuple):
