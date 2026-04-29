@@ -9,12 +9,14 @@ from typing import Generator
 from documents.docling.chunker_docling import TypeFichier, ChunkerDocling
 from documents.docling.chunker_docling_mqc import ChunkerDoclingMQC
 from documents.docling.multi_processeur import Multiprocesseur
+from documents.html.document_html import BlocPageReponse
 from documents.indexeur.indexeur import (
     DocumentAIndexer,
     Indexeur,
     ReponseDocument,
     ReponseDocumentEnErreur,
     ReponseDocumentEnSucces,
+    ReponseDocumentMaitriseEnSucces,
 )
 from documents.page import BlocPage
 from infra.executeur_requete import ExecuteurDeRequete
@@ -144,15 +146,29 @@ class IndexeurDocling(Indexeur):
                 )
                 return reponses
 
-            resultat_indexation: ReponseDocumentEnSucces | ReponseDocumentEnErreur = (
-                ReponseDocumentEnSucces(
+            mapping = {
+                bloc.id_reponse: bloc.reponse
+                for bloc in les_blocs_non_vides
+                if isinstance(bloc, BlocPageReponse) and bloc.id_reponse
+            }
+            if mapping:
+                resultat_indexation: ReponseDocument = ReponseDocumentMaitriseEnSucces(
+                    id=resultat["id"],
+                    name=resultat.get("name", nom_du_document),
+                    collection_id=resultat.get("collection_id", str(id_collection)),
+                    created_at=resultat.get("created_at", ""),
+                    updated_at=resultat.get("updated_at", ""),
+                    mapping=mapping,
+                    chemin_source=str(document_a_indexer.chemin),
+                )
+            else:
+                resultat_indexation = ReponseDocumentEnSucces(
                     id=resultat["id"],
                     name=resultat.get("name", nom_du_document),
                     collection_id=resultat.get("collection_id", str(id_collection)),
                     created_at=resultat.get("created_at", ""),
                     updated_at=resultat.get("updated_at", ""),
                 )
-            )
 
             def _en_payload(bloc: BlocPage) -> dict:
                 return {"content": bloc.texte, "metadata": document.metadata(bloc)}

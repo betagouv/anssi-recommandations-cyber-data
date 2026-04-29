@@ -1,4 +1,3 @@
-import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -100,18 +99,15 @@ class DocumentHTML(DocumentAIndexer):
 @dataclass(frozen=True)
 class BlocPageReponse(BlocPage):
     id_reponse: str = ""
+    reponse: str = ""
     numero_page: int = 0
 
 
 class GenerateurReponsesMaitrisees(GenerateurDePages):
-    def __init__(self, chemin_source: Optional[Path] = None):
-        self._chemin_source = chemin_source
-
     def genere(
         self, elements_filtres: ElementsFiltres, document: Optional[DoclingDocument]
     ) -> dict[int, Page]:
         page = PageHTML()
-        mapping: dict[str, str] = {}
         les_headers: list[SectionHeaderItem | TitleItem] = [
             item
             for item in elements_filtres
@@ -126,12 +122,10 @@ class GenerateurReponsesMaitrisees(GenerateurDePages):
                 if item.self_ref in les_references_enfants
             ]
             reponse = "\n".join(e.text for e in les_enfants)  # type: ignore[union-attr]
-            mapping[id_reponse] = reponse
-            page.ajoute_bloc(BlocPageReponse(texte=header.text, id_reponse=id_reponse))
-        if self._chemin_source is not None:
-            chemin_mapping = self._chemin_source.with_suffix(".mapping.json")
-            chemin_mapping.write_text(
-                json.dumps(mapping, ensure_ascii=False, indent=2), encoding="utf-8"
+            page.ajoute_bloc(
+                BlocPageReponse(
+                    texte=header.text, id_reponse=id_reponse, reponse=reponse
+                )
             )
         return {0: page}
 
@@ -146,6 +140,4 @@ class DocumentReponsesMaitrisees(DocumentHTML):
 
     @property
     def generateur(self) -> GenerateurDePages:
-        return GenerateurReponsesMaitrisees(
-            chemin_source=Path(self._chemin) if self._chemin else None
-        )
+        return GenerateurReponsesMaitrisees()
