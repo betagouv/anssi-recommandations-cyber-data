@@ -1,0 +1,362 @@
+REF,Nom,URL,Inclu ?,Explication RETENU,Fait
+ANSS,anssi_back to basics_standalone_server_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_back%20to%20basics_standalone_server_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS1,anssi_back to basics_AD_DS_member_server_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_back%20to%20basics_AD_DS_member_server_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+BACK,20240829_Back to Basics_DDOS.pdf,https://messervices.cyber.gouv.fr/documents-guides/20240829_Back%20to%20Basics_DDOS.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS2,anssi-avis_scientifiques_et_techniques-modele_zero_trust.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-avis_scientifiques_et_techniques-modele_zero_trust.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+AVIS,Avis de l'ANSSI sur la migration vers la cryptographie.pdf,https://messervices.cyber.gouv.fr/documents-guides/Avis%20de%20l%27ANSSI%20sur%20la%20migration%20vers%20la%20cryptographie.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+DOCU,Document_Analyse_de_risques_FR.pdf,https://messervices.cyber.gouv.fr/documents-guides/Document_Analyse_de_risques_FR.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN,20220516_np_anssi_guide_com_crise_cyber_en.pdf,https://messervices.cyber.gouv.fr/documents-guides/20220516_np_anssi_guide_com_crise_cyber_en.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS3,anssi_fundamentals_securing_wmware_infrastructure_v.1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_fundamentals_securing_wmware_infrastructure_v.1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN1,20150713_NP_ANSSI_SDE_firewall_mid_term_v1.0-en.pdf,https://messervices.cyber.gouv.fr/documents-guides/20150713_NP_ANSSI_SDE_firewall_mid_term_v1.0-en.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+SECU,security_recommandations_for_a_generative_ai_system.pdf,https://messervices.cyber.gouv.fr/documents-guides/security_recommandations_for_a_generative_ai_system.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID,2010-12-03_Guide_externalisation.pdf,https://messervices.cyber.gouv.fr/documents-guides/2010-12-03_Guide_externalisation.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS4,anssi-guide-passerelle_internet_securisee-v3.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-passerelle_internet_securisee-v3.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+HIGH,high_level_risks_analysis_ai_paris_summit.pdf,https://messervices.cyber.gouv.fr/documents-guides/high_level_risks_analysis_ai_paris_summit.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+REFE,Referentiel_exigences_prestataires_integration_maintenance_V1_0.1.pdf,https://messervices.cyber.gouv.fr/documents-guides/Referentiel_exigences_prestataires_integration_maintenance_V1_0.1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+PSSI,pssi-section1-introduction-2004-03-03.pdf,https://messervices.cyber.gouv.fr/documents-guides/pssi-section1-introduction-2004-03-03.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS5,anssi-guide-recommandations-securite-pour-mise-en-oeuvre-dispositifs-videoprotection-obsolete.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-recommandations-securite-pour-mise-en-oeuvre-dispositifs-videoprotection-obsolete.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS6,anssi_essentiels_zero_trust_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_zero_trust_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS7,anssi_back to basics_zero_trust_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_back%20to%20basics_zero_trust_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS8,anssi_supervision_piloter_un_projet_de_supervision_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_supervision_piloter_un_projet_de_supervision_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS9,anssi-guide-guide-securite-technologies-sans-contact-pour-controle-acces-physiques-v1.0-obsolete.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-guide-securite-technologies-sans-contact-pour-controle-acces-physiques-v1.0-obsolete.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+FICH,Fiche_methode_Systeme_dinformation _isole_et_simple.pdf,https://messervices.cyber.gouv.fr/documents-guides/Fiche_methode_Systeme_dinformation%20_isole_et_simple.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPPO,NP_Politique_pare_feu_NoteTech.pdf,https://messervices.cyber.gouv.fr/documents-guides/NP_Politique_pare_feu_NoteTech.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN2,20150713_NP_ANSSI_SDE_vpn_mid_term_v1.0-en.pdf,https://messervices.cyber.gouv.fr/documents-guides/20150713_NP_ANSSI_SDE_vpn_mid_term_v1.0-en.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+SYST,Système de contrôle d_accès physique v1-1-fr.pdf,https://messervices.cyber.gouv.fr/documents-guides/Syst%C3%A8me%20de%20contr%C3%B4le%20d_acc%C3%A8s%20physique%20v1-1-fr.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CYBE,cyber-attacks-remediation-the-keys-to-decision-making.pdf,https://messervices.cyber.gouv.fr/documents-guides/cyber-attacks-remediation-the-keys-to-decision-making.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPTL,NP_TLS_NoteTech.pdf,https://messervices.cyber.gouv.fr/documents-guides/NP_TLS_NoteTech.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS10,anssi_amrae-guide-maitrise_risque_numerique-atout_confiance.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_amrae-guide-maitrise_risque_numerique-atout_confiance.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPSE,np_securisation_windows10_securite_reposant_sur_la_virtualisation_v1.pdf,https://messervices.cyber.gouv.fr/documents-guides/np_securisation_windows10_securite_reposant_sur_la_virtualisation_v1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPCO,NP_ConfigMateriel.pdf,https://messervices.cyber.gouv.fr/documents-guides/NP_ConfigMateriel.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN3,20220117_np_anssi_sde_pare_feu_court_terme_v1-1-fr.pdf,https://messervices.cyber.gouv.fr/documents-guides/20220117_np_anssi_sde_pare_feu_court_terme_v1-1-fr.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN4,20220117_np_anssi_sde_pare_feu_moyen_terme_v1-1-fr.pdf,https://messervices.cyber.gouv.fr/documents-guides/20220117_np_anssi_sde_pare_feu_moyen_terme_v1-1-fr.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+MATU,maturitessi-methode-2007-11-02.pdf,https://messervices.cyber.gouv.fr/documents-guides/maturitessi-methode-2007-11-02.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+MAPP,mapping_the_information_system-anssi-pa-046.pdf,https://messervices.cyber.gouv.fr/documents-guides/mapping_the_information_system-anssi-pa-046.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID1,guide_dns_fr_anssi_1.3.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide_dns_fr_anssi_1.3.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID2,guide_protection_scientifique_technique_nation_anssi-pa-049_v1.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide_protection_scientifique_technique_nation_anssi-pa-049_v1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+PSSI1,pssi-section3-principes-2004-03-03.pdf,https://messervices.cyber.gouv.fr/documents-guides/pssi-section3-principes-2004-03-03.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+VIDÉ,Vidéo IP Caméra v1-0-fr.pdf,https://messervices.cyber.gouv.fr/documents-guides/Vid%C3%A9o%20IP%20Cam%C3%A9ra%20v1-0-fr.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS11,anssi-guide-recommandations_securite_architecture_systeme_journalisation.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-recommandations_securite_architecture_systeme_journalisation.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS12,anssi-guide-rules_for_secure_c_language_software_development-v1.4.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-rules_for_secure_c_language_software_development-v1.4.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPOR,NP_Ordiphones_NoteTech_v1.2.pdf,https://messervices.cyber.gouv.fr/documents-guides/NP_Ordiphones_NoteTech_v1.2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS13,anssi_back to basics_is_security_architecture_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_back%20to%20basics_is_security_architecture_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CYBE1,cyber-attacks-remediation-remadation-of-active-directory-tier-0.pdf,https://messervices.cyber.gouv.fr/documents-guides/cyber-attacks-remediation-remadation-of-active-directory-tier-0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS14,anssi_essentiels_denis-de-service-distribues_v2.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_denis-de-service-distribues_v2.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN5,20220516_np_anssi_guide_gestion_crise_cyber_en1.pdf,https://messervices.cyber.gouv.fr/documents-guides/20220516_np_anssi_guide_gestion_crise_cyber_en1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN6,20150713_NP_ANSSI_SDE_vpn_short_term_v1.0-en.pdf,https://messervices.cyber.gouv.fr/documents-guides/20150713_NP_ANSSI_SDE_vpn_short_term_v1.0-en.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAC,NP_ActiveDirectory_NoteTech.pdf,https://messervices.cyber.gouv.fr/documents-guides/NP_ActiveDirectory_NoteTech.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS15,anssi-guide-recommandations_configuration_commutateurs_pare-feux_siemens_scalance.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-recommandations_configuration_commutateurs_pare-feux_siemens_scalance.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS16,anssi-profil_de_fonctionnalites_et_de_securite-sas_et_station_blanche_reseaux_non_classifies-v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-profil_de_fonctionnalites_et_de_securite-sas_et_station_blanche_reseaux_non_classifies-v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS17,anssi-zed-note_technique-v1.1.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-zed-note_technique-v1.1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS18,anssi-guide-gestion_crise_cyber.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-gestion_crise_cyber.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+TRAN,transition_post_quantique_tls_1_3.pdf,https://messervices.cyber.gouv.fr/documents-guides/transition_post_quantique_tls_1_3.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS19,anssi_back to basics_hygiene_mobile_phones_1.1.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_back%20to%20basics_hygiene_mobile_phones_1.1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NTIP,NT_IPsec.pdf,https://messervices.cyber.gouv.fr/documents-guides/NT_IPsec.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+FOLL,follow_up_position_paper_on_post_quantum_cryptography.pdf,https://messervices.cyber.gouv.fr/documents-guides/follow_up_position_paper_on_post_quantum_cryptography.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID3,guide-charte-utilisation-moyens-informatiques-outils-numeriques_anssi.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide-charte-utilisation-moyens-informatiques-outils-numeriques_anssi.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+TRAN1,transition_post_quantique_ipsec.pdf,https://messervices.cyber.gouv.fr/documents-guides/transition_post_quantique_ipsec.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID4,guide_cpme_bonnes_pratiques.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide_cpme_bonnes_pratiques.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+FICH1,fiche_methode_Organiser_une_revue_des_systemes_dinformation.pdf,https://messervices.cyber.gouv.fr/documents-guides/fiche_methode_Organiser_une_revue_des_systemes_dinformation.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS20,anssi_essentiels_bdd_relationnelles_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_bdd_relationnelles_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+MESS,messagerie_phishing_fiche_anssi.pdf,https://messervices.cyber.gouv.fr/documents-guides/messagerie_phishing_fiche_anssi.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS21,anssi-guide-openstack_v1-0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-openstack_v1-0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID5,guide_dns_en_anssi_1.3.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide_dns_en_anssi_1.3.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS22,anssi-guide-archi_interco_mn-v1-0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-archi_interco_mn-v1-0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID6,guide_cloisonnement_systeme_anssi_pg_040_v1.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide_cloisonnement_systeme_anssi_pg_040_v1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS23,anssi-avis-migration-vers-la-cryptographie-post-quantique.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-avis-migration-vers-la-cryptographie-post-quantique.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS24,anssi-guide-recommandations_securite_journalisation_systemes_microsoft_windows_environnement_active_directory.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-recommandations_securite_journalisation_systemes_microsoft_windows_environnement_active_directory.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS25,anssi_essentiels_serveur_Windows_controleur_domaine_v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_serveur_Windows_controleur_domaine_v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS26,anssi_back to basics_data_leak_prevention_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_back%20to%20basics_data_leak_prevention_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+PSSI2,pssi-plaquette-2004-03-03.pdf,https://messervices.cyber.gouv.fr/documents-guides/pssi-plaquette-2004-03-03.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS27,anssi_essentiels_sauvegarde-si_v1.1.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_sauvegarde-si_v1.1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS28,anssi-guide-regles_de_programmation_pour_le_developpement_securise_de_logiciels_en_langage_c-v1.2.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-regles_de_programmation_pour_le_developpement_securise_de_logiciels_en_langage_c-v1.2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CYBE2,CyberDico_ANSSI_2024.pdf,https://messervices.cyber.gouv.fr/documents-guides/CyberDico_ANSSI_2024.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPWI,NP_WIFI_NoteTech.pdf,https://messervices.cyber.gouv.fr/documents-guides/NP_WIFI_NoteTech.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS29,anssi-guide-industrial_control_systems-classification_method_v2-0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-industrial_control_systems-classification_method_v2-0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS30,anssi_essentiels_igc_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_igc_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS31,anssi-guide-regles_de_programmation_pour_le_developpement_dapplications_securisees_en_rust-v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-regles_de_programmation_pour_le_developpement_dapplications_securisees_en_rust-v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS32,anssi-guide-recommandations_pour_la_securisation_de_la_mise_en_oeuvre_du_protocole_openid_connect-v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-recommandations_pour_la_securisation_de_la_mise_en_oeuvre_du_protocole_openid_connect-v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID7,Guide_pour_une_formation_sur_la_cybersécurité_des_systèmes_industriels.pdf,https://messervices.cyber.gouv.fr/documents-guides/Guide_pour_une_formation_sur_la_cybers%C3%A9curit%C3%A9_des_syst%C3%A8mes_industriels.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS33,anssi-guide-programming_rules_to_develop_secure_applications_with_rust-v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-programming_rules_to_develop_secure_applications_with_rust-v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS34,anssi_essentiels_architecture_securisee_v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_architecture_securisee_v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+TRAN2,transition_post_quantique_ssh_v2.pdf,https://messervices.cyber.gouv.fr/documents-guides/transition_post_quantique_ssh_v2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+VOLE,20231218_Volet_technique_cyberattaquesetremediation_a5_v1h.pdf,https://messervices.cyber.gouv.fr/documents-guides/20231218_Volet_technique_cyberattaquesetremediation_a5_v1h.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS35,anssi_Recommendations on hosting sensitive IS in the cloud.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_Recommendations%20on%20hosting%20sensitive%20IS%20in%20the%20cloud.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS36,anssi-fondamentaux-securisation-acme-v1-1.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-fondamentaux-securisation-acme-v1-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPSE1,np_securiser_jre_notetech.pdf,https://messervices.cyber.gouv.fr/documents-guides/np_securiser_jre_notetech.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID8,guideline-for-a-healthy-information-system-in-42-measures_v2.pdf,https://messervices.cyber.gouv.fr/documents-guides/guideline-for-a-healthy-information-system-in-42-measures_v2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPSE2,np_securisation_windows10_collecte_de_donnees_v1.2.pdf,https://messervices.cyber.gouv.fr/documents-guides/np_securisation_windows10_collecte_de_donnees_v1.2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+VOLE1,20231218_Volet_stratégique_cyberattaquesetremédiation_v1g.pdf,https://messervices.cyber.gouv.fr/documents-guides/20231218_Volet_strat%C3%A9gique_cyberattaquesetrem%C3%A9diation_v1g.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS37,anssi-guide-recommandations_configuration_commutateurs_pare-feux_hirschmann.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-recommandations_configuration_commutateurs_pare-feux_hirschmann.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+VOLE2,20231218_Volet_operationnel_cyberattaquesetremediation_a5_v1j.pdf,https://messervices.cyber.gouv.fr/documents-guides/20231218_Volet_operationnel_cyberattaquesetremediation_a5_v1j.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS38,anssi-technical-position-paper-coco-v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-technical-position-paper-coco-v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+VIDÉ1,Vidéo IP VMS v1-0-fr.pdf,https://messervices.cyber.gouv.fr/documents-guides/Vid%C3%A9o%20IP%20VMS%20v1-0-fr.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS39,anssi-guide-securite_numerique_collectivites_territoriales-reglementation1.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-securite_numerique_collectivites_territoriales-reglementation1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID9,guide_hygiene_informatique_anssi.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide_hygiene_informatique_anssi.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS40,anssi-guide-securite_des_systemes_objets_connectes_iot-v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-securite_des_systemes_objets_connectes_iot-v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS41,anssi-guide-selection_crypto-1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-selection_crypto-1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID10,guide_preconisations-pare-feux-zone-exposee-internet_anssi_pa_044_v1.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide_preconisations-pare-feux-zone-exposee-internet_anssi_pa_044_v1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS42,anssi-guide-attaques_par_rancongiciels_tous_concernes-v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-attaques_par_rancongiciels_tous_concernes-v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS43,anssi_essentiels_virtualisation_v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_virtualisation_v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN7,20230614_np_anssi_sde_automate_court_terme_v1-2-fr.pdf,https://messervices.cyber.gouv.fr/documents-guides/20230614_np_anssi_sde_automate_court_terme_v1-2-fr.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS44,anssi-fondamentaux-securisation_infrastructure_vmware_v1-0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-fondamentaux-securisation_infrastructure_vmware_v1-0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS45,anssi_fondamentaux_securisation_infrastructure_vmware_v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_fondamentaux_securisation_infrastructure_vmware_v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN8,20220117_np_anssi_sde_commutateur_moyen_terme_v1-1-fr.pdf,https://messervices.cyber.gouv.fr/documents-guides/20220117_np_anssi_sde_commutateur_moyen_terme_v1-1-fr.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+FICH2,Fiche_methode_Lhomologation_pour_les_decideurs.pdf,https://messervices.cyber.gouv.fr/documents-guides/Fiche_methode_Lhomologation_pour_les_decideurs.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS46,20181213_anssi_guide_cartographie_v1b.pdf,https://messervices.cyber.gouv.fr/documents-guides/20181213_anssi_guide_cartographie_v1b.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ENPO,EN_Position.pdf,https://messervices.cyber.gouv.fr/documents-guides/EN_Position.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN9,20150713_NP_ANSSI_SDE_vpn_court_terme_v1.0-fr.pdf,https://messervices.cyber.gouv.fr/documents-guides/20150713_NP_ANSSI_SDE_vpn_court_terme_v1.0-fr.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS47,anssi_passeport_2019_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_passeport_2019_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID11,guide-homologation-securite-web-04-2025.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide-homologation-securite-web-04-2025.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS48,anssi_fundamentals_IT_backup_1.1.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_fundamentals_IT_backup_1.1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+PREP,preparation_remediation_fr-web.pdf,https://messervices.cyber.gouv.fr/documents-guides/preparation_remediation_fr-web.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS49,anssi_amrae-guide-controlling_digital_risk-trust_advantage.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_amrae-guide-controlling_digital_risk-trust_advantage.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN10,250129_np_anssi_guide_ebios_fr_final_collection_WEB.pdf,https://messervices.cyber.gouv.fr/documents-guides/250129_np_anssi_guide_ebios_fr_final_collection_WEB.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAP,np_applocker_notetech-v2.pdf,https://messervices.cyber.gouv.fr/documents-guides/np_applocker_notetech-v2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS50,anssi-guide-doctrine_de_detection_pour_les_systemes_industriels.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-doctrine_de_detection_pour_les_systemes_industriels.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+PSSI3,pssi-section2-methodologie-2004-03-03.pdf,https://messervices.cyber.gouv.fr/documents-guides/pssi-section2-methodologie-2004-03-03.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN11,20150713_NP_ANSSI_SDE_plc_short_term_v1.1-en.pdf,https://messervices.cyber.gouv.fr/documents-guides/20150713_NP_ANSSI_SDE_plc_short_term_v1.1-en.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+LINU,linux_configuration-en-v2.pdf,https://messervices.cyber.gouv.fr/documents-guides/linux_configuration-en-v2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+DOCK,docker_fiche_technique.pdf,https://messervices.cyber.gouv.fr/documents-guides/docker_fiche_technique.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS51,anssi-guide-ebios_risk_manager-en-v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-ebios_risk_manager-en-v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID12,Guide_Systemes_industriels__Mesures_detaillees_v2.pdf,https://messervices.cyber.gouv.fr/documents-guides/Guide_Systemes_industriels__Mesures_detaillees_v2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+THES,the-security-accreditation-guide-for-information-systems_english.pdf,https://messervices.cyber.gouv.fr/documents-guides/the-security-accreditation-guide-for-information-systems_english.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS52,anssi-fondamentaux-securisation-poste-multi-environnements-v1-0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-fondamentaux-securisation-poste-multi-environnements-v1-0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+TDBS,tdbssi-section1-methodologie-2004-02-05.pdf,https://messervices.cyber.gouv.fr/documents-guides/tdbssi-section1-methodologie-2004-02-05.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+BEST,best-practices-for-cyber-security-on-board-ships_anssi.pdf,https://messervices.cyber.gouv.fr/documents-guides/best-practices-for-cyber-security-on-board-ships_anssi.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+BACK1,20240829_Back to Basics_DevSecOps.pdf,https://messervices.cyber.gouv.fr/documents-guides/20240829_Back%20to%20Basics_DevSecOps.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN12,20150713_NP_ANSSI_SDE_plc_mid_term_v1.1-en.pdf,https://messervices.cyber.gouv.fr/documents-guides/20150713_NP_ANSSI_SDE_plc_mid_term_v1.1-en.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS53,anssi_back to basics_migration_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_back%20to%20basics_migration_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS54,anssi_supervision_les_cles_de_decision_1.0 (1).pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_supervision_les_cles_de_decision_1.0%20%281%29.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS55,anssi_back to basics_sensitive_data_and_processing_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_back%20to%20basics_sensitive_data_and_processing_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS56,anssi_essentiels_selection_logiciel_libre_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_selection_logiciel_libre_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+FICH3,fiches-methodes-ebios_projet.pdf,https://messervices.cyber.gouv.fr/documents-guides/fiches-methodes-ebios_projet.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS57,anssi_essentiels_serveur_Windows_membre_AD_DS_v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_serveur_Windows_membre_AD_DS_v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS58,anssi_essentiels_migration_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_migration_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS59,ANSSI-views-on-crypto-agility.pdf,https://messervices.cyber.gouv.fr/documents-guides/ANSSI-views-on-crypto-agility.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID13,guide_nomadisme_anssi_pa_054_v2.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide_nomadisme_anssi_pa_054_v2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS60,anssi-guide-authentification_multifacteur_et_mots_de_passe.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-authentification_multifacteur_et_mots_de_passe.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NTIP1,NT_IPsec_EN.pdf,https://messervices.cyber.gouv.fr/documents-guides/NT_IPsec_EN.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPNE,np_nettoyage-politique-pare-feu.pdf,https://messervices.cyber.gouv.fr/documents-guides/np_nettoyage-politique-pare-feu.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS61,anssi-guide-organiser-un-exercice-de-gestion-de-crise-cyber-fiche_6-chronogramme.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-organiser-un-exercice-de-gestion-de-crise-cyber-fiche_6-chronogramme.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS62,anssi_essentiels_mise-en-oeuvre-securisee-cms_v1.1 (1).pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_mise-en-oeuvre-securisee-cms_v1.1%20%281%29.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS63,anssi-fondamentaux-zero-trust-v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-fondamentaux-zero-trust-v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS64,anssi-guide-archi_services_dns-v1-0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-archi_services_dns-v1-0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS65,anssi-guide-ransomware_attacks_all_concerned-v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-ransomware_attacks_all_concerned-v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS66,anssi-guide-admin_securisee_si_ad_v1-0 (3).pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-admin_securisee_si_ad_v1-0%20%283%29.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS67,anssi-guide-recommandations_de_securite_relatives_a_tls-v1.2.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-recommandations_de_securite_relatives_a_tls-v1.2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPSE3,NP_securiser_ToIP_NoteTech-v1.pdf,https://messervices.cyber.gouv.fr/documents-guides/NP_securiser_ToIP_NoteTech-v1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS68,anssi_back to basics_select_open_source_software.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_back%20to%20basics_select_open_source_software.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS69,anssi-guide-communication_crise_cyber.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-communication_crise_cyber.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS70,anssi-guide-recommandations_securisation_systemes_controle_acces_physique_et_videoprotection-v2.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-recommandations_securisation_systemes_controle_acces_physique_et_videoprotection-v2.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID14,guide_cybersecurite_start-up_numerique_FR_v1.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide_cybersecurite_start-up_numerique_FR_v1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPTE,np_teleassistance_notetech_v1.1.pdf,https://messervices.cyber.gouv.fr/documents-guides/np_teleassistance_notetech_v1.1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN13,20150713_NP_ANSSI_SDE_firewall_short_term_v1.0-en.pdf,https://messervices.cyber.gouv.fr/documents-guides/20150713_NP_ANSSI_SDE_firewall_short_term_v1.0-en.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN14,20151005_NP_ANSSI_SDE_4067_PJ1_diode_court_terme_PJ1.vfp_.pdf,https://messervices.cyber.gouv.fr/documents-guides/20151005_NP_ANSSI_SDE_4067_PJ1_diode_court_terme_PJ1.vfp_.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN15,20150713_NP_ANSSI_SDE_vpn_moyen_terme_v1.0-fr.pdf,https://messervices.cyber.gouv.fr/documents-guides/20150713_NP_ANSSI_SDE_vpn_moyen_terme_v1.0-fr.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+BONN,bonnes_pratiques_securite_informatique_maritime_anssi.pdf,https://messervices.cyber.gouv.fr/documents-guides/bonnes_pratiques_securite_informatique_maritime_anssi.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+FICH4,fiche_methode_homologation_et_ISO27001.pdf,https://messervices.cyber.gouv.fr/documents-guides/fiche_methode_homologation_et_ISO27001.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID15,guide_achat_produits-securite-services-confiance-qualifies_anssi.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide_achat_produits-securite-services-confiance-qualifies_anssi.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS71,anssi_back to basics_domain_controller_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_back%20to%20basics_domain_controller_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+BGPC,bgp-configuration-best-practices.pdf,https://messervices.cyber.gouv.fr/documents-guides/bgp-configuration-best-practices.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS72,anssi_essentiels_hygiene_telephones_mobiles_1.1.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_hygiene_telephones_mobiles_1.1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+THEG,the-golden-rules-of-backup.pdf,https://messervices.cyber.gouv.fr/documents-guides/the-golden-rules-of-backup.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID16,guide-securite-numerique-agile-anssi-pa-v1.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide-securite-numerique-agile-anssi-pa-v1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+FICH5,Fiche_methode_Systeme_dinformation_replique.pdf,https://messervices.cyber.gouv.fr/documents-guides/Fiche_methode_Systeme_dinformation_replique.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID17,guide_configuration_BGP.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide_configuration_BGP.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN16,20230613_np_anssi_sde_automate_moyen_terme_v1-2-fr.pdf,https://messervices.cyber.gouv.fr/documents-guides/20230613_np_anssi_sde_automate_moyen_terme_v1-2-fr.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN17,20220117_np_anssi_sde_commutateur_court_terme_v1-1-fr.pdf,https://messervices.cyber.gouv.fr/documents-guides/20220117_np_anssi_sde_commutateur_court_terme_v1-1-fr.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN18,20240814_np_anssi_recommandations_hebergement_cloud_si_a5_v1g_fr.pdf,https://messervices.cyber.gouv.fr/documents-guides/20240814_np_anssi_recommandations_hebergement_cloud_si_a5_v1g_fr.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NTOP,NT_OpenSSH.pdf,https://messervices.cyber.gouv.fr/documents-guides/NT_OpenSSH.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS73,anssi-guide-recommandations_mise_en_oeuvre_site_web_maitriser_standards_securite_cote_navigateur-v2.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-recommandations_mise_en_oeuvre_site_web_maitriser_standards_securite_cote_navigateur-v2.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+RECO,Recommandations sur la sécurisation des systèmes de contrôle d'accès physique et vidéoprotection - v2.1.pdf,https://messervices.cyber.gouv.fr/documents-guides/Recommandations%20sur%20la%20s%C3%A9curisation%20des%20syst%C3%A8mes%20de%20contr%C3%B4le%20d%27acc%C3%A8s%20physique%20et%20vid%C3%A9oprotection%20-%20v2.1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+PSSI4,pssi-memento-2004-03-03.pdf,https://messervices.cyber.gouv.fr/documents-guides/pssi-memento-2004-03-03.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS74,anssi_back to basics_relational_databases_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_back%20to%20basics_relational_databases_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS75,Anssi views on the Zero Trust model_0.pdf,https://messervices.cyber.gouv.fr/documents-guides/Anssi%20views%20on%20the%20Zero%20Trust%20model_0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS76,anssi_fondamentaux_sauvegarde_systemes_dinformation_v1.1.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_fondamentaux_sauvegarde_systemes_dinformation_v1.1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS77,anssi_essentiels_serveur_Windows_autonome_v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_serveur_Windows_autonome_v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+FRNP,fr_np_linux_configuration-v2.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/fr_np_linux_configuration-v2.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS78,anssi-guide-systemes_industriels-methode_de_classification_v2-0.pdf.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-systemes_industriels-methode_de_classification_v2-0.pdf.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+RECO1,Recommandations_de_sécurité_pour_un_système_d_IA_générative.pdf,https://messervices.cyber.gouv.fr/documents-guides/Recommandations_de_s%C3%A9curit%C3%A9_pour_un_syst%C3%A8me_d_IA_g%C3%A9n%C3%A9rative.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+MANA,Managing_Cybe_for_ICS_EN.pdf,https://messervices.cyber.gouv.fr/documents-guides/Managing_Cybe_for_ICS_EN.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS79,anssi_essentiels_devsecops_v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_devsecops_v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS80,anssi-guide-recommandations_architectures_systemes_information_sensibles_ou_diffusion_restreinte-v1.2.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-recommandations_architectures_systemes_information_sensibles_ou_diffusion_restreinte-v1.2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS81,anssi-technical_position_papers-qkd.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-technical_position_papers-qkd.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPGU,NP_Guide_DDoS.pdf,https://messervices.cyber.gouv.fr/documents-guides/NP_Guide_DDoS.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+FICH6,fiche_methode_Identifier_lautorite_dhomologation.pdf,https://messervices.cyber.gouv.fr/documents-guides/fiche_methode_Identifier_lautorite_dhomologation.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS82,anssi-guide-admin_securisee_si_v3-0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-admin_securisee_si_v3-0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+BACK2,20240829_Back to Basics_Secure implementation of CMS.pdf,https://messervices.cyber.gouv.fr/documents-guides/20240829_Back%20to%20Basics_Secure%20implementation%20of%20CMS.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID18,guide_anssi_secure_admin_is_pa_022_en_v2.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide_anssi_secure_admin_is_pa_022_en_v2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPCR,np_cryhod_notetech.pdf,https://messervices.cyber.gouv.fr/documents-guides/np_cryhod_notetech.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID19,guide_802.1x_anssi_pa_043_v1.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide_802.1x_anssi_pa_043_v1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NTOP1,NT_OpenSSH_en.pdf,https://messervices.cyber.gouv.fr/documents-guides/NT_OpenSSH_en.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS83,anssi_back to basics_pki_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_back%20to%20basics_pki_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CYBE3,cyber-attacks-remediation-managing-remediation.pdf,https://messervices.cyber.gouv.fr/documents-guides/cyber-attacks-remediation-managing-remediation.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS84,anssi-guide-reconditionnement_ordinateurs_bureau_portables_v1-0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-reconditionnement_ordinateurs_bureau_portables_v1-0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN19,20241001_NP_ANSSI_SDE_serveur_scada_moyen_terme_v1-1-fr.pdf,https://messervices.cyber.gouv.fr/documents-guides/20241001_NP_ANSSI_SDE_serveur_scada_moyen_terme_v1-1-fr.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS85,anssi-guide-recommendations_for_the_architecture_of_sensitive_or_restricted_distribution_information_systems.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-recommendations_for_the_architecture_of_sensitive_or_restricted_distribution_information_systems.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPVM,np_vmwareesx_notetech_v1.pdf,https://messervices.cyber.gouv.fr/documents-guides/np_vmwareesx_notetech_v1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS86,anssi_essentiels_données_traitements_sensibles_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_donn%C3%A9es_traitements_sensibles_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS87,20230503_anssi_mesures-cyber-preventives-prioritaires.pdf,https://messervices.cyber.gouv.fr/documents-guides/20230503_anssi_mesures-cyber-preventives-prioritaires.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS88,anssi-guide-organiser-un-exercice-de-gestion-de-crise-cyber-v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-organiser-un-exercice-de-gestion-de-crise-cyber-v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+TABL,tables_il.pdf,https://www.cnil.fr/sites/default/files/2026-03/tables_il.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT,CERTFR-2025-CTI-006.pdf,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-006.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT1,CERTFR-2025-CTI-005.pdf,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-005.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID20,guide_protection_des_systemes_essentiels.pdf,https://messervices.cyber.gouv.fr/documents-guides/guide_protection_des_systemes_essentiels.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS89,anssi_amf-guide-cybersecurite_communes-et-intercommunalites.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_amf-guide-cybersecurite_communes-et-intercommunalites.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+SECU1,security-recommendations-for-tls_v1.1.pdf,https://messervices.cyber.gouv.fr/documents-guides/security-recommendations-for-tls_v1.1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN20,20241212_np_anssi_guide_tpe-pme_v2.pdf,https://messervices.cyber.gouv.fr/documents-guides/20241212_np_anssi_guide_tpe-pme_v2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS90,anssi-guide-hardware_security_requirements.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-hardware_security_requirements.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT2,CERTFR-2025-RFX-008-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-008-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT3,CERTFR-2025-RFX-007-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-007-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT4,CERTFR-2024-RFX-010-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-010-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT5,CERTFR-2025-RFX-006-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-006-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPAN21,20151005_NP_ANSSI_SDE_4067_PJ2_diode_moyen_terme_PJ2.vfp_.pdf,https://messervices.cyber.gouv.fr/documents-guides/20151005_NP_ANSSI_SDE_4067_PJ2_diode_moyen_terme_PJ2.vfp_.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT6,CERTFR-2025-CTI-002.pdf,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-002.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT7,CERTFR-2025-RFX-005-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-005-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT8,CERTFR-2025-CTI-001.pdf,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-001.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT9,CERTFR-2024-RFX-009-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-009-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NPVI,NP_Virtualisation_NoteTech_v1-1.pdf,https://messervices.cyber.gouv.fr/documents-guides/NP_Virtualisation_NoteTech_v1-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+SECN,secnumcloud-referentiel-exigences-v3.2.pdf,https://cyber.gouv.fr/documents/388/secnumcloud-referentiel-exigences-v3.2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS91,anssi-guide-organising_a_cyber_crisis_management_exercise-v1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-organising_a_cyber_crisis_management_exercise-v1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+APPR,approche_ssi_pour_l_internet_des_objets_industriels_2025.pdf,https://messervices.cyber.gouv.fr/documents-guides/approche_ssi_pour_l_internet_des_objets_industriels_2025.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT10,CERTFR-2025-DUR-001.pdf,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-DUR-001.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT11,CERTFR-2025-RFX-004-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-004-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT12,CERTFR-2024-RFX-008-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-008-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT13,CERTFR-2024-RFX-007-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-007-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT14,CERTFR-2025-RFX-003-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-003-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT15,CERTFR-2024-RFX-006-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-006-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+BACK3,20240829_Back to Basics_Virtualization.pdf,https://messervices.cyber.gouv.fr/documents-guides/20240829_Back%20to%20Basics_Virtualization.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT16,CERTFR-2025-RFX-002-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-002-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT17,CERTFR-2024-RFX-005-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-005-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NISV,20260317_NIS_V2_ReCyF_v2.5.pdf,https://messervices.cyber.gouv.fr/documents-ressources/20260317_NIS_V2_ReCyF_v2.5.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT18,CERTFR-2024-RFX-004-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-004-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT19,CERTFR-2025-RFX-001-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-001-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+MEME,mementodep-v1-1.pdf,https://messervices.cyber.gouv.fr/documents-guides/mementodep-v1-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT20,CERTFR-2024-RFX-003-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-003-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT21,CERTFR-2026-CTI-002.pdf,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2026-CTI-002.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CATA,catalogue-produits-services-profils-de-protection-sites-certifies-qualifies-agrees-anssi.pdf,https://messervices.cyber.gouv.fr/visas/catalogue-produits-services-profils-de-protection-sites-certifies-qualifies-agrees-anssi.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT22,CERTFR-2024-RFX-002-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-002-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT23,CERTFR-2024-RFX-001-1.pdf,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-001-1.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT24,CERTFR-2026-CTI-001.pdf,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2026-CTI-001.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+NTCO,nt_commutateurs.pdf,https://messervices.cyber.gouv.fr/documents-guides/nt_commutateurs.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT25,CERTFR-2025-CTI-012.pdf,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-012.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID21,guide_durees_de_conservation.pdf,https://www.cnil.fr/sites/cnil/files/atoms/files/guide_durees_de_conservation.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+GUID22,guide_pratique_rgpd_-_delegues_a_la_protection_des_donnees.pdf,https://www.cnil.fr/sites/cnil/files/atoms/files/guide_pratique_rgpd_-_delegues_a_la_protection_des_donnees.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CNIL,cnil_guide_securite_personnelle_2024.pdf,https://www.cnil.fr/sites/cnil/files/2024-03/cnil_guide_securite_personnelle_2024.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+REFE1,referentiel_gestion_des_ressources_humaines.pdf,https://www.cnil.fr/sites/cnil/files/2023-09/referentiel_gestion_des_ressources_humaines.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+BPIC,bpi-cnil-rgpd_guide-tpe-pme.pdf,https://www.cnil.fr/sites/default/files/atoms/files/bpi-cnil-rgpd_guide-tpe-pme.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+RECO2,recommandation-applications-mobiles-modifiee.pdf,https://www.cnil.fr/sites/default/files/2025-04/recommandation-applications-mobiles-modifiee.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS92,anssi-guide-recommandations_configuration_securisee_pare_feu_stormshield_network_security_version_3.7.17.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-recommandations_configuration_securisee_pare_feu_stormshield_network_security_version_3.7.17.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS93,anssi_essentiels_fuites_données_1.0.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi_essentiels_fuites_donn%C3%A9es_1.0.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS94,anssi-guide-exigences_securite_materielle.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-exigences_securite_materielle.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS95,anssi-guide-mecanismes-crypto-3.00.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-guide-mecanismes-crypto-3.00.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ANSS96,anssi-digital_security-best_practices_for_business_travellers-2019.pdf,https://messervices.cyber.gouv.fr/documents-guides/anssi-digital_security-best_practices_for_business_travellers-2019.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+PSSI5,pssi-section4-referencesssi-2004-03-03.pdf,https://messervices.cyber.gouv.fr/documents-guides/pssi-section4-referencesssi-2004-03-03.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+RECO3,recommandations-sur-la-sécurisation-des-systèmes-de-contrôle-d_acces-physique-et-vidéoprotection-v2.2.pdf,https://messervices.cyber.gouv.fr/documents-guides/recommandations-sur-la-s%C3%A9curisation-des-syst%C3%A8mes-de-contr%C3%B4le-d_acces-physique-et-vid%C3%A9oprotection-v2.2.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT26,CERTFR-2025-CTI-003.pdf,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-003.pdf,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+ADS,ads.html,https://messervices.cyber.gouv.fr/services/ads.html,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CYBE4,cyber-enjeux.html,https://messervices.cyber.gouv.fr/ressources/cyber-enjeux.html,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+DEMA,demainspecialiste.cyber.gouv.fr_.html,https://demainspecialiste.cyber.gouv.fr/,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+DEMA1,demainspecialiste.cyber.gouv.fr_cyber-en-jeux.html,https://demainspecialiste.cyber.gouv.fr/cyber-en-jeux/,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+MESS1,messervices.cyber.gouv.fr_.html,https://messervices.cyber.gouv.fr/,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+MESS2,messervices.cyber.gouv.fr_nis2.html,https://messervices.cyber.gouv.fr/nis2,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+MONA,mon-aide-cyber-aidants.html,https://messervices.cyber.gouv.fr/services/mon-aide-cyber-aidants.html,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+MONA1,mon-aide-cyber.html,https://messervices.cyber.gouv.fr/services/mon-aide-cyber.html,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+MONS,mon-service-securise.html,https://messervices.cyber.gouv.fr/services/mon-service-securise.html,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+SILE,silene.html,https://messervices.cyber.gouv.fr/services/silene.html,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT27,cert-fr,https://cyber.gouv.fr/nous-connaitre/lagence/organisation/cert-fr/,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT28,CERTFR-2020-DUR-001,https://www.cert.ssi.gouv.fr/dur/CERTFR-2020-DUR-001/,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT29,CERTFR-2021-DUR-001,https://www.cert.ssi.gouv.fr/dur/CERTFR-2021-DUR-001/,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT30,CERTFR-2025-CTI-008,https://www.cert.ssi.gouv.fr/cti/CERTFR-2025-CTI-008/,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT31,CERTFR-2025-CTI-010,https://www.cert.ssi.gouv.fr/cti/CERTFR-2025-CTI-010/,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT32,CERTFR-2025-CTI-011,https://www.cert.ssi.gouv.fr/cti/CERTFR-2025-CTI-011/,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+CERT33,CERTFR-2025-DUR-003,https://www.cert.ssi.gouv.fr/dur/CERTFR-2025-DUR-003/,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+DECL,declarations,https://club.ssi.gouv.fr/#/declarations,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+DELE,delegues-territoriaux,https://cyber.gouv.fr/nous-connaitre/lagence/organisation/delegues-territoriaux/,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+DIRE,direction-generale,https://cyber.gouv.fr/nous-connaitre/lagence/organisation/direction-generale/,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+LALO,la-loi-informatique-et-libertes#article87,https://www.cnil.fr/fr/le-cadre-national/la-loi-informatique-et-libertes#article87,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+MISS,missions,https://cyber.gouv.fr/nous-connaitre/lagence/missions/,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+REGL,reglement-europeen-protection-donnees,https://www.cnil.fr/fr/reglement-europeen-protection-donnees,OUI,Dataset Q/R généré (PDF + HTML + Texte),True
+MSCMON,MSC - MonAideCyber,https://messervices.cyber.gouv.fr/services/mon-aide-cyber.html,OUI,Dataset Q/R généré (base_anssi_albert),True
+MSCSIL,MSC - Silene,https://messervices.cyber.gouv.fr/services/silene.html,OUI,Dataset Q/R généré (base_anssi_albert),True
+MSCMON1,MSC - MonServiceSecurise,https://messervices.cyber.gouv.fr/services/mon-service-securise.html,OUI,Dataset Q/R généré (base_anssi_albert),True
+MSCCYB,MSC - CyberEnJeux,https://messervices.cyber.gouv.fr/ressources/cyber-enjeux.html,OUI,Dataset Q/R généré (base_anssi_albert),True
+MSCMON2,MSC - MonAideCyber - Aidants,https://messervices.cyber.gouv.fr/services/mon-aide-cyber-aidants.html,OUI,Dataset Q/R généré (base_anssi_albert),True
+ANSDÉL,ANSSI - Déléguées territoriaux,https://cyber.gouv.fr/nous-connaitre/lagence/organisation/delegues-territoriaux/,OUI,Dataset Q/R généré (base_anssi_albert),True
+ANSDIR,ANSSI - Direction générale,https://cyber.gouv.fr/nous-connaitre/lagence/organisation/direction-generale/,OUI,Dataset Q/R généré (base_anssi_albert),True
+ANSMIS,ANSSI - Missions,https://cyber.gouv.fr/nous-connaitre/lagence/missions/,OUI,Dataset Q/R généré (base_anssi_albert),True
+ANSCER,ANSSI - CERT-FR,https://cyber.gouv.fr/nous-connaitre/lagence/organisation/cert-fr/,OUI,Dataset Q/R généré (base_anssi_albert),True
+MON,MonServiceSecurise,https://monservicesecurise.cyber.gouv.fr/,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRC,CERT-FR - Classe de vulnérabilités en environnemen,https://www.cert.ssi.gouv.fr/dur/CERTFR-2021-DUR-001/,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRP,CERT-FR - Points de contrôle Active Directory,https://www.cert.ssi.gouv.fr/dur/CERTFR-2020-DUR-001/,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRF,CERT-FR - Fiche réflexe - Fuite de données - Endig,https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-008-1.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRF1,CERT-FR - Fiche réflexe - Fuite de données - Quali,https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-007-1.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRF2,CERT-FR - Fiche réflexe - Compromission d'un tiers,https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-005-1.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CNICON,CNIL - Conservation,https://www.cnil.fr/sites/cnil/files/atoms/files/guide_durees_de_conservation.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRF3,CERT-FR - Fiche réflexe - Compromission d'un tenan,https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-003-1.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CNIGUI,CNIL - Guide pratique RGPD,https://www.cnil.fr/sites/cnil/files/atoms/files/guide_pratique_rgpd_-_delegues_a_la_protection_des_donnees.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRF4,CERT-FR - Fiche réflexe - Compromission d'un équip,https://cert.ssi.gouv.fr/uploads/CERTFR-2025-RFX-001-1.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CNIGUI1,CNIL - Guide sécurité personnelle,https://www.cnil.fr/sites/cnil/files/2024-03/cnil_guide_securite_personnelle_2024.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRF5,CERT-FR - Fiche réflexe - Déni de service réseau -,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-010-1.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CNIGUI2,CNIL - Guide gestion RH,https://www.cnil.fr/sites/cnil/files/2023-09/referentiel_gestion_des_ressources_humaines.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRF6,CERT-FR - Fiche réflexe - Défiguration de site web,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-007-1.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CNIGUI3,CNIL - Guide TPE PME,https://www.cnil.fr/sites/default/files/atoms/files/bpi-cnil-rgpd_guide-tpe-pme.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+PACREF,PACS_Referentiel-exigences_v1.1_vFR.pdf,https://cyber.gouv.fr/documents/372/PACS_Referentiel-exigences_v1.1_vFR.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRF7,CERT-FR - Fiche réflexe - Compromission système -,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-005-1.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+PASREF,PASSI_Referentiel-exigences_v2.2.pdf,https://cyber.gouv.fr/documents/375/PASSI_Referentiel-exigences_v2.2.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRF8,CERT-FR - Fiche réflexe - Compromission d'un compt,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-003-1.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CNITAB,CNIL - Tables Informatique et Libertés,https://www.cnil.fr/sites/default/files/2026-03/tables_il.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+RGS,RGS_v-2-0_C.pdf,https://cyber.gouv.fr/documents/341/RGS_v-2-0_C.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRF9,CERT-FR - Fiche réflexe - Chiffrement en cours - E,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-002-1.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+EIDPSC,eidas_psc-qualifies_v1.3_anssi.pdf,https://cyber.gouv.fr/documents/356/eidas_psc-qualifies_v1.3_anssi.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+PRIREF,PRIS_Referentiel-exigences_v3.2.pdf,https://cyber.gouv.fr/documents/380/PRIS_Referentiel-exigences_v3.2.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+EIDHOR,eidas_horodatage-qualifie_v1.1_anssi.pdf,https://cyber.gouv.fr/documents/357/eidas_horodatage-qualifie_v1.1_anssi.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRF10,CERT-FR - Fiche réflexe - Chiffrement en cours - Q,https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-001-1.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CNIREC,CNIL - Recommandations applications mobiles,https://www.cnil.fr/sites/default/files/2025-04/recommandation-applications-mobiles-modifiee.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CNILAL,CNIL - La loi,https://www.cnil.fr/fr/le-cadre-national/la-loi-informatique-et-libertes#article87,OUI,Dataset Q/R généré (base_anssi_albert),True
+CNIRÈG,CNIL - Règlement Européen,https://www.cnil.fr/fr/reglement-europeen-protection-donnees,OUI,Dataset Q/R généré (base_anssi_albert),True
+EIDDEL,eidas_delivrance-certificats-qualifies_v1.2_anssi.,https://cyber.gouv.fr/documents/358/eidas_delivrance-certificats-qualifies_v1.2_anssi.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+PDIREF,pdis_referentiel_v2.01.pdf,https://cyber.gouv.fr/documents/383/pdis_referentiel_v2.01.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+EIDVAL,eidas_validation-signatures-cachets-qualifies_v1.0,https://cyber.gouv.fr/documents/359/eidas_validation-signatures-cachets-qualifies_v1.0_anssi.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+EIDCON,eidas_conservation-signatures-cachets-qualifies_v1,https://cyber.gouv.fr/documents/360/eidas_conservation-signatures-cachets-qualifies_v1.0_anssi.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+PDIREF1,pdis_referentiel_v2.0_en1.pdf,https://cyber.gouv.fr/documents/384/pdis_referentiel_v2.0_en1.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+ADDAUR,Addendum-au-referentiel-PDIS-v2.0.pdf,https://cyber.gouv.fr/documents/382/Addendum-au-referentiel-PDIS-v2.0.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+EIDHOR1,eidas_horodatage-transition-rgs_v1.1_anssi.pdf,https://cyber.gouv.fr/documents/362/eidas_horodatage-transition-rgs_v1.1_anssi.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+NISRÉF,NIS2 - Référentiel,https://messervices.cyber.gouv.fr/documents-ressources/20260317_NIS_V2_ReCyF_v2.5.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+EIDDEL1,eidas_delivrance-certificats-transition-rgs_v1.1_a,https://cyber.gouv.fr/documents/363/eidas_delivrance-certificats-transition-rgs_v1.1_anssi.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+EIDORG,eidas-organismesevaluationconformite_v1.1_anssi.pd,https://cyber.gouv.fr/documents/364/eidas-organismesevaluationconformite_v1.1_anssi.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+EIDCER,eidas-certificationconformiteqscd_v1.0_anssi.pdf,https://cyber.gouv.fr/documents/365/eidas-certificationconformiteqscd_v1.0_anssi.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+SERINT,Services introduits par la loi pour une République,https://cyber.gouv.fr/reglementation/reglementation-identite-confiance-numerique/securite-echanges-voie-electronique/services-introduits-par-republique-num%C3%A9rique/,OUI,Dataset Q/R généré (base_anssi_albert),True
+PVIREF,PVID_referentiel-exigences_v1.1.pdf,https://cyber.gouv.fr/documents/386/PVID_referentiel-exigences_v1.1.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+ANSPAN,ANSSI - Panorama de la cyber menace,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2026-CTI-002.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+MSCPRO,MSC - Proposition de valeur,https://messervices.cyber.gouv.fr/,OUI,Dataset Q/R généré (base_anssi_albert),True
+NISPRO,NIS2 - Proposition de valeur,https://messervices.cyber.gouv.fr/nis2,OUI,Dataset Q/R généré (base_anssi_albert),True
+DSCPRO,DSC - Proposition de valeur,https://demainspecialiste.cyber.gouv.fr/,OUI,Dataset Q/R généré (base_anssi_albert),True
+DSCCYB,DSC - Cyber En Jeux,https://demainspecialiste.cyber.gouv.fr/cyber-en-jeux/,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRI,CERT-FR - IA générative face aux attaques informat,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2026-CTI-001.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+NPANSE,20220811_np_anssi_eidas_eid-referentielexigences_v,https://cyber.gouv.fr/documents/387/20220811_np_anssi_eidas_eid-referentielexigences_v1.2.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRT,CERT-FR - Téléphones mobiles : État de la menace d,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-012.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRO,CERT-FR - Opération ENDGAME de novembre 2025,https://www.cert.ssi.gouv.fr/cti/CERTFR-2025-CTI-011/,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRC1,CERT-FR - Campagne de notifications de menace envo,https://www.cert.ssi.gouv.fr/cti/CERTFR-2025-CTI-010/,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRO1,CERT-FR - Opération ENDGAME 2025,https://www.cert.ssi.gouv.fr/cti/CERTFR-2025-CTI-008/,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRC2,CERT-FR - Ciblage et compromission d'entités franç,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-006.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRT1,CERT-FR - Transports urbains - État de la menace i,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-005.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+ANSPAM,ANSSI_PAMS_referentiel_v1.1_vFR.pdf,https://cyber.gouv.fr/documents/389/ANSSI_PAMS_referentiel_v1.1_vFR.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRP1,CERT-FR - Panorama de la cybermenace 2024,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-003.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRC3,CERT-FR - Collectivités territoriales - Synthèse d,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-002.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+RGSCOR,RGS_v-2-00_Corps_du_texte.pdf,https://cyber.gouv.fr/documents/331/RGS_v-2-00_Corps_du_texte.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+RGSA1,RGS_v-2-0_A1.pdf,https://cyber.gouv.fr/documents/332/RGS_v-2-0_A1.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRS,CERT-FR - Secteur du cloud - État de la menace inf,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-CTI-001.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRR,CERT-FR - Recommandations à destination des acteur,https://www.cert.ssi.gouv.fr/dur/CERTFR-2025-DUR-003/,OUI,Dataset Q/R généré (base_anssi_albert),True
+CERFRB,CERT-FR - 10 bonnes pratiques pour l’utilisation d,https://www.cert.ssi.gouv.fr/uploads/CERTFR-2025-DUR-001.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+ADSACT,ADS - Active Directory Security,https://messervices.cyber.gouv.fr/services/ads.html,OUI,Dataset Q/R généré (base_anssi_albert),True
+RGSA2,RGS_v-2-0_A2.pdf,https://cyber.gouv.fr/documents/333/RGS_v-2-0_A2.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+RGSA3,RGS_v-2-0_A3.pdf,https://cyber.gouv.fr/documents/334/RGS_v-2-0_A3.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+RGSA3E,RGS_v-2-0_A3-errata_horodatage_electronique_v1.0.p,https://cyber.gouv.fr/documents/335/RGS_v-2-0_A3-errata_horodatage_electronique_v1.0.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+RGSA4,RGS_v-2-0_A4.pdf,https://cyber.gouv.fr/documents/336/RGS_v-2-0_A4.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+RGSA5,RGS_v-2-0_A5.pdf,https://cyber.gouv.fr/documents/337/RGS_v-2-0_A5.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+ANSGUI,anssi-guide-mecanismes_crypto-2.04.pdf,https://cyber.gouv.fr/documents/338/anssi-guide-mecanismes_crypto-2.04.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+RGSB3,RGS_v-2-0_B3.pdf,https://cyber.gouv.fr/documents/340/RGS_v-2-0_B3.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+RGSB2,RGS_v-2-0_B2.pdf,https://cyber.gouv.fr/documents/339/RGS_v-2-0_B2.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
+EIDENV,eidas_envoi-recommande-electronique-qualifie_v1.0_,https://cyber.gouv.fr/documents/361/eidas_envoi-recommande-electronique-qualifie_v1.0_anssi.pdf,OUI,Dataset Q/R généré (base_anssi_albert),True
