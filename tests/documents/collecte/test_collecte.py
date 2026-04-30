@@ -123,3 +123,11 @@ def test_collecte_document_maitrise_retourne_un_document_reponses_maitrisees():
 
     assert isinstance(document, DocumentReponsesMaitrisees)
     assert document.nom_document == "faq_reponses_maitrisees"
+
+
+def test_collecte_document_maitrise_retourne_l_url_de_la_faq():
+    chemin = Path("donnees/collection_reponses_maitrisees/faq_reponses_maitrisees.html")
+
+    document = collecte_document_maitrise(chemin)
+
+    assert document.url == "https://demo.mesquestionscyber.beta.gouv.fr/faq"

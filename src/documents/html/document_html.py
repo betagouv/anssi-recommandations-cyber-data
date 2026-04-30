@@ -132,11 +132,13 @@ class GenerateurReponsesMaitrisees(GenerateurDePages):
 
 class DocumentReponsesMaitrisees(DocumentHTML):
     def __init__(self, nom_document: str, chemin: Optional[str] = None):
-        super().__init__(nom_document, "", chemin)
+        super().__init__(
+            nom_document, "https://demo.mesquestionscyber.beta.gouv.fr/faq", chemin
+        )
 
     @property
     def url(self) -> str:
-        return str(self.chemin)
+        return str(self._url)
 
     @property
     def generateur(self) -> GenerateurDePages:
