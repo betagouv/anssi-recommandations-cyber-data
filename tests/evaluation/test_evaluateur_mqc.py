@@ -8,7 +8,7 @@ import respx
 
 from adaptateurs.journal import AdaptateurJournalMemoire, TypeEvenement
 from configuration import Configuration
-from evaluation.evaluateur_mqc import evaluateur_mqc
+from evaluation.evaluateur_mqc import evaluateur_mqc, parse_arguments
 from evaluation.mqc.lanceur_deepeval import LanceurEvaluationDeepeval
 from evaluation.mqc.remplisseur_reponses import (
     construit_base_url,
@@ -96,6 +96,20 @@ async def test_lance_l_evaluation_avec_deepeval(
 
     assert isinstance(id_evaluation_cree, str) is True
     assert est_uuid_valide(id_evaluation_cree) is True
+
+
+def test_parse_arguments_retourne_les_chemins_passes_en_argument():
+    args = parse_arguments(
+        [
+            "--fichier-evaluation",
+            "mon_fichier.csv",
+            "--fichier-mapping",
+            "mon_mapping.csv",
+        ]
+    )
+
+    assert args.fichier_evaluation == Path("mon_fichier.csv")
+    assert args.fichier_mapping == Path("mon_mapping.csv")
 
 
 def est_uuid_valide(uuid_a_tester):

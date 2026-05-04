@@ -1,9 +1,43 @@
+from pathlib import Path
+
 from deepeval.metrics import (
     BaseMetric,
 )
 
+from evaluation.mqc.fabrique_lanceur_evaluation import fabrique_lanceur_evaluation
 from evaluation.mqc.lanceur_deepeval import LanceurEvaluationDeepeval
 from journalisation.evaluation import EntrepotEvaluationMemoire
+
+
+def test_fabrique_lanceur_evaluation_transmet_chemin_mapping(
+    tmp_path: Path, configuration, evaluateur_de_test_avec_metriques
+):
+    mapping_csv = tmp_path / "mapping.csv"
+    mapping_csv.write_text(
+        "REF,Nom,URL\nGAUT,Guide Auth,https://example.com/guide-fabrique.pdf\n",
+        encoding="utf-8",
+    )
+    contenu_csv = (
+        "REF Guide,REF Question,Question type,Tags,REF Réponse,Réponse envisagée,"
+        "Numéro page (lecteur),Localisation paragraphe,Réponse Bot,Note réponse (/10),"
+        "Commentaire Note,Contexte,Noms Documents,Numéros Page\n"
+        "GAUT,GAUT.Q.1,Question?,Usuelle,GAUT.R.1,réponse,10,en bas,réponse mqc,nan,OK,test,[],[]\n"
+    )
+    fichier_csv = tmp_path / "resultats.csv"
+    fichier_csv.write_text(contenu_csv, encoding="utf-8")
+    entrepot_evaluation = EntrepotEvaluationMemoire()
+
+    lanceur = fabrique_lanceur_evaluation(
+        configuration, entrepot_evaluation, chemin_mapping=mapping_csv
+    )
+    assert isinstance(lanceur, LanceurEvaluationDeepeval)
+    lanceur.evaluateur_deepeval = evaluateur_de_test_avec_metriques
+    lanceur.lance_l_evaluation(fichier_csv)
+    cas = evaluateur_de_test_avec_metriques.cas_de_test_executes[0]
+
+    assert (
+        cas.additional_metadata["nom_document_verite_terrain"] == "guide-fabrique.pdf"
+    )
 
 
 def test_evalue_un_jeu_de_donnees(

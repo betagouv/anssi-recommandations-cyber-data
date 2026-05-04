@@ -32,11 +32,13 @@ class LanceurEvaluationDeepeval(LanceurEvaluation):
         self,
         entrepot_evaluation: EntrepotEvaluation,
         evaluateur_deepeval: EvaluateurDeepeval,
+        chemin_mapping: Path = Path("donnees/jointure-nom-guide.csv"),
     ):
         super().__init__()
         self.client_deepeval_albert = ClientDeepEvalAlbert()
         self.entrepot_evaluation = entrepot_evaluation
         self.evaluateur_deepeval = evaluateur_deepeval
+        self.chemin_mapping = chemin_mapping
 
     def lance_l_evaluation(self, fichier_csv: Path) -> int | str | None:
         id_evaluation = str(uuid.uuid4())
@@ -78,11 +80,14 @@ class LanceurEvaluationDeepeval(LanceurEvaluation):
 
         return liste_cas_de_test
 
-    @staticmethod
-    def __charge_donnees_depuis_fichier_csv(chemin_vers_fichier: Path) -> pd.DataFrame:
+    def __charge_donnees_depuis_fichier_csv(
+        self, chemin_vers_fichier: Path
+    ) -> pd.DataFrame:
         lecteur = LecteurCSV(chemin_vers_fichier)
         donnees_brutes = lecteur.dataframe
-        donnees_preparees = prepare_dataframe(donnees_brutes)
+        donnees_preparees = prepare_dataframe(
+            donnees_brutes, chemin_mapping=self.chemin_mapping
+        )
         return donnees_preparees
 
     @staticmethod

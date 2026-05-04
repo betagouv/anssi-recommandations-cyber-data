@@ -71,7 +71,10 @@ def applique_mapping_noms_documents(
     return df_resultat
 
 
-def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+def prepare_dataframe(
+    df: pd.DataFrame,
+    chemin_mapping: Path = Path("donnees/jointure-nom-guide.csv"),
+) -> pd.DataFrame:
     if "Contexte" in df.columns:
         df["Contexte"] = df["Contexte"].apply(
             lambda x: x.split("${SEPARATEUR_DOCUMENT}")
@@ -79,7 +82,6 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
             else []
         )
 
-    chemin_mapping = Path("donnees/jointure-nom-guide.csv")
     if "Noms Documents" in df.columns and "REF Guide" in df.columns:
         df = applique_mapping_noms_documents(df, chemin_mapping)
     else:

@@ -1,3 +1,4 @@
+import argparse
 import asyncio
 import logging
 from pathlib import Path
@@ -42,8 +43,23 @@ async def evaluateur_mqc(
     return None
 
 
+def parse_arguments(args=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--fichier-evaluation",
+        type=Path,
+        default=Path("donnees/questions_avec_verite_terrain.csv"),
+    )
+    parser.add_argument(
+        "--fichier-mapping",
+        type=Path,
+        default=Path("donnees/jointure-nom-guide.csv"),
+    )
+    return parser.parse_args(args)
+
+
 if __name__ == "__main__":
-    entree = Path("donnees/questions_avec_verite_terrain.csv")
+    args = parse_arguments()
     la_configuration: Configuration = recupere_configuration()
     client = ClientMQCHTTPAsync(la_configuration.mqc)
     sortie = Path("/tmp/collecte_reponses")
@@ -53,11 +69,11 @@ if __name__ == "__main__":
     )
     entrepot_evaluation = fabrique_entrepot_evaluation()
     lanceur_evaluation = fabrique_lanceur_evaluation(
-        la_configuration, entrepot_evaluation
+        la_configuration, entrepot_evaluation, chemin_mapping=args.fichier_mapping
     )
     asyncio.run(
         evaluateur_mqc(
-            entree,
+            args.fichier_evaluation,
             "collecte_reponses_mqc",
             ecrivain_sortie,
             la_configuration.parametres_deepeval.taille_de_lot_collecte_mqc,
