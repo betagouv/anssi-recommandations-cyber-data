@@ -4,7 +4,7 @@ import uuid
 from io import TextIOWrapper
 from pathlib import Path
 
-from fastapi import APIRouter, UploadFile, HTTPException
+from fastapi import APIRouter, UploadFile, HTTPException, BackgroundTasks
 from fastapi.params import Depends, File, Form
 from pydantic import BaseModel, AnyHttpUrl
 
@@ -32,12 +32,14 @@ class ReponseEvaluationEnCours(BaseModel):
 
 @api_evaluation.post("/", status_code=200)
 async def evaluation(
+        background_tasks: BackgroundTasks,
     fichier_evaluation: UploadFile = File(...),  # type: ignore[assignment]
     fichier_mapping: UploadFile = File(...),  # type: ignore[assignment]
     service_evaluation: ServiceEvaluation = Depends(fabrique_service_evaluation),  # type: ignore[assignment]
     collecteur_de_reponses: CollecteurDeReponses = Depends( # type: ignore[assignment]
         fabrique_collecteur_de_reponses
     ),
+
 ):
     chemin_evaluation = Path(f"/tmp/{fichier_evaluation.filename}")
     with chemin_evaluation.open("wb") as buffer:
@@ -47,8 +49,11 @@ async def evaluation(
     with chemin_mapping.open("wb") as buffer:
         shutil.copyfileobj(fichier_mapping.file, buffer)
 
-    await service_evaluation.lance_evaluation(
-        chemin_evaluation, chemin_mapping, collecteur_de_reponses
+    background_tasks.add_task(
+        service_evaluation.lance_evaluation,
+        chemin_evaluation,
+        chemin_mapping,
+        collecteur_de_reponses,
     )
 
 
