@@ -28,13 +28,16 @@ async def evaluateur_mqc(
     entrepot_evaluation: EntrepotEvaluation,
     journal: AdaptateurJournal,
     lanceur_evaluation: LanceurEvaluation,
+    chemin_mapping: Path,
 ):
     await collecte_reponses_mqc(
         entree_donnees, prefixe, ecrivain_sortie, nombre_lot, client_mqc
     )
     fichier_csv = ecrivain_sortie._chemin_courant
     if fichier_csv is not None:
-        id_evaluation = lanceur_evaluation.lance_l_evaluation(fichier_csv)
+        id_evaluation = lanceur_evaluation.lance_l_evaluation(
+            fichier_csv, chemin_mapping
+        )
         if id_evaluation is not None:
             consigne_evaluation(
                 id_evaluation, entrepot_evaluation, journal, fichier_csv
@@ -68,9 +71,7 @@ if __name__ == "__main__":
         racine=Path.cwd(), sous_dossier=sortie, horloge=HorlogeSysteme()
     )
     entrepot_evaluation = fabrique_entrepot_evaluation()
-    lanceur_evaluation = fabrique_lanceur_evaluation(
-        la_configuration, entrepot_evaluation, chemin_mapping=args.fichier_mapping
-    )
+    lanceur_evaluation = fabrique_lanceur_evaluation(entrepot_evaluation)
     asyncio.run(
         evaluateur_mqc(
             args.fichier_evaluation,
@@ -81,5 +82,6 @@ if __name__ == "__main__":
             entrepot_evaluation,
             fabrique_adaptateur_journal(),
             lanceur_evaluation,
+            args.fichier_mapping,
         )
     )

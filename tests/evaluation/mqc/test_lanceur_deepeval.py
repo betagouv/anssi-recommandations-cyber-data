@@ -4,7 +4,6 @@ from deepeval.metrics import (
     BaseMetric,
 )
 
-from evaluation.mqc.fabrique_lanceur_evaluation import fabrique_lanceur_evaluation
 from evaluation.mqc.lanceur_deepeval import LanceurEvaluationDeepeval
 from journalisation.evaluation import EntrepotEvaluationMemoire
 
@@ -27,14 +26,13 @@ def test_fabrique_lanceur_evaluation_transmet_chemin_mapping(
     fichier_csv.write_text(contenu_csv, encoding="utf-8")
     entrepot_evaluation = EntrepotEvaluationMemoire()
 
-    lanceur = fabrique_lanceur_evaluation(
-        configuration, entrepot_evaluation, chemin_mapping=mapping_csv
+    lanceur = LanceurEvaluationDeepeval(
+        entrepot_evaluation,
+        evaluateur_de_test_avec_metriques,
     )
-    assert isinstance(lanceur, LanceurEvaluationDeepeval)
-    lanceur.evaluateur_deepeval = evaluateur_de_test_avec_metriques
-    lanceur.lance_l_evaluation(fichier_csv)
-    cas = evaluateur_de_test_avec_metriques.cas_de_test_executes[0]
+    lanceur.lance_l_evaluation(fichier_csv, mapping_csv)
 
+    cas = evaluateur_de_test_avec_metriques.cas_de_test_executes[0]
     assert (
         cas.additional_metadata["nom_document_verite_terrain"] == "guide-fabrique.pdf"
     )
@@ -49,7 +47,8 @@ def test_evalue_un_jeu_de_donnees(
     )
 
     id_evaluation = lanceur_evaluation.lance_l_evaluation(
-        resultat_collecte_mqc_avec_deux_resultats._chemin_courant
+        resultat_collecte_mqc_avec_deux_resultats._chemin_courant,
+        Path("donnees/jointure-nom-guide.csv"),
     )
 
     evaluation_creee = entrepot_evaluation.lit(id_evaluation)
@@ -69,7 +68,8 @@ def test_evalue_un_jeu_de_donnees_avec_des_cas_de_test(
         entrepot_evaluation, evaluateur_deepeval
     )
     lanceur_evaluation.lance_l_evaluation(
-        resultat_collecte_mqc_avec_deux_resultats._chemin_courant
+        resultat_collecte_mqc_avec_deux_resultats._chemin_courant,
+        Path("donnees/jointure-nom-guide.csv"),
     )
 
     assert len(evaluateur_deepeval.cas_de_test_executes) == 2
@@ -98,7 +98,8 @@ def test_evalue_un_jeu_de_donnees_avec_les_metriques_deepeval(
         entrepot_evaluation, evaluateur_deepeval
     )
     lanceur_evaluation.lance_l_evaluation(
-        resultat_collecte_mqc_avec_deux_resultats._chemin_courant
+        resultat_collecte_mqc_avec_deux_resultats._chemin_courant,
+        Path("donnees/jointure-nom-guide.csv"),
     )
 
     assert evaluateur_deepeval.nombre_metriques_soumise == 19
@@ -123,7 +124,8 @@ def test_evalue_un_jeu_de_donnees_avec_les_metriques_personnalisees(
         entrepot_evaluation, evaluateur_deepeval
     )
     lanceur_evaluation.lance_l_evaluation(
-        resultat_collecte_mqc_avec_deux_resultats._chemin_courant
+        resultat_collecte_mqc_avec_deux_resultats._chemin_courant,
+        Path("donnees/jointure-nom-guide.csv"),
     )
 
     assert evaluateur_deepeval.nombre_metriques_soumise == 19
@@ -167,7 +169,8 @@ def test_evalue_un_jeu_de_donnees_et_retourne_le_numero_de_ligne(
     )
 
     id_evaluation = lanceur_evaluation.lance_l_evaluation(
-        resultat_collecte_mqc_avec_deux_resultats._chemin_courant
+        resultat_collecte_mqc_avec_deux_resultats._chemin_courant,
+        Path("donnees/jointure-nom-guide.csv"),
     )
 
     evaluation_creee = entrepot_evaluation.lit(id_evaluation)

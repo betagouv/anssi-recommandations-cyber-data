@@ -1,7 +1,7 @@
 import csv
 import uuid
 from pathlib import Path
-from typing import Union
+from typing import Union, cast
 
 from infra.ecrivain_sortie import EcrivainSortie
 from infra.horloge import HorlogeSysteme
@@ -24,23 +24,22 @@ class EcrivainSortieDeTest(EcrivainSortie):
     def ecrit_ligne_depuis_lecteur_csv(
         self, ligne: dict[str, Union[str, int, float]], prefixe: str
     ) -> Path:
-        dossier = self._racine / self._sous_dossier
-        dossier.mkdir(parents=True, exist_ok=True)
-        self._chemin_courant = (dossier / self._nom_fichier(prefixe)).resolve()
-
-        lignes = self.contenu_fichier_csv_resultat_collecte.split("\n")
-        en_tete = lignes[0].split(",")
-        resultat_premiere_ligne = lignes[1].split(",")
-        with open(self._chemin_courant, "a", encoding="utf-8", newline="") as f:
-            ecrivain = csv.writer(f)
-            ecrivain.writerow(en_tete)
-            ecrivain.writerow(resultat_premiere_ligne)
+        self._ecris_dans_fichier(prefixe)
         return Path()
 
     def ecris_contenu(self):
+        prefixe = str(uuid.uuid4())
+
+        self._ecris_dans_fichier(prefixe)
+
+    @property
+    def fichier_de_reponses(self) -> Path:
+        self._ecris_dans_fichier(str(uuid.uuid4()))
+        return cast(Path, self._chemin_courant)
+
+    def _ecris_dans_fichier(self, prefixe: str):
         dossier = self._racine / self._sous_dossier
         dossier.mkdir(parents=True, exist_ok=True)
-        prefixe = str(uuid.uuid4())
         self._chemin_courant = (dossier / self._nom_fichier(prefixe)).resolve()
 
         lignes = self.contenu_fichier_csv_resultat_collecte.split("\n")

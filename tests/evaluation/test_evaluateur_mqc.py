@@ -50,6 +50,7 @@ async def test_execute_la_collecte_des_reponses_pour_creer_le_fichier_de_resulta
         EntrepotEvaluationMemoire(),
         AdaptateurJournalMemoire(),
         lanceur_evaluation,
+        Path("donnees/jointure-nom-guide.csv"),
     )
 
     assert sortie.exists()
@@ -92,6 +93,7 @@ async def test_lance_l_evaluation_avec_deepeval(
         entrepot_evaluation,
         AdaptateurJournalMemoire(),
         lanceur_evaluation,
+        Path("donnees/jointure-nom-guide.csv"),
     )
 
     assert isinstance(id_evaluation_cree, str) is True
@@ -153,6 +155,7 @@ async def test_consigne_les_resultats_d_evaluation(
         entrepot_evaluation,
         adaptateur_journal,
         lanceur_evaluation,
+        Path("donnees/jointure-nom-guide.csv"),
     )
 
     assert (
