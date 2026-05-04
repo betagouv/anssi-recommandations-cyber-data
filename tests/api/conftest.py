@@ -18,17 +18,25 @@ from adaptateurs.journal import (
     fabrique_adaptateur_journal,
     AdaptateurJournalMemoire,
 )
+from configuration import MQC
 from documents.docling.multi_processeur import Multiprocesseur
 from evaluation.evaluateur_deepeval import EvaluateurDeepeval
 from evaluation.evaluation_en_cours import (
     EntrepotEvaluationEnCoursMemoire,
     EvaluationEnCours,
 )
+from evaluation.mqc.collecte_reponses_mqc import (
+    CollecteurDeReponses,
+    fabrique_collecteur_de_reponses,
+)
+from evaluation.mqc.lanceur_deepeval import LanceurEvaluationDeepeval
+from evaluation.mqc.remplisseur_reponses import ClientMQCHTTPAsync, ReponseQuestion
 from evaluation.reformulation.evaluation import QuestionAEvaluer
 from evaluation.service_evaluation import ServiceEvaluation, fabrique_service_evaluation
 from evenement.bus import BusEvenement
 from evenement.fabrique_bus_evenements import fabrique_bus_evenements
 from infra.executeur_requete import fabrique_executeur_de_requete
+from infra.memoire.ecrivain import EcrivainSortieDeTest
 from infra.memoire.executeur_de_requete_memoire import (
     ExecuteurDeRequeteDeTest,
     ReponseAttendueOK,
@@ -54,6 +62,7 @@ from jeopardy.service_jeopardyse_liste_de_documents import (
     ServiceJeopardyseDocuments,
     fabrique_service_jeopardise_documents,
 )
+from journalisation.evaluation import EntrepotEvaluationMemoire
 from serveur import fabrique_serveur
 
 
@@ -76,12 +85,60 @@ class EvaluateurDeepevalTest(EvaluateurDeepeval):
         return []
 
 
+class CollecteurDeReponsesDeTest(CollecteurDeReponses):
+    def __init__(self):
+        super().__init__(EcrivainSortieDeTest(""), ClientMQCHTTPAsyncDeTest(), 1)
+        self.collecteur_de_reponse_appele = False
+
+    async def collecte_reponses(self, chemin_csv: Path):
+        self.collecteur_de_reponse_appele = True
+        return None
+
+
+class LanceurEvaluationDeepevalDeTest(LanceurEvaluationDeepeval):
+    def __init__(self):
+        super().__init__(EntrepotEvaluationMemoire(), EvaluateurDeepevalTest())
+
+    def lance_l_evaluation(
+        self, fichier_csv: Path, mapping_csv: Path
+    ) -> int | str | None:
+        return None
+
+
 class ServiceEvaluationDeTest(ServiceEvaluation):
     def __init__(self):
-        super().__init__(EntrepotEvaluationEnCoursMemoire())
+        super().__init__(
+            EntrepotEvaluationEnCoursMemoire(),
+            LanceurEvaluationDeepevalDeTest(),
+            AdaptateurJournalMemoire(),
+            EntrepotEvaluationMemoire(),
+        )
+        self.evaluation_lancee = False
+        self.chemin_fichier_evaluation = None
+        self.chemin_fichier_mapping = None
         self.prompt_recu = None
         self.evaluation_reformulation_lancee = False
         self.questions_evaluees = []
+        self._collecteur_de_reponse: CollecteurDeReponsesDeTest = None
+
+    async def lance_evaluation(
+        self,
+        fichier_evaluation: Path,
+        fichier_mapping: Path,
+        collecteur_de_reponse: CollecteurDeReponses,
+    ):
+        self.evaluation_lancee = True
+        self.chemin_fichier_evaluation = fichier_evaluation
+        self.chemin_fichier_mapping = fichier_mapping
+        self._collecteur_de_reponse = cast(
+            CollecteurDeReponsesDeTest, collecteur_de_reponse
+        )
+        await collecteur_de_reponse.collecte_reponses(fichier_evaluation)
+        return None
+
+    @property
+    def collecteur_de_reponse_appele(self):
+        return self._collecteur_de_reponse.collecteur_de_reponse_appele
 
     def lance_reformulation(
         self,
@@ -201,6 +258,25 @@ class ServiceJeopardyseDocumentsDeTest(ServiceJeopardyseDocuments):
         self.identifiant_collection_a_jeopardyser = liste_de_documents.id_collection_mqc
 
 
+class ClientMQCHTTPAsyncDeTest(ClientMQCHTTPAsync):
+    def __init__(self):
+        super().__init__(
+            MQC(
+                port=1,
+                hote="ici.local",
+                api_prefixe_route="/prefixe",
+                route_pose_question="/question",
+                delai_attente_maximum=1,
+            )
+        )
+        self.reponses_recues = []
+
+    async def pose_question(self, question: str) -> ReponseQuestion:
+        return ReponseQuestion(
+            reponse="La réponse", paragraphes=[], question="La question"
+        )
+
+
 class ConstructeurServeur:
     def __init__(
         self,
@@ -262,6 +338,14 @@ class ConstructeurServeur:
     ):
         self._dependances[fabrique_service_jeopardise_documents] = (
             lambda: service_jeopardy_de_documents
+        )
+        return self
+
+    def avec_un_collecteur_de_reponses(
+        self, collecteur_de_reponses: CollecteurDeReponsesDeTest
+    ):
+        self._dependances[fabrique_collecteur_de_reponses] = (
+            lambda: collecteur_de_reponses
         )
         return self
 
@@ -361,6 +445,8 @@ def un_serveur_de_test_complet(
             else executeur_de_requete_de_test
         )
         serveur.avec_un_executeur_de_requete(executeur_de_requete)
+        collecteur_de_reponses = CollecteurDeReponsesDeTest()
+        serveur.avec_un_collecteur_de_reponses(collecteur_de_reponses)
         return (
             serveur.construis(),
             adaptateur_journal,

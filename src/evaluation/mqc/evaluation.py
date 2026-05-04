@@ -4,10 +4,14 @@ from pathlib import Path
 
 class LanceurEvaluation(ABC):
     @abstractmethod
-    def lance_l_evaluation(self, fichier_csv: Path) -> int | str | None:
+    def lance_l_evaluation(
+        self, fichier_csv: Path, chemin_mapping: Path
+    ) -> int | str | None:
         pass
 
 
 class LanceurEvaluationMemoire(LanceurEvaluation):
-    def lance_l_evaluation(self, fichier_csv: Path | None) -> int | None:
+    def lance_l_evaluation(
+        self, fichier_csv: Path | None, chemin_mapping: Path
+    ) -> int | None:
         return 1

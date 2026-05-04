@@ -1,7 +1,7 @@
 import csv
 import re
 from pathlib import Path
-from typing import Union
+from typing import Union, cast
 
 from infra.horloge import HorlogeSysteme
 
@@ -45,3 +45,7 @@ class EcrivainSortie:
             ecrivain.writerow(ligne.values())
 
         return self._chemin_courant
+
+    @property
+    def fichier_de_reponses(self) -> Path:
+        return cast(Path, self._chemin_courant)
