@@ -9,7 +9,7 @@ from infra.memoire.executeur_de_requete_memoire import (
 )
 
 
-def toto():
+def un_fichier_de_questions():
     questions = """question_originale,reformulation_ideale
 Qu'est-ce qu'une attaque DDOS ?,Qu'est-ce qu'une attaque DDOS (attaque par déni de service distribué) ?
 """
@@ -27,7 +27,7 @@ def test_lance_une_evaluation_de_reformulation_retourne_201(un_serveur_de_test_c
     reponse = client.post(
         "/api/evaluation/reformulation",
         data={"url_prompt": "https://une-url.com"},
-        files=toto(),
+        files=un_fichier_de_questions(),
     )
 
     assert reponse.status_code == 201
@@ -45,7 +45,7 @@ def test_lance_une_evaluation_de_reformulation_avec_les_questions_fournies(
     client.post(
         "/api/evaluation/reformulation",
         data={"url_prompt": "https://une-url.com"},
-        files=toto(),
+        files=un_fichier_de_questions(),
     )
 
     assert service_evaluation.evaluation_reformulation_lancee
@@ -70,7 +70,7 @@ def test_lance_une_evaluation_de_reformulation_avec_le_prompt_attendu(
     client.post(
         "/api/evaluation/reformulation",
         data={"url_prompt": "https://une-url.com"},
-        files=toto(),
+        files=un_fichier_de_questions(),
     )
 
     assert executeur_de_requete.url_appelee == "https://une-url.com/"
@@ -91,7 +91,7 @@ def test_retourne_404_si_le_prompt_ne_peut_pas_etre_recupere(
     reponse = client.post(
         "/api/evaluation/reformulation",
         data={"url_prompt": "https://une-url.com"},
-        files=toto(),
+        files=un_fichier_de_questions(),
     )
 
     assert reponse.status_code == 404
