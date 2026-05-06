@@ -32,14 +32,13 @@ class ReponseEvaluationEnCours(BaseModel):
 
 @api_evaluation.post("/", status_code=200)
 async def evaluation(
-        background_tasks: BackgroundTasks,
+    background_tasks: BackgroundTasks,
     fichier_evaluation: UploadFile = File(...),  # type: ignore[assignment]
     fichier_mapping: UploadFile = File(...),  # type: ignore[assignment]
     service_evaluation: ServiceEvaluation = Depends(fabrique_service_evaluation),  # type: ignore[assignment]
-    collecteur_de_reponses: CollecteurDeReponses = Depends( # type: ignore[assignment]
+    collecteur_de_reponses: CollecteurDeReponses = Depends(  # type: ignore[assignment]
         fabrique_collecteur_de_reponses
     ),
-
 ):
     chemin_evaluation = Path(f"/tmp/{fichier_evaluation.filename}")
     with chemin_evaluation.open("wb") as buffer:

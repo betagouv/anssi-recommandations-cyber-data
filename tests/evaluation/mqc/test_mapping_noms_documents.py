@@ -30,8 +30,10 @@ def test_applique_mapping_noms_documents_avec_ref_valide(tmp_path: Path):
     for i in range(5):
         assert f"nom_document_reponse_bot_{i}" in df_resultat.columns
     assert "nom_document_verite_terrain" in df_resultat.columns
-    assert df_resultat["nom_document_verite_terrain"].iloc[0] == "guide-auth.pdf"
-    assert df_resultat["nom_document_verite_terrain"].iloc[1] == "guide-crise.pdf"
+    assert (
+        df_resultat["nom_document_verite_terrain"].iloc[0] == "Guide Authentification"
+    )
+    assert df_resultat["nom_document_verite_terrain"].iloc[1] == "Guide Crise"
 
     assert df_resultat["nom_document_reponse_bot_0"].iloc[0] == "Doc1"
     assert df_resultat["nom_document_reponse_bot_0"].iloc[1] == "Doc3"
