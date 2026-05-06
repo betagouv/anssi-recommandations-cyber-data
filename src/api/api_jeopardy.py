@@ -25,7 +25,7 @@ class RequeteJeopardy(BaseModel):
 def jeopardy(
     requete: RequeteJeopardy,
     background_tasks: BackgroundTasks,
-    service_jeopardy: ServiceJeopardyseCollectionEntiere = Depends( # type: ignore[assignment]
+    service_jeopardy: ServiceJeopardyseCollectionEntiere = Depends(  # type: ignore[assignment]
         fabrique_service_jeopardise_collection_entiere
     ),
 ):

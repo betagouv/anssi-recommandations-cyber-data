@@ -33,9 +33,7 @@ def test_fabrique_lanceur_evaluation_transmet_chemin_mapping(
     lanceur.lance_l_evaluation(fichier_csv, mapping_csv)
 
     cas = evaluateur_de_test_avec_metriques.cas_de_test_executes[0]
-    assert (
-        cas.additional_metadata["nom_document_verite_terrain"] == "guide-fabrique.pdf"
-    )
+    assert cas.additional_metadata["nom_document_verite_terrain"] == "Guide Auth"
 
 
 def test_evalue_un_jeu_de_donnees(

@@ -35,8 +35,7 @@ def applique_mapping_noms_documents(
 
         ligne_mapping = df_mapping[df_mapping["REF"] == ref]
         if not ligne_mapping.empty:
-            url = ligne_mapping["URL"].iloc[0]
-            return url.split("/")[-1]
+            return ligne_mapping["Nom"].iloc[0]
         return ""
 
     df_resultat["nom_document_verite_terrain"] = df_resultat["REF Guide"].apply(
