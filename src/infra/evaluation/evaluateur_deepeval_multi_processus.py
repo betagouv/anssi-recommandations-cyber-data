@@ -9,6 +9,7 @@ from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
 
 from evaluation.evaluateur_deepeval import EvaluateurDeepeval
+from infra.logger import log
 
 
 def configure_sorties_utf8():
@@ -38,15 +39,19 @@ class EvaluateurDeepevalMultiProcessus(EvaluateurDeepeval):
     def execute_evaluation(
         self, les_cas_de_test: list[LLMTestCase]
     ) -> EvaluationResult:
-        return evaluate(
-            les_cas_de_test,
-            self.metrics,
-            display_config=DisplayConfig(
-                print_results=False,
-                show_indicator=False,
-                verbose_mode=False,
-            ),
-        )
+        try :
+            return evaluate(
+                les_cas_de_test,
+                self.metrics,
+                display_config=DisplayConfig(
+                    print_results=False,
+                    show_indicator=False,
+                    verbose_mode=False,
+                ),
+            )
+        except Exception as e:
+            log(__name__, f"❌️Erreur lors de l’évaluation : {e}")
+            return EvaluationResult(test_results=[], confident_link=None, test_run_id=None)
 
     def divise_en_lots(self, cas_de_test: list[LLMTestCase]) -> list[list[LLMTestCase]]:
         return list(self.genere_chunk(cas_de_test))
