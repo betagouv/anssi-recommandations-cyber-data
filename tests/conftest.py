@@ -114,7 +114,6 @@ def reponse_avec_paragraphes() -> dict:
         "reponse": "Réponse test",
         "paragraphes": [
             {
-                "score_similarite": 0.9,
                 "numero_page": 5,
                 "url": "https://test.com",
                 "nom_document": "Doc test",
