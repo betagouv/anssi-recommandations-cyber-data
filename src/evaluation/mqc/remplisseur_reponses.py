@@ -13,7 +13,6 @@ from infra.lecteur_csv import LecteurCSV
 
 
 class Paragraphe(BaseModel):
-    score_similarite: float
     numero_page: int
     url: str
     nom_document: str

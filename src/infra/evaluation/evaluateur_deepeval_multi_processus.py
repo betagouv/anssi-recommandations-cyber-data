@@ -39,7 +39,7 @@ class EvaluateurDeepevalMultiProcessus(EvaluateurDeepeval):
     def execute_evaluation(
         self, les_cas_de_test: list[LLMTestCase]
     ) -> EvaluationResult:
-        try :
+        try:
             return evaluate(
                 les_cas_de_test,
                 self.metrics,
@@ -51,7 +51,9 @@ class EvaluateurDeepevalMultiProcessus(EvaluateurDeepeval):
             )
         except Exception as e:
             log(__name__, f"❌️Erreur lors de l’évaluation : {e}")
-            return EvaluationResult(test_results=[], confident_link=None, test_run_id=None)
+            return EvaluationResult(
+                test_results=[], confident_link=None, test_run_id=None
+            )
 
     def divise_en_lots(self, cas_de_test: list[LLMTestCase]) -> list[list[LLMTestCase]]:
         return list(self.genere_chunk(cas_de_test))

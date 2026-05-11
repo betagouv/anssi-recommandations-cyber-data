@@ -55,7 +55,6 @@ def test_pose_question_retourne_reponse_question_structuree(configuration_mqc: M
         "reponse": "Voici la réponse",
         "paragraphes": [
             {
-                "score_similarite": 0.85,
                 "numero_page": 1,
                 "url": "https://example.com/doc1",
                 "nom_document": "Guide sécurité",
@@ -75,7 +74,6 @@ def test_pose_question_retourne_reponse_question_structuree(configuration_mqc: M
     assert resultat.reponse == "Voici la réponse"
     assert resultat.question == "Ma question?"
     assert len(resultat.paragraphes) == 1
-    assert resultat.paragraphes[0].score_similarite == 0.85
     assert resultat.paragraphes[0].nom_document == "Guide sécurité"
 
 
@@ -119,7 +117,6 @@ def test_remplissage_ajoute_colonne_context_avec_paragraphes(
         "reponse": "Réponse test",
         "paragraphes": [
             {
-                "score_similarite": 0.9,
                 "numero_page": 5,
                 "url": "https://test.com",
                 "nom_document": "Doc test",
@@ -157,14 +154,12 @@ def test_remplissage_ajoute_colonne_context_avec_deux_paragraphes_separes_par_ma
         "reponse": "Réponse test",
         "paragraphes": [
             {
-                "score_similarite": 0.9,
                 "numero_page": 5,
                 "url": "https://test.com",
                 "nom_document": "Doc test",
                 "contenu": "Premier paragraphe",
             },
             {
-                "score_similarite": 0.8,
                 "numero_page": 6,
                 "url": "https://test2.com",
                 "nom_document": "Doc test 2",
@@ -204,14 +199,12 @@ def test_remplissage_ajoute_colonne_contenant_nom_document_qui_liste_origine_des
         "reponse": "Réponse test",
         "paragraphes": [
             {
-                "score_similarite": 0.9,
                 "numero_page": 5,
                 "url": "https://test.com",
                 "nom_document": "Guide de sécurité",
                 "contenu": "Premier paragraphe",
             },
             {
-                "score_similarite": 0.8,
                 "numero_page": 6,
                 "url": "https://test2.com",
                 "nom_document": "Manuel utilisateur",
@@ -272,14 +265,12 @@ def test_remplissage_ajoute_colonne_numeros_page_de_tous_les_paragraphes(
         "reponse": "Réponse test",
         "paragraphes": [
             {
-                "score_similarite": 0.9,
                 "numero_page": 5,
                 "url": "https://test.com",
                 "nom_document": "Guide de sécurité",
                 "contenu": "Premier paragraphe",
             },
             {
-                "score_similarite": 0.8,
                 "numero_page": 12,
                 "url": "https://test2.com",
                 "nom_document": "Manuel utilisateur",
@@ -375,14 +366,12 @@ def test_remplit_ligne_ecrit_bien_le_contexte(tmp_path: Path, configuration_mqc:
             "reponse": "reponse_test",
             "paragraphes": [
                 {
-                    "score_similarite": 0.9,
                     "numero_page": 5,
                     "url": "https://test.com",
                     "nom_document": "Doc test",
                     "contenu": "Premier paragraphe",
                 },
                 {
-                    "score_similarite": 0.8,
                     "numero_page": 6,
                     "url": "https://test2.com",
                     "nom_document": "Doc test 2",
