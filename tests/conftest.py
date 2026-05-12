@@ -20,6 +20,7 @@ from configuration import (
     BaseDeDonnees,
     IndexeurDocument,
     MQCData,
+    CollectionsMQC,
 )
 from configuration import ParametresEvaluation
 from documents.indexeur.indexeur import (
@@ -91,6 +92,7 @@ def configuration() -> Configuration:
             modele_generation="mistral-medium-2508",
             base_url=albert.url,
         ),
+        collections_MQC=CollectionsMQC(id_collection_indexee="12345"),
     )
 
 
