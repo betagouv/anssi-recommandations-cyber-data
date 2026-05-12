@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 
 
 def test_effectue_un_jeopardy_sur_une_collection(un_serveur_de_test_complet):
-    (serveur, _, _, _, _, _) = un_serveur_de_test_complet(None)
+    (serveur, _, _, _, _, _, _) = un_serveur_de_test_complet(None)
     client: TestClient = TestClient(serveur)
 
     reponse = client.post(
@@ -21,7 +21,7 @@ def test_effectue_un_jeopardy_sur_une_collection(un_serveur_de_test_complet):
 def test_effectue_un_jeopardy_sur_une_collection_appelle_le_service(
     un_serveur_de_test_complet,
 ):
-    (serveur, _, _, _, service_jeopardy, _) = un_serveur_de_test_complet(None)
+    (serveur, _, _, _, service_jeopardy, _, _) = un_serveur_de_test_complet(None)
     client: TestClient = TestClient(serveur)
 
     client.post(
@@ -40,7 +40,7 @@ def test_effectue_un_jeopardy_sur_une_collection_appelle_le_service(
 
 
 def test_ajoute_des_documents_a_un_jeopardy_existant(un_serveur_de_test_complet):
-    (serveur, _, _, _, _, _) = un_serveur_de_test_complet(None)
+    (serveur, _, _, _, _, _, _) = un_serveur_de_test_complet(None)
     client: TestClient = TestClient(serveur)
 
     reponse = client.post(
@@ -60,7 +60,7 @@ def test_ajoute_des_documents_a_un_jeopardy_existant(un_serveur_de_test_complet)
 def test_effectue_un_jeopardy_sur_des_documents(
     un_serveur_de_test_complet,
 ):
-    (serveur, _, _, _, _, service_jeopardy) = un_serveur_de_test_complet(None)
+    (serveur, _, _, _, _, service_jeopardy, _) = un_serveur_de_test_complet(None)
     client: TestClient = TestClient(serveur)
 
     client.post(
