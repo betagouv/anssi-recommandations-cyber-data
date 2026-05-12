@@ -53,6 +53,10 @@ class MSC(NamedTuple):
     chemin_guides: str
 
 
+class CollectionsMQC(NamedTuple):
+    id_collection_indexee: str
+
+
 class Configuration(NamedTuple):
     mqc: MQC
     albert: Albert
@@ -61,6 +65,7 @@ class Configuration(NamedTuple):
     msc: MSC
     mqc_data: MQCData
     jeopardy: ConfigurationJeopardy
+    collections_MQC: CollectionsMQC
 
 
 def recupere_configuration_postgres() -> BaseDeDonnees | None:
@@ -128,6 +133,10 @@ def recupere_configuration() -> Configuration:
         modele_generation=os.getenv("ALBERT_MODELE_JEOPARDY", "mistral-medium-2508"),
     )
 
+    collections_mqc = CollectionsMQC(
+        id_collection_indexee=os.getenv("ALBERT_ID_COLLECTION_INDEXEE", "")
+    )
+
     return Configuration(
         mqc=configuration_mqc,
         albert=albert,
@@ -136,4 +145,5 @@ def recupere_configuration() -> Configuration:
         msc=configuration_msc,
         mqc_data=configuration_mqc_data,
         jeopardy=configuration_jeopardy,
+        collections_MQC=collections_mqc,
     )

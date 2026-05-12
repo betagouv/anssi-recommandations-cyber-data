@@ -17,7 +17,7 @@ class RequeteIndexationDocument(BaseModel):
 @api_documents.post("/", status_code=200)
 def indexe_documents(
     requete: RequeteIndexationDocument,
-    service_indexation_document: ServiceDIndexation = Depends(
+    service_indexation_document: ServiceDIndexation = Depends(  # type: ignore[assignment]
         fabrique_service_indexation_de_documents  # type: ignore[assignment]
     ),
 ):
