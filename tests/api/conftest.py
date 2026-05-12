@@ -20,6 +20,10 @@ from adaptateurs.journal import (
 )
 from configuration import MQC
 from documents.docling.multi_processeur import Multiprocesseur
+from documents.service_indexation_documents import (
+    ServiceDIndexation,
+    fabrique_service_indexation_de_documents,
+)
 from evaluation.evaluateur_deepeval import EvaluateurDeepeval
 from evaluation.evaluation_en_cours import (
     EntrepotEvaluationEnCoursMemoire,
@@ -277,6 +281,16 @@ class ClientMQCHTTPAsyncDeTest(ClientMQCHTTPAsync):
         )
 
 
+class ServiceDIndexationDeTest(ServiceDIndexation):
+    def __init__(self):
+        self.appele = False
+        self.documents_ajoutes = []
+
+    def indexe_documents(self, documents_a_ajouter: list[str]):
+        self.appele = True
+        self.documents_ajoutes = documents_a_ajouter
+
+
 class ConstructeurServeur:
     def __init__(
         self,
@@ -349,6 +363,14 @@ class ConstructeurServeur:
         )
         return self
 
+    def avec_un_service_d_indexation(
+        self, service_d_indexation: ServiceDIndexationDeTest
+    ):
+        self._dependances[fabrique_service_indexation_de_documents] = (
+            lambda: service_d_indexation
+        )
+        return self
+
 
 @pytest.fixture(autouse=True)
 def pages_statiques(tmp_path) -> Path:
@@ -413,6 +435,7 @@ def un_serveur_de_test_complet(
         ServiceEvaluationDeTest,
         ServiceJeopardyseCollectionEntiereDeTest,
         ServiceJeopardyseDocumentsDeTest,
+        ServiceDIndexationDeTest,
     ],
 ]:
     def _un_serveur_de_test_complet(
@@ -447,6 +470,8 @@ def un_serveur_de_test_complet(
         serveur.avec_un_executeur_de_requete(executeur_de_requete)
         collecteur_de_reponses = CollecteurDeReponsesDeTest()
         serveur.avec_un_collecteur_de_reponses(collecteur_de_reponses)
+        service_de_gestion_de_documents = ServiceDIndexationDeTest()
+        serveur.avec_un_service_d_indexation(service_de_gestion_de_documents)
         return (
             serveur.construis(),
             adaptateur_journal,
@@ -454,6 +479,7 @@ def un_serveur_de_test_complet(
             service_evaluation,
             service_jeopardy_de_collection_entiere,
             service_jeopardy_de_documents,
+            service_de_gestion_de_documents,
         )
 
     return _un_serveur_de_test_complet

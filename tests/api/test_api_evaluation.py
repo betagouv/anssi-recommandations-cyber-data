@@ -25,7 +25,7 @@ Contenu col1,Contenu col2
 
 
 def test_lance_l_evaluation_d_une_collection(un_serveur_de_test_complet):
-    (serveur, _, _, _, _, _) = un_serveur_de_test_complet(None)
+    (serveur, _, _, _, _, _, _) = un_serveur_de_test_complet(None)
     client: TestClient = TestClient(serveur)
 
     reponse = client.post(
@@ -37,7 +37,7 @@ def test_lance_l_evaluation_d_une_collection(un_serveur_de_test_complet):
 
 
 def test_transmets_les_fichiers_d_evaluation(un_serveur_de_test_complet):
-    (serveur, _, _, service_evaluation, _, _) = un_serveur_de_test_complet(None)
+    (serveur, _, _, service_evaluation, _, _, _) = un_serveur_de_test_complet(None)
     client: TestClient = TestClient(serveur)
 
     client.post(
@@ -53,7 +53,7 @@ def test_transmets_les_fichiers_d_evaluation(un_serveur_de_test_complet):
 
 
 def test_collecte_les_reponses_mqc_lors_d_une_evaluation(un_serveur_de_test_complet):
-    (serveur, _, _, service_evaluation, _, _) = un_serveur_de_test_complet(None)
+    (serveur, _, _, service_evaluation, _, _, _) = un_serveur_de_test_complet(None)
     client: TestClient = TestClient(serveur)
 
     client.post(
