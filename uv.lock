@@ -7,6 +7,10 @@ resolution-markers = [
     "(platform_machine != 'aarch64' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'linux')",
 ]
 
+[options]
+exclude-newer = "2026-05-05T12:13:26.600226Z"
+exclude-newer-span = "P1W"
+
 [[package]]
 name = "accelerate"
 version = "1.12.0"
