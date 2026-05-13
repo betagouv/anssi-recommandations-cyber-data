@@ -63,26 +63,29 @@ Optimisation retrieval :
 11) Conserver les termes techniques du paragraphe.
 12) Ne conserver que les éléments discriminants utiles à la recherche.
 
-Mise en avant des recommandations ANSSI :
-13) Si le paragraphe contient une mention de recommandation "R" suivie d’un ou plusieurs chiffres :
-- Générer au moins UNE question dédiée par recommandation détectée.
-- La question doit citer explicitement la recommandation.
-- Formuler la question comme un besoin utilisateur, pas comme une extraction. Bon : "Que préconise la recommandation R12 de l’ANSSI concernant le stockage des mots de passe ?" Mauvais : "Quel est le contenu de R12 ?"
-
 Nettoyage obligatoire :
-14) Interdire et supprimer dans les questions :
+13) Interdire et supprimer dans les questions :
 - toute référence bibliographique ou note ;
 - tout astérisque ;
 - "cf.", "voir", "référence", "guide", "article", ou toute mention de source externe ;
 - toute référence à la structure du document : numéro de section, sous-section, chapitre, partie, tableau, figure, annexe, schéma, page, titre numéroté ;
 - tout verbe ou tournure méta-textuelle : "apparaît", "est mentionné", "figure dans", "est cité", "est indiqué", "est listé", "est décrit dans" ;
-- Seuls les numéros de recommandations sont à conserver, du style R2, R4, R17, etc.
+- tout identifiant de recommandation du style R1, R2, R17, etc. (voir règle 14).
+
+Interdiction absolue des références à des identifiants de recommandation :
+14) Ne JAMAIS générer de question citant un identifiant de recommandation (R1, R2, R7, R17, Rx…).
+- Les numéros de recommandation (R + chiffre(s)) sont des identifiants locaux à chaque guide : deux guides distincts peuvent utiliser le même numéro pour des sujets complètement différents. Une question du type "Que préconise la R17 ?" est donc ambiguë, non pertinente et inutilisable pour la recherche sémantique.
+- Si un paragraphe contient une recommandation numérotée, formuler la question en exprimant la notion technique ou le besoin informationnel concret qu’elle adresse, sans jamais citer son identifiant.
+- Bon : "Quelle est la durée maximale de validité d’un certificat TLS ?" — Mauvais : "Que préconise la recommandation R17 ?"
+- Bon : "Quels algorithmes de chiffrement sont recommandés pour les données au repos ?" — Mauvais : "Que dit la R4 sur le chiffrement ?"
 
 Exemples de transformation (few-shot) :
 
 Paragraphe : "L’ANSSI recommande l’utilisation de l’authentification multifacteur (MFA) pour tout accès à des ressources sensibles. La recommandation R1 préconise de combiner au minimum deux facteurs parmi : ce que l’on sait (mot de passe), ce que l’on possède (token matériel), ce que l’on est (biométrie)."
 Bonnes questions :
-{"questions":["Quels facteurs d’authentification l’ANSSI recommande-t-elle de combiner pour le MFA ?","Que préconise la recommandation R1 de l’ANSSI sur l’authentification multifacteur ?","Dans quels cas l’authentification multifacteur est-elle requise selon l’ANSSI ?"]}
+{"questions":["Quels facteurs d’authentification l’ANSSI recommande-t-elle de combiner pour le MFA ?","Dans quels cas l’authentification multifacteur est-elle requise selon l’ANSSI ?"]}
+Mauvaises questions (interdites) :
+{"questions":["Que préconise la recommandation R1 de l’ANSSI sur l’authentification multifacteur ?"]}
 
 Paragraphe : "AES-256 et ChaCha20 sont les deux algorithmes de chiffrement symétrique recommandés par l’ANSSI pour la protection des données au repos. L’utilisation de 3DES est à proscrire depuis 2024."
 Bonnes questions :
@@ -90,5 +93,7 @@ Bonnes questions :
 
 Paragraphe : "La recommandation R17 impose de renouveler les certificats TLS au moins tous les 12 mois et de révoquer immédiatement tout certificat compromis via le protocole OCSP."
 Bonnes questions :
-{"questions":["Quelle est la durée maximale de validité d’un certificat TLS selon la recommandation R17 de l’ANSSI ?","Quel protocole utiliser pour révoquer un certificat TLS compromis selon l’ANSSI ?","Que préconise la recommandation R17 de l’ANSSI sur le renouvellement des certificats TLS ?"]}
+{"questions":["Quelle est la durée maximale de validité d’un certificat TLS selon l’ANSSI ?","Quel protocole utiliser pour révoquer un certificat TLS compromis selon l’ANSSI ?","À quelle fréquence l’ANSSI recommande-t-elle de renouveler les certificats TLS ?"]}
+Mauvaises questions (interdites) :
+{"questions":["Que préconise la recommandation R17 de l’ANSSI sur le renouvellement des certificats TLS ?","Quelle est la durée maximale de validité d’un certificat TLS selon la recommandation R17 de l’ANSSI ?"]}
 """.strip()
