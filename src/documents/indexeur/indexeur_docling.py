@@ -21,6 +21,7 @@ from documents.indexeur.indexeur import (
 from documents.page import BlocPage
 from infra.executeur_requete import ExecuteurDeRequete
 from infra.interval import AdaptateurInterval
+from infra.logger import log
 
 for name in (
     "docling",
@@ -94,14 +95,15 @@ class IndexeurDocling(Indexeur):
     ) -> list[ReponseDocument]:
         reponse_documents = []
         for indice, document in enumerate(documents.documents):
-            print(
-                f"[Liste {documents.numero_liste_en_cours}][{indice + 1} de {len(documents.documents)}] - Découpage du document {document.url}"
+            log(
+                __name__,
+                f"[Liste {documents.numero_liste_en_cours}][{indice + 1} de {len(documents.documents)}] - Découpage du document {document.url}",
             )
             reponse_documents.extend(
                 self.__ajoute_document(document, documents.id_collection)
             )
             if indice + 1 == len(documents.documents):
-                print(f"[Liste {documents.numero_liste_en_cours}] - FINI")
+                log(__name__, f"[Liste {documents.numero_liste_en_cours}] - FINI")
         return reponse_documents
 
     def __ajoute_document(

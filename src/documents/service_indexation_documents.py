@@ -22,7 +22,9 @@ class ServiceDIndexation:
         self.client_indexation.ajoute_documents(
             list(
                 map(
-                    lambda doc: DocumentPDFDistant(doc, normalise_url(doc, self.configuration_MSC)),
+                    lambda doc: DocumentPDFDistant(
+                        doc, normalise_url(doc, self.configuration_MSC)
+                    ),
                     documents,
                 )
             )
