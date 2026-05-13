@@ -55,6 +55,7 @@ class MSC(NamedTuple):
 
 class CollectionsMQC(NamedTuple):
     id_collection_indexee: str
+    id_collection_jeopardy: str
 
 
 class Configuration(NamedTuple):
@@ -134,7 +135,8 @@ def recupere_configuration() -> Configuration:
     )
 
     collections_mqc = CollectionsMQC(
-        id_collection_indexee=os.getenv("ALBERT_ID_COLLECTION_INDEXEE", "")
+        id_collection_indexee=os.getenv("ALBERT_ID_COLLECTION_INDEXEE", ""),
+        id_collection_jeopardy=os.getenv("ALBERT_ID_COLLECTION_JEOPARDY", ""),
     )
 
     return Configuration(
