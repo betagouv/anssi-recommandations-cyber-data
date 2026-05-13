@@ -1,7 +1,7 @@
 import json
 import sys
 from pathlib import Path
-from typing import Callable, Type, Union, Optional
+from typing import Callable, Type, Union, Optional, cast
 
 import pytest
 from docling.backend.html_backend import HTMLDocumentBackend
@@ -31,6 +31,7 @@ from docling_core.types.io import DocumentStream
 from documents.docling.chunker_docling import TypeFichier
 from documents.docling.chunker_docling_mqc import ChunkerDoclingMQC
 from documents.docling.document import Document
+from documents.docling.multi_processeur import Multiprocesseur
 from documents.elements_filtres import ElementsFiltres
 from documents.generateur_de_pages import GenerateurDePages
 from documents.indexeur.indexeur import (
@@ -45,6 +46,18 @@ from documents.indexeur.indexeur import (
 from documents.html.document_html import BlocPageReponse, PageHTML
 from documents.page import Page
 from documents.pdf.document_pdf import Position, PagePDF, BlocPagePDF
+from jeopardy.client_albert_jeopardy import (
+    ClientAlbertJeopardy,
+    ReponseDocumentOrigine,
+    ReponseDocumentsCollectionOrigine,
+    RequeteAjoutChunksDansDocumentAlbert,
+    RequeteCreationDocumentAlbert,
+    ReponseCreationDocument,
+    ReponseCreationCollection,
+)
+from jeopardy.questions import EntrepotQuestionGenereeMemoire
+from jeopardy.service import CollectionEntiere, ListeDeDocuments
+from jeopardy.service_jeopardyse_liste_de_documents import ServiceJeopardyseDocuments
 
 
 def _creer_document(texts=None, tables=None) -> DoclingDocument:
@@ -602,3 +615,77 @@ def resultat_conversion() -> ConversionResult:
             path_or_stream=Path(),
         ),
     )
+
+
+class ClientAlbertJeopardyDeTest(ClientAlbertJeopardy):
+    def cree_collection(
+        self, nom_collection, description_collection
+    ) -> ReponseCreationCollection:
+        return ReponseCreationCollection(id="collection-jeopardy-test")
+
+    def cree_document(
+        self, identifiant_collection: str, document: RequeteCreationDocumentAlbert
+    ) -> ReponseCreationDocument:
+        return ReponseCreationDocument(id="document-test")
+
+    def genere_questions(self, prompt: str, contenu: str) -> list[str]:
+        return []
+
+    def ajoute_chunks_dans_document(
+        self, identifiant_collection: str, requete: RequeteAjoutChunksDansDocumentAlbert
+    ):
+        return RequeteAjoutChunksDansDocumentAlbert(id_document="chunk-test", chunks=[])
+
+    def recupere_chunks_document(self, id_document: str) -> list[dict]:
+        return []
+
+    def recupere_documents_collection(
+        self, id_collection: str
+    ) -> ReponseDocumentsCollectionOrigine:
+        return ReponseDocumentsCollectionOrigine(id="id", documents=[])
+
+    def recupere_documents_par_noms(
+        self, id_collection: str, noms_documents: list[str]
+    ) -> list[ReponseDocumentOrigine]:
+        return []
+
+
+class MultiProcesseurDeTest(Multiprocesseur):
+    def __init__(self):
+        self.resultats = []
+
+    def execute(self, func, iterable) -> list:
+        for chunk in iterable:
+            self.resultats.append(func(chunk))
+        return self.resultats
+
+
+class ServiceJeopardyseDocumentsDeTest(ServiceJeopardyseDocuments):
+    def __init__(self):
+        super().__init__(
+            ClientAlbertJeopardyDeTest(),
+            EntrepotQuestionGenereeMemoire(),
+            None,
+            "Un prompt",
+            MultiProcesseurDeTest(),
+        )
+        self.jeopardyse_documents_appele = False
+        self.identifiant_collection_jeopardy = None
+        self.noms_documents_a_jeopardyser = []
+        self.identifiant_collection_a_jeopardyser = None
+
+    def jeopardyse(
+        self,
+        donnees: CollectionEntiere | ListeDeDocuments,
+        taille_paquet_chunks: int = 10,
+    ):
+        liste_de_documents = cast(ListeDeDocuments, donnees)
+        self.jeopardyse_documents_appele = True
+        self.identifiant_collection_jeopardy = liste_de_documents.id_collection_jeopardy
+        self.noms_documents_a_jeopardyser = liste_de_documents.noms_documents
+        self.identifiant_collection_a_jeopardyser = liste_de_documents.id_collection_mqc
+
+
+@pytest.fixture()
+def un_service_jeopardy():
+    return ServiceJeopardyseDocumentsDeTest()

@@ -1,5 +1,5 @@
 from adaptateurs.clients_albert import ClientAlbertIndexation, ReponseCollection
-from configuration import MSC
+from configuration import MSC, CollectionsMQC
 from documents.indexeur.indexeur import DocumentAIndexer, ReponseDocument, Indexeur
 from documents.service_indexation_documents import ServiceDIndexation
 from infra.memoire.executeur_de_requete_memoire import ExecuteurDeRequeteDeTest
@@ -47,13 +47,17 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
         )
 
 
-def test_indexe_un_document():
+def test_indexe_un_document(un_service_jeopardy):
     client_indexation = ClientAlbertIndexationDeTest()
 
     ServiceDIndexation(
         client_indexation,
-        "collection-1",
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
         MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
     ).indexe_documents(["doc-1.pdf"])
 
     assert client_indexation.id_collection == "collection-1"
@@ -64,3 +68,23 @@ def test_indexe_un_document():
         == "http://documents.local/guides/doc-1.pdf"
     )
     assert client_indexation.documents_ajoutes[0]._type == "PDF"
+
+
+def test_jeopardyse_les_documents_indexes(un_service_jeopardy):
+    ServiceDIndexation(
+        ClientAlbertIndexationDeTest(),
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents(["nouveau-doc-1.pdf", "nouveau-doc-2.pdf"])
+
+    assert un_service_jeopardy.jeopardyse_documents_appele
+    assert un_service_jeopardy.identifiant_collection_jeopardy == "collection-jeopardy"
+    assert un_service_jeopardy.noms_documents_a_jeopardyser == [
+        "nouveau-doc-1.pdf",
+        "nouveau-doc-2.pdf",
+    ]
+    assert un_service_jeopardy.identifiant_collection_a_jeopardyser == "collection-1"

@@ -92,7 +92,9 @@ def configuration() -> Configuration:
             modele_generation="mistral-medium-2508",
             base_url=albert.url,
         ),
-        collections_MQC=CollectionsMQC(id_collection_indexee="12345"),
+        collections_MQC=CollectionsMQC(
+            id_collection_indexee="12345", id_collection_jeopardy="67890"
+        ),
     )
 
 
