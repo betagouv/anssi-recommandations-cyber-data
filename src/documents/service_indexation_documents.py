@@ -26,6 +26,12 @@ class ServiceDIndexation:
 
     def indexe_documents(self, documents: list[str]):
         self._client_indexation.attribue_collection(self._id_collection)
+        for document in documents:
+            identifiant_document_existant = self._client_indexation.document_existe(
+                document
+            )
+            if identifiant_document_existant:
+                self._client_indexation.supprime_document(identifiant_document_existant)
         self._client_indexation.ajoute_documents(
             list(
                 map(

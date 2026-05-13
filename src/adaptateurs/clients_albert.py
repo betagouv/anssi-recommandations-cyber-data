@@ -65,6 +65,14 @@ class ClientAlbertIndexation(ABC):
     def attribue_collection(self, id_collection: str) -> bool:
         pass
 
+    @abstractmethod
+    def document_existe(self, nom_document: str) -> str | None:
+        pass
+
+    @abstractmethod
+    def supprime_document(self, id_document: str):
+        pass
+
 
 class ClientAlbertReformulation(ABC):
     @abstractmethod

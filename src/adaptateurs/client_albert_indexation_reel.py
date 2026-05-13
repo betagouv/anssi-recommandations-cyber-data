@@ -35,6 +35,12 @@ class ClientAlbertIndexationReel(ClientAlbertIndexation):
         id_collection = self.id_collection
         return self.indexeur.ajoute_documents(documents, id_collection)
 
+    def document_existe(self, nom_document: str) -> str | None:
+        pass
+
+    def supprime_document(self, id_document: str):
+        pass
+
     def _collection_existe(self, id_collection: str) -> bool:
         response = self.executeur_de_requete.recupere(
             f"{self.url}/collections/{id_collection}"
