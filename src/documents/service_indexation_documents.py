@@ -9,7 +9,7 @@ from jeopardy.service_jeopardyse_liste_de_documents import (
 )
 
 
-class ServiceDIndexation:
+class ServiceIndexationNouveauxDocuments:
     def __init__(
         self,
         client_indexation: ClientAlbertIndexation,
@@ -67,10 +67,10 @@ class ServiceDIndexation:
         )
 
 
-def fabrique_service_indexation_de_documents() -> ServiceDIndexation:
+def fabrique_service_indexation_de_documents() -> ServiceIndexationNouveauxDocuments:
     client = fabrique_client_albert()
     configuration = recupere_configuration()
-    return ServiceDIndexation(
+    return ServiceIndexationNouveauxDocuments(
         client,
         configuration.collections_MQC,
         configuration.msc,

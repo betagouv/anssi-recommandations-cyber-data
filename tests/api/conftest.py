@@ -23,7 +23,7 @@ from api.securite import verifie_token_jwt
 from configuration import MQC
 from documents.docling.multi_processeur import Multiprocesseur
 from documents.service_indexation_documents import (
-    ServiceDIndexation,
+    ServiceIndexationNouveauxDocuments,
     fabrique_service_indexation_de_documents,
 )
 from evaluation.evaluateur_deepeval import EvaluateurDeepeval
@@ -283,7 +283,7 @@ class ClientMQCHTTPAsyncDeTest(ClientMQCHTTPAsync):
         )
 
 
-class ServiceDIndexationDeTest(ServiceDIndexation):
+class ServiceIndexationNouveauxDocumentsDeTest(ServiceIndexationNouveauxDocuments):
     def __init__(self):
         self.appele = False
         self.documents_ajoutes = []
@@ -366,7 +366,7 @@ class ConstructeurServeur:
         return self
 
     def avec_un_service_d_indexation(
-        self, service_d_indexation: ServiceDIndexationDeTest
+        self, service_d_indexation: ServiceIndexationNouveauxDocumentsDeTest
     ):
         self._dependances[fabrique_service_indexation_de_documents] = (
             lambda: service_d_indexation
@@ -441,7 +441,7 @@ def un_serveur_de_test_complet(
         ServiceEvaluationDeTest,
         ServiceJeopardyseCollectionEntiereDeTest,
         ServiceJeopardyseDocumentsDeTest,
-        ServiceDIndexationDeTest,
+        ServiceIndexationNouveauxDocumentsDeTest,
     ],
 ]:
     def _un_serveur_de_test_complet(
@@ -476,7 +476,7 @@ def un_serveur_de_test_complet(
         serveur.avec_un_executeur_de_requete(executeur_de_requete)
         collecteur_de_reponses = CollecteurDeReponsesDeTest()
         serveur.avec_un_collecteur_de_reponses(collecteur_de_reponses)
-        service_de_gestion_de_documents = ServiceDIndexationDeTest()
+        service_de_gestion_de_documents = ServiceIndexationNouveauxDocumentsDeTest()
         serveur.avec_un_service_d_indexation(service_de_gestion_de_documents)
 
         def faux_verificateur_token(credentials=Security(HTTPBearer())):

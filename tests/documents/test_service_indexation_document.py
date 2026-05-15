@@ -1,7 +1,7 @@
 from adaptateurs.clients_albert import ClientAlbertIndexation, ReponseCollection
 from configuration import MSC, CollectionsMQC
 from documents.indexeur.indexeur import DocumentAIndexer, ReponseDocument, Indexeur
-from documents.service_indexation_documents import ServiceDIndexation
+from documents.service_indexation_documents import ServiceIndexationNouveauxDocuments
 from infra.memoire.executeur_de_requete_memoire import ExecuteurDeRequeteDeTest
 
 
@@ -109,7 +109,7 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
 def test_indexe_un_document(un_service_jeopardy):
     client_indexation = ClientAlbertIndexationDeTest()
 
-    ServiceDIndexation(
+    ServiceIndexationNouveauxDocuments(
         client_indexation,
         CollectionsMQC(
             id_collection_indexee="collection-1",
@@ -130,7 +130,7 @@ def test_indexe_un_document(un_service_jeopardy):
 
 
 def test_jeopardyse_les_documents_indexes(un_service_jeopardy):
-    ServiceDIndexation(
+    ServiceIndexationNouveauxDocuments(
         ClientAlbertIndexationDeTest(),
         CollectionsMQC(
             id_collection_indexee="collection-1",
@@ -155,7 +155,7 @@ def test_modifie_un_document_deja_indexe(un_service_jeopardy):
         "collection-1": [{"id": "2", "nom": "doc-2.pdf"}]
     }
 
-    ServiceDIndexation(
+    ServiceIndexationNouveauxDocuments(
         client_indexation,
         CollectionsMQC(
             id_collection_indexee="collection-1",
@@ -188,7 +188,7 @@ def test_supprime_le_document_correspondant_dans_la_collection_jeopardy(
 
     client_indexation.documents_jeopardy_existants = [{"id": "b", "nom": "doc-2.pdf"}]
 
-    ServiceDIndexation(
+    ServiceIndexationNouveauxDocuments(
         client_indexation,
         CollectionsMQC(
             id_collection_indexee="collection-1",
@@ -220,7 +220,7 @@ def test_continue_le_traitement_si_le_document_existe_leve_une_erreur(
     client_indexation.document_existe_leve_une_erreur("collection-1", "doc-1.pdf")
     client_indexation.documents_jeopardy_existants = [{"id": "b", "nom": "doc-2.pdf"}]
 
-    ServiceDIndexation(
+    ServiceIndexationNouveauxDocuments(
         client_indexation,
         CollectionsMQC(
             id_collection_indexee="collection-1",
@@ -249,7 +249,7 @@ def test_continue_le_traitement_si_supprime_document_leve_une_erreur(
     }
     client_indexation.supprime_document_leve_une_erreur("collection-1", "1")
 
-    ServiceDIndexation(
+    ServiceIndexationNouveauxDocuments(
         client_indexation,
         CollectionsMQC(
             id_collection_indexee="collection-1",
