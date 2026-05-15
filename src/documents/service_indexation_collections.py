@@ -17,10 +17,8 @@ class ServiceIndexationNouvellesCollections:
         self._client_indexation = client_indexation
         self._configuration_MSC = configuration_MSC
 
-    def indexe_documents(self, documents: list[str]):
-        reponse_collection = self._client_indexation.cree_collection(
-            "collection-test", "pour tester"
-        )
+    def indexe_documents(self, nom: str, description: str, documents: list[str]):
+        reponse_collection = self._client_indexation.cree_collection(nom, description)
         self._client_indexation.attribue_collection(reponse_collection.id)
         resultats = self._client_indexation.ajoute_documents(
             list(
