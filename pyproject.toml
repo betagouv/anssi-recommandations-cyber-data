@@ -18,6 +18,7 @@ dependencies = [
     "psycopg2-binary",
     "pyasn1>=0.6.3",
     "pydantic",
+    "pyjwt>=2.12.1",
     "python-multipart",
     "reportlab",
     "requests>=2.33.0",

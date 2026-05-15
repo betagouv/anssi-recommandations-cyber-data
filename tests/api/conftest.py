@@ -6,7 +6,8 @@ import pytest
 from deepeval.evaluate.types import EvaluationResult
 from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Security, status
+from fastapi.security import HTTPBearer
 from typing_extensions import Callable, Dict, Optional
 
 from adaptateurs.client_albert_reformulation_reel import (
@@ -18,6 +19,7 @@ from adaptateurs.journal import (
     fabrique_adaptateur_journal,
     AdaptateurJournalMemoire,
 )
+from api.securite import verifie_token_jwt
 from configuration import MQC
 from documents.docling.multi_processeur import Multiprocesseur
 from documents.service_indexation_documents import (
@@ -371,6 +373,10 @@ class ConstructeurServeur:
         )
         return self
 
+    def avec_une_verification_de_token_jwt(self, verificateur):
+        self._dependances[verifie_token_jwt] = verificateur
+        return self
+
 
 @pytest.fixture(autouse=True)
 def pages_statiques(tmp_path) -> Path:
@@ -472,6 +478,17 @@ def un_serveur_de_test_complet(
         serveur.avec_un_collecteur_de_reponses(collecteur_de_reponses)
         service_de_gestion_de_documents = ServiceDIndexationDeTest()
         serveur.avec_un_service_d_indexation(service_de_gestion_de_documents)
+
+        def faux_verificateur_token(credentials=Security(HTTPBearer())):
+            if not credentials:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token manquant",
+                )
+            return "un-token-de-test"
+
+        serveur.avec_une_verification_de_token_jwt(faux_verificateur_token)
+
         return (
             serveur.construis(),
             adaptateur_journal,
