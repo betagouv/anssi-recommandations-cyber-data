@@ -14,7 +14,7 @@ security = HTTPBearer()
 
 def verifie_token_jwt(
     credentials: HTTPAuthorizationCredentials = Security(security),
-    secret= recupere_configuration().secret_jwt,
+    secret=recupere_configuration().secret_jwt,
 ):
     if not credentials:
         raise HTTPException(
