@@ -4,6 +4,7 @@ from adaptateurs.clients_albert import (
     PayloadCollection,
 )
 from documents.indexeur.indexeur import DocumentAIndexer, ReponseDocument
+from infra.logger import log
 
 
 class ClientAlbertIndexationReel(ClientAlbertIndexation):
@@ -36,10 +37,29 @@ class ClientAlbertIndexationReel(ClientAlbertIndexation):
         return self.indexeur.ajoute_documents(documents, id_collection)
 
     def document_existe(self, nom_document: str) -> str | None:
-        pass
+        payload_document = {"name": nom_document, "collection_id": self.id_collection}
+        reponse = self.executeur_de_requete.recupere(
+            f"{self.url}/documents", payload_document
+        )
+        if reponse.status_code != 200:
+            log(
+                __name__,
+                f"Erreur {reponse.status_code}: {reponse.text}, pour le document : {nom_document}",
+            )
+            raise Exception(
+                f"Erreur lors de la récupération du document : {reponse.status_code}"
+            )
+        result = reponse.json()
+        return result.get("data")[0]["id"] if len(result.get("data")) > 0 else None
 
     def supprime_document(self, id_document: str):
-        pass
+        reponse = self.executeur_de_requete.supprime(
+            f"{self.url}/documents/{id_document}"
+        )
+        if reponse.status_code != 204:
+            raise Exception(
+                f"Erreur lors de la suppression du document : {id_document}, {reponse.json()}"
+            )
 
     def _collection_existe(self, id_collection: str) -> bool:
         response = self.executeur_de_requete.recupere(
