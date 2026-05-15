@@ -10,11 +10,6 @@ from api.securite import verifie_token_jwt
 SECRET_JWT = "un_secret_tres_secret"
 
 
-@pytest.fixture(autouse=True)
-def definit_secret_jwt(monkeypatch):
-    monkeypatch.setenv("SECRET_JWT", SECRET_JWT)
-
-
 def test_verifie_token_jwt_leve_exception_si_signature_invalide():
     token_invalide = jwt.encode(
         {"some": "payload"}, "mauvais_secret", algorithm="HS256"
@@ -24,7 +19,7 @@ def test_verifie_token_jwt_leve_exception_si_signature_invalide():
     )
 
     with pytest.raises(HTTPException) as excinfo:
-        verifie_token_jwt(credentials)
+        verifie_token_jwt(credentials, SECRET_JWT)
 
     assert excinfo.value.status_code == 401
     assert excinfo.value.detail == "Token invalide"
@@ -36,7 +31,7 @@ def test_verifie_token_jwt_accepte_token_valide():
         scheme="Bearer", credentials=token_valide
     )
 
-    token = verifie_token_jwt(credentials)
+    token = verifie_token_jwt(credentials, SECRET_JWT)
 
     assert token == token_valide
 
@@ -49,7 +44,7 @@ def test_verifie_token_jwt_leve_exception_si_token_expire():
     )
 
     with pytest.raises(HTTPException) as excinfo:
-        verifie_token_jwt(credentials)
+        verifie_token_jwt(credentials, SECRET_JWT)
 
     assert excinfo.value.status_code == 401
     assert excinfo.value.detail == "Token invalide"

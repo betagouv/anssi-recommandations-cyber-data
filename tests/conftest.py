@@ -95,6 +95,7 @@ def configuration() -> Configuration:
         collections_MQC=CollectionsMQC(
             id_collection_indexee="12345", id_collection_jeopardy="67890"
         ),
+        secret_jwt="SECRET",
     )
 
 

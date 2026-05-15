@@ -1,7 +1,8 @@
-import os
 import jwt
 from fastapi import HTTPException, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+from configuration import recupere_configuration
 
 
 def fabrique_verifie_token_jwt():
@@ -11,7 +12,10 @@ def fabrique_verifie_token_jwt():
 security = HTTPBearer()
 
 
-def verifie_token_jwt(credentials: HTTPAuthorizationCredentials = Security(security)):
+def verifie_token_jwt(
+    credentials: HTTPAuthorizationCredentials = Security(security),
+    secret= recupere_configuration().secret_jwt,
+):
     if not credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -19,7 +23,6 @@ def verifie_token_jwt(credentials: HTTPAuthorizationCredentials = Security(secur
         )
 
     token = credentials.credentials
-    secret = os.getenv("SECRET_JWT", "un_secret_par_defaut_a_changer")
 
     try:
         jwt.decode(token, secret, algorithms=["HS256"])
