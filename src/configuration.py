@@ -67,6 +67,7 @@ class Configuration(NamedTuple):
     mqc_data: MQCData
     jeopardy: ConfigurationJeopardy
     collections_MQC: CollectionsMQC
+    secret_jwt: str
 
 
 def recupere_configuration_postgres() -> BaseDeDonnees | None:
@@ -148,4 +149,5 @@ def recupere_configuration() -> Configuration:
         mqc_data=configuration_mqc_data,
         jeopardy=configuration_jeopardy,
         collections_MQC=collections_mqc,
+        secret_jwt=os.getenv("SECRET_JWT", ""),
     )
