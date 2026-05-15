@@ -26,30 +26,41 @@ class ServiceDIndexation:
 
     def indexe_documents(self, documents: list[str]):
         self._client_indexation.attribue_collection(self._id_collection)
+        documents_a_indexer = []
         for document in documents:
-            identifiant_document_existant = self._client_indexation.document_existe(
-                document, self._id_collection
-            )
-            if identifiant_document_existant:
-                self._client_indexation.supprime_document(identifiant_document_existant)
-            identifiant_document_jeopardy_existant = self._client_indexation.document_existe(
-                document, self._id_collection_jeopardy
-            )
-            if identifiant_document_jeopardy_existant:
-                self._client_indexation.supprime_document(identifiant_document_jeopardy_existant)
+            try:
+                identifiant_document_existant = self._client_indexation.document_existe(
+                    document, self._id_collection
+                )
+                if identifiant_document_existant:
+                    self._client_indexation.supprime_document(
+                        identifiant_document_existant
+                    )
+                identifiant_document_jeopardy_existant = (
+                    self._client_indexation.document_existe(
+                        document, self._id_collection_jeopardy
+                    )
+                )
+                if identifiant_document_jeopardy_existant:
+                    self._client_indexation.supprime_document(
+                        identifiant_document_jeopardy_existant
+                    )
+            except Exception:
+                continue
+            documents_a_indexer.append(document)
         self._client_indexation.ajoute_documents(
             list(
                 map(
                     lambda doc: DocumentPDFDistant(
                         doc, normalise_url(doc, self._configuration_MSC)
                     ),
-                    documents,
+                    documents_a_indexer,
                 )
             )
         )
         self._service_jeopardy.jeopardyse(
             ListeDeDocuments(
-                noms_documents=documents,
+                noms_documents=documents_a_indexer,
                 id_collection_jeopardy=self._id_collection_jeopardy,
                 id_collection_mqc=self._id_collection,
             )
