@@ -22,8 +22,8 @@ class ExecuteurDeRequete:
             return self.session.post(f"{url}", data=payload, files=fichiers)
         return self.session.post(f"{url}", json=payload, files=fichiers)
 
-    def recupere(self, url: str, params: Optional[dict] = None) -> Response:
-        return self.session.get(url, params=params)
+    def recupere(self, url: str, parametres: Optional[dict] = None) -> Response:
+        return self.session.get(url, params=parametres)
 
     def supprime(self, url: str) -> Response:
         return self.session.delete(url)

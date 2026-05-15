@@ -36,8 +36,8 @@ class ClientAlbertIndexationReel(ClientAlbertIndexation):
         id_collection = self.id_collection
         return self.indexeur.ajoute_documents(documents, id_collection)
 
-    def document_existe(self, nom_document: str) -> str | None:
-        payload_document = {"name": nom_document, "collection_id": self.id_collection}
+    def document_existe(self, nom_document: str, id_collection: str) -> str | None:
+        payload_document = {"name": nom_document, "collection_id": id_collection}
         reponse = self.executeur_de_requete.recupere(
             f"{self.url}/documents", payload_document
         )

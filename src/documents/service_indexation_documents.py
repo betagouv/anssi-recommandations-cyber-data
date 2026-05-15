@@ -28,10 +28,15 @@ class ServiceDIndexation:
         self._client_indexation.attribue_collection(self._id_collection)
         for document in documents:
             identifiant_document_existant = self._client_indexation.document_existe(
-                document
+                document, self._id_collection
             )
             if identifiant_document_existant:
                 self._client_indexation.supprime_document(identifiant_document_existant)
+            identifiant_document_jeopardy_existant = self._client_indexation.document_existe(
+                document, self._id_collection_jeopardy
+            )
+            if identifiant_document_jeopardy_existant:
+                self._client_indexation.supprime_document(identifiant_document_jeopardy_existant)
         self._client_indexation.ajoute_documents(
             list(
                 map(

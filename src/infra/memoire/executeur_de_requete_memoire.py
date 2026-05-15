@@ -167,7 +167,7 @@ class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
         self.index_courant += 1
         return reponse
 
-    def recupere(self, url: str, params: Optional[dict] = None) -> Response:
+    def recupere(self, url: str, parametres: Optional[dict] = None) -> Response:
         self.nombre_appels += 1
         self.url_appelee = url
         reponse = Mock()

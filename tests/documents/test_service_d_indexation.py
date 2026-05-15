@@ -21,8 +21,10 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
             "", "", IndexeurDeTest(), ExecuteurDeRequeteDeTest(reponse_attendue=[])
         )
         self.documents_ajoutes = []
-        self.documents_existants = []
-        self.documents_supprimes = []
+        self.collections_existantes = {}
+        self.documents_supprimes = {}
+        self.documents_jeopardy_existants = []
+        self.documents_jeopardy_supprimes = []
 
     def attribue_collection(self, id_collection: str) -> bool:
         self.id_collection = id_collection
@@ -34,18 +36,27 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
         self.documents_ajoutes = documents
         return []
 
-    def document_existe(self, nom_document: str):
-        document_existe = list(
-            filter(lambda doc: doc["nom"] == nom_document, self.documents_existants)
-        )
-        return document_existe[0]["id"] if len(document_existe) > 0 else None
+    def document_existe(self, nom_document: str, id_collection: str) -> str | None:
+        documents = self.collections_existantes.get(id_collection)
+        if documents:
+            document_existe = list(
+                filter(lambda doc: doc["nom"] == nom_document, documents)
+            )
+            return document_existe[0]["id"] if len(document_existe) > 0 else None
+        return None
 
     def supprime_document(self, id_document: str):
-        document_existant = list(
-            filter(lambda doc: doc["id"] == id_document, self.documents_existants)
-        )[0]
-        self.documents_supprimes.append(document_existant["nom"])
-        self.documents_existants.remove(document_existant)
+        docs_a_supprimer = {
+            k: [doc for doc in docs if doc["id"] == id_document]
+            for k, docs in self.collections_existantes.items()
+        }
+        self.documents_supprimes.update(
+            {k: v for k, v in docs_a_supprimer.items() if v}
+        )
+        self.collections_existantes = {
+            k: [doc for doc in docs if doc["id"] != id_document]
+            for k, docs in self.collections_existantes.items()
+        }
 
     def _collection_existe(self, id_collection: str) -> bool:
         return True
@@ -107,7 +118,9 @@ def test_jeopardyse_les_documents_indexes(un_service_jeopardy):
 
 def test_modifie_un_document_deja_indexe(un_service_jeopardy):
     client_indexation = ClientAlbertIndexationDeTest()
-    client_indexation.documents_existants = [{"id": "2", "nom": "doc-2.pdf"}]
+    client_indexation.collections_existantes = {
+        "collection-1": [{"id": "2", "nom": "doc-2.pdf"}]
+    }
 
     ServiceDIndexation(
         client_indexation,
@@ -119,11 +132,39 @@ def test_modifie_un_document_deja_indexe(un_service_jeopardy):
         un_service_jeopardy,
     ).indexe_documents(["doc-1.pdf", "doc-2.pdf"])
 
+    assert client_indexation.documents_supprimes.get("collection-1") == [
+        {"id": "2", "nom": "doc-2.pdf"}
+    ]
     assert len(client_indexation.documents_ajoutes) == 2
-    assert client_indexation.documents_supprimes == ["doc-2.pdf"]
     assert client_indexation.documents_ajoutes[0].nom_document == "doc-1.pdf"
     assert client_indexation.documents_ajoutes[1].nom_document == "doc-2.pdf"
     assert un_service_jeopardy.noms_documents_a_jeopardyser == [
         "doc-1.pdf",
         "doc-2.pdf",
+    ]
+
+
+def test_supprime_le_document_correspondant_dans_la_collection_jeopardy(
+    un_service_jeopardy,
+):
+    client_indexation = ClientAlbertIndexationDeTest()
+    client_indexation.collections_existantes = {
+        "collection-1": [{"id": "2", "nom": "doc-2.pdf"}],
+        "collection-jeopardy": [{"id": "b", "nom": "doc-2.pdf"}],
+    }
+
+    client_indexation.documents_jeopardy_existants = [{"id": "b", "nom": "doc-2.pdf"}]
+
+    ServiceDIndexation(
+        client_indexation,
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents(["doc-1.pdf", "doc-2.pdf"])
+
+    assert client_indexation.documents_supprimes.get("collection-jeopardy") == [
+        {"id": "b", "nom": "doc-2.pdf"}
     ]
