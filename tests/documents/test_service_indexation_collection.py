@@ -8,7 +8,9 @@ from documents.indexeur.indexeur import (
     ReponseDocument,
     ReponseDocumentEnSucces,
 )
-from documents.service_indexation_collections import ServiceIndexationNouvellesCollections
+from documents.service_indexation_collections import (
+    ServiceIndexationNouvellesCollections,
+)
 from infra.memoire.executeur_de_requete_memoire import ExecuteurDeRequeteDeTest
 
 
@@ -30,7 +32,7 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
         self.leve_une_exception_sur_document_existe = None
         self.leve_une_exception_sur_supprime_document = None
         self.documents_ajoutes = []
-        self.collections_existantes = {}
+        self.collections_creees = {}
         self.documents_supprimes = {}
         self.documents_jeopardy_existants = []
         self.documents_jeopardy_supprimes = []
@@ -43,7 +45,7 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
         self, documents: list[DocumentAIndexer]
     ) -> list[ReponseDocument]:
         self.documents_ajoutes = documents
-        resultat:list[ReponseDocument] = []
+        resultat: list[ReponseDocument] = []
         for document in documents:
             resultat.append(
                 ReponseDocumentEnSucces(
@@ -66,7 +68,7 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
         return True
 
     def cree_collection(self, nom: str, description: str) -> ReponseCollection:
-        return ReponseCollection(
+        reponse_collection = ReponseCollection(
             name=nom,
             description=description,
             id="collection-test",
@@ -75,6 +77,8 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
             updated_at="2023-01-01T00:00:00Z",
             documents=0,
         )
+        self.collections_creees[nom] = reponse_collection
+        return reponse_collection
 
 
 def test_ajoute_un_guide_de_l_anssi(un_service_jeopardy):
@@ -84,9 +88,27 @@ def test_ajoute_un_guide_de_l_anssi(un_service_jeopardy):
         client_indexation,
         MSC(url="http://documents.local", chemin_guides="guides"),
         un_service_jeopardy,
-    ).indexe_documents(["doc-1.pdf"])
+    ).indexe_documents("", "", ["doc-1.pdf"])
 
     assert len(reponse) == 1
     assert reponse[0].id is not None
     assert reponse[0].collection_id == "collection-test"
     assert reponse[0].name == "doc-1.pdf"
+
+
+def test_nomme_et_decrit_la_nouvelle_collection(un_service_jeopardy):
+    client_indexation = ClientAlbertIndexationDeTest()
+
+    ServiceIndexationNouvellesCollections(
+        client_indexation,
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents("le_nouveau_nom", "la description nouvelle", ["doc-1.pdf"])
+
+    assert (
+        client_indexation.collections_creees["le_nouveau_nom"].name == "le_nouveau_nom"
+    )
+    assert (
+        client_indexation.collections_creees["le_nouveau_nom"].description
+        == "la description nouvelle"
+    )
