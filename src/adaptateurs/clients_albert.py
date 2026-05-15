@@ -66,7 +66,7 @@ class ClientAlbertIndexation(ABC):
         pass
 
     @abstractmethod
-    def document_existe(self, nom_document: str) -> str | None:
+    def document_existe(self, nom_document: str, id_collection: str) -> str | None:
         pass
 
     @abstractmethod
