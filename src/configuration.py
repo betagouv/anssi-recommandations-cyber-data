@@ -1,5 +1,4 @@
 import os
-from enum import StrEnum
 
 from typing_extensions import NamedTuple, Optional
 
@@ -22,15 +21,9 @@ class MQCData(NamedTuple):
     port: int
 
 
-class IndexeurDocument(StrEnum):
-    INDEXEUR_ALBERT = ("INDEXEUR_ALBERT",)
-    INDEXEUR_DOCLING = ("INDEXEUR_DOCLING",)
-
-
 class Albert(NamedTuple):
     url: str
     cle_api: str
-    indexeur: IndexeurDocument
     modele: str
     chunker: Optional[ChunkerDocling] = None
 
@@ -100,19 +93,14 @@ def recupere_configuration() -> Configuration:
         ),
     )
 
-    indexeur_document = IndexeurDocument(os.getenv("INDEXEUR", "INDEXEUR_ALBERT"))
-    chunker: ChunkerDocling | None = None
     albert_url = os.getenv("ALBERT_URL", "https://albert.api.etalab.gouv.fr/v1")
     albert_cle_api = os.getenv("ALBERT_CLE_API", "cle_api")
-    if indexeur_document == IndexeurDocument.INDEXEUR_DOCLING:
-        chunker = ChunkerDoclingMQC(cle_api=albert_cle_api, url_albert=albert_url)
 
     albert: Albert = Albert(
         url=albert_url,
         cle_api=albert_cle_api,
-        indexeur=indexeur_document,
         modele=os.getenv("ALBERT_MODELE", "openweight-medium"),
-        chunker=chunker,
+        chunker=ChunkerDoclingMQC(cle_api=albert_cle_api, url_albert=albert_url),
     )
 
     base_de_donnees_journal: BaseDeDonnees | None = recupere_configuration_postgres()
