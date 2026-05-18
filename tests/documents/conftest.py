@@ -1,7 +1,7 @@
 import json
 import sys
 from pathlib import Path
-from typing import Callable, Type, Union, Optional, cast
+from typing import Callable, Type, Union, Optional
 
 import pytest
 from docling.backend.html_backend import HTMLDocumentBackend
@@ -34,6 +34,7 @@ from documents.docling.document import Document
 from documents.docling.multi_processeur import Multiprocesseur
 from documents.elements_filtres import ElementsFiltres
 from documents.generateur_de_pages import GenerateurDePages
+from documents.html.document_html import BlocPageReponse, PageHTML
 from documents.indexeur.indexeur import (
     ReponseDocument,
     ReponseDocumentEnSucces,
@@ -43,7 +44,6 @@ from documents.indexeur.indexeur import (
     ReponseChunkEnErreur,
     DetailErreur,
 )
-from documents.html.document_html import BlocPageReponse, PageHTML
 from documents.page import Page
 from documents.pdf.document_pdf import Position, PagePDF, BlocPagePDF
 from jeopardy.client_albert_jeopardy import (
@@ -56,8 +56,7 @@ from jeopardy.client_albert_jeopardy import (
     ReponseCreationCollection,
 )
 from jeopardy.questions import EntrepotQuestionGenereeMemoire
-from jeopardy.service import CollectionEntiere, ListeDeDocuments
-from jeopardy.service_jeopardyse_liste_de_documents import ServiceJeopardyseDocuments
+from jeopardy.service import CollectionEntiere, ListeDeDocuments, ServiceJeopardyse
 
 
 def _creer_document(texts=None, tables=None) -> DoclingDocument:
@@ -660,7 +659,7 @@ class MultiProcesseurDeTest(Multiprocesseur):
         return self.resultats
 
 
-class ServiceJeopardyseDocumentsDeTest(ServiceJeopardyseDocuments):
+class ServiceJeopardyseDeTest(ServiceJeopardyse):
     def __init__(self):
         super().__init__(
             ClientAlbertJeopardyDeTest(),
@@ -669,23 +668,21 @@ class ServiceJeopardyseDocumentsDeTest(ServiceJeopardyseDocuments):
             "Un prompt",
             MultiProcesseurDeTest(),
         )
-        self.jeopardyse_documents_appele = False
-        self.identifiant_collection_jeopardy = None
-        self.noms_documents_a_jeopardyser = []
-        self.identifiant_collection_a_jeopardyser = None
+        self.jeopardyse_appele = False
+        self.donnees_recues = None
+
+    def recupere_les_documents(self, donnees, taille_paquet_chunks=10):
+        return [], ""
 
     def jeopardyse(
         self,
         donnees: CollectionEntiere | ListeDeDocuments,
         taille_paquet_chunks: int = 10,
     ):
-        liste_de_documents = cast(ListeDeDocuments, donnees)
-        self.jeopardyse_documents_appele = True
-        self.identifiant_collection_jeopardy = liste_de_documents.id_collection_jeopardy
-        self.noms_documents_a_jeopardyser = liste_de_documents.noms_documents
-        self.identifiant_collection_a_jeopardyser = liste_de_documents.id_collection_mqc
+        self.jeopardyse_appele = True
+        self.donnees_recues = donnees
 
 
 @pytest.fixture()
 def un_service_jeopardy():
-    return ServiceJeopardyseDocumentsDeTest()
+    return ServiceJeopardyseDeTest()
