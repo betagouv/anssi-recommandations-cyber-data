@@ -22,6 +22,10 @@ from adaptateurs.journal import (
 from api.securite import verifie_token_jwt
 from configuration import MQC
 from documents.docling.multi_processeur import Multiprocesseur
+from documents.service_indexation_collections import (
+    ServiceIndexationNouvellesCollections,
+    fabrique_service_indexation_collections,
+)
 from documents.service_indexation_documents import (
     ServiceIndexationNouveauxDocuments,
     fabrique_service_indexation_de_documents,
@@ -293,6 +297,22 @@ class ServiceIndexationNouveauxDocumentsDeTest(ServiceIndexationNouveauxDocument
         self.documents_ajoutes = documents_a_ajouter
 
 
+class ServiceIndexationNouvellesCollectionsDeTest(
+    ServiceIndexationNouvellesCollections
+):
+    def __init__(self):
+        self.appele = False
+        self.nom = None
+        self.description = None
+        self.fichiers = []
+
+    def indexe_documents(self, nom: str, description: str, fichiers: list[str]):
+        self.appele = True
+        self.nom = nom
+        self.description = description
+        self.fichiers = fichiers
+
+
 class ConstructeurServeur:
     def __init__(
         self,
@@ -371,6 +391,12 @@ class ConstructeurServeur:
         self._dependances[fabrique_service_indexation_de_documents] = (
             lambda: service_d_indexation
         )
+        return self
+
+    def avec_un_service_indexation_collections(
+        self, service: ServiceIndexationNouvellesCollectionsDeTest
+    ):
+        self._dependances[fabrique_service_indexation_collections] = lambda: service
         return self
 
     def avec_une_verification_de_token_jwt(self, verificateur):
@@ -478,6 +504,8 @@ def un_serveur_de_test_complet(
         serveur.avec_un_collecteur_de_reponses(collecteur_de_reponses)
         service_de_gestion_de_documents = ServiceIndexationNouveauxDocumentsDeTest()
         serveur.avec_un_service_d_indexation(service_de_gestion_de_documents)
+        service_indexation_collections = ServiceIndexationNouvellesCollectionsDeTest()
+        serveur.avec_un_service_indexation_collections(service_indexation_collections)
 
         def faux_verificateur_token(credentials=Security(HTTPBearer())):
             if not credentials:
@@ -500,3 +528,29 @@ def un_serveur_de_test_complet(
         )
 
     return _un_serveur_de_test_complet
+
+
+@pytest.fixture()
+def un_serveur_de_test_pour_collections(
+    pages_statiques,
+) -> Callable[[], tuple[FastAPI, ServiceIndexationNouvellesCollectionsDeTest]]:
+    def _construis():
+        service = ServiceIndexationNouvellesCollectionsDeTest()
+        serveur = (
+            ConstructeurServeur(max_requetes_par_minute=100)  # type: ignore[arg-type]
+            .avec_pages_statiques(pages_statiques)
+            .avec_un_service_indexation_collections(service)
+        )
+
+        def faux_verificateur_token(credentials=Security(HTTPBearer())):
+            if not credentials:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token manquant",
+                )
+            return "un-token-de-test"
+
+        serveur.avec_une_verification_de_token_jwt(faux_verificateur_token)
+        return serveur.construis(), service
+
+    return _construis
