@@ -18,7 +18,6 @@ from configuration import (
     MSC,
     Albert,
     BaseDeDonnees,
-    IndexeurDocument,
     MQCData,
     CollectionsMQC,
 )
@@ -67,7 +66,6 @@ def configuration() -> Configuration:
     albert = Albert(
         url="https://albert.api.etalab.gouv.fr/v1",
         cle_api="fausse_cle",
-        indexeur=IndexeurDocument.INDEXEUR_ALBERT,
         modele="albert-de-test",
     )
     base_de_donnees = BaseDeDonnees(
