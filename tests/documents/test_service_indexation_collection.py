@@ -12,6 +12,7 @@ from documents.service_indexation_collections import (
     ServiceIndexationNouvellesCollections,
 )
 from infra.memoire.executeur_de_requete_memoire import ExecuteurDeRequeteDeTest
+from jeopardy.service import CollectionEntiere
 
 
 class IndexeurDeTest(Indexeur):
@@ -29,13 +30,8 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
         super().__init__(
             "", "", IndexeurDeTest(), ExecuteurDeRequeteDeTest(reponse_attendue=[])
         )
-        self.leve_une_exception_sur_document_existe = None
-        self.leve_une_exception_sur_supprime_document = None
         self.documents_ajoutes = []
         self.collections_creees = {}
-        self.documents_supprimes = {}
-        self.documents_jeopardy_existants = []
-        self.documents_jeopardy_supprimes = []
 
     def attribue_collection(self, id_collection: str) -> bool:
         self.id_collection = id_collection
@@ -112,3 +108,21 @@ def test_nomme_et_decrit_la_nouvelle_collection(un_service_jeopardy):
         client_indexation.collections_creees["le_nouveau_nom"].description
         == "la description nouvelle"
     )
+
+
+def test_jeopardyse_un_guide_de_l_anssi(un_service_jeopardy):
+    client_indexation = ClientAlbertIndexationDeTest()
+
+    ServiceIndexationNouvellesCollections(
+        client_indexation,
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents("le_nouveau_nom", "pour tester", ["doc-1.pdf"])
+
+    assert un_service_jeopardy.jeopardyse_appele
+    assert isinstance(un_service_jeopardy.donnees_recues, CollectionEntiere)
+    assert un_service_jeopardy.donnees_recues.id_collection == "collection-test"
+    assert (
+        un_service_jeopardy.donnees_recues.nom_collection == "Jeopardy - le_nouveau_nom"
+    )
+    assert un_service_jeopardy.donnees_recues.description_collection == "pour tester"
