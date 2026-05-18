@@ -1,15 +1,26 @@
 from adaptateurs.client_albert_indexation_reel import ClientAlbertIndexationReel
 from adaptateurs.clients_albert import ReponseCollectionAlbert
 from documents.indexeur.indexeur import Indexeur, DocumentAIndexer, ReponseDocument
-from documents.indexeur.indexeur_albert import IndexeurBaseVectorielleAlbert
 from documents.pdf.document_pdf import DocumentPDF
 
 
-def test_client_albert_initialise_correctement():
-    url = "https://test.api"
+class IndexeurDeTest(Indexeur):
+    def __init__(self):
+        super().__init__()
+        self.documents_recus = []
+        self.collection_recue = None
 
+    def ajoute_documents(
+        self, documents: list[DocumentAIndexer], id_collection: str | None
+    ) -> list[ReponseDocument]:
+        self.documents_recus.extend(documents)
+        self.collection_recue = id_collection
+        return []
+
+
+def test_client_albert_initialise_correctement():
     client = ClientAlbertIndexationReel(
-        url, "test-key", IndexeurBaseVectorielleAlbert(url)
+        "https://test.api", "test-key", IndexeurDeTest()
     )
 
     assert (
@@ -36,7 +47,7 @@ def test_client_albert_cree_collection(
     client = ClientAlbertIndexationReel(
         url,
         "test-key",
-        IndexeurBaseVectorielleAlbert(url),
+        IndexeurDeTest(),
         un_executeur_de_requete(
             [une_reponse_de_creation_de_collection_OK(reponse_attendue)]
         ),
@@ -64,7 +75,7 @@ def test_attribue_id_collection_au_client_albert(
     client = ClientAlbertIndexationReel(
         "https://test.api",
         "test-key",
-        IndexeurBaseVectorielleAlbert("https://test.api"),
+        IndexeurDeTest(),
         un_executeur_de_requete(
             [une_reponse_de_recuperation_de_collection_OK(reponse_collection)]
         ),
@@ -83,7 +94,7 @@ def test_client_albert_verifie_collection_n_existe_pas(
     client = ClientAlbertIndexationReel(
         "https://test.api",
         "test-key",
-        IndexeurBaseVectorielleAlbert("https://test.api"),
+        IndexeurDeTest(),
         un_executeur_de_requete([une_reponse_de_recuperation_de_collection_KO]),
     )
     client.collections_existantes = {"collection-123"}
@@ -91,20 +102,6 @@ def test_client_albert_verifie_collection_n_existe_pas(
     result = client.attribue_collection("collection-123")
 
     assert result is False
-
-
-class IndexeurDeTest(Indexeur):
-    def __init__(self):
-        super().__init__()
-        self.documents_recus = []
-        self.collection_recue = None
-
-    def ajoute_documents(
-        self, documents: list[DocumentAIndexer], id_collection: str | None
-    ) -> list[ReponseDocument]:
-        self.documents_recus.extend(documents)
-        self.collection_recue = id_collection
-        return []
 
 
 def test_client_albert_ajoute_documents(
