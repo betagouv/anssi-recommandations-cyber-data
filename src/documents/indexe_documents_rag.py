@@ -5,7 +5,7 @@ from pathlib import Path
 
 from adaptateurs.client_albert_indexation_reel import ClientAlbertIndexationReel
 from adaptateurs.clients_albert import ClientAlbertIndexation
-from configuration import recupere_configuration, IndexeurDocument
+from configuration import recupere_configuration
 from documents.collecte.collecte import (
     collecte_document_maitrise,
     collecte_guides_anssi,
@@ -18,27 +18,15 @@ from documents.indexeur.indexeur import (
     ReponseDocumentEnSucces,
     ReponseDocumentMaitriseEnSucces,
 )
-from documents.indexeur.indexeur_albert import IndexeurBaseVectorielleAlbert
 from documents.indexeur.indexeur_docling import IndexeurDocling
 
 
 def fabrique_client_albert() -> ClientAlbertIndexation:
     config = recupere_configuration().albert
-    match config.indexeur:
-        case "INDEXEUR_ALBERT":
-            return ClientAlbertIndexationReel(
-                config.url,
-                config.cle_api,
-                IndexeurBaseVectorielleAlbert(config.url, 3, 1),
-            )
-        case "INDEXEUR_DOCLING":
-            return ClientAlbertIndexationReel(
-                config.url,
-                config.cle_api,
-                IndexeurDocling(config.url, config.cle_api, config.chunker),  # type: ignore[arg-type]
-            )
-    raise Exception(
-        f"Erreur, un indexeur {', '.join([indexeur.name for indexeur in IndexeurDocument])} doit être fourni. L’indexeur configuré est : {config.indexeur}"
+    return ClientAlbertIndexationReel(
+        config.url,
+        config.cle_api,
+        IndexeurDocling(config.url, config.cle_api, config.chunker),  # type: ignore[arg-type]
     )
 
 

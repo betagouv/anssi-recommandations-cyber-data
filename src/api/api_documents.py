@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from api.securite import fabrique_verifie_token_jwt
 from documents.service_indexation_documents import (
     fabrique_service_indexation_de_documents,
-    ServiceDIndexation,
+    ServiceIndexationNouveauxDocuments,
 )
 from infra.logger import log
 
@@ -20,7 +20,7 @@ class RequeteIndexationDocument(BaseModel):
 def indexe_documents(
     background_tasks: BackgroundTasks,
     requete: RequeteIndexationDocument,
-    service_indexation_document: ServiceDIndexation = Depends(  # type: ignore[assignment]
+    service_indexation_document: ServiceIndexationNouveauxDocuments = Depends(  # type: ignore[assignment]
         fabrique_service_indexation_de_documents  # type: ignore[assignment]
     ),
     _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]

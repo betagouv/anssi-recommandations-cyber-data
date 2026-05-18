@@ -1,8 +1,9 @@
 from adaptateurs.clients_albert import ClientAlbertIndexation, ReponseCollection
 from configuration import MSC, CollectionsMQC
 from documents.indexeur.indexeur import DocumentAIndexer, ReponseDocument, Indexeur
-from documents.service_indexation_documents import ServiceDIndexation
+from documents.service_indexation_documents import ServiceIndexationNouveauxDocuments
 from infra.memoire.executeur_de_requete_memoire import ExecuteurDeRequeteDeTest
+from jeopardy.service import ListeDeDocuments
 
 
 class IndexeurDeTest(Indexeur):
@@ -109,7 +110,7 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
 def test_indexe_un_document(un_service_jeopardy):
     client_indexation = ClientAlbertIndexationDeTest()
 
-    ServiceDIndexation(
+    ServiceIndexationNouveauxDocuments(
         client_indexation,
         CollectionsMQC(
             id_collection_indexee="collection-1",
@@ -130,7 +131,7 @@ def test_indexe_un_document(un_service_jeopardy):
 
 
 def test_jeopardyse_les_documents_indexes(un_service_jeopardy):
-    ServiceDIndexation(
+    ServiceIndexationNouveauxDocuments(
         ClientAlbertIndexationDeTest(),
         CollectionsMQC(
             id_collection_indexee="collection-1",
@@ -140,13 +141,17 @@ def test_jeopardyse_les_documents_indexes(un_service_jeopardy):
         un_service_jeopardy,
     ).indexe_documents(["nouveau-doc-1.pdf", "nouveau-doc-2.pdf"])
 
-    assert un_service_jeopardy.jeopardyse_documents_appele
-    assert un_service_jeopardy.identifiant_collection_jeopardy == "collection-jeopardy"
-    assert un_service_jeopardy.noms_documents_a_jeopardyser == [
+    assert un_service_jeopardy.jeopardyse_appele
+    assert isinstance(un_service_jeopardy.donnees_recues, ListeDeDocuments)
+    assert (
+        un_service_jeopardy.donnees_recues.id_collection_jeopardy
+        == "collection-jeopardy"
+    )
+    assert un_service_jeopardy.donnees_recues.noms_documents == [
         "nouveau-doc-1.pdf",
         "nouveau-doc-2.pdf",
     ]
-    assert un_service_jeopardy.identifiant_collection_a_jeopardyser == "collection-1"
+    assert un_service_jeopardy.donnees_recues.id_collection_mqc == "collection-1"
 
 
 def test_modifie_un_document_deja_indexe(un_service_jeopardy):
@@ -155,7 +160,7 @@ def test_modifie_un_document_deja_indexe(un_service_jeopardy):
         "collection-1": [{"id": "2", "nom": "doc-2.pdf"}]
     }
 
-    ServiceDIndexation(
+    ServiceIndexationNouveauxDocuments(
         client_indexation,
         CollectionsMQC(
             id_collection_indexee="collection-1",
@@ -171,7 +176,7 @@ def test_modifie_un_document_deja_indexe(un_service_jeopardy):
     assert len(client_indexation.documents_ajoutes) == 2
     assert client_indexation.documents_ajoutes[0].nom_document == "doc-1.pdf"
     assert client_indexation.documents_ajoutes[1].nom_document == "doc-2.pdf"
-    assert un_service_jeopardy.noms_documents_a_jeopardyser == [
+    assert un_service_jeopardy.donnees_recues.noms_documents == [
         "doc-1.pdf",
         "doc-2.pdf",
     ]
@@ -188,7 +193,7 @@ def test_supprime_le_document_correspondant_dans_la_collection_jeopardy(
 
     client_indexation.documents_jeopardy_existants = [{"id": "b", "nom": "doc-2.pdf"}]
 
-    ServiceDIndexation(
+    ServiceIndexationNouveauxDocuments(
         client_indexation,
         CollectionsMQC(
             id_collection_indexee="collection-1",
@@ -220,7 +225,7 @@ def test_continue_le_traitement_si_le_document_existe_leve_une_erreur(
     client_indexation.document_existe_leve_une_erreur("collection-1", "doc-1.pdf")
     client_indexation.documents_jeopardy_existants = [{"id": "b", "nom": "doc-2.pdf"}]
 
-    ServiceDIndexation(
+    ServiceIndexationNouveauxDocuments(
         client_indexation,
         CollectionsMQC(
             id_collection_indexee="collection-1",
@@ -232,7 +237,7 @@ def test_continue_le_traitement_si_le_document_existe_leve_une_erreur(
 
     assert len(client_indexation.documents_ajoutes) == 1
     assert client_indexation.documents_ajoutes[0].nom_document == "doc-2.pdf"
-    assert un_service_jeopardy.noms_documents_a_jeopardyser == [
+    assert un_service_jeopardy.donnees_recues.noms_documents == [
         "doc-2.pdf",
     ]
 
@@ -249,7 +254,7 @@ def test_continue_le_traitement_si_supprime_document_leve_une_erreur(
     }
     client_indexation.supprime_document_leve_une_erreur("collection-1", "1")
 
-    ServiceDIndexation(
+    ServiceIndexationNouveauxDocuments(
         client_indexation,
         CollectionsMQC(
             id_collection_indexee="collection-1",
@@ -261,4 +266,4 @@ def test_continue_le_traitement_si_supprime_document_leve_une_erreur(
 
     assert len(client_indexation.documents_ajoutes) == 1
     assert client_indexation.documents_ajoutes[0].nom_document == "doc-2.pdf"
-    assert un_service_jeopardy.noms_documents_a_jeopardyser == ["doc-2.pdf"]
+    assert un_service_jeopardy.donnees_recues.noms_documents == ["doc-2.pdf"]
