@@ -263,7 +263,7 @@ def test_continue_le_traitement_si_supprime_document_leve_une_erreur(
 
     assert len(client_indexation.documents_ajoutes) == 1
     assert client_indexation.documents_ajoutes[0].nom_document == "doc-2.pdf"
-    assert un_service_jeopardy.noms_documents_a_jeopardyser == ["doc-2.pdf"]
+    assert un_service_jeopardy.donnees_recues.noms_documents == ["doc-2.pdf"]
 
 
 def test_supprime_les_documents(un_service_jeopardy):
@@ -275,7 +275,7 @@ def test_supprime_les_documents(un_service_jeopardy):
         ],
     }
 
-    ServiceDIndexation(
+    ServiceIndexationNouveauxDocuments(
         client_indexation,
         CollectionsMQC(
             id_collection_indexee="collection-1",
@@ -298,7 +298,7 @@ def test_supprime_les_documents_seulement_si_le_document_existe(un_service_jeopa
         ],
     }
 
-    ServiceDIndexation(
+    ServiceIndexationNouveauxDocuments(
         client_indexation,
         CollectionsMQC(
             id_collection_indexee="collection-1",
