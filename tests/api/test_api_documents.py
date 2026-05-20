@@ -66,3 +66,25 @@ def test_appelle_le_service_d_indexation_de_documents_pour_modifier_des_document
         "doc-2.pdf",
         "doc-3.pdf",
     ]
+
+def test_appelle_le_service_d_indexation_de_documents_pour_supprimer_des_documents(
+        un_serveur_de_test_complet,
+):
+    (serveur, _, _, _, _, _, service_indexation_document) = un_serveur_de_test_complet(
+        None
+    )
+    client: TestClient = TestClient(serveur)
+
+    client.post(
+        "/api/documents/",
+        json={
+            "fichiers_supprimes": ["doc-1.pdf", "doc-2.pdf"],
+        },
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert service_indexation_document.appele
+    assert service_indexation_document.documents_supprimes == [
+        "doc-1.pdf",
+        "doc-2.pdf",
+    ]
