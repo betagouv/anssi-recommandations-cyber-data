@@ -13,7 +13,8 @@ api_documents = APIRouter(prefix="/documents")
 
 
 class RequeteIndexationDocument(BaseModel):
-    fichiers_ajoutes: list[str]
+    fichiers_ajoutes: list[str] = []
+    fichiers_modifies: list[str] = []
 
 
 @api_documents.post("/", status_code=200)
@@ -25,8 +26,9 @@ def indexe_documents(
     ),
     _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
 ):
-    log(__name__, f"Indexation des documents {requete.fichiers_ajoutes}")
+    les_documents = [*requete.fichiers_ajoutes, *requete.fichiers_modifies]
+    log(__name__, f"Indexation des documents {les_documents}")
     background_tasks.add_task(
-        service_indexation_document.indexe_documents, requete.fichiers_ajoutes
+        service_indexation_document.indexe_documents, les_documents
     )
     return {"message": "Indexation en cours d’exécution..."}
