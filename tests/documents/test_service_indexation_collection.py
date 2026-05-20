@@ -10,6 +10,7 @@ from documents.indexeur.indexeur import (
 )
 from documents.service_indexation_collections import (
     ServiceIndexationNouvellesCollections,
+    SourcesDocuments,
 )
 from infra.memoire.executeur_de_requete_memoire import ExecuteurDeRequeteDeTest
 from jeopardy.service import CollectionEntiere
@@ -84,7 +85,7 @@ def test_ajoute_un_guide_de_l_anssi(un_service_jeopardy):
         client_indexation,
         MSC(url="http://documents.local", chemin_guides="guides"),
         un_service_jeopardy,
-    ).indexe_documents("", "", ["doc-1.pdf"])
+    ).indexe_documents("", "", SourcesDocuments(fichiers=["doc-1.pdf"]))
 
     assert len(reponse) == 1
     assert reponse[0].id is not None
@@ -99,7 +100,11 @@ def test_nomme_et_decrit_la_nouvelle_collection(un_service_jeopardy):
         client_indexation,
         MSC(url="http://documents.local", chemin_guides="guides"),
         un_service_jeopardy,
-    ).indexe_documents("le_nouveau_nom", "la description nouvelle", ["doc-1.pdf"])
+    ).indexe_documents(
+        "le_nouveau_nom",
+        "la description nouvelle",
+        SourcesDocuments(fichiers=["doc-1.pdf"]),
+    )
 
     assert (
         client_indexation.collections_creees["le_nouveau_nom"].name == "le_nouveau_nom"
@@ -117,7 +122,9 @@ def test_jeopardyse_un_guide_de_l_anssi(un_service_jeopardy):
         client_indexation,
         MSC(url="http://documents.local", chemin_guides="guides"),
         un_service_jeopardy,
-    ).indexe_documents("le_nouveau_nom", "pour tester", ["doc-1.pdf"])
+    ).indexe_documents(
+        "le_nouveau_nom", "pour tester", SourcesDocuments(fichiers=["doc-1.pdf"])
+    )
 
     assert un_service_jeopardy.jeopardyse_appele
     assert isinstance(un_service_jeopardy.donnees_recues, CollectionEntiere)

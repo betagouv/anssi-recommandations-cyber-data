@@ -36,7 +36,27 @@ def test_appelle_le_service_indexation_collections(un_serveur_de_test_pour_colle
     assert service.appele
     assert service.nom == "ma-collection"
     assert service.description == "une description"
-    assert service.fichiers == ["doc-1.pdf", "doc-2.pdf"]
+    assert service.sources.fichiers == ["doc-1.pdf", "doc-2.pdf"]
+
+
+def test_transmet_fichier_documents_distants_au_service(
+    un_serveur_de_test_pour_collections,
+):
+    serveur, service = un_serveur_de_test_pour_collections()
+    client: TestClient = TestClient(serveur)
+
+    client.post(
+        "/api/collections/",
+        json={
+            "nom": "ma-collection",
+            "description": "une description",
+            "fichiers": [],
+            "fichier_documents_distants": "chemin.json",
+        },
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert service.sources.fichier_documents_distants == "chemin.json"
 
 
 def test_securise_la_route_collections(un_serveur_de_test_complet):
