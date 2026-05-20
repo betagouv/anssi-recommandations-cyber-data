@@ -287,12 +287,14 @@ class ServiceDIndexationDeTest(ServiceDIndexation):
     def __init__(self):
         self.appele = False
         self.documents_ajoutes = []
+        self.documents_supprimes = []
 
     def indexe_documents(
         self, documents_a_ajouter: list[str], documents_a_supprimer: list[str] = []
     ):
         self.appele = True
         self.documents_ajoutes = documents_a_ajouter
+        self.documents_supprimes = documents_a_supprimer
 
 
 class ConstructeurServeur:
