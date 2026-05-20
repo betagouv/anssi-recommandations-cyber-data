@@ -47,9 +47,9 @@ class ServiceDIndexation:
                     self._client_indexation.supprime_document(
                         identifiant_document_jeopardy_existant
                     )
+                documents_a_indexer.append(document)
             except Exception:
                 continue
-            documents_a_indexer.append(document)
         self._client_indexation.ajoute_documents(
             list(
                 map(
