@@ -288,7 +288,9 @@ class ServiceDIndexationDeTest(ServiceDIndexation):
         self.appele = False
         self.documents_ajoutes = []
 
-    def indexe_documents(self, documents_a_ajouter: list[str]):
+    def indexe_documents(
+        self, documents_a_ajouter: list[str], documents_a_supprimer: list[str] = []
+    ):
         self.appele = True
         self.documents_ajoutes = documents_a_ajouter
 

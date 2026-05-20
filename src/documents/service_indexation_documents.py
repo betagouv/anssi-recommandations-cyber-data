@@ -24,7 +24,9 @@ class ServiceDIndexation:
         self._client_indexation = client_indexation
         self._configuration_MSC = configuration_MSC
 
-    def indexe_documents(self, documents: list[str]):
+    def indexe_documents(
+        self, documents: list[str], documents_a_supprimer: list[str] = []
+    ):
         self._client_indexation.attribue_collection(self._id_collection)
         documents_a_indexer = []
         for document in documents:
@@ -65,6 +67,12 @@ class ServiceDIndexation:
                 id_collection_mqc=self._id_collection,
             )
         )
+        for document in documents_a_supprimer:
+            identifiant_document_existant = self._client_indexation.document_existe(
+                document, self._id_collection
+            )
+            if identifiant_document_existant:
+                self._client_indexation.supprime_document(identifiant_document_existant)
 
 
 def fabrique_service_indexation_de_documents() -> ServiceDIndexation:
