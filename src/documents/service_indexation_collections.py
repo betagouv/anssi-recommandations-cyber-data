@@ -1,12 +1,27 @@
+from pathlib import Path
+from typing import NamedTuple
+
 from adaptateurs.clients_albert import ClientAlbertIndexation
 from configuration import MSC, recupere_configuration
+from documents.collecte.collecte import (
+    collecte_document_maitrise,
+    collecte_documents_distants,
+    mappe_en_document_distant,
+)
 from documents.indexe_documents_rag import fabrique_client_albert
+from documents.indexeur.indexeur import DocumentAIndexer
 from documents.pdf.cree_document_pdf import normalise_url
 from documents.pdf.document_pdf import DocumentPDFDistant
 from jeopardy.service import ServiceJeopardyse, CollectionEntiere
 from jeopardy.service_jeopardyse_collection_entiere import (
     fabrique_service_jeopardise_collection_entiere,
 )
+
+
+class SourcesDocuments(NamedTuple):
+    fichiers: list[str] = []
+    fichier_documents_distants: str | None = None
+    fichier_documents_maitrises: str | None = None
 
 
 class ServiceIndexationNouvellesCollections:
@@ -21,19 +36,32 @@ class ServiceIndexationNouvellesCollections:
         self._client_indexation = client_indexation
         self._configuration_MSC = configuration_MSC
 
-    def indexe_documents(self, nom: str, description: str, documents: list[str]):
+    def indexe_documents(
+        self,
+        nom: str,
+        description: str,
+        sources: SourcesDocuments,
+    ):
         reponse_collection = self._client_indexation.cree_collection(nom, description)
         self._client_indexation.attribue_collection(reponse_collection.id)
-        resultats = self._client_indexation.ajoute_documents(
-            list(
-                map(
-                    lambda doc: DocumentPDFDistant(
-                        doc, normalise_url(doc, self._configuration_MSC)
-                    ),
-                    documents,
-                )
+
+        docs: list[DocumentAIndexer] = [
+            DocumentPDFDistant(doc, normalise_url(doc, self._configuration_MSC))
+            for doc in sources.fichiers
+        ]
+        if sources.fichier_documents_distants is not None:
+            mapping = mappe_en_document_distant(
+                Path(sources.fichier_documents_distants)
             )
-        )
+            if mapping is not None:
+                docs += collecte_documents_distants(mapping)
+
+        if sources.fichier_documents_maitrises is not None:
+            docs.append(
+                collecte_document_maitrise(Path(sources.fichier_documents_maitrises))
+            )
+
+        resultats = self._client_indexation.ajoute_documents(docs)
         self._service_jeopardy.jeopardyse(
             CollectionEntiere(
                 id_collection=reponse_collection.id,

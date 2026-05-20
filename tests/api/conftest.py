@@ -24,6 +24,7 @@ from configuration import MQC
 from documents.docling.multi_processeur import Multiprocesseur
 from documents.service_indexation_collections import (
     ServiceIndexationNouvellesCollections,
+    SourcesDocuments,
     fabrique_service_indexation_collections,
 )
 from documents.service_indexation_documents import (
@@ -306,15 +307,20 @@ class ServiceIndexationNouvellesCollectionsDeTest(
 ):
     def __init__(self):
         self.appele = False
-        self.nom = None
-        self.description = None
-        self.fichiers = []
+        self.nom: str | None = None
+        self.description: str | None = None
+        self.sources: SourcesDocuments = SourcesDocuments()
 
-    def indexe_documents(self, nom: str, description: str, fichiers: list[str]):
+    def indexe_documents(
+        self,
+        nom: str,
+        description: str,
+        sources: SourcesDocuments,
+    ):
         self.appele = True
         self.nom = nom
         self.description = description
-        self.fichiers = fichiers
+        self.sources = sources
 
 
 class ConstructeurServeur:
