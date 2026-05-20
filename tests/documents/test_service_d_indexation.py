@@ -20,6 +20,7 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
         super().__init__(
             "", "", IndexeurDeTest(), ExecuteurDeRequeteDeTest(reponse_attendue=[])
         )
+        self.supprime_document_appele = 0
         self.leve_une_exception_sur_document_existe = None
         self.leve_une_exception_sur_supprime_document = None
         self.documents_ajoutes = []
@@ -57,6 +58,7 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
         return None
 
     def supprime_document(self, id_document: str):
+        self.supprime_document_appele += 1
         if self.leve_une_exception_sur_supprime_document:
             docs_dans_collection = self.collections_existantes.get(
                 self.leve_une_exception_sur_supprime_document["collection"], []
@@ -71,9 +73,9 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
             k: [doc for doc in docs if doc["id"] == id_document]
             for k, docs in self.collections_existantes.items()
         }
-        self.documents_supprimes.update(
-            {k: v for k, v in docs_a_supprimer.items() if v}
-        )
+        for k, v in docs_a_supprimer.items():
+            if v:
+                self.documents_supprimes.setdefault(k, []).extend(v)
         self.collections_existantes = {
             k: [doc for doc in docs if doc["id"] != id_document]
             for k, docs in self.collections_existantes.items()
@@ -262,3 +264,48 @@ def test_continue_le_traitement_si_supprime_document_leve_une_erreur(
     assert len(client_indexation.documents_ajoutes) == 1
     assert client_indexation.documents_ajoutes[0].nom_document == "doc-2.pdf"
     assert un_service_jeopardy.noms_documents_a_jeopardyser == ["doc-2.pdf"]
+
+
+def test_supprime_les_documents(un_service_jeopardy):
+    client_indexation = ClientAlbertIndexationDeTest()
+    client_indexation.collections_existantes = {
+        "collection-1": [
+            {"id": "1", "nom": "doc-1.pdf"},
+            {"id": "2", "nom": "doc-2.pdf"},
+        ],
+    }
+
+    ServiceDIndexation(
+        client_indexation,
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents([], ["doc-1.pdf", "doc-2.pdf"])
+
+    documents_supprimes = client_indexation.documents_supprimes.get("collection-1")
+    assert documents_supprimes is not None
+    assert len(documents_supprimes) == 2
+
+
+def test_supprime_les_documents_seulement_si_le_document_existe(un_service_jeopardy):
+    client_indexation = ClientAlbertIndexationDeTest()
+    client_indexation.collections_existantes = {
+        "collection-1": [
+            {"id": "2", "nom": "doc-2.pdf"},
+        ],
+    }
+
+    ServiceDIndexation(
+        client_indexation,
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents([], ["doc-1.pdf", "doc-2.pdf"])
+
+    assert client_indexation.supprime_document_appele == 1
