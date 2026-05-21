@@ -67,8 +67,9 @@ def test_appelle_le_service_d_indexation_de_documents_pour_modifier_des_document
         "doc-3.pdf",
     ]
 
+
 def test_appelle_le_service_d_indexation_de_documents_pour_supprimer_des_documents(
-        un_serveur_de_test_complet,
+    un_serveur_de_test_complet,
 ):
     (serveur, _, _, _, _, _, service_indexation_document) = un_serveur_de_test_complet(
         None

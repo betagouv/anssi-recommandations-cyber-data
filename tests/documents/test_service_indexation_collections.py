@@ -87,9 +87,7 @@ def test_indexe_le_document_maitrise_si_chemin_fourni(monkeypatch: pytest.Monkey
         client, MSC_DE_TEST, ServiceJeopardyseDeTest()
     )
 
-    service.indexe_documents(
-        "nom", "desc", DocumentsSources(fichier_documents_maitrises="chemin.html")
-    )
+    service.indexe_documents("nom", "desc", DocumentsSources())
 
     assert un_document_maitrise in client.documents_recus
 
@@ -114,8 +112,6 @@ def test_indexe_les_documents_distants_si_chemin_fourni(
         client, MSC_DE_TEST, ServiceJeopardyseDeTest()
     )
 
-    service.indexe_documents(
-        "nom", "desc", DocumentsSources(fichier_documents_distants="chemin.json")
-    )
+    service.indexe_documents("nom", "desc", DocumentsSources())
 
     assert un_document_distant in client.documents_recus

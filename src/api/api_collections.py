@@ -16,8 +16,6 @@ class RequeteIndexationCollection(BaseModel):
     nom: str
     description: str
     fichiers: list[str] = []
-    fichier_documents_distants: str | None = None
-    fichier_documents_maitrises: str | None = None
 
 
 @api_collections.post("/", status_code=200)
@@ -33,10 +31,6 @@ def cree_collection(
         service.indexe_documents,
         requete.nom,
         requete.description,
-        DocumentsSources(
-            fichiers=requete.fichiers,
-            fichier_documents_distants=requete.fichier_documents_distants,
-            fichier_documents_maitrises=requete.fichier_documents_maitrises,
-        ),
+        DocumentsSources(fichiers=requete.fichiers),
     )
     return {"message": "Indexation en cours d'exécution..."}

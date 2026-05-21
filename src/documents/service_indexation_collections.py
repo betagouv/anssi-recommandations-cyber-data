@@ -18,10 +18,24 @@ from jeopardy.service_jeopardyse_collection_entiere import (
 )
 
 
+FICHIER_DOCUMENTS_DISTANTS = "donnees/documents_distants.json"
+FICHIER_DOCUMENTS_MAITRISES = "donnees/collection_reponses_maitrisees/faq_reponses_maitrisees.html"
+
+
 class DocumentsSources(NamedTuple):
     fichiers: list[str] = []
-    fichier_documents_distants: str | None = None
-    fichier_documents_maitrises: str | None = None
+
+
+class CollecteurDocumentsAdditionnels:
+    def collecte(self) -> list[DocumentAIndexer]:
+        docs: list[DocumentAIndexer] = []
+        mapping = mappe_en_document_distant(Path(FICHIER_DOCUMENTS_DISTANTS))
+        if mapping is not None:
+            docs += collecte_documents_distants(mapping)
+        doc_maitrise = collecte_document_maitrise(Path(FICHIER_DOCUMENTS_MAITRISES))
+        if doc_maitrise is not None:
+            docs.append(doc_maitrise)
+        return docs
 
 
 class ServiceIndexationNouvellesCollections:
@@ -30,11 +44,13 @@ class ServiceIndexationNouvellesCollections:
         client_indexation: ClientAlbertIndexation,
         configuration_MSC: MSC,
         service_jeopardy: ServiceJeopardyse,
+        collecteur: CollecteurDocumentsAdditionnels = CollecteurDocumentsAdditionnels(),
     ):
         super().__init__()
         self._service_jeopardy = service_jeopardy
         self._client_indexation = client_indexation
         self._configuration_MSC = configuration_MSC
+        self._collecteur = collecteur
 
     def indexe_documents(
         self,
@@ -49,17 +65,7 @@ class ServiceIndexationNouvellesCollections:
             DocumentPDFDistant(doc, normalise_url(doc, self._configuration_MSC))
             for doc in sources.fichiers
         ]
-        if sources.fichier_documents_distants is not None:
-            mapping = mappe_en_document_distant(
-                Path(sources.fichier_documents_distants)
-            )
-            if mapping is not None:
-                docs += collecte_documents_distants(mapping)
-
-        if sources.fichier_documents_maitrises is not None:
-            docs.append(
-                collecte_document_maitrise(Path(sources.fichier_documents_maitrises))
-            )
+        docs += self._collecteur.collecte()
 
         resultats = self._client_indexation.ajoute_documents(docs)
         self._service_jeopardy.jeopardyse(
