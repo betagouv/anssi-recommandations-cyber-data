@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from api.securite import fabrique_verifie_token_jwt
 from documents.service_indexation_collections import (
     ServiceIndexationNouvellesCollections,
-    SourcesDocuments,
+    DocumentsSources,
     fabrique_service_indexation_collections,
 )
 
@@ -33,7 +33,7 @@ def cree_collection(
         service.indexe_documents,
         requete.nom,
         requete.description,
-        SourcesDocuments(
+        DocumentsSources(
             fichiers=requete.fichiers,
             fichier_documents_distants=requete.fichier_documents_distants,
             fichier_documents_maitrises=requete.fichier_documents_maitrises,

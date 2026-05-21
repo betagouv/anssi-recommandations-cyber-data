@@ -8,7 +8,7 @@ from documents.indexeur.indexeur import DocumentAIndexer, ReponseDocument
 from documents.pdf.document_pdf import DocumentPDFDistant
 from documents.service_indexation_collections import (
     ServiceIndexationNouvellesCollections,
-    SourcesDocuments,
+    DocumentsSources,
 )
 from jeopardy.service import (
     CollectionEntiere,
@@ -88,7 +88,7 @@ def test_indexe_le_document_maitrise_si_chemin_fourni(monkeypatch: pytest.Monkey
     )
 
     service.indexe_documents(
-        "nom", "desc", SourcesDocuments(fichier_documents_maitrises="chemin.html")
+        "nom", "desc", DocumentsSources(fichier_documents_maitrises="chemin.html")
     )
 
     assert un_document_maitrise in client.documents_recus
@@ -115,7 +115,7 @@ def test_indexe_les_documents_distants_si_chemin_fourni(
     )
 
     service.indexe_documents(
-        "nom", "desc", SourcesDocuments(fichier_documents_distants="chemin.json")
+        "nom", "desc", DocumentsSources(fichier_documents_distants="chemin.json")
     )
 
     assert un_document_distant in client.documents_recus

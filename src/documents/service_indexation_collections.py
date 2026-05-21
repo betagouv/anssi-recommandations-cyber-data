@@ -18,7 +18,7 @@ from jeopardy.service_jeopardyse_collection_entiere import (
 )
 
 
-class SourcesDocuments(NamedTuple):
+class DocumentsSources(NamedTuple):
     fichiers: list[str] = []
     fichier_documents_distants: str | None = None
     fichier_documents_maitrises: str | None = None
@@ -40,7 +40,7 @@ class ServiceIndexationNouvellesCollections:
         self,
         nom: str,
         description: str,
-        sources: SourcesDocuments,
+        sources: DocumentsSources,
     ):
         reponse_collection = self._client_indexation.cree_collection(nom, description)
         self._client_indexation.attribue_collection(reponse_collection.id)
