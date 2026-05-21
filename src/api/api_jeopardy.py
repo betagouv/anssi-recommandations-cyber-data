@@ -55,6 +55,7 @@ def jeopardyse_documents_collection(
     service_jeopardy: ServiceJeopardyseDocuments = Depends(  # type: ignore[assignment]
         fabrique_service_jeopardise_documents
     ),
+    _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
 ):
     background_tasks.add_task(
         service_jeopardy.jeopardyse,

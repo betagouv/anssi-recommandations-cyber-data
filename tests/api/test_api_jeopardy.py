@@ -51,6 +51,7 @@ def test_ajoute_des_documents_a_un_jeopardy_existant(un_serveur_de_test_complet)
             "documents": ["doc-1", "doc-2"],
             "identifiant_collection": "0987",
         },
+        headers={"Authorization": "Bearer token-valide"},
     )
 
     assert reponse.status_code == 200
@@ -59,7 +60,7 @@ def test_ajoute_des_documents_a_un_jeopardy_existant(un_serveur_de_test_complet)
     }
 
 
-def test_securise_la_route_jeopardy(un_serveur_de_test_complet):
+def test_retourne_401_si_aucun_token_transmis(un_serveur_de_test_complet):
     (serveur, *_) = un_serveur_de_test_complet(None)
     client: TestClient = TestClient(serveur)
 
@@ -69,6 +70,21 @@ def test_securise_la_route_jeopardy(un_serveur_de_test_complet):
             "id_collection": "123",
             "nom_collection": "Nom",
             "description_collection": "Description",
+        },
+    )
+
+    assert reponse.status_code == 401
+
+
+def test_retourne_401_si_aucun_token_transmis_sur_documents(un_serveur_de_test_complet):
+    (serveur, *_) = un_serveur_de_test_complet(None)
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.post(
+        "/api/jeopardy/12345/documents",
+        json={
+            "documents": ["doc-1", "doc-2"],
+            "identifiant_collection": "0987",
         },
     )
 
@@ -87,6 +103,7 @@ def test_effectue_un_jeopardy_sur_des_documents(
             "documents": ["doc-3", "doc-4", "doc-5"],
             "identifiant_collection": "0987",
         },
+        headers={"Authorization": "Bearer token-valide"},
     )
 
     assert service_jeopardy.jeopardyse_documents_appele

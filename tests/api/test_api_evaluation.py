@@ -31,6 +31,7 @@ def test_lance_l_evaluation_d_une_collection(un_serveur_de_test_complet):
     reponse = client.post(
         "/api/evaluation",
         files=les_fichiers_d_evaluation(),
+        headers={"Authorization": "Bearer token-valide"},
     )
 
     assert reponse.status_code == 200
@@ -43,6 +44,7 @@ def test_transmets_les_fichiers_d_evaluation(un_serveur_de_test_complet):
     client.post(
         "/api/evaluation",
         files=les_fichiers_d_evaluation(),
+        headers={"Authorization": "Bearer token-valide"},
     )
 
     assert service_evaluation.evaluation_lancee
@@ -52,6 +54,18 @@ def test_transmets_les_fichiers_d_evaluation(un_serveur_de_test_complet):
     assert service_evaluation.chemin_fichier_mapping == Path("/tmp/mapping.csv")
 
 
+def test_retourne_401_si_aucun_token_transmis(un_serveur_de_test_complet):
+    (serveur, *_) = un_serveur_de_test_complet(None)
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.post(
+        "/api/evaluation",
+        files=les_fichiers_d_evaluation(),
+    )
+
+    assert reponse.status_code == 401
+
+
 def test_collecte_les_reponses_mqc_lors_d_une_evaluation(un_serveur_de_test_complet):
     (serveur, _, _, service_evaluation, _, _, _) = un_serveur_de_test_complet(None)
     client: TestClient = TestClient(serveur)
@@ -59,6 +73,7 @@ def test_collecte_les_reponses_mqc_lors_d_une_evaluation(un_serveur_de_test_comp
     client.post(
         "/api/evaluation",
         files=les_fichiers_d_evaluation(),
+        headers={"Authorization": "Bearer token-valide"},
     )
 
     assert service_evaluation.collecteur_de_reponse_appele

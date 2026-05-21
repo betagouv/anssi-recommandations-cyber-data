@@ -28,6 +28,7 @@ def test_lance_une_evaluation_de_reformulation_retourne_201(un_serveur_de_test_c
         "/api/evaluation/reformulation",
         data={"url_prompt": "https://une-url.com"},
         files=un_fichier_de_questions(),
+        headers={"Authorization": "Bearer token-valide"},
     )
 
     assert reponse.status_code == 201
@@ -46,6 +47,7 @@ def test_lance_une_evaluation_de_reformulation_avec_les_questions_fournies(
         "/api/evaluation/reformulation",
         data={"url_prompt": "https://une-url.com"},
         files=un_fichier_de_questions(),
+        headers={"Authorization": "Bearer token-valide"},
     )
 
     assert service_evaluation.evaluation_reformulation_lancee
@@ -71,10 +73,24 @@ def test_lance_une_evaluation_de_reformulation_avec_le_prompt_attendu(
         "/api/evaluation/reformulation",
         data={"url_prompt": "https://une-url.com"},
         files=un_fichier_de_questions(),
+        headers={"Authorization": "Bearer token-valide"},
     )
 
     assert executeur_de_requete.url_appelee == "https://une-url.com/"
     assert service_evaluation.prompt_recu == "Prompt attendu"
+
+
+def test_retourne_401_si_aucun_token_transmis(un_serveur_de_test_complet):
+    (serveur, *_) = un_serveur_de_test_complet(None)
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.post(
+        "/api/evaluation/reformulation",
+        data={"url_prompt": "https://une-url.com"},
+        files=un_fichier_de_questions(),
+    )
+
+    assert reponse.status_code == 401
 
 
 def test_retourne_404_si_le_prompt_ne_peut_pas_etre_recupere(
@@ -92,6 +108,7 @@ def test_retourne_404_si_le_prompt_ne_peut_pas_etre_recupere(
         "/api/evaluation/reformulation",
         data={"url_prompt": "https://une-url.com"},
         files=un_fichier_de_questions(),
+        headers={"Authorization": "Bearer token-valide"},
     )
 
     assert reponse.status_code == 404

@@ -8,6 +8,7 @@ from fastapi import APIRouter, UploadFile, HTTPException, BackgroundTasks
 from fastapi.params import Depends, File, Form
 from pydantic import BaseModel, AnyHttpUrl
 
+from api.securite import fabrique_verifie_token_jwt
 from adaptateurs.client_albert_reformulation_reel import (
     fabrique_client_albert_reformulation,
 )
@@ -39,6 +40,7 @@ async def evaluation(
     collecteur_de_reponses: CollecteurDeReponses = Depends(  # type: ignore[assignment]
         fabrique_collecteur_de_reponses
     ),
+    _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
 ):
     chemin_evaluation = Path(f"/tmp/{fichier_evaluation.filename}")
     with chemin_evaluation.open("wb") as buffer:
@@ -69,6 +71,7 @@ async def reformulation(
     bus_evenement: BusEvenement = Depends(fabrique_bus_evenements),  # type: ignore[assignment]
     service_evaluation: ServiceEvaluation = Depends(fabrique_service_evaluation),  # type: ignore[assignment]
     executeur_de_requete: ExecuteurDeRequete = Depends(fabrique_executeur_de_requete),  # type: ignore[assignment]
+    _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
 ) -> ReponseEvaluationEnCours:
     lecteur_csv = csv.DictReader(TextIOWrapper(file.file, encoding="utf-8"))
     questions = [
