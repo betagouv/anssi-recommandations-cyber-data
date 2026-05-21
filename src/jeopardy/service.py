@@ -10,6 +10,7 @@ from typing import Generator
 from documents.docling.multi_processeur import Multiprocesseur
 from evenement.bus import BusEvenement
 from infra.interval import Interval
+from infra.logger import log
 from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
     RequeteAjoutChunksDansDocumentAlbert,
@@ -70,6 +71,7 @@ class ServiceJeopardyse(ABC):
         donnees: CollectionEntiere | ListeDeDocuments,
         taille_paquet_chunks: int = 10,
     ):
+        log(__name__, "LANCEMENT DE JEOPARDY")
         documents, id_collection_jeopardy = self.recupere_les_documents(
             donnees, taille_paquet_chunks
         )
