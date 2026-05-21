@@ -17,7 +17,8 @@ services:
     env_file:
       - .env
     volumes:
-      - .:/app
+      - ./src:/app/src
+      - ./ui/dist:/app/ui/dist
       - ./donnees:/app/donnees
     ports:
       - '3007:3001'
