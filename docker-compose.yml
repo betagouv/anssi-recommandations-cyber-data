@@ -9,7 +9,6 @@ services:
     volumes:
       - ./ui:/usr/src/app
       - /usr/src/app/node_modules # On ne monte pas le node_modules de l’hôte
-      - dist-front:/usr/src/app/dist
 
   mqc-data-backend:
     build:
@@ -19,7 +18,7 @@ services:
       - .env
     volumes:
       - .:/app
-      - dist-front:/app/ui/dist
+      - ./donnees:/app/donnees
     ports:
       - '3007:3001'
     networks:
