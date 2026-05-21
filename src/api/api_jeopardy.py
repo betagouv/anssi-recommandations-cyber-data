@@ -2,6 +2,7 @@ from fastapi import APIRouter, BackgroundTasks
 from fastapi.params import Depends
 from pydantic import BaseModel
 
+from api.securite import fabrique_verifie_token_jwt
 from jeopardy.service import CollectionEntiere, ListeDeDocuments
 from jeopardy.service_jeopardyse_collection_entiere import (
     ServiceJeopardyseCollectionEntiere,
@@ -28,6 +29,7 @@ def jeopardy(
     service_jeopardy: ServiceJeopardyseCollectionEntiere = Depends(  # type: ignore[assignment]
         fabrique_service_jeopardise_collection_entiere
     ),
+    _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
 ):
     background_tasks.add_task(
         service_jeopardy.jeopardyse,

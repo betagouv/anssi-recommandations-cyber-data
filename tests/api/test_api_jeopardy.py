@@ -12,6 +12,7 @@ def test_effectue_un_jeopardy_sur_une_collection(un_serveur_de_test_complet):
             "nom_collection": "Nom",
             "description_collection": "Description",
         },
+        headers={"Authorization": "Bearer token-valide"},
     )
 
     assert reponse.status_code == 200
@@ -31,6 +32,7 @@ def test_effectue_un_jeopardy_sur_une_collection_appelle_le_service(
             "nom_collection": "Un jeopardy",
             "description_collection": "Description jeopardy",
         },
+        headers={"Authorization": "Bearer token-valide"},
     )
 
     assert service_jeopardy.jeopardyse_appele
@@ -55,6 +57,22 @@ def test_ajoute_des_documents_a_un_jeopardy_existant(un_serveur_de_test_complet)
     assert reponse.json() == {
         "message": "Ajout des documents de la collection 0987 dans la collection 12345 en cours d’exécution..."
     }
+
+
+def test_securise_la_route_jeopardy(un_serveur_de_test_complet):
+    (serveur, *_) = un_serveur_de_test_complet(None)
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.post(
+        "/api/jeopardy",
+        json={
+            "id_collection": "123",
+            "nom_collection": "Nom",
+            "description_collection": "Description",
+        },
+    )
+
+    assert reponse.status_code == 401
 
 
 def test_effectue_un_jeopardy_sur_des_documents(
