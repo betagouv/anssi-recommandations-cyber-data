@@ -9,9 +9,11 @@ from documents.collecte.collecte import (
     mappe_en_document_distant,
 )
 from documents.indexe_documents_rag import fabrique_client_albert
-from documents.indexeur.indexeur import DocumentAIndexer
+from documents.indexeur.indexeur import DocumentAIndexer, ReponseDocumentEnErreur, ReponseDocumentEnSucces, \
+    ReponseDocumentMaitriseEnSucces
 from documents.pdf.cree_document_pdf import normalise_url
 from documents.pdf.document_pdf import DocumentPDFDistant
+from infra.logger import log
 from jeopardy.service import ServiceJeopardyse, CollectionEntiere
 from jeopardy.service_jeopardyse_collection_entiere import (
     fabrique_service_jeopardise_collection_entiere,
@@ -59,6 +61,7 @@ class ServiceIndexationNouvellesCollections:
         sources: DocumentsSources,
     ):
         reponse_collection = self._client_indexation.cree_collection(nom, description)
+        log(__name__, f"Collection {nom} créée avec succès (id : {reponse_collection.id})")
         self._client_indexation.attribue_collection(reponse_collection.id)
 
         docs: list[DocumentAIndexer] = [
@@ -67,7 +70,27 @@ class ServiceIndexationNouvellesCollections:
         ]
         docs += self._collecteur.collecte()
 
+        log(__name__, f"Indexe {len(docs)} documents")
+
         resultats = self._client_indexation.ajoute_documents(docs)
+
+        les_documents_en_erreur = list(
+            filter(lambda reponse: isinstance(reponse, ReponseDocumentEnErreur), resultats)
+        )
+        les_documents_en_succes = list(
+            filter(
+                lambda reponse: isinstance(
+                    reponse, (ReponseDocumentEnSucces, ReponseDocumentMaitriseEnSucces)
+                ),
+                resultats,
+            )
+        )
+
+        log(__name__,
+            f"{len(les_documents_en_succes)} documents ajoutés à la collection {reponse_collection.id}"
+        )
+        log(__name__, f"{len(les_documents_en_erreur)} documents non ajoutés à la collection")
+
         self._service_jeopardy.jeopardyse(
             CollectionEntiere(
                 id_collection=reponse_collection.id,
