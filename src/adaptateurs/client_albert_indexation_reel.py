@@ -17,7 +17,6 @@ class ClientAlbertIndexationReel(ClientAlbertIndexation):
             print(f"Erreur {response.status_code}: {response.text}")
             raise Exception(f"Erreur création collection: {response.status_code}")
         result = response.json()
-        print(f"Réponse API: {result}")
         self.id_collection = result["id"]
         return ReponseCollection(
             id=result["id"],
