@@ -1,0 +1,10 @@
+.deepeval
+.direnv
+.venv
+.github
+.idea
+documentation
+donnees
+node_modules
+.envrc
+shell.nix
