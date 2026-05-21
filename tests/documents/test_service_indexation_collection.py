@@ -11,6 +11,7 @@ from documents.indexeur.indexeur import (
 from documents.service_indexation_collections import (
     ServiceIndexationNouvellesCollections,
     DocumentsSources,
+    CollecteurDocumentsAdditionnels,
 )
 from infra.memoire.executeur_de_requete_memoire import ExecuteurDeRequeteDeTest
 from jeopardy.service import CollectionEntiere
@@ -78,6 +79,11 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
         return reponse_collection
 
 
+class CollecteurDocumentsAdditionnelsDeTest(CollecteurDocumentsAdditionnels):
+    def collecte(self) -> list[DocumentAIndexer]:
+        return []
+
+
 def test_ajoute_un_guide_de_l_anssi(un_service_jeopardy):
     client_indexation = ClientAlbertIndexationDeTest()
 
@@ -85,6 +91,7 @@ def test_ajoute_un_guide_de_l_anssi(un_service_jeopardy):
         client_indexation,
         MSC(url="http://documents.local", chemin_guides="guides"),
         un_service_jeopardy,
+        CollecteurDocumentsAdditionnelsDeTest(),
     ).indexe_documents("", "", DocumentsSources(fichiers=["doc-1.pdf"]))
 
     assert len(reponse) == 1
@@ -100,6 +107,7 @@ def test_nomme_et_decrit_la_nouvelle_collection(un_service_jeopardy):
         client_indexation,
         MSC(url="http://documents.local", chemin_guides="guides"),
         un_service_jeopardy,
+        CollecteurDocumentsAdditionnelsDeTest(),
     ).indexe_documents(
         "le_nouveau_nom",
         "la description nouvelle",
@@ -122,6 +130,7 @@ def test_jeopardyse_un_guide_de_l_anssi(un_service_jeopardy):
         client_indexation,
         MSC(url="http://documents.local", chemin_guides="guides"),
         un_service_jeopardy,
+        CollecteurDocumentsAdditionnelsDeTest(),
     ).indexe_documents(
         "le_nouveau_nom", "pour tester", DocumentsSources(fichiers=["doc-1.pdf"])
     )
