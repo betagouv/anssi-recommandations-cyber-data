@@ -102,22 +102,22 @@
   "MSC - Proposition de valeur": {
     "type": "HTML",
     "url": "https://messervices.cyber.gouv.fr/",
-    "chemin": "messervices.cyber.gouv.fr_.html"
+    "chemin": "./donnees/pages_html/demainspecialiste.cyber.gouv.fr_.html"
   },
   "NIS2 - Proposition de valeur": {
     "type": "HTML",
     "url": "https://messervices.cyber.gouv.fr/nis2",
-    "chemin": "messervices.cyber.gouv.fr_nis2.html"
+    "chemin": "./donnees/pages_html/messervices.cyber.gouv.fr_nis2.html"
   },
   "DSC - Proposition de valeur": {
     "type": "HTML",
     "url": "https://demainspecialiste.cyber.gouv.fr/",
-    "chemin": "demainspecialiste.cyber.gouv.fr_.html"
+    "chemin": "./donnees/pages_html/demainspecialiste.cyber.gouv.fr_.html"
   },
   "DSC - Cyber En Jeux": {
     "type": "HTML",
     "url": "https://demainspecialiste.cyber.gouv.fr/cyber-en-jeux/",
-    "chemin": "demainspecialiste.cyber.gouv.fr_cyber-en-jeux.html"
+    "chemin": "./donnees/pages_html/demainspecialiste.cyber.gouv.fr_cyber-en-jeux.html"
   },
   "CERT-FR - IA générative face aux attaques informatiques": {
     "type": "PDF",
