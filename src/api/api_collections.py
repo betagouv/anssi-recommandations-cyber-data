@@ -8,6 +8,7 @@ from documents.service_indexation_collections import (
     DocumentsSources,
     fabrique_service_indexation_collections,
 )
+from infra.logger import log
 
 api_collections = APIRouter(prefix="/collections")
 
@@ -27,6 +28,7 @@ def cree_collection(
     ),
     _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
 ):
+    log(__name__, "Log de test")
     background_tasks.add_task(
         service.indexe_documents,
         requete.nom,
