@@ -1,6 +1,10 @@
+import logging
+
 import uvicorn
 
 from configuration import recupere_configuration
+
+logging.basicConfig(level=logging.INFO, format="%(name)s - %(levelname)s - %(message)s")
 from serveur import fabrique_serveur
 
 configuration = recupere_configuration()
