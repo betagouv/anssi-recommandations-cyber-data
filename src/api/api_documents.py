@@ -27,12 +27,17 @@ def indexe_documents(
     ),
     _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
 ):
-    les_documents = [*requete.fichiers_ajoutes, *requete.fichiers_modifies]
+    les_documents = list(
+        filter(
+            lambda doc: doc.endswith(".pdf"),
+            [*requete.fichiers_ajoutes, *requete.fichiers_modifies],
+        )
+    )
     log(__name__, f"Indexation des documents {les_documents}")
     log(__name__, f"Suppression des documents {requete.fichiers_supprimes}")
     background_tasks.add_task(
         service_indexation_document.indexe_documents,
         les_documents,
-        requete.fichiers_supprimes,
+        list(filter(lambda doc: doc.endswith(".pdf"), requete.fichiers_supprimes)),
     )
     return {"message": "Indexation en cours d’exécution..."}
