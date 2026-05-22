@@ -9,7 +9,9 @@ def genere_token():
     parser = argparse.ArgumentParser()
     parser.add_argument("--nom", required=True, help="Nom du token")
     parser.add_argument(
-        "--duree", required=True, help="Durée de validité du token (par défaut en heures)"
+        "--duree",
+        required=True,
+        help="Durée de validité du token (par défaut en heures)",
     )
     parser.add_argument(
         "--jours",

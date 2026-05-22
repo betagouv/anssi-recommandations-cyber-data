@@ -28,7 +28,7 @@ def cree_collection(
     ),
     _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
 ):
-    log(__name__, "Log de test")
+    log(__name__, f"Log l'indexation pour {len(requete.fichiers)} fichiers")
     background_tasks.add_task(
         service.indexe_documents,
         requete.nom,
