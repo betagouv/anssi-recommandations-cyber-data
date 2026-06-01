@@ -1,5 +1,7 @@
 import csv
+import os
 import shutil
+import tempfile
 import uuid
 from io import TextIOWrapper
 from pathlib import Path
@@ -8,11 +10,11 @@ from fastapi import APIRouter, UploadFile, HTTPException, BackgroundTasks
 from fastapi.params import Depends, File, Form
 from pydantic import BaseModel, AnyHttpUrl
 
-from api.securite import fabrique_verifie_token_jwt
 from adaptateurs.client_albert_reformulation_reel import (
     fabrique_client_albert_reformulation,
 )
 from adaptateurs.clients_albert import ClientAlbertReformulation
+from api.securite import fabrique_verifie_token_jwt
 from evaluation.mqc.collecte_reponses_mqc import (
     CollecteurDeReponses,
     fabrique_collecteur_de_reponses,
@@ -42,11 +44,14 @@ async def evaluation(
     ),
     _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
 ):
-    chemin_evaluation = Path(f"/tmp/{fichier_evaluation.filename}")
+    dossier_temporaire = tempfile.mkdtemp()
+    nom_fichier_evaluation = os.path.basename(str(fichier_evaluation.filename))
+    chemin_evaluation = Path(dossier_temporaire) / nom_fichier_evaluation
     with chemin_evaluation.open("wb") as buffer:
         shutil.copyfileobj(fichier_evaluation.file, buffer)
 
-    chemin_mapping = Path(f"/tmp/{fichier_mapping.filename}")
+    nom_fichier_mapping = os.path.basename(str(fichier_mapping.filename))
+    chemin_mapping = Path(dossier_temporaire) / nom_fichier_mapping
     with chemin_mapping.open("wb") as buffer:
         shutil.copyfileobj(fichier_mapping.file, buffer)
 
