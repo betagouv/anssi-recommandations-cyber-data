@@ -10,6 +10,13 @@ from fastapi import FastAPI, HTTPException, Security, status
 from fastapi.security import HTTPBearer
 from typing_extensions import Callable, Dict, Optional
 
+from adaptateurs.authentification import (
+    fabrique_service_authentification,
+    fabrique_entrepot_utilisateurs,
+    ServiceAuthentification,
+    UtilisateurEnCoursAuthentification,
+    EntrepotUtilisateurs,
+)
 from adaptateurs.client_albert_reformulation_reel import (
     fabrique_client_albert_reformulation,
 )
@@ -332,6 +339,15 @@ class ConstructeurServeur:
         self._dependances: Dict[Callable, Callable] = {}
         self.pages_statiques: Path = Path()
 
+    def construis(self):
+        self._serveur = fabrique_serveur(
+            self._max_requetes_par_minute,
+            f"{self.pages_statiques}/ui/dist/",
+        )
+        for clef, dependance in self._dependances.items():
+            self._serveur.dependency_overrides[clef] = dependance
+        return self._serveur
+
     def avec_adaptateur_journal(self, adaptateur_journal: AdaptateurJournal):
         self._dependances[fabrique_adaptateur_journal] = lambda: adaptateur_journal
         return self
@@ -361,15 +377,6 @@ class ConstructeurServeur:
     ):
         self._dependances[fabrique_executeur_de_requete] = lambda: executeur_de_requete
         return self
-
-    def construis(self):
-        self._serveur = fabrique_serveur(
-            self._max_requetes_par_minute,
-            f"{self.pages_statiques}/ui/dist/",
-        )
-        for clef, dependance in self._dependances.items():
-            self._serveur.dependency_overrides[clef] = dependance
-        return self._serveur
 
     def avec_un_service_jeopardy_de_collection_entiere(
         self, service_jeopardy: ServiceJeopardyseCollectionEntiereDeTest
@@ -411,6 +418,20 @@ class ConstructeurServeur:
 
     def avec_une_verification_de_token_jwt(self, verificateur):
         self._dependances[verifie_token_jwt] = verificateur
+        return self
+
+    def avec_un_service_de_generation_de_challenge(
+        self, service_generation_challenge: ServiceAuthentification
+    ):
+        self._dependances[fabrique_service_authentification] = (
+            lambda: service_generation_challenge
+        )
+        return self
+
+    def avec_un_entrepot_utilisateurs(self, entrepot_utilisateurs):
+        self._dependances[fabrique_entrepot_utilisateurs] = (
+            lambda: entrepot_utilisateurs
+        )
         return self
 
 
@@ -562,5 +583,37 @@ def un_serveur_de_test_pour_collections(
 
         serveur.avec_une_verification_de_token_jwt(faux_verificateur_token)
         return serveur.construis(), service
+
+    return _construis
+
+
+class ServiceAuthentificationDeTest(ServiceAuthentification):
+    def genere_challenge(self):
+        return "123"
+
+
+class EntrepotUtilisateursMemoire(EntrepotUtilisateurs):
+    les_utilisateurs: dict[str, UtilisateurEnCoursAuthentification] = {
+        "utilisateur.mqc": UtilisateurEnCoursAuthentification(id="456")
+    }
+
+    def recupere_utilisateur_par_id_utilisateur(self, identifiant_utilisateur):
+        return self.les_utilisateurs[identifiant_utilisateur]
+
+
+@pytest.fixture()
+def un_serveur_de_test_pour_authentification(
+    pages_statiques,
+) -> Callable[[], tuple[FastAPI, ServiceAuthentification, EntrepotUtilisateurs]]:
+    def _construis():
+        service_generation_challenge = ServiceAuthentificationDeTest()
+        entrepot_utilisateurs = EntrepotUtilisateursMemoire()
+        serveur = (
+            ConstructeurServeur(max_requetes_par_minute=100)  # type: ignore[arg-type]
+            .avec_un_service_de_generation_de_challenge(service_generation_challenge)
+            .avec_un_entrepot_utilisateurs(entrepot_utilisateurs)
+            .avec_pages_statiques(pages_statiques)
+        )
+        return serveur.construis(), service_generation_challenge, entrepot_utilisateurs
 
     return _construis
