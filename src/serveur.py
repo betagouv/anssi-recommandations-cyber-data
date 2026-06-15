@@ -11,6 +11,7 @@ from slowapi.util import get_remote_address
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from api.api import api
+from api.auth import auth
 from infra.ui_kit.version_ui_kit import version_ui_kit
 
 HEADERS_SECURITE = {
@@ -48,6 +49,7 @@ def fabrique_serveur(
     serveur.add_middleware(ProxyHeadersMiddleware, trusted_hosts=["*"])  # type: ignore [arg-type]
 
     serveur.include_router(api)
+    serveur.include_router(auth)
 
     for static in ["assets", "fonts", "icons", "images"]:
         serveur.mount(

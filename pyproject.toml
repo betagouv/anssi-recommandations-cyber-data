@@ -30,6 +30,7 @@ dependencies = [
     "types-reportlab",
     "urllib3>=2.7.0",
     "uvicorn",
+    "webauthn",
     "wheel>=0.46.2",
 ]
 
