@@ -21,15 +21,15 @@ class EntrepotUtilisateurs(ABC):
     @abstractmethod
     def recupere_utilisateur_par_id_utilisateur(
         self, identifiant_utilisateur
-    ) -> UtilisateurEnCoursAuthentification:
+    ) -> UtilisateurEnCoursAuthentification | None:
         pass
 
 
 class EntrepotUtilisateursConcret(EntrepotUtilisateurs):
     def recupere_utilisateur_par_id_utilisateur(
         self, identifiant_utilisateur
-    ) -> UtilisateurEnCoursAuthentification:
-        return UtilisateurEnCoursAuthentification(id=identifiant_utilisateur)
+    ) -> UtilisateurEnCoursAuthentification | None:
+        return None
 
 
 def fabrique_entrepot_utilisateurs() -> EntrepotUtilisateurs:

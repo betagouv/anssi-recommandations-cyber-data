@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
 from fastapi.params import Depends
 from pydantic import BaseModel
 
@@ -30,9 +30,8 @@ def initie(
     utilisateur = entrepot_utilisateurs.recupere_utilisateur_par_id_utilisateur(
         requete.utilisateur
     )
-    # credential_id = lis dans le fichier la clé correspondant à l’utilisateur passé en POST puis l’id de l’objet
-
-    # sessions["challenge"] = challenge
+    if utilisateur is None:
+        return Response(status_code=401)
 
     return {"challenge": challenge, "id": utilisateur.id}
 

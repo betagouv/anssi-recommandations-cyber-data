@@ -597,8 +597,10 @@ class EntrepotUtilisateursMemoire(EntrepotUtilisateurs):
         "utilisateur.mqc": UtilisateurEnCoursAuthentification(id="456")
     }
 
-    def recupere_utilisateur_par_id_utilisateur(self, identifiant_utilisateur):
-        return self.les_utilisateurs[identifiant_utilisateur]
+    def recupere_utilisateur_par_id_utilisateur(
+        self, identifiant_utilisateur
+    ) -> UtilisateurEnCoursAuthentification | None:
+        return self.les_utilisateurs.get(identifiant_utilisateur)
 
 
 @pytest.fixture()
