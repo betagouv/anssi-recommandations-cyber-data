@@ -121,6 +121,32 @@ def test_finalise_l_authentification_en_generant_un_token_jwt(
     assert service_generation_token.token_genere
 
 
+def test_finalise_l_authentification_en_ajoutant_le_token_dans_un_cookie(
+    un_serveur_de_test_pour_authentification,
+):
+    (serveur, _, _) = un_serveur_de_test_pour_authentification()
+    client: TestClient = TestClient(serveur)
+    credential = {
+        "id": "456",
+        "rawId": "456",
+        "response": {
+            "authenticatorData": "authenticator",
+            "clientDataJSON": "clientData",
+            "signature": "signature",
+        },
+        "type": "public-key",
+        "clientExtensionResults": {},
+    }
+
+    reponse = client.post(
+        "/auth/finalise/",
+        json={"credential": credential, "challenge": "123"},
+    )
+
+    assert "session" in reponse.cookies
+    assert reponse.cookies["session"] == "token-genere"
+
+
 def test_finalise_l_authentification_en_renvoyant_une_erreur_401_si_l_utilisateurice_est_inconnue(
     un_serveur_de_test_pour_authentification,
 ):

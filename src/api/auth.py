@@ -42,6 +42,7 @@ def initie(
 @auth.post("/finalise")
 def finalise(
     requete: RequeteAccreditation,
+    reponse: Response,
     service_generation_de_challenge: ServiceAuthentification = Depends(  # type: ignore[assignment]
         fabrique_service_authentification
     ),
@@ -56,9 +57,11 @@ def finalise(
         requete.credential.id
     )
     if utilisateur is None:
-        return Response(status_code=401)
+        reponse.status_code = 401
+        return
 
     service_generation_de_challenge.verifie_challenge(
         requete.credential, requete.challenge, utilisateur.clef_publique
     )
-    service_generation_token.genere_token()
+    token = service_generation_token.genere_token()
+    reponse.set_cookie(key="session", value=token, httponly=True, samesite="strict")
