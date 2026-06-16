@@ -19,6 +19,7 @@ class MQCData(NamedTuple):
     max_requetes_par_minute: int
     hote: str
     port: int
+    url_hote: str
 
 
 class Albert(NamedTuple):
@@ -92,6 +93,7 @@ def recupere_configuration() -> Configuration:
         max_requetes_par_minute=int(
             os.getenv("MQC_DATA_MAX_REQUETES_PAR_MINUTE", "100")
         ),
+        url_hote=os.getenv("MQC_DATA_URL_HOTE", ""),
     )
 
     albert_url = os.getenv("ALBERT_URL", "https://albert.api.etalab.gouv.fr/v1")
