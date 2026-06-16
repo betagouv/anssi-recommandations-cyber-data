@@ -48,9 +48,9 @@ def test_finalise_l_authentification(
             "authenticatorData": "authenticator",
             "clientDataJSON": "clientData",
             "signature": "signature",
+            "userHandle": None,
         },
         "type": "public-key",
-        "clientExtensionResults": {},
     }
 
     reponse = client.post(

@@ -1,7 +1,7 @@
 import json
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta, timezone
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 
 import jwt
 from pydantic import BaseModel
@@ -15,6 +15,7 @@ class ReponseAccreditation(BaseModel):
     authenticatorData: str
     clientDataJSON: str
     signature: str
+    userHandle: Optional[bytes] = None
 
 
 class Accreditation(BaseModel):
@@ -22,7 +23,6 @@ class Accreditation(BaseModel):
     rawId: str
     response: ReponseAccreditation
     type: str
-    clientExtensionResults: dict
 
 
 class RequeteAccreditation(BaseModel):
