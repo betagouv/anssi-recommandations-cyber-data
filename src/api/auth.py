@@ -52,9 +52,13 @@ def finalise(
         fabrique_entrepot_utilisateurs
     ),
 ):
-    utilisateur = entrepot_utilisateurs.recupere_utilisateur_par_id_de_clef(requete.id)
+    utilisateur = entrepot_utilisateurs.recupere_utilisateur_par_id_de_clef(
+        requete.credential.id
+    )
     if utilisateur is None:
         return Response(status_code=401)
 
-    service_generation_de_challenge.verifie_challenge(requete)
+    service_generation_de_challenge.verifie_challenge(
+        requete.credential, requete.challenge
+    )
     service_generation_token.genere_token()
