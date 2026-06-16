@@ -14,7 +14,7 @@ class ReponseAccreditation(BaseModel):
     signature: str
 
 
-class RequeteAccreditation(BaseModel):
+class Accreditation(BaseModel):
     id: str
     rawId: str
     response: ReponseAccreditation
@@ -22,11 +22,16 @@ class RequeteAccreditation(BaseModel):
     clientExtensionResults: dict
 
 
+class RequeteAccreditation(BaseModel):
+    credential: Accreditation
+    challenge: str
+
+
 class ServiceAuthentification:
     def genere_challenge(self):
         return generate_challenge()
 
-    def verifie_challenge(self, requete: RequeteAccreditation):
+    def verifie_challenge(self, requete: Accreditation, challenge: str):
         pass
 
 

@@ -17,9 +17,9 @@ from adaptateurs.authentification import (
     ServiceAuthentification,
     UtilisateurEnCoursAuthentification,
     EntrepotUtilisateurs,
-    RequeteAccreditation,
     ServiceGenerationToken,
     fabrique_service_generation_token,
+    Accreditation,
 )
 from adaptateurs.client_albert_reformulation_reel import (
     fabrique_client_albert_reformulation,
@@ -613,8 +613,8 @@ class ServiceAuthentificationDeTest(ServiceAuthentification):
     def genere_challenge(self):
         return "123"
 
-    def verifie_challenge(self, requete: RequeteAccreditation):
-        self.challenge_attendu = "123"
+    def verifie_challenge(self, requete: Accreditation, challenge: str):
+        self.challenge_attendu = challenge
         self.rp_id_attendu = self.rp_id
         self.origine_attendue = self.origine
         self.clef_publique_attendue = "clef-publique"

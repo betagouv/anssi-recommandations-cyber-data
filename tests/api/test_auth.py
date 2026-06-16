@@ -55,7 +55,7 @@ def test_finalise_l_authentification(
 
     reponse = client.post(
         "/auth/finalise/",
-        json=credential,
+        json={"credential": credential, "challenge": "123"},
     )
 
     assert reponse.status_code == 200
@@ -88,7 +88,7 @@ def test_finalise_l_authentification_en_generant_un_token_jwt(
 
     client.post(
         "/auth/finalise/",
-        json=credential,
+        json={"credential": credential, "challenge": "123"},
     )
 
     assert service_generation_token.token_genere
@@ -115,7 +115,7 @@ def test_finalise_l_authentification_en_renvoyant_une_erreur_401_si_l_utilisateu
 
     reponse = client.post(
         "/auth/finalise/",
-        json=credential,
+        json={"credential": credential, "challenge": "123"},
     )
 
     assert reponse.status_code == 401
