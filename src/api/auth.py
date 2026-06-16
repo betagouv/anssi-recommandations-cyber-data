@@ -59,6 +59,6 @@ def finalise(
         return Response(status_code=401)
 
     service_generation_de_challenge.verifie_challenge(
-        requete.credential, requete.challenge
+        requete.credential, requete.challenge, utilisateur.clef_publique
     )
     service_generation_token.genere_token()

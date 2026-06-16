@@ -31,7 +31,7 @@ class ServiceAuthentification:
     def genere_challenge(self):
         return generate_challenge()
 
-    def verifie_challenge(self, requete: Accreditation, challenge: str):
+    def verifie_challenge(self, requete: Accreditation, challenge: str, clef_publique):
         pass
 
 
@@ -41,6 +41,7 @@ def fabrique_service_authentification() -> ServiceAuthentification:
 
 class UtilisateurEnCoursAuthentification(NamedTuple):
     id: str
+    clef_publique: str
 
 
 class EntrepotUtilisateurs(ABC):
@@ -74,7 +75,10 @@ class EntrepotUtilisateursConcret(EntrepotUtilisateurs):
         donnees_utilisateur = utilisateurs.get(identifiant_utilisateur)
         if not donnees_utilisateur:
             return None
-        return UtilisateurEnCoursAuthentification(id=donnees_utilisateur["id"])
+        return UtilisateurEnCoursAuthentification(
+            id=donnees_utilisateur["id"],
+            clef_publique=donnees_utilisateur["response"]["clef_publique"],
+        )
 
     def recupere_utilisateur_par_id_de_clef(
         self, id_clef: str
@@ -82,7 +86,10 @@ class EntrepotUtilisateursConcret(EntrepotUtilisateurs):
         utilisateurs = self._recupere_utilisateurs()
         for donnees_utilisateur in utilisateurs.values():
             if donnees_utilisateur.get("id") == id_clef:
-                return UtilisateurEnCoursAuthentification(id=donnees_utilisateur["id"])
+                return UtilisateurEnCoursAuthentification(
+                    id=donnees_utilisateur["id"],
+                    clef_publique=donnees_utilisateur["response"]["clef_publique"],
+                )
         return None
 
 

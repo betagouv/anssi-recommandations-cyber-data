@@ -63,8 +63,35 @@ def test_finalise_l_authentification(
     assert service_generation_challenge.challenge_attendu == "123"
     assert service_generation_challenge.rp_id_attendu == "localhost"
     assert service_generation_challenge.origine_attendue == "http://localhost"
-    assert service_generation_challenge.clef_publique_attendue == "clef-publique"
     assert service_generation_challenge.verification_utilisateur_attendue
+
+
+def test_finalise_l_authentification_en_fournissant_la_clef_publique_de_l_utilisateurice_reconnue(
+    un_serveur_de_test_pour_authentification,
+):
+    (serveur, service_generation_challenge, _) = (
+        un_serveur_de_test_pour_authentification()
+    )
+    client: TestClient = TestClient(serveur)
+    credential = {
+        "id": "456",
+        "rawId": "456",
+        "response": {
+            "authenticatorData": "authenticator",
+            "clientDataJSON": "clientData",
+            "signature": "signature",
+        },
+        "type": "public-key",
+        "clientExtensionResults": {},
+    }
+
+    reponse = client.post(
+        "/auth/finalise/",
+        json={"credential": credential, "challenge": "123"},
+    )
+
+    assert reponse.status_code == 200
+    assert service_generation_challenge.clef_publique_attendue == "clef-publique-de-456"
 
 
 def test_finalise_l_authentification_en_generant_un_token_jwt(
