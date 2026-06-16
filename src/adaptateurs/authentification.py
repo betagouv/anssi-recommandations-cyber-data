@@ -105,7 +105,7 @@ class EntrepotUtilisateursConcret(EntrepotUtilisateurs):
             if donnees_utilisateur.get("id") == id_clef:
                 return UtilisateurEnCoursAuthentification(
                     id=donnees_utilisateur["id"],
-                    clef_publique=donnees_utilisateur["response"]["clef_publique"],
+                    clef_publique=donnees_utilisateur["response"]["publicKey"],
                 )
         return None
 
