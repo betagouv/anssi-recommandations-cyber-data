@@ -613,18 +613,22 @@ class ServiceAuthentificationDeTest(ServiceAuthentification):
     def genere_challenge(self):
         return "123"
 
-    def verifie_challenge(self, requete: Accreditation, challenge: str):
+    def verifie_challenge(
+        self, requete: Accreditation, challenge: str, clef_publique: str
+    ):
         self.challenge_attendu = challenge
         self.rp_id_attendu = self.rp_id
         self.origine_attendue = self.origine
-        self.clef_publique_attendue = "clef-publique"
+        self.clef_publique_attendue = clef_publique
         self.verification_utilisateur_attendue = True
         self.credential_verifie = json.loads(requete.model_dump_json())
 
 
 class EntrepotUtilisateursMemoire(EntrepotUtilisateurs):
     les_utilisateurs: dict[str, UtilisateurEnCoursAuthentification] = {
-        "utilisateur.mqc": UtilisateurEnCoursAuthentification(id="456")
+        "utilisateur.mqc": UtilisateurEnCoursAuthentification(
+            id="456", clef_publique="clef-publique-de-456"
+        )
     }
 
     def recupere_utilisateur_par_id_utilisateur(
