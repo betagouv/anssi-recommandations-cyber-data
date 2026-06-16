@@ -3,9 +3,10 @@ from abc import ABC, abstractmethod
 from typing import NamedTuple
 
 from pydantic import BaseModel
+from webauthn import verify_authentication_response, base64url_to_bytes
 from webauthn.helpers import generate_challenge
 
-from configuration import Configuration, recupere_configuration
+from configuration import Configuration, recupere_configuration, MQCData
 
 
 class ReponseAccreditation(BaseModel):
@@ -28,15 +29,29 @@ class RequeteAccreditation(BaseModel):
 
 
 class ServiceAuthentification:
+    def __init__(self, mqc_data: MQCData):
+        super().__init__()
+        self.mqc_data = mqc_data
+
     def genere_challenge(self):
         return generate_challenge()
 
-    def verifie_challenge(self, requete: Accreditation, challenge: str, clef_publique):
-        pass
+    def verifie_challenge(
+        self, requete: Accreditation, challenge: str, clef_publique: str
+    ):
+        verify_authentication_response(
+            credential=requete.model_dump_json(),
+            expected_challenge=base64url_to_bytes(challenge),
+            expected_rp_id=self.mqc_data.hote,
+            expected_origin=self.mqc_data.url_hote,
+            credential_public_key=base64url_to_bytes(clef_publique),
+            credential_current_sign_count=0,
+        )
 
 
 def fabrique_service_authentification() -> ServiceAuthentification:
-    return ServiceAuthentification()
+    la_configuration = recupere_configuration()
+    return ServiceAuthentification(la_configuration.mqc_data)
 
 
 class UtilisateurEnCoursAuthentification(NamedTuple):
