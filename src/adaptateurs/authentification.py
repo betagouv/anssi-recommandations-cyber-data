@@ -1,7 +1,9 @@
 import json
 from abc import ABC, abstractmethod
+from datetime import datetime, timedelta, timezone
 from typing import NamedTuple
 
+import jwt
 from pydantic import BaseModel
 from webauthn import verify_authentication_response, base64url_to_bytes
 from webauthn.helpers import generate_challenge
@@ -114,9 +116,25 @@ def fabrique_entrepot_utilisateurs() -> EntrepotUtilisateurs:
 
 
 class ServiceGenerationToken:
+    def __init__(self, secret_jwt: str):
+        super().__init__()
+        self.secret_jwt = secret_jwt
+
     def genere_token(self) -> str:
-        return ""
+        payload = {
+            "name": "Token Admin MQC Data",
+            "iat": datetime.now(timezone.utc),
+            "exp": datetime.now(timezone.utc) + timedelta(hours=2),
+        }
+
+        token = jwt.encode(
+            payload,
+            self.secret_jwt,
+            algorithm="HS256",
+        )
+        return token
 
 
 def fabrique_service_generation_token() -> ServiceGenerationToken:
-    return ServiceGenerationToken()
+    la_configuration = recupere_configuration()
+    return ServiceGenerationToken(la_configuration.secret_jwt)

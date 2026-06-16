@@ -646,7 +646,7 @@ class EntrepotUtilisateursMemoire(EntrepotUtilisateurs):
 
 class ServiceGenerationTokenDeTest(ServiceGenerationToken):
     def __init__(self):
-        super().__init__()
+        super().__init__("token")
         self.token_genere = False
 
     def genere_token(self) -> str:
