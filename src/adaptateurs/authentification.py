@@ -6,7 +6,7 @@ from typing import NamedTuple
 import jwt
 from pydantic import BaseModel
 from webauthn import verify_authentication_response, base64url_to_bytes
-from webauthn.helpers import generate_challenge
+from webauthn.helpers import generate_challenge, bytes_to_base64url
 
 from configuration import Configuration, recupere_configuration, MQCData
 
@@ -35,8 +35,8 @@ class ServiceAuthentification:
         super().__init__()
         self.mqc_data = mqc_data
 
-    def genere_challenge(self):
-        return generate_challenge()
+    def genere_challenge(self) -> str:
+        return bytes_to_base64url(generate_challenge())
 
     def verifie_challenge(
         self, requete: Accreditation, challenge: str, clef_publique: str
