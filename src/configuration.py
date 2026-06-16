@@ -19,6 +19,7 @@ class MQCData(NamedTuple):
     max_requetes_par_minute: int
     hote: str
     port: int
+    nom_hote: str
     url_hote: str
 
 
@@ -93,6 +94,7 @@ def recupere_configuration() -> Configuration:
         max_requetes_par_minute=int(
             os.getenv("MQC_DATA_MAX_REQUETES_PAR_MINUTE", "100")
         ),
+        nom_hote=os.getenv("MQC_DATA_NOM_HOTE", ""),
         url_hote=os.getenv("MQC_DATA_URL_HOTE", ""),
     )
 

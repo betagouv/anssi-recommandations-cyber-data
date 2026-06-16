@@ -88,6 +88,7 @@ def configuration() -> Configuration:
             max_requetes_par_minute=10,
             hote="mqc.local",
             port=5672,
+            nom_hote="mqc.local",
             url_hote="http://mqc.local:3000",
         ),
         jeopardy=ConfigurationJeopardy(
