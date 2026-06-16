@@ -7,6 +7,9 @@ from adaptateurs.authentification import (
     ServiceAuthentification,
     EntrepotUtilisateurs,
     fabrique_entrepot_utilisateurs,
+    RequeteAccreditation,
+    fabrique_service_generation_token,
+    ServiceGenerationToken,
 )
 
 auth = APIRouter(prefix="/auth")
@@ -36,18 +39,22 @@ def initie(
     return {"challenge": challenge, "id": utilisateur.id}
 
 
-@auth.post("/auth/finish")
-def finish(assertion):
-    # credential = admins["credential_id"]
-    #
-    # verify_authentication_response(
-    #     credential=credential,
-    #     assertion=assertion,
-    #     expected_challenge=sessions["challenge"],
-    #     expected_origin="https://admin.example.com"
-    # )
-    #
-    # return {
-    #     "authenticated": True
-    # }
-    pass
+@auth.post("/finalise")
+def finalise(
+    requete: RequeteAccreditation,
+    service_generation_de_challenge: ServiceAuthentification = Depends(  # type: ignore[assignment]
+        fabrique_service_authentification
+    ),
+    service_generation_token: ServiceGenerationToken = Depends(  # type: ignore[assignment]
+        fabrique_service_generation_token
+    ),
+    entrepot_utilisateurs: EntrepotUtilisateurs = Depends(  # type: ignore[assignment]
+        fabrique_entrepot_utilisateurs
+    ),
+):
+    utilisateur = entrepot_utilisateurs.recupere_utilisateur_par_id_de_clef(requete.id)
+    if utilisateur is None:
+        return Response(status_code=401)
+
+    service_generation_de_challenge.verifie_challenge(requete)
+    service_generation_token.genere_token()

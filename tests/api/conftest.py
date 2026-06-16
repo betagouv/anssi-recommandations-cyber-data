@@ -1,3 +1,4 @@
+import json
 import uuid
 from pathlib import Path
 from typing import cast
@@ -16,6 +17,9 @@ from adaptateurs.authentification import (
     ServiceAuthentification,
     UtilisateurEnCoursAuthentification,
     EntrepotUtilisateurs,
+    RequeteAccreditation,
+    ServiceGenerationToken,
+    fabrique_service_generation_token,
 )
 from adaptateurs.client_albert_reformulation_reel import (
     fabrique_client_albert_reformulation,
@@ -434,6 +438,14 @@ class ConstructeurServeur:
         )
         return self
 
+    def avec_un_service_de_generation_de_token(
+        self, service_generationToken: ServiceGenerationToken
+    ):
+        self._dependances[fabrique_service_generation_token] = (
+            lambda: service_generationToken
+        )
+        return self
+
 
 @pytest.fixture(autouse=True)
 def pages_statiques(tmp_path) -> Path:
@@ -588,8 +600,26 @@ def un_serveur_de_test_pour_collections(
 
 
 class ServiceAuthentificationDeTest(ServiceAuthentification):
+    def __init__(self):
+        self.rp_id = "localhost"
+        self.origine = "http://localhost"
+        self.credential_verifie = None
+        self.challenge_attendu = ""
+        self.rp_id_attendu = ""
+        self.origine_attendue = ""
+        self.clef_publique_attendue = ""
+        self.verification_utilisateur_attendue = False
+
     def genere_challenge(self):
         return "123"
+
+    def verifie_challenge(self, requete: RequeteAccreditation):
+        self.challenge_attendu = "123"
+        self.rp_id_attendu = self.rp_id
+        self.origine_attendue = self.origine
+        self.clef_publique_attendue = "clef-publique"
+        self.verification_utilisateur_attendue = True
+        self.credential_verifie = json.loads(requete.model_dump_json())
 
 
 class EntrepotUtilisateursMemoire(EntrepotUtilisateurs):
@@ -602,20 +632,45 @@ class EntrepotUtilisateursMemoire(EntrepotUtilisateurs):
     ) -> UtilisateurEnCoursAuthentification | None:
         return self.les_utilisateurs.get(identifiant_utilisateur)
 
+    def recupere_utilisateur_par_id_de_clef(
+        self, id_clef: str
+    ) -> UtilisateurEnCoursAuthentification | None:
+        return next(
+            (u for u in self.les_utilisateurs.values() if u.id == id_clef), None
+        )
+
+
+class ServiceGenerationTokenDeTest(ServiceGenerationToken):
+    def __init__(self):
+        super().__init__()
+        self.token_genere = False
+
+    def genere_token(self) -> str:
+        self.token_genere = True
+        return "token-genere"
+
 
 @pytest.fixture()
 def un_serveur_de_test_pour_authentification(
     pages_statiques,
-) -> Callable[[], tuple[FastAPI, ServiceAuthentification, EntrepotUtilisateurs]]:
+) -> Callable[
+    [], tuple[FastAPI, ServiceAuthentificationDeTest, ServiceGenerationTokenDeTest]
+]:
     def _construis():
         service_generation_challenge = ServiceAuthentificationDeTest()
         entrepot_utilisateurs = EntrepotUtilisateursMemoire()
+        service_generation_token = ServiceGenerationTokenDeTest()
         serveur = (
             ConstructeurServeur(max_requetes_par_minute=100)  # type: ignore[arg-type]
             .avec_un_service_de_generation_de_challenge(service_generation_challenge)
             .avec_un_entrepot_utilisateurs(entrepot_utilisateurs)
+            .avec_un_service_de_generation_de_token(service_generation_token)
             .avec_pages_statiques(pages_statiques)
         )
-        return serveur.construis(), service_generation_challenge, entrepot_utilisateurs
+        return (
+            serveur.construis(),
+            service_generation_challenge,
+            service_generation_token,
+        )
 
     return _construis
