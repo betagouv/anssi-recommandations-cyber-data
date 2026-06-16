@@ -1,8 +1,11 @@
+import json
 from abc import ABC, abstractmethod
 from typing import NamedTuple
 
 from pydantic import BaseModel
 from webauthn.helpers import generate_challenge
+
+from configuration import Configuration, recupere_configuration
 
 
 class ReponseAccreditation(BaseModel):
@@ -50,19 +53,37 @@ class EntrepotUtilisateurs(ABC):
 
 
 class EntrepotUtilisateursConcret(EntrepotUtilisateurs):
+    def __init__(self, utilisateurs_mqc: str):
+        self.utilisateurs_mqc = utilisateurs_mqc
+
+    def _recupere_utilisateurs(self) -> dict:
+        try:
+            return json.loads(self.utilisateurs_mqc)
+        except json.JSONDecodeError:
+            return {}
+
     def recupere_utilisateur_par_id_utilisateur(
         self, identifiant_utilisateur
     ) -> UtilisateurEnCoursAuthentification | None:
-        return None
+        utilisateurs = self._recupere_utilisateurs()
+        donnees_utilisateur = utilisateurs.get(identifiant_utilisateur)
+        if not donnees_utilisateur:
+            return None
+        return UtilisateurEnCoursAuthentification(id=donnees_utilisateur["id"])
 
     def recupere_utilisateur_par_id_de_clef(
         self, id_clef: str
     ) -> UtilisateurEnCoursAuthentification | None:
+        utilisateurs = self._recupere_utilisateurs()
+        for donnees_utilisateur in utilisateurs.values():
+            if donnees_utilisateur.get("id") == id_clef:
+                return UtilisateurEnCoursAuthentification(id=donnees_utilisateur["id"])
         return None
 
 
 def fabrique_entrepot_utilisateurs() -> EntrepotUtilisateurs:
-    return EntrepotUtilisateursConcret()
+    la_configuration: Configuration = recupere_configuration()
+    return EntrepotUtilisateursConcret(la_configuration.utilisateurs_mqc)
 
 
 class ServiceGenerationToken:
