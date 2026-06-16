@@ -94,7 +94,7 @@ class EntrepotUtilisateursConcret(EntrepotUtilisateurs):
             return None
         return UtilisateurEnCoursAuthentification(
             id=donnees_utilisateur["id"],
-            clef_publique=donnees_utilisateur["response"]["clef_publique"],
+            clef_publique=donnees_utilisateur["response"]["publicKey"],
         )
 
     def recupere_utilisateur_par_id_de_clef(
