@@ -15,12 +15,16 @@ class MQC(NamedTuple):
     delai_attente_maximum: float
 
 
+class Authentification(NamedTuple):
+    rp_id: str
+    origin: str
+
+
 class MQCData(NamedTuple):
     max_requetes_par_minute: int
     hote: str
     port: int
-    nom_hote: str
-    url_hote: str
+    authentification: Authentification
 
 
 class Albert(NamedTuple):
@@ -94,8 +98,10 @@ def recupere_configuration() -> Configuration:
         max_requetes_par_minute=int(
             os.getenv("MQC_DATA_MAX_REQUETES_PAR_MINUTE", "100")
         ),
-        nom_hote=os.getenv("MQC_DATA_NOM_HOTE", ""),
-        url_hote=os.getenv("MQC_DATA_URL_HOTE", ""),
+        authentification=Authentification(
+            rp_id=os.getenv("MQC_DATA_AUTH_RP_ID", ""),
+            origin=os.getenv("MQC_DATA_AUTH_ORIGIN", ""),
+        ),
     )
 
     albert_url = os.getenv("ALBERT_URL", "https://albert.api.etalab.gouv.fr/v1")

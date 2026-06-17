@@ -44,8 +44,8 @@ class ServiceAuthentification:
         verify_authentication_response(
             credential=requete.model_dump_json(),
             expected_challenge=base64url_to_bytes(challenge),
-            expected_rp_id=self.mqc_data.nom_hote,
-            expected_origin=self.mqc_data.url_hote,
+            expected_rp_id=self.mqc_data.authentification.rp_id,
+            expected_origin=self.mqc_data.authentification.origin,
             credential_public_key=base64url_to_bytes(clef_publique),
             credential_current_sign_count=0,
         )
