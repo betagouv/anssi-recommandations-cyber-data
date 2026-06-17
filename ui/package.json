@@ -48,7 +48,8 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
-    "@lab-anssi/ui-kit": "^1.44.2"
+    "@lab-anssi/ui-kit": "^1.44.2",
+    "@simplewebauthn/browser": "^13.3.0"
   },
   "pnpm": {
     "overrides": {
