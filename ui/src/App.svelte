@@ -11,7 +11,7 @@
   }
 
   const authentifie = async () => {
-    if (identifiantAuthentification.trim() !== "") return;
+    if (identifiantAuthentification.trim() === "") return;
 
     const reponse = await fetch("/auth/initie", {
       method: "POST",
@@ -40,7 +40,7 @@
   }
 
   const enrolement = async () => {
-    if (identifiantEnrolement.trim() !== "") return;
+    if (identifiantEnrolement.trim() === "") return;
 
     const reponse = await fetch("/auth/enrole", {
       method: "POST",
