@@ -1,6 +1,6 @@
 <script lang="ts">
 
-  import {startAuthentication} from "@simplewebauthn/browser";
+  import {startAuthentication, startRegistration} from "@simplewebauthn/browser";
 
   type Initialisation = {
     challenge: string;
@@ -35,10 +35,28 @@
 
     console.log(`CONNECTÉ ? ${reponseFinalisation.status} : ${await reponseFinalisation.text()} - ${await reponseFinalisation.json()}`);
   }
+
+  const enrolement = async () => {
+    const reponse = await fetch("/auth/enrole", {
+      method: "POST",
+    });
+
+    const enrolement = await reponse.json();
+    const credential = await startRegistration(JSON.parse(enrolement.options));
+
+    await fetch("/auth/verifie-enrolement", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({credential, challenge: enrolement.challenge})
+    });
+  }
 </script>
 
 
 <main class="main">
+  <input type="button" value="enrolement" onclick={enrolement}>
   <input type="button" value="bertrand.bougon" onclick={authentifie}>
 </main>
 
