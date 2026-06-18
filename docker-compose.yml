@@ -19,6 +19,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./ui/dist:/app/ui/dist
+      - ./ui/package.json:/app/ui/package.json
       - ./donnees:/app/donnees
     ports:
       - '3007:3001'
