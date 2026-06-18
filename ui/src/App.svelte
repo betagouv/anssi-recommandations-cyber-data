@@ -2,20 +2,23 @@
 
   import {startAuthentication, startRegistration} from "@simplewebauthn/browser";
 
+  let identifiantEnrolement = $state("")
+  let identifiantAuthentification = $state("")
+
   type Initialisation = {
     challenge: string;
     id: string;
   }
 
   const authentifie = async () => {
-    console.log("authentifie");
+    if (identifiantAuthentification.trim() !== "") return;
 
     const reponse = await fetch("/auth/initie", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({utilisateur: "bertrand.bougon"}),
+      body: JSON.stringify({utilisateur: identifiantAuthentification}),
     });
 
     const initialisation: Initialisation = await reponse.json();
@@ -37,27 +40,50 @@
   }
 
   const enrolement = async () => {
+    if (identifiantEnrolement.trim() !== "") return;
+
     const reponse = await fetch("/auth/enrole", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({utilisateur: identifiantEnrolement})
     });
 
     const enrolement = await reponse.json();
     const credential = await startRegistration(JSON.parse(enrolement.options));
 
-    await fetch("/auth/verifie-enrolement", {
+    const reponseVerificationEnrolement = await fetch("/auth/verifie-enrolement", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({credential, challenge: enrolement.challenge})
     });
+
+    console.log(`ENRÔLÉ ? ${reponseVerificationEnrolement.status}`);
   }
 </script>
 
 
 <main class="main">
-  <input type="button" value="enrolement" onclick={enrolement}>
-  <input type="button" value="bertrand.bougon" onclick={authentifie}>
+  <section>
+    <div>
+      <input type="text" bind:value={identifiantEnrolement} />
+    </div>
+    <div>
+      <input type="button" value="Enrôlement" onclick={enrolement}>
+    </div>
+  </section>
+
+  <section>
+    <div>
+      <input type="text" bind:value={identifiantAuthentification} />
+    </div>
+    <div>
+      <input type="button" value="Login" onclick={authentifie}>
+    </div>
+  </section>
 </main>
 
 <style lang="scss">
