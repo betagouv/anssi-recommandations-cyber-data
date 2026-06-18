@@ -618,7 +618,12 @@ def un_serveur_de_test_pour_collections(
 class ServiceAuthentificationDeTest(ServiceAuthentification):
     def __init__(self):
         super().__init__(
-            MQCData(1, "hote", 3000, Authentification("localhost", "http://localhost"))
+            MQCData(
+                1,
+                "hote",
+                3000,
+                Authentification("localhost", "http://localhost", "la-clef"),
+            )
         )
         self.verification_enrolement_challenge = None
         self.verification_enrolement_credential = None

@@ -18,6 +18,7 @@ class MQC(NamedTuple):
 class Authentification(NamedTuple):
     rp_id: str
     origin: str
+    clef_secrete_de_session: str
 
 
 class MQCData(NamedTuple):
@@ -101,6 +102,9 @@ def recupere_configuration() -> Configuration:
         authentification=Authentification(
             rp_id=os.getenv("MQC_DATA_AUTH_RP_ID", ""),
             origin=os.getenv("MQC_DATA_AUTH_ORIGIN", ""),
+            clef_secrete_de_session=os.getenv(
+                "MQC_DATA_AUTH_CLEF_SECRETE_DE_SESSION", ""
+            ),
         ),
     )
 
