@@ -1,4 +1,41 @@
+import json
+
 from fastapi.testclient import TestClient
+
+
+def test_initie_l_enrolement_de_la_clef(
+    un_serveur_de_test_pour_authentification,
+):
+    (serveur, service_authentification, _) = un_serveur_de_test_pour_authentification()
+
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.post(
+        "/auth/enrole/",
+        json={
+            "utilisateur": "jean.dujardin",
+        },
+    )
+
+    assert reponse.status_code == 200
+    reponse_json = reponse.json()
+    assert reponse_json["challenge"] == "MTIz"
+    assert json.loads(reponse_json["options"]) == {
+        "rp": {"name": "Tableau de bord admin MQC data", "id": "localhost"},
+        "user": {"id": "MQ", "name": "jean.dujardin", "displayName": "jean.dujardin"},
+        "challenge": "MTIz",
+        "pubKeyCredParams": [
+            {"type": "public-key", "alg": -7},
+            {"type": "public-key", "alg": -8},
+        ],
+        "excludeCredentials": [],
+        "authenticatorSelection": {
+            "residentKey": "required",
+            "requireResidentKey": True,
+            "userVerification": "required",
+        },
+        "attestation": "none",
+    }
 
 
 def test_initie_l_authentification(

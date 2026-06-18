@@ -10,6 +10,17 @@ from deepeval.test_case import LLMTestCase
 from fastapi import FastAPI, HTTPException, Security, status
 from fastapi.security import HTTPBearer
 from typing_extensions import Callable, Dict, Optional
+from webauthn.helpers.cose import COSEAlgorithmIdentifier
+from webauthn.helpers.structs import (
+    PublicKeyCredentialCreationOptions,
+    PublicKeyCredentialRpEntity,
+    PublicKeyCredentialUserEntity,
+    PublicKeyCredentialParameters,
+    AuthenticatorSelectionCriteria,
+    ResidentKeyRequirement,
+    UserVerificationRequirement,
+    AttestationConveyancePreference,
+)
 
 from adaptateurs.authentification import (
     fabrique_service_authentification,
@@ -31,7 +42,7 @@ from adaptateurs.journal import (
     AdaptateurJournalMemoire,
 )
 from api.securite import verifie_token_jwt
-from configuration import MQC
+from configuration import MQC, MQCData, Authentification
 from documents.docling.multi_processeur import Multiprocesseur
 from documents.service_indexation_collections import (
     ServiceIndexationNouvellesCollections,
@@ -601,6 +612,9 @@ def un_serveur_de_test_pour_collections(
 
 class ServiceAuthentificationDeTest(ServiceAuthentification):
     def __init__(self):
+        super().__init__(
+            MQCData(1, "hote", 3000, Authentification("localhost", "http://localhost"))
+        )
         self.rp_id = "localhost"
         self.origine = "http://localhost"
         self.credential_verifie = None
@@ -612,6 +626,32 @@ class ServiceAuthentificationDeTest(ServiceAuthentification):
 
     def genere_challenge(self):
         return "123"
+
+    def initie_enrolement(self, utilisateur) -> PublicKeyCredentialCreationOptions:
+        return PublicKeyCredentialCreationOptions(
+            rp=PublicKeyCredentialRpEntity(
+                name="Tableau de bord admin MQC data", id=self.rp_id
+            ),
+            user=PublicKeyCredentialUserEntity(
+                id=b"1", name=utilisateur, display_name=utilisateur
+            ),
+            challenge=b"123",
+            pub_key_cred_params=[
+                PublicKeyCredentialParameters(
+                    type="public-key", alg=COSEAlgorithmIdentifier.ECDSA_SHA_256
+                ),
+                PublicKeyCredentialParameters(
+                    type="public-key", alg=COSEAlgorithmIdentifier.EDDSA
+                ),
+            ],
+            exclude_credentials=[],
+            authenticator_selection=AuthenticatorSelectionCriteria(
+                resident_key=ResidentKeyRequirement.REQUIRED,
+                user_verification=UserVerificationRequirement.REQUIRED,
+                require_resident_key=True,
+            ),
+            attestation=AttestationConveyancePreference.NONE,
+        )
 
     def verifie_challenge(
         self, requete: Accreditation, challenge: str, clef_publique: str
