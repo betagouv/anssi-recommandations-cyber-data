@@ -90,7 +90,9 @@ def configuration() -> Configuration:
             hote="mqc.local",
             port=5672,
             authentification=Authentification(
-                rp_id="mqc.local", origin="http://mqc.local:3000"
+                rp_id="mqc.local",
+                origin="http://mqc.local:3000",
+                clef_secrete_de_session="une-clef",
             ),
         ),
         jeopardy=ConfigurationJeopardy(
