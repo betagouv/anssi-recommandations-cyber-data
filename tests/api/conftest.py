@@ -1,7 +1,7 @@
 import json
 import uuid
 from pathlib import Path
-from typing import cast
+from typing import cast, Any
 
 import pytest
 from deepeval.evaluate.types import EvaluationResult
@@ -20,7 +20,11 @@ from webauthn.helpers.structs import (
     ResidentKeyRequirement,
     UserVerificationRequirement,
     AttestationConveyancePreference,
+    AttestationFormat,
+    PublicKeyCredentialType,
+    CredentialDeviceType,
 )
+from webauthn.registration.verify_registration_response import VerifiedRegistration
 
 from adaptateurs.authentification import (
     fabrique_service_authentification,
@@ -615,6 +619,8 @@ class ServiceAuthentificationDeTest(ServiceAuthentification):
         super().__init__(
             MQCData(1, "hote", 3000, Authentification("localhost", "http://localhost"))
         )
+        self.verification_enrolement_challenge = None
+        self.verification_enrolement_credential = None
         self.rp_id = "localhost"
         self.origine = "http://localhost"
         self.credential_verifie = None
@@ -651,6 +657,24 @@ class ServiceAuthentificationDeTest(ServiceAuthentification):
                 require_resident_key=True,
             ),
             attestation=AttestationConveyancePreference.NONE,
+        )
+
+    def verifie_enrolement(
+        self, credential: dict[str, Any], challenge: str
+    ) -> VerifiedRegistration:
+        self.verification_enrolement_challenge = challenge
+        self.verification_enrolement_credential = credential
+        return VerifiedRegistration(
+            credential_id=b"123",
+            credential_public_key=b"cle",
+            sign_count=0,
+            aaguid="",
+            fmt=AttestationFormat.FIDO_U2F,
+            credential_type=PublicKeyCredentialType.PUBLIC_KEY,
+            user_verified=True,
+            attestation_object=b"",
+            credential_device_type=CredentialDeviceType.SINGLE_DEVICE,
+            credential_backed_up=True,
         )
 
     def verifie_challenge(
