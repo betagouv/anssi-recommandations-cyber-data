@@ -1,11 +1,11 @@
 import base64
 from typing import Any
 
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Response, Request
 from fastapi.params import Depends
 from pydantic import BaseModel
 from webauthn import options_to_json
-from webauthn.helpers import bytes_to_base64url
+from webauthn.helpers import base64url_to_bytes
 
 from adaptateurs.authentification import (
     fabrique_service_authentification,
@@ -27,7 +27,7 @@ class RequeteAuthentification(BaseModel):
 
 class RequeteVerificationEnrolement(BaseModel):
     credential: dict[str, Any]
-    challenge: str
+    utilisateur: str
 
 
 def b64u(data: bytes) -> str:
@@ -48,35 +48,40 @@ class RequeteEnrolement(BaseModel):
 
 @auth.post("/enrole")
 def enrole(
+    request: Request,
     requete: RequeteEnrolement,
-    service_generation_de_challenge: ServiceAuthentification = Depends(  # type: ignore[assignment]
+    service_authentification: ServiceAuthentification = Depends(  # type: ignore[assignment]
         fabrique_service_authentification
     ),
 ):
-    options = service_generation_de_challenge.initie_enrolement(requete.utilisateur)
-    return {
-        "options": options_to_json(options),
-        "challenge": bytes_to_base64url(options.challenge),
-    }
+    options = service_authentification.initie_enrolement(requete.utilisateur)
+    service_authentification.persiste_le_challenge(
+        request, requete.utilisateur, options.challenge
+    )
+
+    return {"options": options_to_json(options)}
 
 
 @auth.post("/verifie-enrolement")
 def verifie_enrolement(
+    request: Request,
     requete: RequeteVerificationEnrolement,
-    service_generation_de_challenge: ServiceAuthentification = Depends(  # type: ignore[assignment]
+    service_authentification: ServiceAuthentification = Depends(  # type: ignore[assignment]
         fabrique_service_authentification
     ),
 ):
+    challenge = service_authentification.recupere_challenge(
+        request, requete.utilisateur
+    )
     reponse = verified_registration_to_dict(
-        service_generation_de_challenge.verifie_enrolement(
-            requete.credential, requete.challenge
-        )
+        service_authentification.verifie_enrolement(requete.credential, challenge)
     )
     log(__name__, f"Finalisation de l'enrôlement : {reponse}")
 
 
 @auth.post("/initie")
 def initie(
+    request: Request,
     requete: RequeteAuthentification,
     service_generation_de_challenge: ServiceAuthentification = Depends(  # type: ignore[assignment]
         fabrique_service_authentification
@@ -92,14 +97,18 @@ def initie(
     if utilisateur is None:
         return Response(status_code=401)
 
+    service_generation_de_challenge.persiste_le_challenge(
+        request, requete.utilisateur, base64url_to_bytes(challenge)
+    )
     return {"challenge": challenge, "id": utilisateur.id}
 
 
 @auth.post("/finalise")
 def finalise(
+    request: Request,
     requete: RequeteAccreditation,
     reponse: Response,
-    service_generation_de_challenge: ServiceAuthentification = Depends(  # type: ignore[assignment]
+    service_authentification: ServiceAuthentification = Depends(  # type: ignore[assignment]
         fabrique_service_authentification
     ),
     service_generation_token: ServiceGenerationToken = Depends(  # type: ignore[assignment]
@@ -116,8 +125,11 @@ def finalise(
         reponse.status_code = 401
         return
 
-    service_generation_de_challenge.verifie_challenge(
-        requete.credential, requete.challenge, utilisateur.clef_publique
+    challenge = service_authentification.recupere_challenge(
+        request, requete.utilisateur
+    )
+    service_authentification.verifie_challenge(
+        requete.credential, challenge, utilisateur.clef_publique
     )
     token = service_generation_token.genere_token()
     reponse.set_cookie(key="session", value=token, httponly=True, samesite="strict")
