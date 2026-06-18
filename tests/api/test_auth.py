@@ -38,6 +38,34 @@ def test_initie_l_enrolement_de_la_clef(
     }
 
 
+def test_verifie_l_enrolement(un_serveur_de_test_pour_authentification):
+    (serveur, service_authentification, _) = un_serveur_de_test_pour_authentification()
+
+    client: TestClient = TestClient(serveur)
+    reponse = client.post(
+        "/auth/verifie-enrolement/",
+        json={
+            "credential": {
+                "id": "123",
+                "rawId": "456",
+                "response": {
+                    "attestationObject": "attestation",
+                    "clientDataJSON": "client",
+                },
+            },
+            "challenge": "789",
+        },
+    )
+    assert reponse.status_code == 200
+    assert reponse.json
+    assert service_authentification.verification_enrolement_credential == {
+        "id": "123",
+        "rawId": "456",
+        "response": {"attestationObject": "attestation", "clientDataJSON": "client"},
+    }
+    assert service_authentification.verification_enrolement_challenge == "789"
+
+
 def test_initie_l_authentification(
     un_serveur_de_test_pour_authentification,
 ):

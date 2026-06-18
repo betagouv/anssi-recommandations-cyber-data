@@ -1,7 +1,7 @@
 import json
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta, timezone
-from typing import NamedTuple, Optional
+from typing import NamedTuple, Optional, Any
 
 import jwt
 from pydantic import BaseModel
@@ -9,6 +9,7 @@ from webauthn import (
     verify_authentication_response,
     base64url_to_bytes,
     generate_registration_options,
+    verify_registration_response,
 )
 from webauthn.helpers import generate_challenge, bytes_to_base64url
 from webauthn.helpers.cose import COSEAlgorithmIdentifier
@@ -17,7 +18,10 @@ from webauthn.helpers.structs import (
     ResidentKeyRequirement,
     UserVerificationRequirement,
     PublicKeyCredentialCreationOptions,
+    RegistrationCredential,
+    AuthenticatorAttestationResponse,
 )
+from webauthn.registration.verify_registration_response import VerifiedRegistration
 
 from configuration import Configuration, recupere_configuration, MQCData
 
@@ -62,6 +66,30 @@ class ServiceAuthentification:
                 require_resident_key=True,
             ),
         )
+
+    def verifie_enrolement(
+        self, credential: dict[str, Any], challenge: str
+    ) -> VerifiedRegistration:
+        credential = RegistrationCredential( # type: ignore[assignment]
+            id=credential["id"],
+            raw_id=base64url_to_bytes(credential["rawId"]),
+            response=AuthenticatorAttestationResponse(
+                attestation_object=base64url_to_bytes(
+                    credential["response"]["attestationObject"]
+                ),
+                client_data_json=base64url_to_bytes(
+                    credential["response"]["clientDataJSON"]
+                ),
+            ),
+        )
+        verification: VerifiedRegistration = verify_registration_response(
+            credential=credential,
+            expected_challenge=base64url_to_bytes(challenge),
+            expected_origin=self.mqc_data.authentification.origin,
+            expected_rp_id=self.mqc_data.authentification.rp_id,
+        )
+
+        return verification
 
     def genere_challenge(self) -> str:
         return bytes_to_base64url(generate_challenge())
