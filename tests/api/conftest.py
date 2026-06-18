@@ -9,6 +9,7 @@ from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
 from fastapi import FastAPI, HTTPException, Security, status
 from fastapi.security import HTTPBearer
+from starlette.requests import Request
 from typing_extensions import Callable, Dict, Optional
 from webauthn.helpers.cose import COSEAlgorithmIdentifier
 from webauthn.helpers.structs import (
@@ -629,9 +630,19 @@ class ServiceAuthentificationDeTest(ServiceAuthentification):
         self.origine_attendue = ""
         self.clef_publique_attendue = ""
         self.verification_utilisateur_attendue = False
+        self.challenge_enrolement_persiste = False
 
     def genere_challenge(self):
         return "123"
+
+    def recupere_challenge(self, requete: Request, utilisateur: str) -> str:
+        return "789"
+
+    def persiste_le_challenge(
+        self, request: Request, utilisateur: str, challenge: bytes
+    ):
+        self.challenge_enrolement_persiste = True
+        pass
 
     def initie_enrolement(self, utilisateur) -> PublicKeyCredentialCreationOptions:
         return PublicKeyCredentialCreationOptions(

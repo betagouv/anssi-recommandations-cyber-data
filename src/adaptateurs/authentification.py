@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from typing import NamedTuple, Optional, Any
 
 import jwt
+from fastapi import Request
 from pydantic import BaseModel
 from webauthn import (
     verify_authentication_response,
@@ -42,7 +43,7 @@ class Accreditation(BaseModel):
 
 class RequeteAccreditation(BaseModel):
     credential: Accreditation
-    challenge: str
+    utilisateur: str
 
 
 class ServiceAuthentification:
@@ -70,7 +71,7 @@ class ServiceAuthentification:
     def verifie_enrolement(
         self, credential: dict[str, Any], challenge: str
     ) -> VerifiedRegistration:
-        credential = RegistrationCredential( # type: ignore[assignment]
+        credential = RegistrationCredential(  # type: ignore[assignment]
             id=credential["id"],
             raw_id=base64url_to_bytes(credential["rawId"]),
             response=AuthenticatorAttestationResponse(
@@ -107,6 +108,14 @@ class ServiceAuthentification:
             credential_public_key=base64url_to_bytes(clef_publique),
             credential_current_sign_count=0,
         )
+
+    def recupere_challenge(self, requete: Request, utilisateur: str) -> str:
+        return requete.session[f"{utilisateur}"]
+
+    def persiste_le_challenge(
+        self, request: Request, utilisateur: str, challenge: bytes
+    ):
+        request.session[f"{utilisateur}"] = bytes_to_base64url(challenge)
 
 
 def fabrique_service_authentification() -> ServiceAuthentification:

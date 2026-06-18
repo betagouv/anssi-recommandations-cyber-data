@@ -8,6 +8,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
+from starlette.middleware.sessions import SessionMiddleware
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from api.api import api
@@ -47,6 +48,13 @@ def fabrique_serveur(
     # Les problèmes de types apparaissants ici sont résolus côté `Starlette`, mais ne semblent pas encore avoir atteint `FastAPI` ;
     # _c.f._ https://github.com/Kludex/starlette/discussions/2451#discussioncomment-14855204 .
     serveur.add_middleware(ProxyHeadersMiddleware, trusted_hosts=["*"])  # type: ignore [arg-type]
+
+    serveur.add_middleware(
+        SessionMiddleware,
+        secret_key="une-cle-secrete-longue-et-aleatoire",
+        same_site="strict",
+        https_only=False,  # À PASSER À True
+    )
 
     serveur.include_router(api)
     serveur.include_router(auth)

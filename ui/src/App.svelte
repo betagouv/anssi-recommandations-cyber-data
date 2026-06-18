@@ -33,7 +33,7 @@
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({credential: authenticationResponse, challenge: initialisation.challenge})
+      body: JSON.stringify({credential: authenticationResponse, utilisateur: identifiantAuthentification})
     });
 
     console.log(`CONNECTÉ ? ${reponseFinalisation.status} : ${await reponseFinalisation.text()} - ${await reponseFinalisation.json()}`);
@@ -58,7 +58,7 @@
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({credential, challenge: enrolement.challenge})
+      body: JSON.stringify({credential, utilisateur: enrolement.utilisateur})
     });
 
     console.log(`ENRÔLÉ ? ${reponseVerificationEnrolement.status}`);

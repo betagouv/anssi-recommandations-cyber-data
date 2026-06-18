@@ -19,7 +19,6 @@ def test_initie_l_enrolement_de_la_clef(
 
     assert reponse.status_code == 200
     reponse_json = reponse.json()
-    assert reponse_json["challenge"] == "MTIz"
     assert json.loads(reponse_json["options"]) == {
         "rp": {"name": "Tableau de bord admin MQC data", "id": "localhost"},
         "user": {"id": "MQ", "name": "jean.dujardin", "displayName": "jean.dujardin"},
@@ -36,6 +35,7 @@ def test_initie_l_enrolement_de_la_clef(
         },
         "attestation": "none",
     }
+    assert service_authentification.challenge_enrolement_persiste
 
 
 def test_verifie_l_enrolement(un_serveur_de_test_pour_authentification):
@@ -53,7 +53,7 @@ def test_verifie_l_enrolement(un_serveur_de_test_pour_authentification):
                     "clientDataJSON": "client",
                 },
             },
-            "challenge": "789",
+            "utilisateur": "jean.dujardin",
         },
     )
     assert reponse.status_code == 200
@@ -120,12 +120,12 @@ def test_finalise_l_authentification(
 
     reponse = client.post(
         "/auth/finalise/",
-        json={"credential": credential, "challenge": "123"},
+        json={"credential": credential, "utilisateur": "jeanne.dupont"},
     )
 
     assert reponse.status_code == 200
     assert service_generation_challenge.credential_verifie == credential
-    assert service_generation_challenge.challenge_attendu == "123"
+    assert service_generation_challenge.challenge_attendu == "789"
     assert service_generation_challenge.rp_id_attendu == "localhost"
     assert service_generation_challenge.origine_attendue == "http://localhost"
     assert service_generation_challenge.verification_utilisateur_attendue
@@ -152,7 +152,7 @@ def test_finalise_l_authentification_en_fournissant_la_clef_publique_de_l_utilis
 
     reponse = client.post(
         "/auth/finalise/",
-        json={"credential": credential, "challenge": "123"},
+        json={"credential": credential, "utilisateur": "jeanne.dupont"},
     )
 
     assert reponse.status_code == 200
@@ -180,7 +180,7 @@ def test_finalise_l_authentification_en_generant_un_token_jwt(
 
     client.post(
         "/auth/finalise/",
-        json={"credential": credential, "challenge": "123"},
+        json={"credential": credential, "utilisateur": "jeanne.dupont"},
     )
 
     assert service_generation_token.token_genere
@@ -205,7 +205,7 @@ def test_finalise_l_authentification_en_ajoutant_le_token_dans_un_cookie(
 
     reponse = client.post(
         "/auth/finalise/",
-        json={"credential": credential, "challenge": "123"},
+        json={"credential": credential, "utilisateur": "jeanne.dupont"},
     )
 
     assert "session" in reponse.cookies
@@ -233,7 +233,7 @@ def test_finalise_l_authentification_en_renvoyant_une_erreur_401_si_l_utilisateu
 
     reponse = client.post(
         "/auth/finalise/",
-        json={"credential": credential, "challenge": "123"},
+        json={"credential": credential, "utilisateur": "jeanne.dupont"},
     )
 
     assert reponse.status_code == 401

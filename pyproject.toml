@@ -32,6 +32,7 @@ dependencies = [
     "uvicorn",
     "webauthn",
     "wheel>=0.46.2",
+    "itsdangerous>=2.2.0",
 ]
 
 [dependency-groups]
