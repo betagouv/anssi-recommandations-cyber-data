@@ -1,7 +1,7 @@
 import secrets
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -13,6 +13,7 @@ from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from api.api import api
 from api.auth import auth
+from api.securite import fabrique_verifie_token_jwt
 from configuration import recupere_configuration
 from infra.ui_kit.version_ui_kit import version_ui_kit
 
@@ -70,6 +71,16 @@ def fabrique_serveur(
     @serveur.get("/")
     def index():
         return sert_la_page_statique(f"{static_root_directory}/index.html")
+
+    pages_protegees = {
+        "tableau-de-bord": "tableau-de-bord.html"
+    }
+    for clef, page in pages_protegees.items():
+        serveur.get(f"/{clef}", dependencies= [Depends(fabrique_verifie_token_jwt())])(
+            lambda page=page: sert_la_page_statique(
+                f"{static_root_directory}/pages/{page}",
+            )
+        )
 
     def sert_la_page_statique(page_statique: str) -> HTMLResponse:
         nonce = secrets.token_hex(16)
