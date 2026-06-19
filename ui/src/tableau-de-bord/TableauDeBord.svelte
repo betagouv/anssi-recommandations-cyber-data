@@ -1,5 +1,6 @@
 <script>
     import CreeCollection from './CreeCollection.svelte';
+    import AjouteDocumentCollection from "./AjouteDocumentCollection.svelte";
 </script>
 
 <main>
@@ -7,5 +8,6 @@
     <section>
         <h4>Gestion des collections</h4>
         <CreeCollection />
+        <AjouteDocumentCollection />
     </section>
 </main>
