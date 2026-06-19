@@ -7,9 +7,8 @@ import pytest
 from deepeval.evaluate.types import EvaluationResult
 from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
-from fastapi import FastAPI, HTTPException, Security, status
-from fastapi.security import HTTPBearer
-from starlette.requests import Request
+from fastapi import FastAPI, HTTPException, Security, status, Request
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing_extensions import Callable, Dict, Optional
 from webauthn.helpers.cose import COSEAlgorithmIdentifier
 from webauthn.helpers.structs import (
@@ -566,13 +565,19 @@ def un_serveur_de_test_complet(
         service_indexation_collections = ServiceIndexationNouvellesCollectionsDeTest()
         serveur.avec_un_service_indexation_collections(service_indexation_collections)
 
-        def faux_verificateur_token(credentials=Security(HTTPBearer())):
-            if not credentials:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Token manquant",
-                )
-            return "un-token-de-test"
+        def faux_verificateur_token(
+            request: Request,
+            credentials: HTTPAuthorizationCredentials = Security(
+                HTTPBearer(auto_error=False)
+            ),
+        ):
+            if "session" in request.cookies or credentials:
+                return "un-token-de-test"
+
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token manquant",
+            )
 
         serveur.avec_une_verification_de_token_jwt(faux_verificateur_token)
 
@@ -601,13 +606,19 @@ def un_serveur_de_test_pour_collections(
             .avec_un_service_indexation_collections(service)
         )
 
-        def faux_verificateur_token(credentials=Security(HTTPBearer())):
-            if not credentials:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Token manquant",
-                )
-            return "un-token-de-test"
+        def faux_verificateur_token(
+            request: Request,
+            credentials: HTTPAuthorizationCredentials = Security(
+                HTTPBearer(auto_error=False)
+            ),
+        ):
+            if "session" in request.cookies or credentials:
+                return "un-token-de-test"
+
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token manquant",
+            )
 
         serveur.avec_une_verification_de_token_jwt(faux_verificateur_token)
         return serveur.construis(), service
