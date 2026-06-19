@@ -13,7 +13,7 @@
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({nom: nomCollection, description: descriptionCollection, fichiers: fichiersCollection.split(",")})
+            body: JSON.stringify({nom: nomCollection, description: descriptionCollection, fichiers: fichiersCollection.split(",").map(f => f.trim())})
         });
 
         const contenuReponse = await reponse.json();
