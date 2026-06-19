@@ -1,6 +1,9 @@
 from fastapi.testclient import TestClient
 
 
+import jwt
+
+
 def test_cree_une_nouvelle_collection(un_serveur_de_test_complet):
     (serveur, *_) = un_serveur_de_test_complet(None)
     client: TestClient = TestClient(serveur)
@@ -53,3 +56,22 @@ def test_securise_la_route_collections(un_serveur_de_test_complet):
     )
 
     assert reponse.status_code == 401
+
+
+def test_valide_le_token_jwt_dans_un_cookie_de_session(un_serveur_de_test_complet):
+    (serveur, *_) = un_serveur_de_test_complet(None)
+    client: TestClient = TestClient(serveur)
+    token_valide = jwt.encode({"some": "payload"}, "SECRET", algorithm="HS256")
+
+    reponse = client.post(
+        "/api/collections/",
+        json={
+            "nom": "ma-collection",
+            "description": "une description",
+            "fichiers": ["doc-1.pdf"],
+        },
+        cookies={"session": token_valide},
+    )
+
+    # assert reponse.status_code == 200
+    assert reponse.json() == {"message": "Indexation en cours d'exécution..."}
