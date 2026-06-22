@@ -4,7 +4,7 @@ from unittest.mock import Mock
 
 from requests import Response
 
-from adaptateurs.clients_albert import ReponseCollectionAlbert
+from adaptateurs.clients_albert import ReponseCreationCollection
 from documents.indexeur.indexeur import (
     ReponseDocument,
     ReponseChunk,
@@ -39,7 +39,7 @@ class ReponseAttendueAbstraite:
         self,
         reponse: ReponseDocument
         | ReponseChunk
-        | ReponseCollectionAlbert
+        | ReponseCreationCollection
         | ReponseTexte,
     ):
         super().__init__()
@@ -87,7 +87,7 @@ class ReponseAttendueKO(ReponseAttendueAbstraite):
 
 
 class ReponseCreationCollectionOK(ReponseAttendueAbstraite):
-    def __init__(self, reponse: ReponseCollectionAlbert):
+    def __init__(self, reponse: ReponseCreationCollection):
         super().__init__(reponse)
         self.reponse_collection = reponse
 
@@ -101,7 +101,7 @@ class ReponseCreationCollectionOK(ReponseAttendueAbstraite):
 
 
 class ReponseRecuperationCollectionOK(ReponseAttendueAbstraite):
-    def __init__(self, reponse: ReponseCollectionAlbert):
+    def __init__(self, reponse: ReponseCreationCollection):
         super().__init__(reponse)
         self.reponse_collection = reponse
 

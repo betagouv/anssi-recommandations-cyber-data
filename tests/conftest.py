@@ -9,8 +9,8 @@ from deepeval.test_case import LLMTestCase
 from deepeval.tracing.api import MetricData
 
 from adaptateurs.clients_albert import (
-    ReponseCollectionAlbert,
     ClientAlbertReformulation,
+    ReponseCreationCollection,
 )
 from configuration import (
     Configuration,
@@ -288,10 +288,10 @@ def une_reponse_attendue_KO() -> Callable[
 
 @pytest.fixture
 def une_reponse_de_creation_de_collection_OK() -> Callable[
-    [ReponseCollectionAlbert], ReponseCreationCollectionOK
+    [ReponseCreationCollection], ReponseCreationCollectionOK
 ]:
     def _une_reponse_de_creation_de_collection(
-        reponse_collection: ReponseCollectionAlbert,
+        reponse_collection: ReponseCreationCollection,
     ) -> ReponseCreationCollectionOK:
         return ReponseCreationCollectionOK(reponse_collection)
 
@@ -300,10 +300,10 @@ def une_reponse_de_creation_de_collection_OK() -> Callable[
 
 @pytest.fixture
 def une_reponse_de_recuperation_de_collection_OK() -> Callable[
-    [ReponseCollectionAlbert], ReponseRecuperationCollectionOK
+    [ReponseCreationCollection], ReponseRecuperationCollectionOK
 ]:
     def _une_reponse_de_recuperation_de_collection(
-        reponse_collection: ReponseCollectionAlbert,
+        reponse_collection: ReponseCreationCollection,
     ) -> ReponseRecuperationCollectionOK:
         return ReponseRecuperationCollectionOK(reponse_collection)
 

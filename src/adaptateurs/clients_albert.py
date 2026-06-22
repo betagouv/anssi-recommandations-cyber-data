@@ -12,17 +12,7 @@ class PayloadCollection(NamedTuple):
     visibility: str = "private"
 
 
-class ReponseCollection(NamedTuple):
-    id: str
-    name: str
-    description: str
-    visibility: str
-    documents: int
-    created_at: str
-    updated_at: str
-
-
-class ReponseCollectionAlbert(NamedTuple):
+class ReponseCreationCollection(NamedTuple):
     id: str
     name: str
     description: str
@@ -47,7 +37,7 @@ class ClientAlbertIndexation(ABC):
         self.executeur_de_requete.initialise_connexion_securisee(cle_api)
 
     @abstractmethod
-    def cree_collection(self, nom: str, description: str) -> ReponseCollection:
+    def cree_collection(self, nom: str, description: str) -> ReponseCreationCollection:
         pass
 
     @abstractmethod

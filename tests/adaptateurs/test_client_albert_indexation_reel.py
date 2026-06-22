@@ -1,5 +1,5 @@
 from adaptateurs.client_albert_indexation_reel import ClientAlbertIndexationReel
-from adaptateurs.clients_albert import ReponseCollectionAlbert
+from adaptateurs.clients_albert import ReponseCreationCollection
 from documents.indexeur.indexeur import Indexeur, DocumentAIndexer, ReponseDocument
 from documents.pdf.document_pdf import DocumentPDF
 
@@ -34,7 +34,7 @@ def test_client_albert_cree_collection(
     un_executeur_de_requete, une_reponse_de_creation_de_collection_OK
 ):
     url = "https://test.api"
-    reponse_attendue = ReponseCollectionAlbert(
+    reponse_attendue = ReponseCreationCollection(
         id="mem-0",
         name="test collection",
         description="description test",
@@ -63,7 +63,7 @@ def test_client_albert_cree_collection(
 def test_attribue_id_collection_au_client_albert(
     un_executeur_de_requete, une_reponse_de_recuperation_de_collection_OK
 ):
-    reponse_collection = ReponseCollectionAlbert(
+    reponse_collection = ReponseCreationCollection(
         id="collection-123",
         name="test collection",
         description="description test",
@@ -108,7 +108,7 @@ def test_client_albert_ajoute_documents(
     un_executeur_de_requete, une_reponse_de_creation_de_collection_OK
 ):
     indexeur_de_test = IndexeurDeTest()
-    collection = ReponseCollectionAlbert(
+    collection = ReponseCreationCollection(
         id="id-collection",
         name="test collection",
         description="description test",

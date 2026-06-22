@@ -2,7 +2,7 @@ from typing import Optional
 
 import pytest
 
-from adaptateurs.clients_albert import ClientAlbertIndexation, ReponseCollection
+from adaptateurs.clients_albert import ClientAlbertIndexation, ReponseCreationCollection
 from configuration import MSC
 from documents.indexeur.indexeur import DocumentAIndexer, ReponseDocument
 from documents.pdf.document_pdf import DocumentPDFDistant
@@ -24,8 +24,8 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
         self.id_collection = ""
         self.documents_recus: list[DocumentAIndexer] = []
 
-    def cree_collection(self, nom: str, description: str) -> ReponseCollection:
-        return ReponseCollection(
+    def cree_collection(self, nom: str, description: str) -> ReponseCreationCollection:
+        return ReponseCreationCollection(
             id="id-de-test",
             name=nom,
             description=description,

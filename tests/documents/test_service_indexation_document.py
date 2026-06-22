@@ -1,4 +1,4 @@
-from adaptateurs.clients_albert import ClientAlbertIndexation, ReponseCollection
+from adaptateurs.clients_albert import ClientAlbertIndexation, ReponseCreationCollection
 from configuration import MSC, CollectionsMQC
 from documents.indexeur.indexeur import DocumentAIndexer, ReponseDocument, Indexeur
 from documents.service_indexation_documents import ServiceIndexationNouveauxDocuments
@@ -85,8 +85,8 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
     def _collection_existe(self, id_collection: str) -> bool:
         return True
 
-    def cree_collection(self, nom: str, description: str) -> ReponseCollection:
-        return ReponseCollection(
+    def cree_collection(self, nom: str, description: str) -> ReponseCreationCollection:
+        return ReponseCreationCollection(
             name=nom,
             description=description,
             id="collection-test",

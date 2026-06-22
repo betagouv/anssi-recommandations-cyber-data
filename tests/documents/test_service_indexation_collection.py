@@ -1,6 +1,6 @@
 import uuid
 
-from adaptateurs.clients_albert import ClientAlbertIndexation, ReponseCollection
+from adaptateurs.clients_albert import ClientAlbertIndexation, ReponseCreationCollection
 from configuration import MSC
 from documents.indexeur.indexeur import (
     Indexeur,
@@ -65,8 +65,8 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
     def _collection_existe(self, id_collection: str) -> bool:
         return True
 
-    def cree_collection(self, nom: str, description: str) -> ReponseCollection:
-        reponse_collection = ReponseCollection(
+    def cree_collection(self, nom: str, description: str) -> ReponseCreationCollection:
+        reponse_collection = ReponseCreationCollection(
             name=nom,
             description=description,
             id="collection-test",
