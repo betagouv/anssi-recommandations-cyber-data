@@ -3,6 +3,10 @@ from fastapi.params import Depends
 from pydantic import BaseModel
 
 from api.securite import fabrique_verifie_token_jwt
+from documents.service_collections import (
+    ServiceCollections,
+    fabrique_service_collections,
+)
 from documents.service_indexation_collections import (
     ServiceIndexationNouvellesCollections,
     DocumentsSources,
@@ -36,3 +40,11 @@ def cree_collection(
         DocumentsSources(fichiers=requete.fichiers),
     )
     return {"message": "Indexation en cours d'exécution..."}
+
+
+@api_collections.get("/", status_code=200)
+def recupere_collections(
+    service: ServiceCollections = Depends(fabrique_service_collections),  # type: ignore[assignment]
+    _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
+):
+    return service.les_collections()

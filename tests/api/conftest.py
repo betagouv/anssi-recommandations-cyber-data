@@ -48,6 +48,11 @@ from adaptateurs.journal import (
 from api.securite import verifie_token_jwt
 from configuration import MQC, MQCData, Authentification
 from documents.docling.multi_processeur import Multiprocesseur
+from documents.service_collections import (
+    ServiceCollections,
+    Collection,
+    fabrique_service_collections,
+)
 from documents.service_indexation_collections import (
     ServiceIndexationNouvellesCollections,
     DocumentsSources,
@@ -349,6 +354,28 @@ class ServiceIndexationNouvellesCollectionsDeTest(
         self.sources = sources
 
 
+class ServiceCollectionsDeTest(ServiceCollections):
+    def les_collections(self) -> list[Collection]:
+        return [
+            Collection(
+                id="1",
+                nom="Une collection",
+                description="une description",
+                date_de_creation="2026-06-12T12:47:00",
+                date_de_derniere_modification="2026-06-12T15:52:00",
+                nombre_documents=1,
+            ),
+            Collection(
+                id="2",
+                nom="Une collection Jeopardy",
+                description="une description jeopardy",
+                date_de_creation="2026-06-12T12:48:00",
+                date_de_derniere_modification="2026-06-12T15:53:00",
+                nombre_documents=1,
+            ),
+        ]
+
+
 class ConstructeurServeur:
     def __init__(
         self,
@@ -433,6 +460,12 @@ class ConstructeurServeur:
         self, service: ServiceIndexationNouvellesCollectionsDeTest
     ):
         self._dependances[fabrique_service_indexation_collections] = lambda: service
+        return self
+
+    def avec_un_service_collections(
+        self, service_collections: ServiceCollectionsDeTest
+    ):
+        self._dependances[fabrique_service_collections] = lambda: service_collections
         return self
 
     def avec_une_verification_de_token_jwt(self, verificateur):
@@ -597,13 +630,20 @@ def un_serveur_de_test_complet(
 @pytest.fixture()
 def un_serveur_de_test_pour_collections(
     pages_statiques,
-) -> Callable[[], tuple[FastAPI, ServiceIndexationNouvellesCollectionsDeTest]]:
+) -> Callable[
+    [],
+    tuple[
+        FastAPI, ServiceIndexationNouvellesCollectionsDeTest, ServiceCollectionsDeTest
+    ],
+]:
     def _construis():
         service = ServiceIndexationNouvellesCollectionsDeTest()
+        service_collections = ServiceCollectionsDeTest()
         serveur = (
             ConstructeurServeur(max_requetes_par_minute=100)  # type: ignore[arg-type]
             .avec_pages_statiques(pages_statiques)
             .avec_un_service_indexation_collections(service)
+            .avec_un_service_collections(service_collections)
         )
 
         def faux_verificateur_token(
@@ -621,7 +661,7 @@ def un_serveur_de_test_pour_collections(
             )
 
         serveur.avec_une_verification_de_token_jwt(faux_verificateur_token)
-        return serveur.construis(), service
+        return serveur.construis(), service, service_collections
 
     return _construis
 
