@@ -33,6 +33,18 @@ class ReponseCollection(NamedTuple):
     updated: str
 
 
+class ReponseDocumentCollection(NamedTuple):
+    id: str
+    name: str
+    created: str
+    chunks: int
+
+
+class ReponseDocuments(NamedTuple):
+    indexee: list[ReponseDocumentCollection]
+    jeopardy: list[ReponseDocumentCollection]
+
+
 class ClientAlbertIndexation(ABC):
     def __init__(
         self,
@@ -96,4 +108,10 @@ class ClientAlbertCollections(ABC):
 
     @abstractmethod
     def recupere_collections_mqc(self) -> list[ReponseCollection]:
+        pass
+
+    @abstractmethod
+    def recupere_documents_collection(
+        self, offset_indexation: int, offset_jeopardy: int
+    ) -> ReponseDocuments:
         pass
