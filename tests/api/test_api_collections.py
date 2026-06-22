@@ -1,6 +1,5 @@
 from fastapi.testclient import TestClient
 
-
 import jwt
 
 
@@ -73,12 +72,12 @@ def test_valide_le_token_jwt_dans_un_cookie_de_session(un_serveur_de_test_comple
         cookies={"session": token_valide},
     )
 
-    # assert reponse.status_code == 200
+    assert reponse.status_code == 200
     assert reponse.json() == {"message": "Indexation en cours d'exécution..."}
 
 
 def test_recupere_la_collection_d_indexation(un_serveur_de_test_pour_collections):
-    (serveur, _, service_collections) = un_serveur_de_test_pour_collections()
+    (serveur, *_) = un_serveur_de_test_pour_collections()
     client: TestClient = TestClient(serveur)
 
     reponse = client.get(
@@ -87,8 +86,8 @@ def test_recupere_la_collection_d_indexation(un_serveur_de_test_pour_collections
     )
 
     assert reponse.status_code == 200
-    assert reponse.json() == [
-        {
+    assert reponse.json() == {
+        "indexee": {
             "id": "1",
             "nom": "Une collection",
             "description": "une description",
@@ -96,7 +95,7 @@ def test_recupere_la_collection_d_indexation(un_serveur_de_test_pour_collections
             "date_de_derniere_modification": "2026-06-12T15:52:00",
             "nombre_documents": 1,
         },
-        {
+        "jeopardy": {
             "id": "2",
             "nom": "Une collection Jeopardy",
             "description": "une description jeopardy",
@@ -104,11 +103,11 @@ def test_recupere_la_collection_d_indexation(un_serveur_de_test_pour_collections
             "date_de_derniere_modification": "2026-06-12T15:53:00",
             "nombre_documents": 1,
         },
-    ]
+    }
 
 
-def test_securise_la_route_GET_collections(un_serveur_de_test_complet):
-    (serveur, *_) = un_serveur_de_test_complet(None)
+def test_securise_la_route_GET_collections(un_serveur_de_test_pour_collections):
+    (serveur, *_) = un_serveur_de_test_pour_collections()
     client: TestClient = TestClient(serveur)
 
     reponse = client.get(

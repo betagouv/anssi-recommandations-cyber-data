@@ -39,7 +39,10 @@ from adaptateurs.authentification import (
 from adaptateurs.client_albert_reformulation_reel import (
     fabrique_client_albert_reformulation,
 )
-from adaptateurs.clients_albert import ClientAlbertReformulation
+from adaptateurs.clients_albert import (
+    ClientAlbertReformulation,
+    ClientAlbertCollections,
+)
 from adaptateurs.journal import (
     AdaptateurJournal,
     fabrique_adaptateur_journal,
@@ -52,6 +55,7 @@ from documents.service_collections import (
     ServiceCollections,
     Collection,
     fabrique_service_collections,
+    InformationsDeCollections,
 )
 from documents.service_indexation_collections import (
     ServiceIndexationNouvellesCollections,
@@ -355,9 +359,12 @@ class ServiceIndexationNouvellesCollectionsDeTest(
 
 
 class ServiceCollectionsDeTest(ServiceCollections):
-    def les_collections(self) -> list[Collection]:
-        return [
-            Collection(
+    def __init__(self, client_albert: ClientAlbertCollections):
+        super().__init__(client_albert)
+
+    def les_collections(self) -> InformationsDeCollections:
+        return InformationsDeCollections(
+            indexee=Collection(
                 id="1",
                 nom="Une collection",
                 description="une description",
@@ -365,7 +372,7 @@ class ServiceCollectionsDeTest(ServiceCollections):
                 date_de_derniere_modification="2026-06-12T15:52:00",
                 nombre_documents=1,
             ),
-            Collection(
+            jeopardy=Collection(
                 id="2",
                 nom="Une collection Jeopardy",
                 description="une description jeopardy",
@@ -373,7 +380,7 @@ class ServiceCollectionsDeTest(ServiceCollections):
                 date_de_derniere_modification="2026-06-12T15:53:00",
                 nombre_documents=1,
             ),
-        ]
+        )
 
 
 class ConstructeurServeur:
@@ -629,7 +636,7 @@ def un_serveur_de_test_complet(
 
 @pytest.fixture()
 def un_serveur_de_test_pour_collections(
-    pages_statiques,
+    pages_statiques, un_client_albert_collection
 ) -> Callable[
     [],
     tuple[
@@ -638,7 +645,7 @@ def un_serveur_de_test_pour_collections(
 ]:
     def _construis():
         service = ServiceIndexationNouvellesCollectionsDeTest()
-        service_collections = ServiceCollectionsDeTest()
+        service_collections = ServiceCollectionsDeTest(un_client_albert_collection)
         serveur = (
             ConstructeurServeur(max_requetes_par_minute=100)  # type: ignore[arg-type]
             .avec_pages_statiques(pages_statiques)
