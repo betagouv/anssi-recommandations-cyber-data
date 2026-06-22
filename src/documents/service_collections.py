@@ -22,6 +22,23 @@ class InformationsDeCollections(NamedTuple):
     jeopardy: Collection
 
 
+class OffsetsCollections(NamedTuple):
+    indexee: int
+    jeopardy: int
+
+
+class Document(NamedTuple):
+    id: str
+    nom: str
+    date_de_creation: str
+    chunks: int
+
+
+class InformationsDeDocuments(NamedTuple):
+    indexee: list[Document]
+    jeopardy: list[Document]
+
+
 class ServiceCollections:
     def __init__(self, client_albert: ClientAlbertCollections):
         super().__init__()
@@ -53,6 +70,9 @@ class ServiceCollections:
         return InformationsDeCollections(
             indexee=collection_indexee, jeopardy=collection_jeopardy
         )
+
+    def les_documents(self, offsets: OffsetsCollections) -> InformationsDeDocuments:
+        return InformationsDeDocuments(indexee=[], jeopardy=[])
 
 
 def fabrique_service_collections() -> ServiceCollections:
