@@ -1,5 +1,11 @@
 <script lang="ts">
-    import {collectionStore} from "./store/collection.store";
+    import {type Collections, collectionStore} from "./store/collection.store";
+
+    interface Props {
+        collections: Collections;
+    }
+
+    const {collections}: Props = $props()
 
     const formaterDate = (date: Date | string) => {
         if (!date) return "";
@@ -17,7 +23,7 @@
 {#if $collectionStore}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {#each ['indexee', 'jeopardy'] as key (key)}
-            {@const collection = $collectionStore[key]}
+            {@const collection = collections[key]}
             {#if collection}
                 <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col">
                     <h2 class="text-lg font-bold text-gray-900 mb-2">{collection.nom} <span class="text-sm font-normal text-gray-500">(id : {collection.id})</span></h2>
