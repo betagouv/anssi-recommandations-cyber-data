@@ -1,10 +1,20 @@
-<script>
+<script lang="ts">
     import CreeCollection from './CreeCollection.svelte';
     import AjouteDocumentCollection from "./AjouteDocumentCollection.svelte";
     import Collections from "./Collections.svelte";
     import Documents from "./Documents.svelte";
+    import {collectionStore} from "./store/collection.store";
 
-    let activeTab = 'collections';
+    type Tabulation = "collections" | "autre";
+    let offsetIndexation = $state(0);
+    let offsetJeopardy = $state(0);
+    
+    $effect(() => {
+        offsetIndexation = $collectionStore.indexee.nombre_documents
+        offsetJeopardy = $collectionStore.jeopardy.nombre_documents
+    })
+
+    let activeTab = $state<Tabulation>("collections");
 </script>
 
 <main class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -17,13 +27,13 @@
         <div class="mb-8 border-b border-gray-200">
             <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                 <button
-                    on:click={() => activeTab = 'collections'}
+                    onclick={() => activeTab = 'collections'}
                     class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {activeTab === 'collections' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
                 >
                     Gestion des collections
                 </button>
                 <button
-                    on:click={() => activeTab = 'autre'}
+                    onclick={() => activeTab = 'autre'}
                     class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {activeTab === 'autre' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
                 >
                     Informations collections
@@ -53,10 +63,10 @@
                 <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
                     <h4 class="text-xl font-semibold text-gray-700 mb-4">Informations collections</h4>
                     <div class="grid gap-8">
-                        <Collections />
+                        <Collections collections={$collectionStore} />
 
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                            <Documents />
+                            <Documents offsetIndexation={offsetIndexation} offsetJeopardy={ offsetJeopardy }/>
                         </div>
                     </div>
                 </div>

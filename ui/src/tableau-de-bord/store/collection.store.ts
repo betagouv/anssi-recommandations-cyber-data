@@ -9,7 +9,7 @@ type Collection = {
   date_de_derniere_modification: Date;
 };
 
-type Collections = {
+export type Collections = {
   indexee: Collection
   jeopardy: Collection
 };
