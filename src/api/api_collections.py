@@ -47,4 +47,5 @@ def recupere_collections(
     service: ServiceCollections = Depends(fabrique_service_collections),  # type: ignore[assignment]
     _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
 ):
-    return service.les_collections()
+    collections = service.les_collections()
+    return {"indexee": collections.indexee, "jeopardy": collections.jeopardy}

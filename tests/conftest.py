@@ -10,7 +10,9 @@ from deepeval.tracing.api import MetricData
 
 from adaptateurs.clients_albert import (
     ClientAlbertReformulation,
+    ClientAlbertCollections,
     ReponseCreationCollection,
+    ReponseCollection,
 )
 from configuration import (
     Configuration,
@@ -373,3 +375,40 @@ def un_bus_d_evenement() -> BusEvenementDeTest:
 @pytest.fixture(autouse=True)
 def frise_interval() -> None:
     Interval.frise()
+
+
+class ClientAlbertCollectionsDeTest(ClientAlbertCollections):
+    def __init__(self):
+        super().__init__(
+            "http://mqc.local",
+            "clef-api",
+            CollectionsMQC(id_collection_indexee="1", id_collection_jeopardy="2"),
+            ExecuteurDeRequeteDeTest([]),
+        )
+
+    def recupere_collections_mqc(self) -> list[ReponseCollection]:
+        return [
+            ReponseCollection(
+                id="1",
+                name="collection indexee",
+                description="description",
+                visibility="private",
+                documents=1,
+                created="1776958767",
+                updated="1776958777",
+            ),
+            ReponseCollection(
+                id="2",
+                name="collection jeopardy",
+                description="description jeopardy",
+                visibility="private",
+                documents=1,
+                created="1776958787",
+                updated="1776958797",
+            ),
+        ]
+
+
+@pytest.fixture()
+def un_client_albert_collection() -> ClientAlbertCollections:
+    return ClientAlbertCollectionsDeTest()
