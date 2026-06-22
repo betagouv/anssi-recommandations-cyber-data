@@ -130,3 +130,87 @@ def test_ne_prends_que_les_fichiers_pdf_fournis_dans_la_requete_pour_les_fichier
     assert service_indexation_document.documents_supprimes == [
         "doc-4.pdf",
     ]
+
+
+def test_retourne_les_informations_des_documents_pour_la_collection_indexee(
+    un_serveur_de_test_pour_collections,
+):
+    (serveur, *_) = un_serveur_de_test_pour_collections()
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.get(
+        "/api/documents/",
+        params={"indexee": 3, "jeopardy": 1},
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert reponse.status_code == 200
+    reponse_json = reponse.json()
+    assert reponse_json["indexee"] == [
+        {
+            "id": "1",
+            "nom": "doc-1.pdf",
+            "date_de_creation": "2023-01-01T00:00:00",
+            "chunks": 2,
+        },
+        {
+            "id": "2",
+            "nom": "doc-2.pdf",
+            "date_de_creation": "2023-01-01T00:00:00",
+            "chunks": 3,
+        },
+        {
+            "id": "3",
+            "nom": "doc-3.pdf",
+            "date_de_creation": "2023-01-01T00:00:00",
+            "chunks": 4,
+        },
+    ]
+
+
+def test_retourne_les_informations_des_documents_pour_la_collection_jeopardy(
+    un_serveur_de_test_pour_collections,
+):
+    (serveur, *_) = un_serveur_de_test_pour_collections()
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.get(
+        "/api/documents/",
+        params={
+            "indexee": 1,
+            "jeopardy": 2,
+        },
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert reponse.status_code == 200
+    reponse_json = reponse.json()
+    assert reponse_json["jeopardy"] == [
+        {
+            "id": "1",
+            "nom": "doc-1.pdf",
+            "date_de_creation": "2023-01-01T00:00:00",
+            "chunks": 2,
+        },
+        {
+            "id": "2",
+            "nom": "doc-2.pdf",
+            "date_de_creation": "2023-01-01T00:00:00",
+            "chunks": 3,
+        },
+    ]
+
+
+def test_securise_la_route_GET_documents(un_serveur_de_test_pour_collections):
+    (serveur, *_) = un_serveur_de_test_pour_collections()
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.get(
+        "/api/documents/",
+        params={
+            "indexee": 1,
+            "jeopardy": 2,
+        },
+    )
+
+    assert reponse.status_code == 401

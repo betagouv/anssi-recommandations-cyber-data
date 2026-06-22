@@ -56,6 +56,9 @@ from documents.service_collections import (
     Collection,
     fabrique_service_collections,
     InformationsDeCollections,
+    OffsetsCollections,
+    InformationsDeDocuments,
+    Document,
 )
 from documents.service_indexation_collections import (
     ServiceIndexationNouvellesCollections,
@@ -380,6 +383,44 @@ class ServiceCollectionsDeTest(ServiceCollections):
                 date_de_derniere_modification="2026-06-12T15:53:00",
                 nombre_documents=1,
             ),
+        )
+
+    def les_documents(self, offsets: OffsetsCollections) -> InformationsDeDocuments:
+        return InformationsDeDocuments(
+            indexee=[
+                Document(
+                    id="1",
+                    nom="doc-1.pdf",
+                    date_de_creation="2023-01-01T00:00:00",
+                    chunks=2,
+                ),
+                Document(
+                    id="2",
+                    nom="doc-2.pdf",
+                    date_de_creation="2023-01-01T00:00:00",
+                    chunks=3,
+                ),
+                Document(
+                    id="3",
+                    nom="doc-3.pdf",
+                    date_de_creation="2023-01-01T00:00:00",
+                    chunks=4,
+                ),
+            ],
+            jeopardy=[
+                Document(
+                    id="1",
+                    nom="doc-1.pdf",
+                    date_de_creation="2023-01-01T00:00:00",
+                    chunks=2,
+                ),
+                Document(
+                    id="2",
+                    nom="doc-2.pdf",
+                    date_de_creation="2023-01-01T00:00:00",
+                    chunks=3,
+                ),
+            ],
         )
 
 

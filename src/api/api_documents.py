@@ -3,6 +3,11 @@ from fastapi.params import Depends
 from pydantic import BaseModel
 
 from api.securite import fabrique_verifie_token_jwt
+from documents.service_collections import (
+    ServiceCollections,
+    fabrique_service_collections,
+    OffsetsCollections,
+)
 from documents.service_indexation_documents import (
     fabrique_service_indexation_de_documents,
     ServiceIndexationNouveauxDocuments,
@@ -41,3 +46,19 @@ def indexe_documents(
         list(filter(lambda doc: doc.endswith(".pdf"), requete.fichiers_supprimes)),
     )
     return {"message": "Indexation en cours d’exécution..."}
+
+
+@api_documents.get("/", status_code=200)
+def recupere_documents(
+    indexee: int,
+    jeopardy: int,
+    service: ServiceCollections = Depends(fabrique_service_collections),  # type: ignore[assignment]
+    _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
+):
+    les_documents = service.les_documents(
+        OffsetsCollections(indexee=indexee, jeopardy=jeopardy)
+    )
+    return {
+        "indexee": [doc._asdict() for doc in les_documents.indexee],
+        "jeopardy": [doc._asdict() for doc in les_documents.jeopardy],
+    }
