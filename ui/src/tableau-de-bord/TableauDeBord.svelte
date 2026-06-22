@@ -43,7 +43,7 @@
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                             <CreeCollection />
                         </div>
-                        
+
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                             <AjouteDocumentCollection />
                         </div>
@@ -53,9 +53,7 @@
                 <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
                     <h4 class="text-xl font-semibold text-gray-700 mb-4">Informations collections</h4>
                     <div class="grid gap-8">
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                            <Collections />
-                        </div>
+                        <Collections />
 
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                             <Documents />
