@@ -1,6 +1,6 @@
 from adaptateurs.clients_albert import (
     ClientAlbertIndexation,
-    ReponseCollection,
+    ReponseCreationCollection,
     PayloadCollection,
 )
 from documents.indexeur.indexeur import DocumentAIndexer, ReponseDocument
@@ -8,7 +8,7 @@ from infra.logger import log
 
 
 class ClientAlbertIndexationReel(ClientAlbertIndexation):
-    def cree_collection(self, nom: str, description: str) -> ReponseCollection:
+    def cree_collection(self, nom: str, description: str) -> ReponseCreationCollection:
         payload = PayloadCollection(name=nom, description=description)
         response = self.executeur_de_requete.poste(
             f"{self.url}/collections", payload._asdict(), None
@@ -18,7 +18,7 @@ class ClientAlbertIndexationReel(ClientAlbertIndexation):
             raise Exception(f"Erreur création collection: {response.status_code}")
         result = response.json()
         self.id_collection = result["id"]
-        return ReponseCollection(
+        return ReponseCreationCollection(
             id=result["id"],
             name=result.get("name", nom),
             description=result.get("description", description),

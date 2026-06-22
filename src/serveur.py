@@ -72,11 +72,9 @@ def fabrique_serveur(
     def index():
         return sert_la_page_statique(f"{static_root_directory}/index.html")
 
-    pages_protegees = {
-        "tableau-de-bord": "tableau-de-bord.html"
-    }
+    pages_protegees = {"tableau-de-bord": "tableau-de-bord.html"}
     for clef, page in pages_protegees.items():
-        serveur.get(f"/{clef}", dependencies= [Depends(fabrique_verifie_token_jwt())])(
+        serveur.get(f"/{clef}", dependencies=[Depends(fabrique_verifie_token_jwt())])(
             lambda page=page: sert_la_page_statique(
                 f"{static_root_directory}/pages/{page}",
             )
