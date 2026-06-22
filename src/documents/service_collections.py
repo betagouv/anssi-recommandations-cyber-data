@@ -3,7 +3,10 @@ from datetime import datetime, timezone
 from typing import NamedTuple
 
 from adaptateurs.client_albert_collections_reel import ClientAlbertCollectionsReel
-from adaptateurs.clients_albert import ClientAlbertCollections
+from adaptateurs.clients_albert import (
+    ClientAlbertCollections,
+    ReponseDocumentCollection,
+)
 from configuration import recupere_configuration
 
 
@@ -45,34 +48,58 @@ class ServiceCollections:
         self.client_albert = client_albert
 
     def les_collections(self) -> InformationsDeCollections:
-        def en_date(date: str) -> str:
-            return (
-                datetime.fromtimestamp(int(date)).astimezone(timezone.utc).isoformat()
-            )
-
         les_collections = self.client_albert.recupere_collections_mqc()
         collection_indexee = Collection(
             id=les_collections[0].id,
             nom=les_collections[0].name,
             description=les_collections[0].description,
             nombre_documents=les_collections[0].documents,
-            date_de_creation=en_date(les_collections[0].created),
-            date_de_derniere_modification=en_date(les_collections[0].updated),
+            date_de_creation=ServiceCollections.en_date(les_collections[0].created),
+            date_de_derniere_modification=ServiceCollections.en_date(
+                les_collections[0].updated
+            ),
         )
         collection_jeopardy = Collection(
             id=les_collections[1].id,
             nom=les_collections[1].name,
             description=les_collections[1].description,
             nombre_documents=les_collections[1].documents,
-            date_de_creation=en_date(les_collections[1].created),
-            date_de_derniere_modification=en_date(les_collections[1].updated),
+            date_de_creation=ServiceCollections.en_date(les_collections[1].created),
+            date_de_derniere_modification=ServiceCollections.en_date(
+                les_collections[1].updated
+            ),
         )
         return InformationsDeCollections(
             indexee=collection_indexee, jeopardy=collection_jeopardy
         )
 
     def les_documents(self, offsets: OffsetsCollections) -> InformationsDeDocuments:
-        return InformationsDeDocuments(indexee=[], jeopardy=[])
+        def mappe_en_document(
+            indexee: list[ReponseDocumentCollection],
+        ) -> list[Document]:
+            return list(
+                map(
+                    lambda doc: Document(
+                        id=doc.id,
+                        nom=doc.name,
+                        date_de_creation=ServiceCollections.en_date(doc.created),
+                        chunks=doc.chunks,
+                    ),
+                    indexee,
+                )
+            )
+
+        les_documents = self.client_albert.recupere_documents_collection(
+            offsets.indexee, offsets.jeopardy
+        )
+        return InformationsDeDocuments(
+            indexee=mappe_en_document(les_documents.indexee),
+            jeopardy=mappe_en_document(les_documents.jeopardy),
+        )
+
+    @staticmethod
+    def en_date(date: str) -> str:
+        return datetime.fromtimestamp(int(date)).astimezone(timezone.utc).isoformat()
 
 
 def fabrique_service_collections() -> ServiceCollections:

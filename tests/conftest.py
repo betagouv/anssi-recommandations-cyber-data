@@ -13,6 +13,8 @@ from adaptateurs.clients_albert import (
     ClientAlbertCollections,
     ReponseCreationCollection,
     ReponseCollection,
+    ReponseDocuments,
+    ReponseDocumentCollection,
 )
 from configuration import (
     Configuration,
@@ -407,6 +409,28 @@ class ClientAlbertCollectionsDeTest(ClientAlbertCollections):
                 updated="1776958797",
             ),
         ]
+
+    def recupere_documents_collection(
+        self, offset_indexation: int, offset_jeopardy: int
+    ) -> ReponseDocuments:
+        return ReponseDocuments(
+            indexee=[
+                ReponseDocumentCollection(
+                    chunks=2,
+                    id="1",
+                    name="doc-1.pdf",
+                    created="1672531200",
+                )
+            ],
+            jeopardy=[
+                ReponseDocumentCollection(
+                    chunks=2,
+                    id="1",
+                    name="doc-1.pdf",
+                    created="1672531200",
+                )
+            ],
+        )
 
 
 @pytest.fixture()
