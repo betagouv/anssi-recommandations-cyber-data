@@ -5,3 +5,5 @@ preferFrozenLockfile: true
 
 minimumReleaseAgeExclude:
   - flatted@3.4.2
+  # Renovate security update: vitest@4.1.0
+  - vitest@4.1.0
