@@ -12,6 +12,8 @@
 
     let documents: Documents | undefined = $state(undefined)
     let filtreNom = $state("");
+    let filtreSansChunks = $state(false);
+    let filtreManquants = $state(false);
 
     $effect(() => {
         documentsStore.recupereDocuments(offsetIndexation, offsetJeopardy).then(data => documents = data)
@@ -56,13 +58,24 @@
             result = result.filter(doc => doc.nom.toLowerCase().includes(search));
         }
 
+        if (filtreSansChunks) {
+            result = result.filter(doc => 
+                (doc.indexee && doc.indexee.chunks === 0) || 
+                (doc.jeopardy && doc.jeopardy.chunks === 0)
+            );
+        }
+
+        if (filtreManquants) {
+            result = result.filter(doc => !doc.indexee || !doc.jeopardy);
+        }
+
         return result.sort((a, b) => a.nom.localeCompare(b.nom));
     });
 </script>
 
 
 <section class="space-y-6">
-    <div class="flex items-center space-x-4">
+    <div class="flex flex-wrap items-center gap-4">
         <div class="relative flex-1 max-w-md">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -76,9 +89,25 @@
                 class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
             />
         </div>
-        {#if filtreNom}
+
+        <div class="flex items-center space-x-2">
             <button
-                onclick={() => filtreNom = ""}
+                onclick={() => filtreSansChunks = !filtreSansChunks}
+                class="inline-flex items-center px-3 py-2 border text-sm font-medium rounded-md transition-colors {filtreSansChunks ? 'bg-orange-100 border-orange-500 text-orange-700 shadow-sm' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}"
+            >
+                {filtreSansChunks ? '✓ ' : ''}Sans chunks
+            </button>
+            <button
+                onclick={() => filtreManquants = !filtreManquants}
+                class="inline-flex items-center px-3 py-2 border text-sm font-medium rounded-md transition-colors {filtreManquants ? 'bg-red-100 border-red-500 text-red-700 shadow-sm' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}"
+            >
+                {filtreManquants ? '✓ ' : ''}Manquants
+            </button>
+        </div>
+
+        {#if filtreNom || filtreSansChunks || filtreManquants}
+            <button
+                onclick={() => { filtreNom = ""; filtreSansChunks = false; filtreManquants = false; }}
                 class="text-sm text-gray-500 hover:text-gray-700 font-medium"
             >
                 Effacer
@@ -97,14 +126,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun document trouvé</h3>
-                        <p class="mt-1 text-sm text-gray-500">Aucun document ne correspond à votre recherche "{filtreNom}".</p>
+                        <p class="mt-1 text-sm text-gray-500">Aucun document ne correspond à vos critères de recherche.</p>
                         <div class="mt-6">
                             <button
                                 type="button"
-                                onclick={() => filtreNom = ""}
+                                onclick={() => { filtreNom = ""; filtreSansChunks = false; filtreManquants = false; }}
                                 class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                             >
-                                Effacer la recherche
+                                Effacer tous les filtres
                             </button>
                         </div>
                     </div>
