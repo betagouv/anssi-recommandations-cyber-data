@@ -18,7 +18,7 @@
 </script>
 
 <main class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-7xl mx-auto">
         <header class="mb-8">
             <h3 class="text-3xl font-bold text-gray-900 border-b pb-4">Tableau de bord</h3>
         </header>
