@@ -2,7 +2,7 @@
     import TableauDeDocuments from './TableauDeDocuments.svelte';
 
 
-    import {type Documents, documentsStore} from "./store/documents.store";
+    import {type Documents, type Document, documentsStore} from "./store/documents.store";
 
     interface Props {
         offsetIndexation: number;
@@ -22,50 +22,47 @@
         }
     })
 
-    type Tabulation = "collection-indexee" | "collection-jeopardy";
+    import { SvelteMap } from 'svelte/reactivity';
 
-    let activeTab = $state<Tabulation>("collection-indexee");
+    type DocumentConsolide = {
+        nom: string;
+        indexee?: Document;
+        jeopardy?: Document;
+    }
+
+    let documentsConsolides = $derived.by(() => {
+        if (!documents) return [];
+
+        const documentsConsolides = new SvelteMap<string, DocumentConsolide>();
+
+        documents.indexee.forEach(doc => {
+            documentsConsolides.set(doc.nom, { nom: doc.nom, indexee: doc });
+        });
+
+        documents.jeopardy.forEach(doc => {
+            const existant = documentsConsolides.get(doc.nom);
+            if (existant) {
+                existant.jeopardy = doc;
+            } else {
+                documentsConsolides.set(doc.nom, { nom: doc.nom, jeopardy: doc });
+            }
+        });
+
+        return Array.from(documentsConsolides.values()).sort((a, b) => a.nom.localeCompare(b.nom));
+    });
 </script>
 
 
-<div class="mb-8 border-b border-gray-200">
-    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-        <button
-                onclick={() => activeTab = 'collection-indexee'}
-                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {activeTab === 'collection-indexee' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
-        >
-            Collection indexée
-        </button>
-        <button
-                onclick={() => activeTab = 'collection-jeopardy'}
-                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {activeTab === 'collection-jeopardy' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
-        >
-            Collection Jeopardy
-        </button>
-    </nav>
-</div>
 <section class="space-y-8">
-    {#if activeTab === 'collection-indexee'}
-        <div>
-            <div class="bg-white shadow-sm border border-gray-200 overflow-hidden">
-                {#if documents}
-                    <TableauDeDocuments documents={documents.indexee} />
-                {:else}
-                    <div class="p-6 text-center text-gray-500 italic">
-                        Chargement des documents...
-                    </div>
-                {/if}
-            </div>
-        </div>
-    {:else if activeTab === 'collection-jeopardy'}
-        <div class="bg-white shadow-sm border border-gray-200">
+    <div>
+        <div class="bg-white shadow-sm border border-gray-200 overflow-hidden">
             {#if documents}
-                <TableauDeDocuments documents={documents.jeopardy} />
+                <TableauDeDocuments documents={documentsConsolides} />
             {:else}
                 <div class="p-6 text-center text-gray-500 italic">
                     Chargement des documents...
                 </div>
             {/if}
         </div>
-    {/if}
+    </div>
 </section>
