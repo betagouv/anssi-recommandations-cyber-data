@@ -30,7 +30,7 @@
     "@eslint/compat": "^2.0.3",
     "@eslint/js": "^10.0.1",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
-    "@tailwindcss/vite": "4.0.0-alpha.25",
+    "@tailwindcss/vite": "4.3.2",
     "@tsconfig/svelte": "^5.0.8",
     "@types/node": "^22.19.15",
     "autoprefixer": "^10.5.0",
