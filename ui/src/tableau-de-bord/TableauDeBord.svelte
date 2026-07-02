@@ -4,6 +4,7 @@
     import Collections from "./Collections.svelte";
     import Documents from "./Documents.svelte";
     import {collectionStore} from "./store/collection.store";
+    import JeopardyseCollectionEntiere from "./JeopardyseCollectionEntiere.svelte";
 
     type Tabulation = "collections" | "autre";
     let offsetIndexation = $state(0);
@@ -56,6 +57,11 @@
 
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                             <AjouteDocumentCollection />
+                        </div>
+
+
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                            <JeopardyseCollectionEntiere />
                         </div>
                     </div>
                 </div>
