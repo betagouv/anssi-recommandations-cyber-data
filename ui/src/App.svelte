@@ -58,6 +58,7 @@
         });
 
         const enrolement = await reponse.json();
+        const utilisateur = JSON.parse(enrolement.options).user.name;
         const credential = await startRegistration(JSON.parse(enrolement.options));
 
         const reponseVerificationEnrolement = await fetch("/auth/verifie-enrolement", {
@@ -65,7 +66,7 @@
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({credential, utilisateur: enrolement.utilisateur})
+            body: JSON.stringify({credential, utilisateur: utilisateur})
         });
 
         console.log(`ENRÔLÉ ? ${reponseVerificationEnrolement.status}`);
