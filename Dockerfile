@@ -1,6 +1,6 @@
 #checkov:skip=CKV_DOCKER_2:Uniquement utilisé en local pour le dev
 #checkov:skip=CKV_DOCKER_3:Uniquement utilisé en local pour le dev
-FROM docker.io/python:3.13.5
+FROM docker.io/python:3.14.6
 
 RUN mkdir /app
 WORKDIR /app
