@@ -47,7 +47,7 @@ importers:
         version: 10.1.8(eslint@10.5.0(jiti@2.7.0))
       eslint-plugin-svelte:
         specifier: ^3.15.2
-        version: 3.19.0(eslint@10.5.0(jiti@2.7.0))(svelte@5.56.4(@typescript-eslint/types@8.57.0))
+        version: 3.20.0(eslint@10.5.0(jiti@2.7.0))(svelte@5.56.4(@typescript-eslint/types@8.57.0))
       globals:
         specifier: ^17.4.0
         version: 17.4.0
@@ -958,8 +958,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-svelte@3.19.0:
-    resolution: {integrity: sha512-t3rNaZeXz4d2gG4uJyMEYfJCFKf22+SWbSizIIXIWKu4wM+XPLiMWuSSr/C5821JmFeN9ogK+eExbG+z+twyxw==}
+  eslint-plugin-svelte@3.20.0:
+    resolution: {integrity: sha512-AElKLVt7Hjy4d7ljwhrhw9hux60DCxCNkmK8cY/aAXvjs8tpR7PvU4DlyI/SA1PaJww1gh0wPGo2pbyURuEwxQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.1 || ^9.0.0 || ^10.0.0
@@ -1535,8 +1535,8 @@ packages:
     engines: {node: '>=20.19.0'}
     hasBin: true
 
-  semver@7.8.4:
-    resolution: {integrity: sha512-rUCObTnP32Q08R2uuIrt7r9PlEonuTmtuXYcW6s5kjdlj3xbnwe+21yXptAUYcMAABLkYYTtnmzb3w3EDZfueA==}
+  semver@7.8.5:
+    resolution: {integrity: sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -2284,7 +2284,7 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.57.0
       debug: 4.4.3
       minimatch: 10.2.5
-      semver: 7.8.4
+      semver: 7.8.5
       tinyglobby: 0.2.17
       ts-api-utils: 2.4.0(typescript@5.9.3)
       typescript: 5.9.3
@@ -2502,7 +2502,7 @@ snapshots:
     dependencies:
       eslint: 10.5.0(jiti@2.7.0)
 
-  eslint-plugin-svelte@3.19.0(eslint@10.5.0(jiti@2.7.0))(svelte@5.56.4(@typescript-eslint/types@8.57.0)):
+  eslint-plugin-svelte@3.20.0(eslint@10.5.0(jiti@2.7.0))(svelte@5.56.4(@typescript-eslint/types@8.57.0)):
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@10.5.0(jiti@2.7.0))
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -2513,7 +2513,7 @@ snapshots:
       postcss: 8.5.15
       postcss-load-config: 3.1.4(postcss@8.5.15)
       postcss-safe-parser: 7.0.1(postcss@8.5.15)
-      semver: 7.8.4
+      semver: 7.8.5
       svelte-eslint-parser: 1.8.0(svelte@5.56.4(@typescript-eslint/types@8.57.0))
     optionalDependencies:
       svelte: 5.56.4(@typescript-eslint/types@8.57.0)
@@ -3028,7 +3028,7 @@ snapshots:
       '@parcel/watcher': 2.5.6
     optional: true
 
-  semver@7.8.4: {}
+  semver@7.8.5: {}
 
   shebang-command@2.0.0:
     dependencies:
@@ -3097,7 +3097,7 @@ snapshots:
       postcss: 8.5.15
       postcss-scss: 4.0.9(postcss@8.5.15)
       postcss-selector-parser: 7.1.4
-      semver: 7.8.4
+      semver: 7.8.5
     optionalDependencies:
       svelte: 5.56.4(@typescript-eslint/types@8.57.0)
 
