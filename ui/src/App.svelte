@@ -43,6 +43,8 @@
             body: JSON.stringify({credential: authenticationResponse, utilisateur: identifiantAuthentification})
         });
 
+        window.location.href = "/tableau-de-bord";
+
         console.log(`CONNECTÉ ? ${reponseFinalisation.status} : ${await reponseFinalisation.text()} - ${await reponseFinalisation.json()}`);
     }
 
