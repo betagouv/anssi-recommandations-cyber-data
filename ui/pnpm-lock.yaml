@@ -13,7 +13,7 @@ importers:
     dependencies:
       '@lab-anssi/ui-kit':
         specifier: ^1.44.2
-        version: 1.44.2(svelte@5.56.4(@typescript-eslint/types@8.57.0))
+        version: 1.55.0(svelte@5.56.4(@typescript-eslint/types@8.57.0))
       '@simplewebauthn/browser':
         specifier: ^13.3.0
         version: 13.3.0
@@ -333,10 +333,10 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@lab-anssi/ui-kit@1.44.2':
-    resolution: {integrity: sha512-XE3Ivv4Y07YyLJ07iUi+UU3cjVUUUMwP11mrEFDqEI2biRKIaccDpjRPjwMKYW1HlOsH0OjKU7ITFelCT0doNA==}
+  '@lab-anssi/ui-kit@1.55.0':
+    resolution: {integrity: sha512-jnzFRT+kSGSEwf/4DeDCsm/GTXaYTG7xX8KYZa1qSdUaq6vLD0LNb3t+oFlktuqAsx5QIFIAznCrZ/Nxi/QvCw==}
     peerDependencies:
-      svelte: ~5.38.8
+      svelte: ~5.55.10
 
   '@parcel/watcher-android-arm64@2.5.6':
     resolution: {integrity: sha512-YQxSS34tPF/6ZG7r/Ih9xy+kP/WwediEUsqmtf0cuCV5TPPKw/PQHRhueUo6JdeFJaqV3pyjm0GdYjZotbRt/A==}
@@ -1974,7 +1974,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@lab-anssi/ui-kit@1.44.2(svelte@5.56.4(@typescript-eslint/types@8.57.0))':
+  '@lab-anssi/ui-kit@1.55.0(svelte@5.56.4(@typescript-eslint/types@8.57.0))':
     dependencies:
       svelte: 5.56.4(@typescript-eslint/types@8.57.0)
 
