@@ -74,7 +74,7 @@ importers:
         version: 4.7.1(picomatch@4.0.4)(svelte@5.56.4(@typescript-eslint/types@8.57.0))(typescript@5.9.3)
       tailwindcss:
         specifier: ^4.3.1
-        version: 4.3.1
+        version: 4.3.2
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -1626,9 +1626,6 @@ packages:
     resolution: {integrity: sha512-gAQ9qrUN/UCypHtGFbbe7Rc/f9bzO88IwrG8TDo/aMKAApKyD6E3W4Cm0EfhfBb6Z6SKt59tTCTfD+n1xmAvMg==}
     engines: {node: '>=16.0.0'}
 
-  tailwindcss@4.3.1:
-    resolution: {integrity: sha512-hk+TB1m+K8CYNrP6rjQaq/Y+4Zylwpa87mLYBKCunwnnQ9p+fHb7kmSfGqyEJoxF/O6CDyABWVFEafNSYKll+Q==}
-
   tailwindcss@4.3.2:
     resolution: {integrity: sha512-WtctNNSH8A9jlMIqxzuYumOHU5uGZyRv0Q5svQl+oEPy5w84YpBxdb7MdqyiSPQge5jTJ6zFQLq0PFygdccSBA==}
 
@@ -3134,8 +3131,6 @@ snapshots:
       sync-message-port: 1.2.0
 
   sync-message-port@1.2.0: {}
-
-  tailwindcss@4.3.1: {}
 
   tailwindcss@4.3.2: {}
 
