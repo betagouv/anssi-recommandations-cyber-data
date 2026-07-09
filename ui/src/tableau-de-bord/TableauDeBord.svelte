@@ -5,6 +5,7 @@
     import Documents from "./Documents.svelte";
     import {collectionStore} from "./store/collection.store";
     import JeopardyseCollectionEntiere from "./JeopardyseCollectionEntiere.svelte";
+    import SupprimeDocuments from "./SupprimeDocuments.svelte";
 
     type Tabulation = "collections" | "autre";
     let offsetIndexation = $state(0);
@@ -59,10 +60,14 @@
                             <AjouteDocumentCollection />
                         </div>
 
-
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                             <JeopardyseCollectionEntiere />
                         </div>
+
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                            <SupprimeDocuments />
+                        </div>
+
                     </div>
                 </div>
             {:else if activeTab === 'autre'}

@@ -3,6 +3,8 @@ from fastapi.params import Depends
 from pydantic import BaseModel
 
 from api.securite import fabrique_verifie_token_jwt
+from documents.indexe_documents_rag import fabrique_client_albert
+from adaptateurs.clients_albert import ClientAlbertIndexation
 from documents.service_collections import (
     ServiceCollections,
     fabrique_service_collections,
@@ -22,6 +24,8 @@ class RequeteIndexationDocument(BaseModel):
     fichiers_modifies: list[str] = []
     fichiers_supprimes: list[str] = []
 
+class RequeteSuppressionDocuments(BaseModel):
+    documents: list[str] = []
 
 @api_documents.post("/", status_code=200)
 def indexe_documents(
@@ -47,6 +51,21 @@ def indexe_documents(
     )
     return {"message": "Indexation en cours d’exécution..."}
 
+
+@api_documents.post("/supprimer", status_code=200)
+def supprime_documents_indexation(
+        requete: RequeteSuppressionDocuments,
+        client_albert: ClientAlbertIndexation = Depends(  # type: ignore[assignment]
+            fabrique_client_albert  # type: ignore[assignment]
+        ),
+        _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
+):
+    for document in requete.documents:
+        client_albert.supprime_document(document)
+
+    log(__name__, f"Suppression des documents {requete.documents}")
+
+    return {"message": "Suppression en cours d’exécution..."}
 
 @api_documents.get("/", status_code=200)
 def recupere_documents(
