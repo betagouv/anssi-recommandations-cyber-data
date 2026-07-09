@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from itertools import islice
 from pathlib import Path
 from typing import Generator
+from urllib.parse import unquote
 
 from documents.docling.chunker_docling import TypeFichier, ChunkerDocling
 from documents.docling.chunker_docling_mqc import ChunkerDoclingMQC
@@ -127,9 +128,12 @@ class IndexeurDocling(Indexeur):
 
             payload = {
                 "collection_id": int(id_collection),
-                "name": nom_du_document,
+                "name": unquote(nom_du_document),
                 "metadata": json.dumps(
-                    {"source_url": document.url, "nom_document": document.nom_document}
+                    {
+                        "source_url": document.url,
+                        "nom_document": unquote(document.nom_document),
+                    }
                 ),
                 "disable_chunking": True,
             }
