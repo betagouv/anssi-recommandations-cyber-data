@@ -387,8 +387,14 @@ class ClientAlbertCollectionsDeTest(ClientAlbertCollections):
             CollectionsMQC(id_collection_indexee="1", id_collection_jeopardy="2"),
             ExecuteurDeRequeteDeTest([]),
         )
+        self.ids_recus: tuple[str | None, str | None] | None = None
 
-    def recupere_collections_mqc(self) -> list[ReponseCollection]:
+    def recupere_collections_mqc(
+        self,
+        id_collection_indexee: str | None = None,
+        id_collection_jeopardy: str | None = None,
+    ) -> list[ReponseCollection]:
+        self.ids_recus = (id_collection_indexee, id_collection_jeopardy)
         return [
             ReponseCollection(
                 id="1",

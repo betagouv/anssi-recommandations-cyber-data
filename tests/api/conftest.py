@@ -369,8 +369,14 @@ class ServiceIndexationNouvellesCollectionsDeTest(
 class ServiceCollectionsDeTest(ServiceCollections):
     def __init__(self, client_albert: ClientAlbertCollections):
         super().__init__(client_albert)
+        self.ids_recus: tuple[str | None, str | None] | None = None
 
-    def les_collections(self) -> InformationsDeCollections:
+    def les_collections(
+        self,
+        id_collection_indexee: str | None = None,
+        id_collection_jeopardy: str | None = None,
+    ) -> InformationsDeCollections:
+        self.ids_recus = (id_collection_indexee, id_collection_jeopardy)
         return InformationsDeCollections(
             indexee=Collection(
                 id="1",

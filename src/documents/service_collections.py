@@ -47,8 +47,14 @@ class ServiceCollections:
         super().__init__()
         self.client_albert = client_albert
 
-    def les_collections(self) -> InformationsDeCollections:
-        les_collections = self.client_albert.recupere_collections_mqc()
+    def les_collections(
+        self,
+        id_collection_indexee: str | None = None,
+        id_collection_jeopardy: str | None = None,
+    ) -> InformationsDeCollections:
+        les_collections = self.client_albert.recupere_collections_mqc(
+            id_collection_indexee, id_collection_jeopardy
+        )
         collection_indexee = Collection(
             id=les_collections[0].id,
             nom=les_collections[0].name,
