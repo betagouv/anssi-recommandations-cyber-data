@@ -65,6 +65,20 @@ class ClientAlbertCollectionsReel(ClientAlbertCollections):
         )
         return ReponseDocuments(indexee=documents_indexes, jeopardy=documents_jeopardy)
 
+    def liste_les_collections_disponibles(self) -> list[ReponseCollection]:
+        params = {
+            "limit": 10,
+            "order_by": "created",
+            "order_direction": "desc",
+            "visibility": "private",
+        }
+        reponse = self.executeur_de_requete.recupere(
+            f"{self.url}/collections", params
+        )
+        return [
+            self._en_reponse_collection(c) for c in reponse.json()["data"]
+        ]
+
     def _en_reponse_collection(self, donnees_collection_indexee) -> ReponseCollection:
         return ReponseCollection(
             id=donnees_collection_indexee["id"],

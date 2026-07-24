@@ -120,6 +120,41 @@ def test_transmet_les_ids_de_collection_fournis_en_parametre_de_requete(
     assert service_collections.ids_recus == ("42", "43")
 
 
+def test_recupere_les_collections_disponibles(un_serveur_de_test_pour_collections):
+    (serveur, *_) = un_serveur_de_test_pour_collections()
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.get(
+        "/api/collections/disponibles",
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert reponse.status_code == 200
+    assert reponse.json() == {
+        "collections": [
+            {
+                "id": "1",
+                "nom": "collection disponible",
+                "description": "description",
+                "date_de_creation": "2026-04-23T15:39:27+00:00",
+                "date_de_derniere_modification": "2026-04-23T15:39:37+00:00",
+                "nombre_documents": 1,
+            }
+        ]
+    }
+
+
+def test_securise_la_route_GET_collections_disponibles(
+    un_serveur_de_test_pour_collections,
+):
+    (serveur, *_) = un_serveur_de_test_pour_collections()
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.get("/api/collections/disponibles")
+
+    assert reponse.status_code == 401
+
+
 def test_securise_la_route_GET_collections(un_serveur_de_test_pour_collections):
     (serveur, *_) = un_serveur_de_test_pour_collections()
     client: TestClient = TestClient(serveur)

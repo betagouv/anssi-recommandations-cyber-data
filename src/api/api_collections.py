@@ -51,3 +51,11 @@ def recupere_collections(
 ):
     collections = service.les_collections(id_collection_indexee, id_collection_jeopardy)
     return {"indexee": collections.indexee, "jeopardy": collections.jeopardy}
+
+
+@api_collections.get("/disponibles", status_code=200)
+def recupere_collections_disponibles(
+    service: ServiceCollections = Depends(fabrique_service_collections),  # type: ignore[assignment]
+    _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
+):
+    return {"collections": service.les_collections_disponibles()}

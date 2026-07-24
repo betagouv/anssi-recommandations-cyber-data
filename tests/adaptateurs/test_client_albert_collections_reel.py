@@ -116,3 +116,47 @@ def test_utilise_les_ids_configures_quand_aucun_id_n_est_fourni(
 
     assert resultat[0].id == "1"
     assert resultat[1].id == "2"
+
+
+def test_liste_les_collections_disponibles_avec_les_bons_parametres(
+    un_executeur_de_requete, une_reponse_de_liste_collections_OK
+):
+    collections_disponibles = [
+        ReponseCollection(
+            id="1",
+            name="collection A",
+            description="description",
+            visibility="private",
+            documents=1,
+            created="1672531200",
+            updated="1672531200",
+        ),
+        ReponseCollection(
+            id="2",
+            name="collection B",
+            description="description",
+            visibility="private",
+            documents=2,
+            created="1672531300",
+            updated="1672531300",
+        ),
+    ]
+    executeur = un_executeur_de_requete(
+        [une_reponse_de_liste_collections_OK(collections_disponibles)]
+    )
+    client = ClientAlbertCollectionsReel(
+        "https://test.api",
+        "test-key",
+        CollectionsMQC(id_collection_indexee="1", id_collection_jeopardy="2"),
+        executeur,
+    )
+
+    resultat = client.liste_les_collections_disponibles()
+
+    assert executeur.parametres_recus["https://test.api/collections"] == {
+        "limit": 10,
+        "order_by": "created",
+        "order_direction": "desc",
+        "visibility": "private",
+    }
+    assert [c.id for c in resultat] == ["1", "2"]
