@@ -106,6 +106,20 @@ def test_recupere_la_collection_d_indexation(un_serveur_de_test_pour_collections
     }
 
 
+def test_transmet_les_ids_de_collection_fournis_en_parametre_de_requete(
+    un_serveur_de_test_pour_collections,
+):
+    (serveur, _, service_collections) = un_serveur_de_test_pour_collections()
+    client: TestClient = TestClient(serveur)
+
+    client.get(
+        "/api/collections/?id_collection_indexee=42&id_collection_jeopardy=43",
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert service_collections.ids_recus == ("42", "43")
+
+
 def test_securise_la_route_GET_collections(un_serveur_de_test_pour_collections):
     (serveur, *_) = un_serveur_de_test_pour_collections()
     client: TestClient = TestClient(serveur)

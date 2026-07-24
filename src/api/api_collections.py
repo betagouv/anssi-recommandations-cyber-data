@@ -44,8 +44,10 @@ def cree_collection(
 
 @api_collections.get("/", status_code=200)
 def recupere_collections(
+    id_collection_indexee: str | None = None,
+    id_collection_jeopardy: str | None = None,
     service: ServiceCollections = Depends(fabrique_service_collections),  # type: ignore[assignment]
     _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
 ):
-    collections = service.les_collections()
+    collections = service.les_collections(id_collection_indexee, id_collection_jeopardy)
     return {"indexee": collections.indexee, "jeopardy": collections.jeopardy}
