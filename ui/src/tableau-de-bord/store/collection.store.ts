@@ -10,8 +10,8 @@ type Collection = {
 };
 
 export type Collections = {
-  indexee: Collection
-  jeopardy: Collection
+  indexee: Collection;
+  jeopardy: Collection;
 };
 
 const recupereCollections = async () => {
@@ -31,4 +31,4 @@ const collections = await recupereCollections();
 
 set(collections);
 
-export  const collectionStore = { subscribe };
+export const collectionStore = { subscribe };
