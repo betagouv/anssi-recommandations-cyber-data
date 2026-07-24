@@ -79,6 +79,21 @@ class ServiceCollections:
             indexee=collection_indexee, jeopardy=collection_jeopardy
         )
 
+    def les_collections_disponibles(self) -> list[Collection]:
+        return [
+            Collection(
+                id=collection.id,
+                nom=collection.name,
+                description=collection.description,
+                nombre_documents=collection.documents,
+                date_de_creation=ServiceCollections.en_date(collection.created),
+                date_de_derniere_modification=ServiceCollections.en_date(
+                    collection.updated
+                ),
+            )
+            for collection in self.client_albert.liste_les_collections_disponibles()
+        ]
+
     def les_documents(self, offsets: OffsetsCollections) -> InformationsDeDocuments:
         def mappe_en_document(
             indexee: list[ReponseDocumentCollection],

@@ -45,6 +45,7 @@ from infra.memoire.executeur_de_requete_memoire import (
     ReponseCreationCollectionOK,
     ReponseRecuperationCollectionOK,
     ReponseRecuperationCollectionKO,
+    ReponseListeCollectionsOK,
     ReponseAttendue,
     ReponseTexteEnSucces,
     TypeRequete,
@@ -319,6 +320,18 @@ def une_reponse_de_recuperation_de_collection_KO() -> ReponseRecuperationCollect
     return ReponseRecuperationCollectionKO()
 
 
+@pytest.fixture
+def une_reponse_de_liste_collections_OK() -> Callable[
+    [list[ReponseCollection]], ReponseListeCollectionsOK
+]:
+    def _une_reponse_de_liste_collections(
+        collections: list[ReponseCollection],
+    ) -> ReponseListeCollectionsOK:
+        return ReponseListeCollectionsOK(collections)
+
+    return _une_reponse_de_liste_collections
+
+
 class ClientAlbertReformulationDeTest(ClientAlbertReformulation):
     def __init__(self, reformulations: list[dict[str, str]]):
         super().__init__()
@@ -437,6 +450,19 @@ class ClientAlbertCollectionsDeTest(ClientAlbertCollections):
                 )
             ],
         )
+
+    def liste_les_collections_disponibles(self) -> list[ReponseCollection]:
+        return [
+            ReponseCollection(
+                id="1",
+                name="collection disponible",
+                description="description",
+                visibility="private",
+                documents=1,
+                created="1776958767",
+                updated="1776958777",
+            ),
+        ]
 
 
 @pytest.fixture()

@@ -119,3 +119,7 @@ class ClientAlbertCollections(ABC):
         self, offset_indexation: int, offset_jeopardy: int
     ) -> ReponseDocuments:
         pass
+
+    @abstractmethod
+    def liste_les_collections_disponibles(self) -> list[ReponseCollection]:
+        pass

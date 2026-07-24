@@ -4,7 +4,7 @@ from unittest.mock import Mock
 
 from requests import Response
 
-from adaptateurs.clients_albert import ReponseCreationCollection
+from adaptateurs.clients_albert import ReponseCreationCollection, ReponseCollection
 from documents.indexeur.indexeur import (
     ReponseDocument,
     ReponseChunk,
@@ -40,7 +40,8 @@ class ReponseAttendueAbstraite:
         reponse: ReponseDocument
         | ReponseChunk
         | ReponseCreationCollection
-        | ReponseTexte,
+        | ReponseTexte
+        | list[ReponseCollection],
     ):
         super().__init__()
         self.reponse_attendue = reponse
@@ -61,6 +62,7 @@ class ReponseAttendueOK(ReponseAttendueAbstraite):
 
     @property
     def reponse(self) -> dict:
+        assert not isinstance(self.reponse_attendue, list)
         return self.reponse_attendue._asdict()
 
 
@@ -83,6 +85,7 @@ class ReponseAttendueKO(ReponseAttendueAbstraite):
     def reponse(self) -> dict:
         if self.leve_une_erreur is not None:
             raise RuntimeError(self.leve_une_erreur)
+        assert not isinstance(self.reponse_attendue, list)
         return self.reponse_attendue._asdict()
 
 
@@ -127,12 +130,27 @@ class ReponseRecuperationCollectionKO(ReponseAttendueAbstraite):
         return {"message": "La collection n’existe pas"}
 
 
+class ReponseListeCollectionsOK(ReponseAttendueAbstraite):
+    def __init__(self, collections: list[ReponseCollection]):
+        super().__init__(collections)
+        self.collections = collections
+
+    @property
+    def status_code(self) -> int:
+        return 200
+
+    @property
+    def reponse(self) -> dict:
+        return {"data": [collection._asdict() for collection in self.collections]}
+
+
 ReponseAttendue = Union[
     ReponseAttendueOK,
     ReponseAttendueKO,
     ReponseCreationCollectionOK,
     ReponseRecuperationCollectionOK,
     ReponseRecuperationCollectionKO,
+    ReponseListeCollectionsOK,
 ]
 
 
@@ -145,6 +163,7 @@ class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
         self.index_courant = 0
         self.nombre_appels = 0
         self.url_appelee = ""
+        self.parametres_recus: dict[str, Optional[dict]] = {}
 
     def initialise_connexion_securisee(self, clef_api: str):
         pass
@@ -170,6 +189,7 @@ class ExecuteurDeRequeteDeTest(ExecuteurDeRequete):
     def recupere(self, url: str, parametres: Optional[dict] = None) -> Response:
         self.nombre_appels += 1
         self.url_appelee = url
+        self.parametres_recus[url] = parametres
         reponse = Mock()
         reponse_attendue = self.reponse_attendue[self.index_courant]
         self.index_courant += 1

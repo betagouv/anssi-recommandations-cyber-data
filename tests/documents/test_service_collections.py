@@ -39,6 +39,23 @@ def test_transmet_les_ids_de_collection_fournis_au_client(un_client_albert_colle
     assert un_client_albert_collection.ids_recus == ("42", "43")
 
 
+def test_les_collections_disponibles(un_client_albert_collection):
+    service = ServiceCollections(un_client_albert_collection)
+
+    les_collections_disponibles = service.les_collections_disponibles()
+
+    assert les_collections_disponibles == [
+        Collection(
+            id="1",
+            nom="collection disponible",
+            description="description",
+            nombre_documents=1,
+            date_de_creation="2026-04-23T15:39:27+00:00",
+            date_de_derniere_modification="2026-04-23T15:39:37+00:00",
+        )
+    ]
+
+
 def test_recupere_les_documents_mqc(un_client_albert_collection):
     service = ServiceCollections(un_client_albert_collection)
 
