@@ -107,7 +107,11 @@ class ClientAlbertCollections(ABC):
         self.executeur_de_requete.initialise_connexion_securisee(cle_api)
 
     @abstractmethod
-    def recupere_collections_mqc(self) -> list[ReponseCollection]:
+    def recupere_collections_mqc(
+        self,
+        id_collection_indexee: str | None = None,
+        id_collection_jeopardy: str | None = None,
+    ) -> list[ReponseCollection]:
         pass
 
     @abstractmethod
