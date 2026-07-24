@@ -1,20 +1,11 @@
 <script lang="ts">
   import CreeCollection from './CreeCollection.svelte';
   import AjouteDocumentCollection from './AjouteDocumentCollection.svelte';
-  import Collections from './Collections.svelte';
-  import Documents from './Documents.svelte';
-  import { collectionStore } from './store/collection.store';
   import JeopardyseCollectionEntiere from './JeopardyseCollectionEntiere.svelte';
   import SupprimeDocuments from './SupprimeDocuments.svelte';
+  import PageInformationsCollections from "./PageInformationsCollections.svelte";
 
   type Tabulation = 'collections' | 'autre';
-  let offsetIndexation = $state(0);
-  let offsetJeopardy = $state(0);
-
-  $effect(() => {
-    offsetIndexation = $collectionStore.indexee.nombre_documents;
-    offsetJeopardy = $collectionStore.jeopardy.nombre_documents;
-  });
 
   let activeTab = $state<Tabulation>('collections');
 </script>
@@ -76,18 +67,7 @@
           </div>
         </div>
       {:else if activeTab === 'autre'}
-        <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
-          <h4 class="text-xl font-semibold text-gray-700 mb-4">
-            Informations collections
-          </h4>
-          <div class="grid gap-8">
-            <Collections collections={$collectionStore} />
-
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <Documents {offsetIndexation} {offsetJeopardy} />
-            </div>
-          </div>
-        </div>
+        <PageInformationsCollections />
       {/if}
     </section>
   </div>
