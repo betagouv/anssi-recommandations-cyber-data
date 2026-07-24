@@ -2,6 +2,7 @@
   import Collections from './Collections.svelte';
   import Documents from './Documents.svelte';
   import { collectionStore } from './store/collection.store';
+  import SelecteurCollection from "./SelecteurCollection.svelte";
 
   let offsetIndexation = $state(0);
   let offsetJeopardy = $state(0);
