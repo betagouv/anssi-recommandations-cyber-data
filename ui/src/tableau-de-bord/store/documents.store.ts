@@ -27,8 +27,12 @@ const recupereDocuments = async (
   );
 
   const documents = await reponse.json();
-  documents.indexee.sort((a: Document, b: Document) => b.nom.toLowerCase() > a.nom.toLowerCase() ? -1 : 1);
-  documents.jeopardy.sort((a: Document, b: Document) => b.nom.toLowerCase() > a.nom.toLowerCase() ? -1 : 1);
+  documents.indexee.sort((a: Document, b: Document) =>
+    b.nom.toLowerCase() > a.nom.toLowerCase() ? -1 : 1
+  );
+  documents.jeopardy.sort((a: Document, b: Document) =>
+    b.nom.toLowerCase() > a.nom.toLowerCase() ? -1 : 1
+  );
   return documents;
 };
 

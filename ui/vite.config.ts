@@ -1,10 +1,10 @@
-import {defineConfig} from 'vite';
-import {svelte} from '@sveltejs/vite-plugin-svelte';
+import { defineConfig } from 'vite';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
 import tailwindcss from '@tailwindcss/vite';
-import {resolve} from 'path';
+import { resolve } from 'path';
 
 const pages = {
-  "tableau-de-bord": 'tableau-de-bord.html'
+  'tableau-de-bord': 'tableau-de-bord.html',
 };
 
 const input = Object.fromEntries(
@@ -15,10 +15,7 @@ const input = Object.fromEntries(
 );
 
 export default defineConfig({
-  plugins: [
-    svelte(),
-    tailwindcss(),
-  ],
+  plugins: [svelte(), tailwindcss()],
   build: {
     rollupOptions: {
       input: {
