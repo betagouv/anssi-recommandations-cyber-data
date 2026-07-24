@@ -6,7 +6,7 @@ from typing import Callable, Type, Union, Optional
 import pytest
 from docling.backend.html_backend import HTMLDocumentBackend
 from docling.backend.pdf_backend import PdfDocumentBackend
-from docling.datamodel.base_models import InputFormat
+from docling.datamodel.base_models import InputFormat, HttpSource, DocumentStream
 from docling.datamodel.document import InputDocument
 from docling.datamodel.settings import PageRange
 from docling.document_converter import ConversionResult, FormatOption
@@ -26,7 +26,6 @@ from docling_core.types.doc import (
     TitleItem,
     RichTableCell,
 )
-from docling_core.types.io import DocumentStream
 
 from documents.docling.chunker_docling import TypeFichier
 from documents.docling.chunker_docling_mqc import ChunkerDoclingMQC
@@ -155,7 +154,7 @@ def un_convertisseur_avec_un_texte() -> Callable[[], Type[DocumentConverter]]:
     class ConverterDeTest(DocumentConverter):
         def convert(
             self,
-            document: Union[Path, str, DocumentStream],
+            document: Union[Path, str, DocumentStream, HttpSource],
             headers: Optional[dict[str, str]] = None,
             raises_on_error: bool = True,
             max_num_pages: int = sys.maxsize,
@@ -200,7 +199,7 @@ def un_convertisseur_de_test() -> Callable[[], Type[DocumentConverter]]:
 
         def convert(
             self,
-            document: Union[Path, str, DocumentStream],
+            document: Union[Path, str, DocumentStream, HttpSource],
             headers: Optional[dict[str, str]] = None,
             raises_on_error: bool = True,
             max_num_pages: int = sys.maxsize,
@@ -442,7 +441,7 @@ def un_convertisseur_avec_un_titre_et_un_texte() -> Callable[
     class ConverterDeTestAvecContenuSimple(DocumentConverter):
         def convert(
             self,
-            document: Union[Path, str, DocumentStream],  # TODO review naming
+            document: Union[Path, str, DocumentStream, HttpSource],
             headers: Optional[dict[str, str]] = None,
             raises_on_error: bool = True,
             max_num_pages: int = sys.maxsize,

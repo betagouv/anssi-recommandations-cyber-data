@@ -25,8 +25,10 @@ class RequeteIndexationDocument(BaseModel):
     fichiers_supprimes: list[str] = []
     url_a_ajouter: str | None = None
 
+
 class RequeteSuppressionDocuments(BaseModel):
     documents: list[str] = []
+
 
 @api_documents.post("/", status_code=200)
 def indexe_documents(
@@ -56,11 +58,11 @@ def indexe_documents(
 
 @api_documents.post("/supprimer", status_code=200)
 def supprime_documents_indexation(
-        requete: RequeteSuppressionDocuments,
-        client_albert: ClientAlbertIndexation = Depends(  # type: ignore[assignment]
-            fabrique_client_albert  # type: ignore[assignment]
-        ),
-        _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
+    requete: RequeteSuppressionDocuments,
+    client_albert: ClientAlbertIndexation = Depends(  # type: ignore[assignment]
+        fabrique_client_albert  # type: ignore[assignment]
+    ),
+    _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
 ):
     for document in requete.documents:
         client_albert.supprime_document(document)
@@ -68,6 +70,7 @@ def supprime_documents_indexation(
     log(__name__, f"Suppression des documents {requete.documents}")
 
     return {"message": "Suppression en cours d’exécution..."}
+
 
 @api_documents.get("/", status_code=200)
 def recupere_documents(
