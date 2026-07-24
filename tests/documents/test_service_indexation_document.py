@@ -1,6 +1,7 @@
 from adaptateurs.clients_albert import ClientAlbertIndexation, ReponseCreationCollection
 from configuration import MSC, CollectionsMQC
 from documents.indexeur.indexeur import DocumentAIndexer, ReponseDocument, Indexeur
+from documents.html.document_html import DocumentHTML
 from documents.service_indexation_documents import ServiceIndexationNouveauxDocuments
 from infra.memoire.executeur_de_requete_memoire import ExecuteurDeRequeteDeTest
 from jeopardy.service import ListeDeDocuments
@@ -154,6 +155,26 @@ def test_jeopardyse_les_documents_indexes(un_service_jeopardy):
         "nouveau-doc-2.pdf",
     ]
     assert un_service_jeopardy.donnees_recues.id_collection_mqc == "collection-1"
+
+
+def test_indexe_un_document_html_depuis_son_url(un_service_jeopardy):
+    client_indexation = ClientAlbertIndexationDeTest()
+
+    ServiceIndexationNouveauxDocuments(
+        client_indexation,
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents([], url_a_ajouter="https://cyber.gouv.fr/cyberdico/")
+
+    assert len(client_indexation.documents_ajoutes) == 1
+    assert isinstance(client_indexation.documents_ajoutes[0], DocumentHTML)
+    assert client_indexation.documents_ajoutes[0].nom_document == "cyberdico"
+    assert client_indexation.documents_ajoutes[0].url == "https://cyber.gouv.fr/cyberdico/"
+    assert un_service_jeopardy.donnees_recues.noms_documents == ["cyberdico"]
 
 
 def test_modifie_un_document_deja_indexe(un_service_jeopardy):

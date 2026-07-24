@@ -31,6 +31,24 @@ def test_appelle_le_service_d_indexation_de_documents(un_serveur_de_test_complet
     assert service_indexation_document.documents_ajoutes == ["doc-1.pdf", "doc-2.pdf"]
 
 
+def test_transmet_l_url_du_document_a_ajouter_au_service_d_indexation(
+    un_serveur_de_test_complet,
+):
+    (serveur, _, _, _, _, _, service_indexation_document) = un_serveur_de_test_complet(
+        None
+    )
+    client: TestClient = TestClient(serveur)
+
+    client.post(
+        "/api/documents/",
+        json={"url_a_ajouter": "https://cyber.gouv.fr/cyberdico/"},
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert service_indexation_document.appele
+    assert service_indexation_document.url_a_ajouter == "https://cyber.gouv.fr/cyberdico/"
+
+
 def test_securise_la_route_documents(un_serveur_de_test_complet):
     (serveur, _, _, _, _, _, _) = un_serveur_de_test_complet(None)
     client: TestClient = TestClient(serveur)
