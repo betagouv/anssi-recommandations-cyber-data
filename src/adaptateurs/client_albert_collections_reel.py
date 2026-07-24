@@ -7,12 +7,16 @@ from adaptateurs.clients_albert import (
 
 
 class ClientAlbertCollectionsReel(ClientAlbertCollections):
-    def recupere_collections_mqc(self) -> list[ReponseCollection]:
+    def recupere_collections_mqc(
+        self,
+        id_collection_indexee: str | None = None,
+        id_collection_jeopardy: str | None = None,
+    ) -> list[ReponseCollection]:
         reponse_collection_indexee = self.executeur_de_requete.recupere(
-            f"{self.url}/collections/{self.collections_mqc.id_collection_indexee}"
+            f"{self.url}/collections/{id_collection_indexee or self.collections_mqc.id_collection_indexee}"
         )
         reponse_collection_jeopardy = self.executeur_de_requete.recupere(
-            f"{self.url}/collections/{self.collections_mqc.id_collection_jeopardy}"
+            f"{self.url}/collections/{id_collection_jeopardy or self.collections_mqc.id_collection_jeopardy}"
         )
         collection_indexee = self._en_reponse_collection(
             reponse_collection_indexee.json()
