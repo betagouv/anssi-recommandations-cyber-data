@@ -14,8 +14,13 @@ export type Collections = {
   jeopardy: Collection;
 };
 
-const recupereCollections = async () => {
-  const reponse = await fetch('/api/collections/', {
+const recupereCollections = async (idIndexee?: string, idJeopardy?: string) => {
+  const params = new URLSearchParams();
+  if (idIndexee) params.set('id_collection_indexee', idIndexee);
+  if (idJeopardy) params.set('id_collection_jeopardy', idJeopardy);
+  const query = params.toString();
+
+  const reponse = await fetch(`/api/collections/${query ? `?${query}` : ''}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -31,4 +36,4 @@ const collections = await recupereCollections();
 
 set(collections);
 
-export const collectionStore = { subscribe };
+export const collectionStore = { subscribe, initialise: set, recupereCollections };

@@ -22,7 +22,7 @@
 {#if $collectionStore}
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     {#each ['indexee', 'jeopardy'] as key (key)}
-      {@const collection = collections[key]}
+      {@const collection = collections[key as keyof Collections]}
       {#if collection}
         <section
           class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col"

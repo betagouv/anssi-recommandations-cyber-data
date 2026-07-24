@@ -3,7 +3,7 @@
   import AjouteDocumentCollection from './AjouteDocumentCollection.svelte';
   import JeopardyseCollectionEntiere from './JeopardyseCollectionEntiere.svelte';
   import SupprimeDocuments from './SupprimeDocuments.svelte';
-  import PageInformationsCollections from "./PageInformationsCollections.svelte";
+  import PageInformationsCollections from './PageInformationsCollections.svelte';
 
   type Tabulation = 'collections' | 'autre';
 
