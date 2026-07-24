@@ -23,6 +23,7 @@ class RequeteIndexationDocument(BaseModel):
     fichiers_ajoutes: list[str] = []
     fichiers_modifies: list[str] = []
     fichiers_supprimes: list[str] = []
+    url_a_ajouter: str | None = None
 
 class RequeteSuppressionDocuments(BaseModel):
     documents: list[str] = []
@@ -48,6 +49,7 @@ def indexe_documents(
         service_indexation_document.indexe_documents,
         les_documents,
         list(filter(lambda doc: doc.endswith(".pdf"), requete.fichiers_supprimes)),
+        requete.url_a_ajouter,
     )
     return {"message": "Indexation en cours d’exécution..."}
 

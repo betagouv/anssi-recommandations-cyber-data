@@ -331,13 +331,18 @@ class ServiceIndexationNouveauxDocumentsDeTest(ServiceIndexationNouveauxDocument
         self.appele = False
         self.documents_ajoutes = []
         self.documents_supprimes = []
+        self.url_a_ajouter = None
 
     def indexe_documents(
-        self, documents_a_ajouter: list[str], documents_a_supprimer: list[str] = []
+        self,
+        documents_a_ajouter: list[str],
+        documents_a_supprimer: list[str] = [],
+        url_a_ajouter: str | None = None,
     ):
         self.appele = True
         self.documents_ajoutes = documents_a_ajouter
         self.documents_supprimes = documents_a_supprimer
+        self.url_a_ajouter = url_a_ajouter
 
 
 class ServiceIndexationNouvellesCollectionsDeTest(
