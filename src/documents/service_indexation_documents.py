@@ -80,6 +80,16 @@ class ServiceIndexationNouveauxDocuments:
             if identifiant_document_existant:
                 self._client_indexation.supprime_document(identifiant_document_existant)
 
+            identifiant_document_jeopardy_existant = (
+                self._client_indexation.document_existe(
+                    document_a_supprimer, self._id_collection_jeopardy
+                )
+            )
+            if identifiant_document_jeopardy_existant:
+                self._client_indexation.supprime_document(
+                    identifiant_document_jeopardy_existant
+                )
+
 
 def fabrique_service_indexation_de_documents() -> ServiceIndexationNouveauxDocuments:
     client = fabrique_client_albert()

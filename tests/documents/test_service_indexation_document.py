@@ -335,3 +335,52 @@ def test_supprime_les_documents_seulement_si_le_document_existe(un_service_jeopa
     ).indexe_documents([], ["doc-1.pdf", "doc-2.pdf"])
 
     assert client_indexation.supprime_document_appele == 1
+
+
+def test_supprime_le_document_jeopardy_correspondant_lors_de_la_suppression(
+    un_service_jeopardy,
+):
+    client_indexation = ClientAlbertIndexationDeTest()
+    client_indexation.collections_existantes = {
+        "collection-1": [{"id": "2", "nom": "doc-2.pdf"}],
+        "collection-jeopardy": [{"id": "b", "nom": "doc-2.pdf"}],
+    }
+
+    ServiceIndexationNouveauxDocuments(
+        client_indexation,
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents([], ["doc-2.pdf"])
+
+    assert client_indexation.documents_supprimes.get("collection-1") == [
+        {"id": "2", "nom": "doc-2.pdf"}
+    ]
+    assert client_indexation.documents_supprimes.get("collection-jeopardy") == [
+        {"id": "b", "nom": "doc-2.pdf"}
+    ]
+
+
+def test_ne_supprime_rien_cote_jeopardy_si_le_document_jeopardy_n_existe_pas(
+    un_service_jeopardy,
+):
+    client_indexation = ClientAlbertIndexationDeTest()
+    client_indexation.collections_existantes = {
+        "collection-1": [{"id": "2", "nom": "doc-2.pdf"}],
+        "collection-jeopardy": [],
+    }
+
+    ServiceIndexationNouveauxDocuments(
+        client_indexation,
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents([], ["doc-2.pdf"])
+
+    assert client_indexation.documents_supprimes.get("collection-jeopardy") is None
