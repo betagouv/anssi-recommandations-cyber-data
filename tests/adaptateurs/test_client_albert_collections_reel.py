@@ -1,5 +1,6 @@
+import pytest
 from adaptateurs.client_albert_collections_reel import ClientAlbertCollectionsReel
-from adaptateurs.clients_albert import ReponseCollection
+from adaptateurs.clients_albert import ReponseCollection, ReponseDocumentCollection
 from configuration import CollectionsMQC
 
 
@@ -116,6 +117,72 @@ def test_utilise_les_ids_configures_quand_aucun_id_n_est_fourni(
 
     assert resultat[0].id == "1"
     assert resultat[1].id == "2"
+
+
+@pytest.mark.parametrize(
+    "kwargs_id, id_attendu",
+    [
+        ({"id_collection_indexee": "42"}, "42"),
+        ({}, "1"),
+    ],
+)
+def test_l_id_de_collection_indexee_utilise_pour_les_documents(
+    un_executeur_de_requete, une_reponse_de_liste_collections_OK, kwargs_id, id_attendu
+):
+    documents = [
+        ReponseDocumentCollection(
+            id="1", name="doc-1.pdf", created="1672531200", chunks=2
+        )
+    ]
+    executeur = un_executeur_de_requete([une_reponse_de_liste_collections_OK(documents)])
+    client = ClientAlbertCollectionsReel(
+        "https://test.api",
+        "test-key",
+        CollectionsMQC(id_collection_indexee="1", id_collection_jeopardy="2"),
+        executeur,
+    )
+
+    client.recupere_documents_collection(
+        offset_indexation=1, offset_jeopardy=0, **kwargs_id
+    )
+
+    assert (
+        executeur.parametres_recus["https://test.api/documents"]["collection_id"]
+        == id_attendu
+    )
+
+
+@pytest.mark.parametrize(
+    "kwargs_id, id_attendu",
+    [
+        ({"id_collection_jeopardy": "43"}, "43"),
+        ({}, "2"),
+    ],
+)
+def test_l_id_de_collection_jeopardy_utilise_pour_les_documents(
+    un_executeur_de_requete, une_reponse_de_liste_collections_OK, kwargs_id, id_attendu
+):
+    documents = [
+        ReponseDocumentCollection(
+            id="1", name="doc-1.pdf", created="1672531200", chunks=2
+        )
+    ]
+    executeur = un_executeur_de_requete([une_reponse_de_liste_collections_OK(documents)])
+    client = ClientAlbertCollectionsReel(
+        "https://test.api",
+        "test-key",
+        CollectionsMQC(id_collection_indexee="1", id_collection_jeopardy="2"),
+        executeur,
+    )
+
+    client.recupere_documents_collection(
+        offset_indexation=0, offset_jeopardy=1, **kwargs_id
+    )
+
+    assert (
+        executeur.parametres_recus["https://test.api/documents"]["collection_id"]
+        == id_attendu
+    )
 
 
 def test_liste_les_collections_disponibles_avec_les_bons_parametres(

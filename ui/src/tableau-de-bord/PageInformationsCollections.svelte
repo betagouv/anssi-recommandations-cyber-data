@@ -51,7 +51,12 @@
     <Collections collections={$collectionStore} />
 
     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-      <Documents {offsetIndexation} {offsetJeopardy} />
+      <Documents
+        {offsetIndexation}
+        {offsetJeopardy}
+        {idCollectionIndexee}
+        {idCollectionJeopardy}
+      />
     </div>
   </div>
 </div>

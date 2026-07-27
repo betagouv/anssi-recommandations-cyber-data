@@ -76,11 +76,15 @@ def supprime_documents_indexation(
 def recupere_documents(
     indexee: int,
     jeopardy: int,
+    id_collection_indexee: str | None = None,
+    id_collection_jeopardy: str | None = None,
     service: ServiceCollections = Depends(fabrique_service_collections),  # type: ignore[assignment]
     _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
 ):
     les_documents = service.les_documents(
-        OffsetsCollections(indexee=indexee, jeopardy=jeopardy)
+        OffsetsCollections(indexee=indexee, jeopardy=jeopardy),
+        id_collection_indexee,
+        id_collection_jeopardy,
     )
     return {
         "indexee": [doc._asdict() for doc in les_documents.indexee],
