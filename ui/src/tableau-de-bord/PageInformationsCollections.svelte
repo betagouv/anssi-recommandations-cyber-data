@@ -29,26 +29,14 @@
         <label for="id-collection-indexee" class="text-sm font-medium text-gray-700"
           >Identifiant collection indexation :</label
         >
-        <input
-          type="text"
-          id="id-collection-indexee"
-          name="id-collection-indexee"
-          bind:value={idCollectionIndexee}
-          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-        />
+        <SelecteurCollection bind:value={idCollectionIndexee} />
       </div>
 
       <div class="flex flex-col gap-1.5">
         <label for="id-collection-jeopardy" class="text-sm font-medium text-gray-700"
           >Identifiant collection Jeopardy :</label
         >
-        <input
-          type="text"
-          id="id-collection-jeopardy"
-          name="id-collection-jeopardy"
-          bind:value={idCollectionJeopardy}
-          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-        />
+        <SelecteurCollection bind:value={idCollectionJeopardy} />
       </div>
 
       <button

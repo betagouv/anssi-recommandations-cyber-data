@@ -1,4 +1,6 @@
 <script lang="ts">
+  import SelecteurCollection from './SelecteurCollection.svelte';
+
   let idCollection = $state('');
   let nomCollection = $state('');
   let descriptionCollection = $state('');
@@ -32,14 +34,7 @@
       <label for="id-collection" class="text-sm font-medium text-gray-700"
         >Identifiant de la collection indexée :</label
       >
-      <input
-        type="text"
-        id="id-collection"
-        name="id-collection"
-        bind:value={idCollection}
-        required
-        class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-      />
+      <SelecteurCollection bind:value={idCollection} />
     </div>
 
     <div class="flex flex-col gap-1.5">
