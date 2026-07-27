@@ -27,7 +27,11 @@ class ClientAlbertCollectionsReel(ClientAlbertCollections):
         return [collection_indexee, collection_jeopardy]
 
     def recupere_documents_collection(
-        self, offset_indexation: int, offset_jeopardy: int
+        self,
+        offset_indexation: int,
+        offset_jeopardy: int,
+        id_collection_indexee: str | None = None,
+        id_collection_jeopardy: str | None = None,
     ) -> ReponseDocuments:
         def liste_documents_dans_collection(collection_id: str, offset: int):
             resultats = []
@@ -58,10 +62,12 @@ class ClientAlbertCollectionsReel(ClientAlbertCollections):
             return resultats
 
         documents_indexes = liste_documents_dans_collection(
-            self.collections_mqc.id_collection_indexee, offset_indexation
+            id_collection_indexee or self.collections_mqc.id_collection_indexee,
+            offset_indexation,
         )
         documents_jeopardy = liste_documents_dans_collection(
-            self.collections_mqc.id_collection_jeopardy, offset_jeopardy
+            id_collection_jeopardy or self.collections_mqc.id_collection_jeopardy,
+            offset_jeopardy,
         )
         return ReponseDocuments(indexee=documents_indexes, jeopardy=documents_jeopardy)
 

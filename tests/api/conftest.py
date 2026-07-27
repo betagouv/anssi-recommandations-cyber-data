@@ -370,6 +370,7 @@ class ServiceCollectionsDeTest(ServiceCollections):
     def __init__(self, client_albert: ClientAlbertCollections):
         super().__init__(client_albert)
         self.ids_recus: tuple[str | None, str | None] | None = None
+        self.ids_recus_documents: tuple[str | None, str | None] | None = None
 
     def les_collections(
         self,
@@ -396,7 +397,13 @@ class ServiceCollectionsDeTest(ServiceCollections):
             ),
         )
 
-    def les_documents(self, offsets: OffsetsCollections) -> InformationsDeDocuments:
+    def les_documents(
+        self,
+        offsets: OffsetsCollections,
+        id_collection_indexee: str | None = None,
+        id_collection_jeopardy: str | None = None,
+    ) -> InformationsDeDocuments:
+        self.ids_recus_documents = (id_collection_indexee, id_collection_jeopardy)
         return InformationsDeDocuments(
             indexee=[
                 Document(

@@ -56,6 +56,20 @@ def test_les_collections_disponibles(un_client_albert_collection):
     ]
 
 
+def test_transmet_les_ids_de_collection_fournis_au_client_pour_les_documents(
+    un_client_albert_collection,
+):
+    service = ServiceCollections(un_client_albert_collection)
+
+    service.les_documents(
+        OffsetsCollections(indexee=1, jeopardy=1),
+        id_collection_indexee="42",
+        id_collection_jeopardy="43",
+    )
+
+    assert un_client_albert_collection.ids_recus_documents == ("42", "43")
+
+
 def test_recupere_les_documents_mqc(un_client_albert_collection):
     service = ServiceCollections(un_client_albert_collection)
 

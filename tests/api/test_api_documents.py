@@ -219,6 +219,26 @@ def test_retourne_les_informations_des_documents_pour_la_collection_jeopardy(
     ]
 
 
+def test_transmet_les_ids_de_collection_a_la_route_documents(
+    un_serveur_de_test_pour_collections,
+):
+    (serveur, _, service_collections) = un_serveur_de_test_pour_collections()
+    client: TestClient = TestClient(serveur)
+
+    client.get(
+        "/api/documents/",
+        params={
+            "indexee": 1,
+            "jeopardy": 1,
+            "id_collection_indexee": "42",
+            "id_collection_jeopardy": "43",
+        },
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert service_collections.ids_recus_documents == ("42", "43")
+
+
 def test_securise_la_route_GET_documents(un_serveur_de_test_pour_collections):
     (serveur, *_) = un_serveur_de_test_pour_collections()
     client: TestClient = TestClient(serveur)

@@ -116,7 +116,11 @@ class ClientAlbertCollections(ABC):
 
     @abstractmethod
     def recupere_documents_collection(
-        self, offset_indexation: int, offset_jeopardy: int
+        self,
+        offset_indexation: int,
+        offset_jeopardy: int,
+        id_collection_indexee: str | None = None,
+        id_collection_jeopardy: str | None = None,
     ) -> ReponseDocuments:
         pass
 

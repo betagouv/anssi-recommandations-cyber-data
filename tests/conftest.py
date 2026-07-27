@@ -401,6 +401,7 @@ class ClientAlbertCollectionsDeTest(ClientAlbertCollections):
             ExecuteurDeRequeteDeTest([]),
         )
         self.ids_recus: tuple[str | None, str | None] | None = None
+        self.ids_recus_documents: tuple[str | None, str | None] | None = None
 
     def recupere_collections_mqc(
         self,
@@ -430,8 +431,13 @@ class ClientAlbertCollectionsDeTest(ClientAlbertCollections):
         ]
 
     def recupere_documents_collection(
-        self, offset_indexation: int, offset_jeopardy: int
+        self,
+        offset_indexation: int,
+        offset_jeopardy: int,
+        id_collection_indexee: str | None = None,
+        id_collection_jeopardy: str | None = None,
     ) -> ReponseDocuments:
+        self.ids_recus_documents = (id_collection_indexee, id_collection_jeopardy)
         return ReponseDocuments(
             indexee=[
                 ReponseDocumentCollection(

@@ -94,7 +94,12 @@ class ServiceCollections:
             for collection in self.client_albert.liste_les_collections_disponibles()
         ]
 
-    def les_documents(self, offsets: OffsetsCollections) -> InformationsDeDocuments:
+    def les_documents(
+        self,
+        offsets: OffsetsCollections,
+        id_collection_indexee: str | None = None,
+        id_collection_jeopardy: str | None = None,
+    ) -> InformationsDeDocuments:
         def mappe_en_document(
             indexee: list[ReponseDocumentCollection],
         ) -> list[Document]:
@@ -111,7 +116,10 @@ class ServiceCollections:
             )
 
         les_documents = self.client_albert.recupere_documents_collection(
-            offsets.indexee, offsets.jeopardy
+            offsets.indexee,
+            offsets.jeopardy,
+            id_collection_indexee,
+            id_collection_jeopardy,
         )
         return InformationsDeDocuments(
             indexee=mappe_en_document(les_documents.indexee),

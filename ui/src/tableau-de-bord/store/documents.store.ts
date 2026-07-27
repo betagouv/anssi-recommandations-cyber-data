@@ -14,17 +14,23 @@ export type Documents = {
 
 const recupereDocuments = async (
   nombreDocumentsIndexes: number,
-  nombreDocumentsJeopardy: number
+  nombreDocumentsJeopardy: number,
+  idCollectionIndexee?: string,
+  idCollectionJeopardy?: string
 ): Promise<Documents> => {
-  const reponse = await fetch(
-    `/api/documents/?indexee=${nombreDocumentsIndexes}&jeopardy=${nombreDocumentsJeopardy}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
+  const params = new URLSearchParams({
+    indexee: String(nombreDocumentsIndexes),
+    jeopardy: String(nombreDocumentsJeopardy),
+  });
+  if (idCollectionIndexee) params.set('id_collection_indexee', idCollectionIndexee);
+  if (idCollectionJeopardy) params.set('id_collection_jeopardy', idCollectionJeopardy);
+
+  const reponse = await fetch(`/api/documents/?${params.toString()}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
   const documents = await reponse.json();
   documents.indexee.sort((a: Document, b: Document) =>

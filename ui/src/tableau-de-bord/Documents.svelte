@@ -10,9 +10,12 @@
   interface Props {
     offsetIndexation: number;
     offsetJeopardy: number;
+    idCollectionIndexee?: string;
+    idCollectionJeopardy?: string;
   }
 
-  const { offsetIndexation, offsetJeopardy }: Props = $props();
+  const { offsetIndexation, offsetJeopardy, idCollectionIndexee, idCollectionJeopardy }: Props =
+    $props();
 
   let documents: Documents | undefined = $state(undefined);
   let filtreNom = $state('');
@@ -21,7 +24,12 @@
 
   $effect(() => {
     documentsStore
-      .recupereDocuments(offsetIndexation, offsetJeopardy)
+      .recupereDocuments(
+        offsetIndexation,
+        offsetJeopardy,
+        idCollectionIndexee,
+        idCollectionJeopardy
+      )
       .then((data) => (documents = data));
   });
 
