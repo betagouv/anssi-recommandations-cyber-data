@@ -28,7 +28,7 @@
   <option value="" disabled selected>Sélectionner une collection</option>
   {#each $collectionsDisponiblesStore ?? [] as collection (collection.id)}
     <option value={collection.id}>
-      {collection.nom} — {formaterDate(collection.date_de_creation)}
+      {collection.nom} (id : {collection.id}) — {formaterDate(collection.date_de_creation)}
     </option>
   {/each}
 </select>
