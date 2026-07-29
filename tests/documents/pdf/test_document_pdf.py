@@ -65,6 +65,38 @@ def test_generateur_produit_un_bloc_par_texte_sans_header(
     assert document.pages[1].blocs[0].numero_page == 1
     assert document.pages[1].blocs[0].texte == "Mon texte"
     assert document.pages[1].blocs[0].position_page == 0
+    assert document.pages[1].blocs[0].derniere_page == 1
+
+
+def test_generateur_detecte_un_bloc_a_cheval_sur_deux_pages(
+    un_constructeur_d_element_filtrable,
+    resultat_conversion,
+):
+    document = Document(document_pdf)
+    document.genere_les_pages(
+        document_pdf.generateur,
+        [
+            un_constructeur_d_element_filtrable()
+            .de_type_header()
+            .avec_numero_page(1)
+            .avec_titre("Section")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(1)
+            .avec_texte("Début du paragraphe")
+            .construis(),
+            un_constructeur_d_element_filtrable()
+            .de_type_texte()
+            .avec_numero_page(2)
+            .avec_texte("Suite sur la page suivante")
+            .construis(),
+        ],
+        resultat_conversion.document,
+    )
+    assert len(document.pages[1].blocs) == 1
+    assert document.pages[1].blocs[0].numero_page == 1
+    assert document.pages[1].blocs[0].derniere_page == 2
 
 
 def test_generateur_groupe_les_textes_sous_leur_header(

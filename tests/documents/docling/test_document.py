@@ -49,3 +49,21 @@ def test_metadata_ne_contient_pas_position_page_si_absente():
     metadata = document.metadata(bloc)
 
     assert "position_page" not in metadata
+
+
+def test_metadata_contient_derniere_page_meme_pour_un_bloc_mono_page():
+    document = Document(_un_document_a_indexer())
+    bloc = BlocPage(texte="contenu", numero_page=1, derniere_page=1)
+
+    metadata = document.metadata(bloc)
+
+    assert metadata["derniere_page"] == 1
+
+
+def test_metadata_ne_contient_pas_derniere_page_si_absente():
+    document = Document(_un_document_a_indexer())
+    bloc = BlocPage(texte="contenu", numero_page=1)
+
+    metadata = document.metadata(bloc)
+
+    assert "derniere_page" not in metadata
