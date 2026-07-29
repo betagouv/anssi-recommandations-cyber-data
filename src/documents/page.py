@@ -9,6 +9,7 @@ T_Bloc = TypeVar("T_Bloc", bound="BlocPage")
 class BlocPage:
     texte: str
     numero_page: int | None
+    position_page: int | None = None
 
 
 @dataclass
@@ -23,4 +24,11 @@ class Page(ABC, Generic[T_Bloc]):
     def ajoute_blocs(
         self, contenus: list[str], numero_page: int, classe_bloc: type[T_Bloc]
     ) -> None:
-        self.ajoute_bloc(classe_bloc("\n".join(contenus), numero_page))
+        position_page = len(self.blocs)
+        self.ajoute_bloc(
+            classe_bloc(
+                texte="\n".join(contenus),
+                numero_page=numero_page,
+                position_page=position_page,
+            )
+        )

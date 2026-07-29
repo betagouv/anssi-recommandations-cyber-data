@@ -64,6 +64,7 @@ def test_generateur_produit_un_bloc_par_texte_sans_header(
     assert len(document.pages) == 1
     assert document.pages[1].blocs[0].numero_page == 1
     assert document.pages[1].blocs[0].texte == "Mon texte"
+    assert document.pages[1].blocs[0].position_page == 0
 
 
 def test_generateur_groupe_les_textes_sous_leur_header(
@@ -105,6 +106,8 @@ def test_generateur_groupe_les_textes_sous_leur_header(
     assert len(document.pages[1].blocs) == 2
     assert document.pages[1].blocs[0].texte == "Section 1\nContenu 1\nContenu 2"
     assert document.pages[1].blocs[1].texte == "Section 2\nContenu 3"
+    assert document.pages[1].blocs[0].position_page == 0
+    assert document.pages[1].blocs[1].position_page == 1
 
 
 @pytest.mark.skip(reason="à implémenter plus tard")
@@ -162,6 +165,8 @@ def test_generateur_cree_un_bloc_par_header_sans_contenu(
     assert len(document.pages[1].blocs) == 2
     assert document.pages[1].blocs[0].texte == "Section A"
     assert document.pages[1].blocs[1].texte == "Section B"
+    assert document.pages[1].blocs[0].position_page == 0
+    assert document.pages[1].blocs[1].position_page == 1
 
 
 def test_generateur_gere_les_pages_multiples(
@@ -199,6 +204,8 @@ def test_generateur_gere_les_pages_multiples(
     assert 2 in document.pages
     assert document.pages[1].blocs[0].texte == "Section page 1\nContenu page 1"
     assert document.pages[2].blocs[0].texte == "Section page 2\nContenu page 2"
+    assert document.pages[1].blocs[0].position_page == 0
+    assert document.pages[2].blocs[0].position_page == 0
 
 
 def test_generateur_groupe_les_tableaux_sous_leur_header(
