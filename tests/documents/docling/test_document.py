@@ -31,3 +31,21 @@ def test_metadata_contient_id_reponse_quand_bloc_a_un_slug():
 
     assert metadata["id_reponse"] == "qui-est-le-directeur"
     assert "reponse" not in metadata
+
+
+def test_metadata_contient_position_page():
+    document = Document(_un_document_a_indexer())
+    bloc = BlocPage(texte="contenu", numero_page=1, position_page=3)
+
+    metadata = document.metadata(bloc)
+
+    assert metadata["position_page"] == 3
+
+
+def test_metadata_ne_contient_pas_position_page_si_absente():
+    document = Document(_un_document_a_indexer())
+    bloc = BlocPage(texte="contenu", numero_page=1)
+
+    metadata = document.metadata(bloc)
+
+    assert "position_page" not in metadata

@@ -87,6 +87,7 @@ def test_peut_indexer_un_document_puis_ajouter_un_chunk(
     assert chunks[0]["metadata"] == {
         "source_url": "https://example.com/test.pdf",
         "page": 10,
+        "position_page": 0,
         "nom_document": "test.pdf",
     }
 
