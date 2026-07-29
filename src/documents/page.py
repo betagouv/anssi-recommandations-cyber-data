@@ -10,6 +10,7 @@ class BlocPage:
     texte: str
     numero_page: int | None
     position_page: int | None = None
+    derniere_page: int | None = None
 
 
 @dataclass
@@ -22,7 +23,11 @@ class Page(ABC, Generic[T_Bloc]):
         pass
 
     def ajoute_blocs(
-        self, contenus: list[str], numero_page: int, classe_bloc: type[T_Bloc]
+        self,
+        contenus: list[str],
+        numero_page: int,
+        classe_bloc: type[T_Bloc],
+        derniere_page: int | None = None,
     ) -> None:
         position_page = len(self.blocs)
         self.ajoute_bloc(
@@ -30,5 +35,6 @@ class Page(ABC, Generic[T_Bloc]):
                 texte="\n".join(contenus),
                 numero_page=numero_page,
                 position_page=position_page,
+                derniere_page=derniere_page,
             )
         )

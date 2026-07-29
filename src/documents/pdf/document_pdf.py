@@ -18,6 +18,7 @@ class GenerateurDePagesPDF(GenerateurDePages):
         resultat: dict[int, Page] = {}
         bloc_lignes: list[str] = []
         bloc_page: int = 1
+        derniere_page_du_bloc: int = 1
         dernier_group_ref: str | None = None
         precedent_etait_header: bool = False
 
@@ -25,7 +26,9 @@ class GenerateurDePagesPDF(GenerateurDePages):
             if not bloc_lignes:
                 return
             page = resultat.setdefault(bloc_page, PagePDF(bloc_page))
-            page.ajoute_blocs(bloc_lignes, bloc_page, BlocPagePDF)
+            page.ajoute_blocs(
+                bloc_lignes, bloc_page, BlocPagePDF, derniere_page=derniere_page_du_bloc
+            )
 
         for element in elements_filtres:
             if element.label == DocItemLabel.PAGE_FOOTER:  # type: ignore[union-attr]
@@ -41,6 +44,7 @@ class GenerateurDePagesPDF(GenerateurDePages):
                 _ajoute_bloc_a_la_page()
                 bloc_lignes = [element.text]  # type: ignore[union-attr]
                 bloc_page = numero_page
+                derniere_page_du_bloc = numero_page
                 dernier_group_ref = None
                 precedent_etait_header = True
             else:
@@ -55,7 +59,10 @@ class GenerateurDePagesPDF(GenerateurDePages):
                         _ajoute_bloc_a_la_page()
                         bloc_lignes = []
                         bloc_page = numero_page
+                        derniere_page_du_bloc = numero_page
                     dernier_group_ref = parent_ref
+
+                derniere_page_du_bloc = numero_page
 
                 if isinstance(element, TableItem):
                     bloc_lignes.append(element.export_to_markdown(document))

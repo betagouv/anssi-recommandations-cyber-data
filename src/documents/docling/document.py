@@ -34,6 +34,8 @@ class Document:
         }
         if bloc.position_page is not None:
             metadata["position_page"] = bloc.position_page
+        if bloc.derniere_page is not None:
+            metadata["derniere_page"] = bloc.derniere_page
         if self._reponse_maitrisee:
             metadata["reponse_maitrisee"] = True
         if hasattr(bloc, "id_reponse") and bloc.id_reponse:
