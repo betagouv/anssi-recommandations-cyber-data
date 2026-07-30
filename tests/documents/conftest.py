@@ -26,6 +26,7 @@ from docling_core.types.doc import (
     TitleItem,
     RichTableCell,
 )
+from docling_core.types.doc.base import Size
 
 from documents.docling.chunker_docling import TypeFichier
 from documents.docling.chunker_docling_mqc import ChunkerDoclingMQC
@@ -467,6 +468,76 @@ def un_convertisseur_avec_un_titre_et_un_texte() -> Callable[
 
     def _convertisseur() -> Type[DocumentConverter]:
         return ConverterDeTestAvecContenuSimple
+
+    return _convertisseur
+
+
+@pytest.fixture
+def un_convertisseur_qui_enregistre_les_plages() -> Callable[[], Type[DocumentConverter]]:
+    class ConvertisseurDeTest(DocumentConverter):
+        def __init__(
+            self,
+            allowed_formats: Optional[list[InputFormat]] = None,
+            format_options: Optional[dict[InputFormat, FormatOption]] = None,
+        ):
+            super().__init__(allowed_formats, format_options)
+            self.plages_recues: list[PageRange | None] = []
+
+        def convert(
+            self,
+            document: Union[Path, str, DocumentStream, HttpSource],
+            headers: Optional[dict[str, str]] = None,
+            raises_on_error: bool = True,
+            max_num_pages: int = sys.maxsize,
+            max_file_size: int = sys.maxsize,
+            page_range: Optional[PageRange] = None,
+        ) -> ConversionResult:
+            self.plages_recues.append(page_range)
+            nombre_de_pages = (
+                page_range[1] - page_range[0] + 1
+                if page_range is not None
+                else 5
+            )
+            pages = range(1, nombre_de_pages + 1)
+            textes = []
+            for numero_page in pages:
+                numero_page_pdf = (
+                    numero_page + page_range[0] - 1
+                    if page_range is not None
+                    else numero_page
+                )
+                texte = f"Contenu de la page {numero_page_pdf}"
+                textes.append(
+                    ConstructeurDeSectionHeaderItem()
+                    .avec_titre(f"Page {numero_page_pdf}")
+                    .avec_numero_page(numero_page)
+                    .construis()
+                )
+                textes.append(
+                    ConstructeurDeTextItem()
+                    .avec_texte(texte)
+                    .avec_numero_page(numero_page)
+                    .construis()
+                )
+
+            document_docling = _creer_document(texts=textes)
+            for numero_page in pages:
+                document_docling.add_page(
+                    page_no=numero_page,
+                    size=Size(width=400, height=400),
+                )
+
+            return ConversionResult(
+                document=document_docling,
+                input=InputDocument(
+                    format=InputFormat.PDF,
+                    backend=PdfDocumentBackend,  # type: ignore[type-abstract]
+                    path_or_stream=Path(),
+                ),
+            )
+
+    def _convertisseur() -> Type[DocumentConverter]:
+        return ConvertisseurDeTest
 
     return _convertisseur
 

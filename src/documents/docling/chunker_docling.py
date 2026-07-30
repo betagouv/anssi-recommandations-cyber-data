@@ -6,7 +6,7 @@ from typing import Type, Literal, Callable
 
 from docling.backend.pypdfium2_backend import PyPdfiumDocumentBackend
 from docling.datamodel.base_models import InputFormat
-from docling.datamodel.document import ConversionResult
+from docling.datamodel.document import ConversionResult, InputDocument
 from docling.datamodel.pipeline_options import (
     ApiVlmOptions,
     ResponseFormat,
@@ -20,8 +20,13 @@ from docling.document_converter import (
     HTMLFormatOption,
 )
 from docling.pipeline.vlm_pipeline import VlmPipeline
+from docling_core.types import DoclingDocument
+from docling_core.types.doc.base import Size
 
 from documents.docling.document import Document
+from documents.docling.pages_avec_texte import (
+    identifie_les_plages_de_pages_pdf_qui_contiennent_du_texte,
+)
 from documents.indexeur.indexeur import DocumentAIndexer
 
 
@@ -122,12 +127,50 @@ def _initialise_options_pdf(
     )
 
 
+def _decale_les_numeros_de_page_du_resultat_de_conversion(
+    resultat: ConversionResult,
+    premier_numero_de_page: int,
+) -> None:
+    decalage = premier_numero_de_page - 1
+    if decalage == 0:
+        return
+
+    for element, _ in resultat.document.iterate_items():
+        for provenance in getattr(element, "prov", []):
+            provenance.page_no += decalage
+
+    for page in resultat.document.pages.values():
+        page.page_no += decalage
+    resultat.document.pages = {
+        numero_page + decalage: page
+        for numero_page, page in resultat.document.pages.items()
+    }
+
+
+def _ajoute_les_pages_vides_entre_deux_plages_de_conversion(
+    resultat: ConversionResult,
+    derniere_page_de_la_plage: int,
+    premiere_page_de_la_plage_suivante: int,
+) -> None:
+    for numero_page in range(
+        derniere_page_de_la_plage + 1,
+        premiere_page_de_la_plage_suivante,
+    ):
+        resultat.document.add_page(
+            page_no=numero_page,
+            size=Size(width=1, height=1),
+        )
+
+
 class ChunkerDocling(ABC):
     def __init__(
         self,
         converter: Type[DocumentConverter] = DocumentConverter,
         cle_api: str = "",
         url_albert: str = "https://albert.api.etalab.gouv.fr/v1",
+        identifie_les_plages_de_pages_pdf: Callable[
+            [str], list[tuple[int, int]] | None
+        ] = identifie_les_plages_de_pages_pdf_qui_contiennent_du_texte,
     ):
         super().__init__()
         fichier_options_path = Path(__file__).parent / "../options_guides.json"
@@ -138,6 +181,9 @@ class ChunkerDocling(ABC):
         self.type_fichier = TypeFichier.TEXTE
         self.cle_api = cle_api
         self.url_albert = url_albert
+        self.identifie_les_plages_de_pages_pdf = (
+            identifie_les_plages_de_pages_pdf
+        )
 
     @property
     def format_options(
@@ -163,8 +209,53 @@ class ChunkerDocling(ABC):
         self.converter.format_to_options[
             input_format
         ].backend = option_de_format.backend
-        result = self.converter.convert(document.chemin)
-        return self._cree_le_document(result, document)
+
+        if document.type != "PDF":
+            resultat = self.converter.convert(document.chemin)
+        else:
+            resultat = self._convertit_le_pdf(document)
+        return self._cree_le_document(resultat, document)
+
+    def _convertit_le_pdf(self, document: DocumentAIndexer) -> ConversionResult:
+        plages_de_pages_avec_du_contenu = (
+            self.identifie_les_plages_de_pages_pdf(str(document.chemin))
+        )
+        if plages_de_pages_avec_du_contenu is None:
+            return self.converter.convert(document.chemin)
+        if plages_de_pages_avec_du_contenu == []:
+            return ConversionResult(
+                document=DoclingDocument(name=Path(document.chemin).name),
+                input=InputDocument(
+                    format=InputFormat.PDF,
+                    backend=PyPdfiumDocumentBackend,
+                    path_or_stream=Path(document.chemin),
+                ),
+            )
+
+        resultats = [
+            self.converter.convert(document.chemin, page_range=plage)
+            for plage in plages_de_pages_avec_du_contenu
+        ]
+        for resultat, plage in zip(resultats, plages_de_pages_avec_du_contenu):
+            _decale_les_numeros_de_page_du_resultat_de_conversion(
+                resultat,
+                plage[0],
+            )
+        for resultat, plage, plage_suivante in zip(
+            resultats,
+            plages_de_pages_avec_du_contenu,
+            plages_de_pages_avec_du_contenu[1:],
+        ):
+            _ajoute_les_pages_vides_entre_deux_plages_de_conversion(
+                resultat,
+                plage[1],
+                plage_suivante[0],
+            )
+        resultat = resultats[0]
+        resultat.document = DoclingDocument.concatenate(
+            [r.document for r in resultats]
+        )
+        return resultat
 
     @abstractmethod
     def _cree_le_document(
