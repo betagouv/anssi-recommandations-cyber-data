@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from enum import StrEnum
 
+from documents.page import ContexteDuBloc
+
 class TypeDeBlocOcr(StrEnum):
     TITRE = "titre"
     RECOMMANDATION = "recommandation"
@@ -34,16 +36,6 @@ class PageOcr:
 class ResultatOcrPdf:
     nombre_de_pages: int
     pages: tuple[PageOcr, ...]
-
-
-@dataclass(frozen=True)
-class ContexteDuBloc:
-    type_de_bloc: str | None = None
-    code_recommandation: str | None = None
-    titre: str | None = None
-    section: str | None = None
-    chemin_des_sections: tuple[str, ...] = ()
-    niveau: int | None = None
 
 
 @dataclass(frozen=True)

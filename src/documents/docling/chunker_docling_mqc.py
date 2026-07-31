@@ -13,6 +13,7 @@ from documents.pdf.convertisseur_ocr_json import (
     ExtracteurDeBlocsOcrDepuisUnPdf,
 )
 from documents.pdf.document_pdf import BlocPagePDF, PagePDF
+from documents.page import ContexteDuBloc
 from documents.pdf.pages_avec_texte import (
     identifie_les_plages_de_pages_pdf_qui_contiennent_du_texte,
 )
@@ -82,6 +83,17 @@ class ChunkerDoclingMQC(ChunkerDocling):
                 BlocPagePDF(
                     texte=bloc_indexable.texte,
                     numero_page=bloc_indexable.page_debut,
+                    position_page=len(page.blocs),
+                    derniere_page=bloc_indexable.page_fin,
+                    pages=bloc_indexable.pages_couvertes,
+                    contexte=ContexteDuBloc(
+                        type_de_bloc=bloc_indexable.contexte.type_de_bloc,
+                        code_recommandation=bloc_indexable.contexte.code_recommandation,
+                        titre=bloc_indexable.contexte.titre,
+                        section=bloc_indexable.contexte.section,
+                        chemin_des_sections=bloc_indexable.contexte.chemin_des_sections,
+                        niveau=bloc_indexable.contexte.niveau,
+                    ),
                 )
             )
         document.pages = pages
