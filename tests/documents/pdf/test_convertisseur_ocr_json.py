@@ -1,5 +1,6 @@
 import pytest
 
+from documents.pdf.assembleur_blocs_json import TypeDeBlocOcr
 from documents.pdf.convertisseur_ocr_json import (
     ExtracteurDeBlocsOcrDepuisUnPdf,
     DELAI_MAXIMAL_OCR,
@@ -8,7 +9,6 @@ from documents.pdf.convertisseur_ocr_json import (
     NOMBRE_MAXIMAL_DE_TOKENS_DE_COMPLETION_OCR,
     SCHEMA_BLOCS_OCR,
 )
-
 def annotation_ocr_json(**modifications):
     bloc = {
         "type_de_bloc": "paragraphe",
@@ -190,6 +190,55 @@ def test_refuse_une_reponse_ocr_invalide(
 
     with pytest.raises(ErreurOcrJson):
         convertisseur.convertit("document.pdf", None)
+
+
+def test_normalise_un_code_de_recommandation_avec_des_tirets_de_fin(
+    un_convertisseur_ocr_json,
+):
+    convertisseur, _ = un_convertisseur_ocr_json(
+        annotation_ocr_json(
+            type_de_bloc="recommandation",
+            code_recommandation="R29--",
+        )
+    )
+
+    resultat_ocr = convertisseur.convertit("document.pdf", None)
+
+    assert resultat_ocr.pages[0].blocs[0].type_de_bloc == TypeDeBlocOcr.RECOMMANDATION
+    assert resultat_ocr.pages[0].blocs[0].code == "R29"
+
+
+def test_conserve_un_faux_code_de_recommandation_comme_contenu_ordinaire(
+    un_convertisseur_ocr_json,
+):
+    convertisseur, _ = un_convertisseur_ocr_json(
+        annotation_ocr_json(
+            type_de_bloc="recommandation",
+            code_recommandation="R-",
+            titre="Recommandation alternative",
+            texte="Texte explicatif",
+        )
+    )
+
+    resultat_ocr = convertisseur.convertit("document.pdf", None)
+
+    bloc_ocr = resultat_ocr.pages[0].blocs[0]
+    assert bloc_ocr.type_de_bloc == TypeDeBlocOcr.AUTRE
+    assert bloc_ocr.code is None
+    assert bloc_ocr.titre is None
+    assert bloc_ocr.texte == "R-\nRecommandation alternative\nTexte explicatif"
+
+
+def test_ignore_un_identifiant_de_bloc_qui_n_est_pas_une_recommandation(
+    un_convertisseur_ocr_json,
+):
+    convertisseur, _ = un_convertisseur_ocr_json(
+        annotation_ocr_json(code_recommandation="PARA1")
+    )
+
+    resultat_ocr = convertisseur.convertit("document.pdf", None)
+
+    assert resultat_ocr.pages[0].blocs[0].code is None
 
 
 def test_ne_retourne_jamais_la_cle_api_dans_une_erreur(un_convertisseur_ocr_json):
