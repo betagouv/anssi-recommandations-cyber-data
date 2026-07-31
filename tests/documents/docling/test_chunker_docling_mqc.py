@@ -282,3 +282,50 @@ def test_n_utilise_pas_docling_pour_un_pdf(
     )
 
     chunker.applique(document)
+
+
+def test_conserve_les_sections_et_recommandations_dans_le_chunker(
+    un_convertisseur_avec_un_texte,
+    un_convertisseur_ocr_json_de_test,
+):
+    document = DocumentPDF("mon_document.pdf", url_pdf="http://mon-document.pdf")
+    resultat_ocr = ResultatOcrPdf(
+        nombre_de_pages=1,
+        pages=(
+            PageOcr(
+                numero_page=1,
+                blocs=(
+                    BlocOcr(
+                        type_de_bloc=TypeDeBlocOcr.TITRE,
+                        code=None,
+                        titre="Section 5",
+                        texte="Section 5",
+                        niveau=1,
+                    ),
+                    BlocOcr(
+                        type_de_bloc=TypeDeBlocOcr.RECOMMANDATION,
+                        code="R24",
+                        titre="Titre de la recommandation",
+                        texte="Contenu de la recommandation",
+                    ),
+                ),
+            ),
+        ),
+    )
+    convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(resultat_ocr)
+    chunker = ChunkerDoclingMQC(
+        converter=un_convertisseur_avec_un_texte(),
+        convertisseur_ocr_json=convertisseur_ocr_json,
+    )
+
+    document = chunker.applique(document)
+    bloc = document.pages[1].blocs[0]
+    metadata = document.metadata(bloc)
+
+    assert bloc.texte == (
+        "Section 5\nR24\nTitre de la recommandation\n"
+        "Contenu de la recommandation"
+    )
+    assert metadata["type_de_bloc"] == "recommandation"
+    assert metadata["code_recommandation"] == "R24"
+    assert metadata["chemin_sections"] == '["Section 5"]'

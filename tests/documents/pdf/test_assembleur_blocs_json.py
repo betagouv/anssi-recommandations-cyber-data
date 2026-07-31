@@ -23,6 +23,8 @@ def test_conserve_les_blocs_distincts_d_une_meme_page(
     assert len(blocs_indexables) == 2
     assert blocs_indexables[0].texte == "Premier paragraphe"
     assert blocs_indexables[1].texte == "Deuxième paragraphe"
+    assert blocs_indexables[0].contexte.type_de_bloc == "paragraphe"
+    assert blocs_indexables[1].contexte.type_de_bloc == "paragraphe"
 
 
 def test_conserve_l_ordre_des_blocs_d_une_page(
@@ -65,7 +67,7 @@ def test_cree_un_bloc_indexable_avec_son_type_son_code_et_son_titre(
     assert bloc_indexable.texte == (
         "R24\nProtéger le système\nLe système doit être protégé."
     )
-    assert bloc_indexable.contexte.type_de_bloc == "recommendation"
+    assert bloc_indexable.contexte.type_de_bloc == "recommandation"
     assert bloc_indexable.contexte.code_recommandation == "R24"
     assert bloc_indexable.contexte.titre == "Protéger le système"
 
@@ -460,7 +462,7 @@ def test_conserve_une_liste_comme_un_bloc(
 
     assert len(blocs_indexables) == 1
     assert blocs_indexables[0].texte == "Premier élément\nDeuxième élément"
-    assert blocs_indexables[0].contexte.type_de_bloc == "list"
+    assert blocs_indexables[0].contexte.type_de_bloc == "liste"
 
 
 def test_fusionne_deux_parties_de_liste_si_elles_se_suivent(
@@ -595,7 +597,7 @@ def test_conserve_un_tableau_comme_un_bloc(
     blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
 
     assert len(blocs_indexables) == 1
-    assert blocs_indexables[0].contexte.type_de_bloc == "table"
+    assert blocs_indexables[0].contexte.type_de_bloc == "tableau"
     assert blocs_indexables[0].texte == "Nom\tValeur\nRisque\tÉlevé"
 
 
@@ -737,7 +739,7 @@ def test_conserve_les_elements_de_liste_avec_un_texte_d_introduction():
     assert bloc_indexable.texte == (
         "Introduction de la liste\n- Premier élément\n- Deuxième élément"
     )
-    assert bloc_indexable.contexte.type_de_bloc == "list"
+    assert bloc_indexable.contexte.type_de_bloc == "liste"
 
 
 def test_fusionne_un_paragraphe_qui_introduit_une_liste():
@@ -771,7 +773,7 @@ def test_fusionne_un_paragraphe_qui_introduit_une_liste():
     assert blocs_indexables[0].texte == (
         "Les raisons sont les suivantes :\n- Première raison\n- Deuxième raison"
     )
-    assert blocs_indexables[0].contexte.type_de_bloc == "list"
+    assert blocs_indexables[0].contexte.type_de_bloc == "liste"
     assert blocs_indexables[0].pages_couvertes == (1,)
 
 
@@ -795,7 +797,7 @@ def test_conserve_les_elements_de_liste_d_une_recommandation():
         "La recommandation contient les actions suivantes :\n"
         "- Première action\n- Deuxième action"
     )
-    assert bloc_indexable.contexte.type_de_bloc == "recommendation"
+    assert bloc_indexable.contexte.type_de_bloc == "recommandation"
 
 
 def test_conserve_le_texte_et_les_lignes_d_un_tableau():

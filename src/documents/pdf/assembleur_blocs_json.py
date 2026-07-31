@@ -2,6 +2,8 @@ import re
 from dataclasses import dataclass, replace
 from enum import StrEnum
 
+from documents.page import ContexteDuBloc
+
 
 class TypeDeBlocOcr(StrEnum):
     TITRE = "heading"
@@ -11,6 +13,18 @@ class TypeDeBlocOcr(StrEnum):
     TABLEAU = "table"
     AUTRE = "other"
     PIED_DE_PAGE = "footer"
+
+    @property
+    def libelle_francais(self) -> str:
+        return {
+            TypeDeBlocOcr.TITRE: "titre",
+            TypeDeBlocOcr.RECOMMANDATION: "recommandation",
+            TypeDeBlocOcr.PARAGRAPHE: "paragraphe",
+            TypeDeBlocOcr.LISTE: "liste",
+            TypeDeBlocOcr.TABLEAU: "tableau",
+            TypeDeBlocOcr.AUTRE: "autre",
+            TypeDeBlocOcr.PIED_DE_PAGE: "pied_de_page",
+        }[self]
 
 
 @dataclass(frozen=True)
@@ -36,16 +50,6 @@ class PageOcr:
 class ResultatOcrPdf:
     nombre_de_pages: int
     pages: tuple[PageOcr, ...]
-
-
-@dataclass(frozen=True)
-class ContexteDuBloc:
-    type_de_bloc: str | None = None
-    code_recommandation: str | None = None
-    titre: str | None = None
-    section: str | None = None
-    chemin_des_sections: tuple[str, ...] = ()
-    niveau: int | None = None
 
 
 @dataclass(frozen=True)
@@ -93,7 +97,7 @@ class AssembleurDeBlocsJson:
                                 texte=titre_en_attente.texte,
                                 numero_page=titre_en_attente.page,
                                 contexte=ContexteDuBloc(
-                                    type_de_bloc=TypeDeBlocOcr.TITRE.value,
+                                    type_de_bloc=TypeDeBlocOcr.TITRE.libelle_francais,
                                     titre=titre_en_attente.texte,
                                     section=titre_en_attente.texte,
                                     chemin_des_sections=titre_en_attente.chemin_des_sections,
@@ -150,7 +154,7 @@ class AssembleurDeBlocsJson:
                     titre_en_attente = None
 
                 contexte = ContexteDuBloc(
-                    type_de_bloc=type_de_bloc.value,
+                    type_de_bloc=type_de_bloc.libelle_francais,
                     code_recommandation=bloc_ocr.code,
                     titre=bloc_ocr.titre or titre_de_section,
                     section=chemin_du_bloc[-1] if chemin_du_bloc else None,
@@ -205,7 +209,7 @@ class AssembleurDeBlocsJson:
                     texte=titre_en_attente.texte,
                     numero_page=titre_en_attente.page,
                     contexte=ContexteDuBloc(
-                        type_de_bloc=TypeDeBlocOcr.TITRE.value,
+                        type_de_bloc=TypeDeBlocOcr.TITRE.libelle_francais,
                         titre=titre_en_attente.texte,
                         section=titre_en_attente.texte,
                         chemin_des_sections=titre_en_attente.chemin_des_sections,
@@ -324,11 +328,11 @@ class AssembleurDeBlocsJson:
         types_compatibles = (
             bloc_precedent.contexte.type_de_bloc
             == bloc_suivant.contexte.type_de_bloc
-            == TypeDeBlocOcr.PARAGRAPHE.value
+            == TypeDeBlocOcr.PARAGRAPHE.libelle_francais
             or (
-                bloc_precedent.contexte.type_de_bloc == TypeDeBlocOcr.LISTE.value
+                bloc_precedent.contexte.type_de_bloc == TypeDeBlocOcr.LISTE.libelle_francais
                 and bloc_suivant.contexte.type_de_bloc
-                == TypeDeBlocOcr.PARAGRAPHE.value
+                == TypeDeBlocOcr.PARAGRAPHE.libelle_francais
             )
         )
         if not types_compatibles:
@@ -385,7 +389,7 @@ class AssembleurDeBlocsJson:
             bloc_precedent.page_fin == bloc_suivant.page_debut
             and bloc_precedent.contexte.type_de_bloc
             == bloc_suivant.contexte.type_de_bloc
-            == TypeDeBlocOcr.LISTE.value
+            == TypeDeBlocOcr.LISTE.libelle_francais
         )
         if not pages_contigues and not deux_listes_sur_la_meme_page:
             return False
@@ -395,11 +399,14 @@ class AssembleurDeBlocsJson:
             bloc_precedent.contexte.type_de_bloc
             == bloc_suivant.contexte.type_de_bloc
             and bloc_suivant.contexte.type_de_bloc
-            in {TypeDeBlocOcr.PARAGRAPHE.value, TypeDeBlocOcr.LISTE.value}
+            in {
+                TypeDeBlocOcr.PARAGRAPHE.libelle_francais,
+                TypeDeBlocOcr.LISTE.libelle_francais,
+            }
         )
         return types_compatibles or (
-            bloc_precedent.contexte.type_de_bloc == TypeDeBlocOcr.LISTE.value
-            and bloc_suivant.contexte.type_de_bloc == TypeDeBlocOcr.PARAGRAPHE.value
+            bloc_precedent.contexte.type_de_bloc == TypeDeBlocOcr.LISTE.libelle_francais
+            and bloc_suivant.contexte.type_de_bloc == TypeDeBlocOcr.PARAGRAPHE.libelle_francais
         )
 
     @staticmethod
@@ -412,8 +419,8 @@ class AssembleurDeBlocsJson:
             and bloc_precedent.page_fin == bloc_suivant.page_fin
             and bloc_precedent.contexte.chemin_des_sections
             == bloc_suivant.contexte.chemin_des_sections
-            and bloc_precedent.contexte.type_de_bloc == TypeDeBlocOcr.LISTE.value
-            and bloc_suivant.contexte.type_de_bloc == TypeDeBlocOcr.LISTE.value
+            and bloc_precedent.contexte.type_de_bloc == TypeDeBlocOcr.LISTE.libelle_francais
+            and bloc_suivant.contexte.type_de_bloc == TypeDeBlocOcr.LISTE.libelle_francais
             and bloc_precedent.texte == bloc_suivant.texte
         )
 
@@ -426,9 +433,9 @@ class AssembleurDeBlocsJson:
             return False
         if bloc_precedent.contexte.chemin_des_sections != bloc_suivant.contexte.chemin_des_sections:
             return False
-        if bloc_precedent.contexte.type_de_bloc != TypeDeBlocOcr.PARAGRAPHE.value:
+        if bloc_precedent.contexte.type_de_bloc != TypeDeBlocOcr.PARAGRAPHE.libelle_francais:
             return False
-        if bloc_suivant.contexte.type_de_bloc != TypeDeBlocOcr.LISTE.value:
+        if bloc_suivant.contexte.type_de_bloc != TypeDeBlocOcr.LISTE.libelle_francais:
             return False
         return bloc_precedent.texte.rstrip().endswith(":")
 

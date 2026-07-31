@@ -8,8 +8,12 @@ from documents.docling.chunker_docling import ChunkerDocling, TypeFichier
 from documents.docling.document import Document
 from documents.docling.filtre_resultat import filtre_les_resultats
 from documents.pdf.assembleur_blocs_json import AssembleurDeBlocsJson
-from documents.pdf.convertisseur_ocr_json import ConvertisseurOcrJson
+from documents.pdf.convertisseur_ocr_json import (
+    ConvertisseurDePagesOcrJson,
+    ConvertisseurOcrJson,
+)
 from documents.pdf.document_pdf import BlocPagePDF, PagePDF
+from documents.page import ContexteDuBloc
 from documents.pdf.pages_avec_texte import (
     identifie_les_plages_de_pages_pdf_qui_contiennent_du_texte,
 )
@@ -25,7 +29,7 @@ class ChunkerDoclingMQC(ChunkerDocling):
         identifie_les_plages_de_pages_pdf: Callable[
             [str], list[tuple[int, int]] | None
         ] = identifie_les_plages_de_pages_pdf_qui_contiennent_du_texte,
-        convertisseur_ocr_json: ConvertisseurOcrJson | object | None = None,
+        convertisseur_ocr_json: ConvertisseurDePagesOcrJson | None = None,
     ):
         super().__init__(
             converter,
@@ -79,6 +83,17 @@ class ChunkerDoclingMQC(ChunkerDocling):
                 BlocPagePDF(
                     texte=bloc_indexable.texte,
                     numero_page=bloc_indexable.page_debut,
+                    position_page=len(page.blocs),
+                    derniere_page=bloc_indexable.page_fin,
+                    pages=bloc_indexable.pages_couvertes,
+                    contexte=ContexteDuBloc(
+                        type_de_bloc=bloc_indexable.contexte.type_de_bloc,
+                        code_recommandation=bloc_indexable.contexte.code_recommandation,
+                        titre=bloc_indexable.contexte.titre,
+                        section=bloc_indexable.contexte.section,
+                        chemin_des_sections=bloc_indexable.contexte.chemin_des_sections,
+                        niveau=bloc_indexable.contexte.niveau,
+                    ),
                 )
             )
         document.pages = pages

@@ -44,7 +44,7 @@ from documents.indexeur.indexeur import (
     ReponseChunkEnErreur,
     DetailErreur,
 )
-from documents.page import Page
+from documents.page import ContexteDuBloc, Page
 from documents.pdf.document_pdf import Position, PagePDF, BlocPagePDF
 from documents.pdf.assembleur_blocs_json import (
     BlocOcr,
