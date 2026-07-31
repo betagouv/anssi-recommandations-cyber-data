@@ -272,6 +272,26 @@ def test_refuse_un_code_de_recommandation_invalide(
         convertisseur.convertit("document.pdf", None)
 
 
+def test_interprete_un_code_et_un_titre_vides_comme_absents(
+    un_transport_http_ocr_json_de_test,
+    un_rendeur_de_page_pdf_de_test,
+):
+    transport_http = un_transport_http_ocr_json_de_test(
+        annotation_ocr_json(code="", title="")
+    )
+    convertisseur = ConvertisseurOcrJson(
+        cle_api="cle-secrete",
+        url_albert="https://albert.local/v1",
+        transport_http=transport_http,
+        rendeur_de_page=un_rendeur_de_page_pdf_de_test(nombre_de_pages=1),
+    )
+
+    resultat_ocr = convertisseur.convertit("document.pdf", None)
+
+    assert resultat_ocr.pages[0].blocs[0].code is None
+    assert resultat_ocr.pages[0].blocs[0].titre is None
+
+
 def test_ne_retourne_jamais_la_cle_api_dans_une_erreur(
     un_transport_http_ocr_json_de_test,
     un_rendeur_de_page_pdf_de_test,

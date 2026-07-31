@@ -318,7 +318,9 @@ class ConvertisseurOcrJson:
             code = bloc_json["code"]
             if code == "":
                 code = None
-            if code is not None and not isinstance(code, str):
+            if code is not None and (
+                not isinstance(code, str) or re.fullmatch(r"R\d+", code) is None
+            ):
                 raise ErreurOcrJson("Un code de recommandation OCR est invalide")
             titre = bloc_json["title"]
             if titre == "":
