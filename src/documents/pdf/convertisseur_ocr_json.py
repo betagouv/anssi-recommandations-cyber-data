@@ -318,9 +318,7 @@ class ConvertisseurOcrJson:
             code = bloc_json["code"]
             if code == "":
                 code = None
-            if code is not None and (
-                not isinstance(code, str) or re.fullmatch(r"R\d+", code) is None
-            ):
+            if code is not None and not isinstance(code, str):
                 raise ErreurOcrJson("Un code de recommandation OCR est invalide")
             titre = bloc_json["title"]
             if titre == "":
@@ -335,10 +333,14 @@ class ConvertisseurOcrJson:
             if type_de_bloc == TypeDeBlocOcr.RECOMMANDATION.value and code:
                 code_normalise = re.fullmatch(r"(R\d+)-*", code)
                 if code_normalise is None:
-                    raise ErreurOcrJson(
-                        "Un code de recommandation OCR est invalide"
+                    texte = "\n".join(
+                        partie for partie in (code, titre, texte) if partie
                     )
-                code = code_normalise.group(1)
+                    type_de_bloc = TypeDeBlocOcr.AUTRE.value
+                    code = None
+                    titre = None
+                else:
+                    code = code_normalise.group(1)
             if type_de_bloc != TypeDeBlocOcr.RECOMMANDATION.value:
                 code = None
             niveau = ConvertisseurOcrJson._normalise_le_niveau(type_de_bloc, niveau)

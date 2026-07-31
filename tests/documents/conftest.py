@@ -48,6 +48,7 @@ from documents.page import ContexteDuBloc, Page
 from documents.pdf.document_pdf import Position, PagePDF, BlocPagePDF
 from documents.pdf.assembleur_blocs_json import (
     BlocOcr,
+    PageOcr,
     ResultatOcrPdf,
     TypeDeBlocOcr,
 )
@@ -216,87 +217,6 @@ def un_resultat_ocr() -> Callable[..., ResultatOcrPdf]:
         )
 
     return _cree_un_resultat_ocr
-
-
-class ReponseHttpOcrJsonDeTest:
-    def __init__(self, contenu: object, code_http: int):
-        self.contenu = contenu
-        self.status_code = code_http
-
-    def json(self) -> object:
-        if isinstance(self.contenu, str):
-            return json.loads(self.contenu)
-        return {
-            "choices": [
-                {"message": {"content": json.dumps(self.contenu, ensure_ascii=False)}}
-            ]
-        }
-
-
-class TransportHttpOcrJsonDeTest:
-    def __init__(self, contenu: object, code_http: int):
-        self.reponse = ReponseHttpOcrJsonDeTest(contenu, code_http)
-        self.requetes: list[dict[str, object]] = []
-
-    def post(
-        self,
-        url: str,
-        headers: dict[str, str],
-        corps: dict[str, object],
-        timeout: int,
-    ) -> ReponseHttpOcrJsonDeTest:
-        self.requetes.append(
-            {"url": url, "headers": headers, "corps": corps, "timeout": timeout}
-        )
-        return self.reponse
-
-
-class RendeurDePagePdfDeTest:
-    def __init__(self, nombre_de_pages: int):
-        self.nombre_de_pages_total = nombre_de_pages
-        self.pages_rendues: list[int] = []
-
-    def nombre_de_pages(self, chemin: str | Path) -> int:
-        return self.nombre_de_pages_total
-
-    def encode_l_image(self, chemin: str | Path, numero_page: int) -> str:
-        self.pages_rendues.append(numero_page)
-        return f"image-page-{numero_page}"
-
-
-class ConvertisseurOcrJsonDeTest:
-    def __init__(self, resultat_ocr: ResultatOcrPdf):
-        self.resultat_ocr = resultat_ocr
-        self.plages_recues: list[list[tuple[int, int]] | None] = []
-
-    def convertit(
-        self,
-        chemin: str | Path,
-        plages_de_pages: list[tuple[int, int]] | None,
-    ) -> ResultatOcrPdf:
-        self.plages_recues.append(plages_de_pages)
-        return self.resultat_ocr
-
-
-@pytest.fixture
-def un_transport_http_ocr_json_de_test() -> Callable[..., TransportHttpOcrJsonDeTest]:
-    def _cree_un_transport_http_ocr_json_de_test(
-        contenu: object,
-        code_http: int = 200,
-    ) -> TransportHttpOcrJsonDeTest:
-        return TransportHttpOcrJsonDeTest(contenu, code_http)
-
-    return _cree_un_transport_http_ocr_json_de_test
-
-
-@pytest.fixture
-def un_rendeur_de_page_pdf_de_test() -> Callable[[int], RendeurDePagePdfDeTest]:
-    def _cree_un_rendeur_de_page_pdf_de_test(
-        nombre_de_pages: int,
-    ) -> RendeurDePagePdfDeTest:
-        return RendeurDePagePdfDeTest(nombre_de_pages)
-
-    return _cree_un_rendeur_de_page_pdf_de_test
 
 
 @pytest.fixture

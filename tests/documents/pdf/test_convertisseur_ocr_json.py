@@ -1,5 +1,6 @@
 import pytest
 
+from documents.pdf.assembleur_blocs_json import TypeDeBlocOcr
 from documents.pdf.convertisseur_ocr_json import (
     ConvertisseurOcrJson,
     ErreurOcrJson,
@@ -254,12 +255,12 @@ def test_refuse_un_type_de_bloc_inconnu(
         convertisseur.convertit("document.pdf", None)
 
 
-def test_refuse_un_code_de_recommandation_invalide(
+def test_normalise_un_code_de_recommandation_avec_des_tirets_de_fin(
     un_transport_http_ocr_json_de_test,
     un_rendeur_de_page_pdf_de_test,
 ):
     transport_http = un_transport_http_ocr_json_de_test(
-        annotation_ocr_json(type="recommendation", code="R-24")
+        annotation_ocr_json(type="recommendation", code="R29--")
     )
     convertisseur = ConvertisseurOcrJson(
         cle_api="cle-secrete",
@@ -268,8 +269,58 @@ def test_refuse_un_code_de_recommandation_invalide(
         rendeur_de_page=un_rendeur_de_page_pdf_de_test(nombre_de_pages=1),
     )
 
-    with pytest.raises(ErreurOcrJson):
-        convertisseur.convertit("document.pdf", None)
+    resultat_ocr = convertisseur.convertit("document.pdf", None)
+
+    assert resultat_ocr.pages[0].blocs[0].type_de_bloc == TypeDeBlocOcr.RECOMMANDATION
+    assert resultat_ocr.pages[0].blocs[0].code == "R29"
+
+
+def test_conserve_un_faux_code_de_recommandation_comme_contenu_ordinaire(
+    un_transport_http_ocr_json_de_test,
+    un_rendeur_de_page_pdf_de_test,
+):
+    transport_http = un_transport_http_ocr_json_de_test(
+        annotation_ocr_json(
+            type="recommendation",
+            code="R-",
+            title="Recommandation alternative",
+            text="Texte explicatif",
+        )
+    )
+    convertisseur = ConvertisseurOcrJson(
+        cle_api="cle-secrete",
+        url_albert="https://albert.local/v1",
+        transport_http=transport_http,
+        rendeur_de_page=un_rendeur_de_page_pdf_de_test(nombre_de_pages=1),
+    )
+
+    resultat_ocr = convertisseur.convertit("document.pdf", None)
+
+    assert resultat_ocr.pages[0].blocs[0].type_de_bloc == TypeDeBlocOcr.AUTRE
+    assert resultat_ocr.pages[0].blocs[0].code is None
+    assert resultat_ocr.pages[0].blocs[0].titre is None
+    assert resultat_ocr.pages[0].blocs[0].texte == (
+        "R-\nRecommandation alternative\nTexte explicatif"
+    )
+
+
+def test_ignore_un_identifiant_de_bloc_qui_n_est_pas_une_recommandation(
+    un_transport_http_ocr_json_de_test,
+    un_rendeur_de_page_pdf_de_test,
+):
+    transport_http = un_transport_http_ocr_json_de_test(
+        annotation_ocr_json(code="PARA1")
+    )
+    convertisseur = ConvertisseurOcrJson(
+        cle_api="cle-secrete",
+        url_albert="https://albert.local/v1",
+        transport_http=transport_http,
+        rendeur_de_page=un_rendeur_de_page_pdf_de_test(nombre_de_pages=1),
+    )
+
+    resultat_ocr = convertisseur.convertit("document.pdf", None)
+
+    assert resultat_ocr.pages[0].blocs[0].code is None
 
 
 def test_interprete_un_code_et_un_titre_vides_comme_absents(
