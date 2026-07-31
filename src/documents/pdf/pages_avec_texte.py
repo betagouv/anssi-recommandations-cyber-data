@@ -6,7 +6,9 @@ from typing import Callable, Protocol, cast
 import pypdfium2 as pdfium
 import requests
 
+
 _log = logging.getLogger(__name__)
+SEUIL_CARACTERES_PAGE_VIDE = 10
 
 
 class PageTextePDFLisible(Protocol):
@@ -26,7 +28,8 @@ class DocumentPDFLisible(Protocol):
     def __getitem__(self, numero_page: int) -> PagePDFLisible:
         ...
 
-SEUIL_CARACTERES_PAGE_VIDE = 10
+    def close(self) -> None:
+        ...
 
 
 def _regroupe_en_plages(pages_retenues: list[int]) -> list[tuple[int, int]]:
@@ -63,13 +66,16 @@ def identifie_les_plages_de_pages_pdf_qui_contiennent_du_texte(
 ) -> list[tuple[int, int]] | None:
     try:
         pdf = ouvre_pdf(chemin_ou_url)
-        nombre_de_pages = len(pdf)
-        pages_retenues = [
-            i + 1
-            for i in range(nombre_de_pages)
-            if len(pdf[i].get_textpage().get_text_bounded().strip())
-            >= seuil_caracteres
-        ]
+        try:
+            nombre_de_pages = len(pdf)
+            pages_retenues = [
+                i + 1
+                for i in range(nombre_de_pages)
+                if len(pdf[i].get_textpage().get_text_bounded().strip())
+                >= seuil_caracteres
+            ]
+        finally:
+            pdf.close()
     except Exception:
         _log.warning(
             "Impossible d'analyser le texte embarqué de %s, aucune page ignorée",
