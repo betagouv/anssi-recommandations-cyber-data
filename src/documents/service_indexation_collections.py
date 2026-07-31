@@ -83,19 +83,18 @@ class ServiceIndexationNouvellesCollections:
 
         resultats = self._client_indexation.ajoute_documents(docs)
 
-        les_documents_en_erreur = list(
-            filter(
-                lambda reponse: isinstance(reponse, ReponseDocumentEnErreur), resultats
+        les_documents_en_erreur = [
+            reponse
+            for reponse in resultats
+            if isinstance(reponse, ReponseDocumentEnErreur)
+        ]
+        les_documents_en_succes = [
+            reponse
+            for reponse in resultats
+            if isinstance(
+                reponse, (ReponseDocumentEnSucces, ReponseDocumentMaitriseEnSucces)
             )
-        )
-        les_documents_en_succes = list(
-            filter(
-                lambda reponse: isinstance(
-                    reponse, (ReponseDocumentEnSucces, ReponseDocumentMaitriseEnSucces)
-                ),
-                resultats,
-            )
-        )
+        ]
 
         log(
             __name__,
@@ -105,6 +104,12 @@ class ServiceIndexationNouvellesCollections:
             __name__,
             f"{len(les_documents_en_erreur)} documents non ajoutés à la collection",
         )
+        for document_en_erreur in les_documents_en_erreur:
+            log(
+                __name__,
+                f"Document non ajouté : {document_en_erreur.document_en_erreur} - "
+                f"Erreur : {document_en_erreur.detail}",
+            )
 
         self._service_jeopardy.jeopardyse(
             CollectionEntiere(

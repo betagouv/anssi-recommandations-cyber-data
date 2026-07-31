@@ -7,6 +7,9 @@ from docling.document_converter import DocumentConverter
 from documents.docling.chunker_docling import ChunkerDocling, TypeFichier
 from documents.docling.document import Document
 from documents.docling.filtre_resultat import filtre_les_resultats
+from documents.pdf.assembleur_blocs_json import AssembleurDeBlocsJson
+from documents.pdf.convertisseur_ocr_json import ConvertisseurOcrJson
+from documents.pdf.document_pdf import BlocPagePDF, PagePDF
 from documents.pdf.pages_avec_texte import (
     identifie_les_plages_de_pages_pdf_qui_contiennent_du_texte,
 )
@@ -22,6 +25,7 @@ class ChunkerDoclingMQC(ChunkerDocling):
         identifie_les_plages_de_pages_pdf: Callable[
             [str], list[tuple[int, int]] | None
         ] = identifie_les_plages_de_pages_pdf_qui_contiennent_du_texte,
+        convertisseur_ocr_json: ConvertisseurOcrJson | object | None = None,
     ):
         super().__init__(
             converter,
@@ -30,6 +34,55 @@ class ChunkerDoclingMQC(ChunkerDocling):
             identifie_les_plages_de_pages_pdf,
         )
         self.type_fichier = TypeFichier.TEXTE
+        self.convertisseur_ocr_json = convertisseur_ocr_json or ConvertisseurOcrJson(
+            cle_api=cle_api,
+            url_albert=url_albert,
+        )
+
+    def applique(self, document: DocumentAIndexer) -> Document:
+        if document.type == "PDF":
+            return self._applique_le_pdf_avec_ocr_json(document)
+        return super().applique(document)
+
+    def _applique_le_pdf_avec_ocr_json(
+        self,
+        document_a_indexer: DocumentAIndexer,
+    ) -> Document:
+        plages_de_pages_avec_du_contenu = (
+            self.identifie_les_plages_de_pages_pdf(str(document_a_indexer.chemin))
+        )
+        document = Document(document_a_indexer)
+        self.nom_fichier = (
+            Path(document_a_indexer.chemin)
+            .name.replace(".pdf", ".txt")
+            .replace(".html", ".txt")
+        )
+        if plages_de_pages_avec_du_contenu == []:
+            document.pages = {1: PagePDF(1)}
+            return document
+
+        resultat_ocr = self.convertisseur_ocr_json.convertit(
+            document_a_indexer.chemin,
+            plages_de_pages_avec_du_contenu,
+        )
+        blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+        pages = {
+            numero_page: PagePDF(numero_page)
+            for numero_page in range(1, resultat_ocr.nombre_de_pages + 1)
+        }
+        for bloc_indexable in blocs_indexables:
+            page = pages.setdefault(
+                bloc_indexable.page_debut,
+                PagePDF(bloc_indexable.page_debut),
+            )
+            page.ajoute_bloc(
+                BlocPagePDF(
+                    texte=bloc_indexable.texte,
+                    numero_page=bloc_indexable.page_debut,
+                )
+            )
+        document.pages = pages
+        return document
 
     def _cree_le_document(
         self,
