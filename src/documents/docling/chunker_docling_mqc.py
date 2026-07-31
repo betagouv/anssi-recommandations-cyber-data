@@ -7,7 +7,7 @@ from docling.document_converter import DocumentConverter
 from documents.docling.chunker_docling import ChunkerDocling, TypeFichier
 from documents.docling.document import Document
 from documents.docling.filtre_resultat import filtre_les_resultats
-from documents.docling.pages_avec_texte import (
+from documents.pdf.pages_avec_texte import (
     identifie_les_plages_de_pages_pdf_qui_contiennent_du_texte,
 )
 from documents.indexeur.indexeur import DocumentAIndexer

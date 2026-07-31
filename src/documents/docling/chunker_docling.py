@@ -24,7 +24,7 @@ from docling_core.types import DoclingDocument
 from docling_core.types.doc.base import Size
 
 from documents.docling.document import Document
-from documents.docling.pages_avec_texte import (
+from documents.pdf.pages_avec_texte import (
     identifie_les_plages_de_pages_pdf_qui_contiennent_du_texte,
 )
 from documents.indexeur.indexeur import DocumentAIndexer
