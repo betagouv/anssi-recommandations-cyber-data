@@ -98,6 +98,9 @@ def test_conserve_l_ordre_des_blocs_d_une_page(assemble_les_blocs):
     assert blocs_indexables[0].texte == "Premier paragraphe"
     assert blocs_indexables[1].texte == "Deuxième paragraphe"
     assert blocs_indexables[2].texte == "Troisième paragraphe"
+    assert blocs_indexables[0].contexte.type_de_bloc == "paragraphe"
+    assert blocs_indexables[1].contexte.type_de_bloc == "paragraphe"
+    assert blocs_indexables[2].contexte.type_de_bloc == "paragraphe"
 
 
 def test_cree_un_bloc_indexable_avec_son_type_son_code_et_son_titre(
@@ -452,6 +455,27 @@ def test_deduit_le_niveau_d_un_titre_numerote_meme_si_le_niveau_ocr_est_errone(
         "3 Recommandations",
         titre,
     )
+
+
+def test_separe_un_titre_de_chapitre_d_un_encadre(assemble_les_blocs):
+    blocs_indexables = assemble_les_blocs(
+        _une_page(
+            _un_titre("2 Authentification", 1),
+            {
+                "type_de_bloc": TypeDeBlocOcr.AUTRE,
+                "titre": "Objectif",
+                "texte": "Ce chapitre présente l'authentification.",
+            },
+        )
+    )
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "2 Authentification"
+    assert blocs_indexables[0].contexte.type_de_bloc == "titre"
+    assert blocs_indexables[0].contexte.titre == "2 Authentification"
+    assert blocs_indexables[1].texte == "Ce chapitre présente l'authentification."
+    assert blocs_indexables[1].contexte.type_de_bloc == "autre"
+    assert blocs_indexables[1].contexte.titre == "Objectif"
 
 
 def test_conserve_le_titre_dans_le_premier_bloc_de_la_section(assemble_les_blocs):

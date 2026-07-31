@@ -92,6 +92,52 @@ def test_peut_indexer_un_document_puis_ajouter_un_chunk(
     }
 
 
+def test_transmet_le_contexte_json_dans_les_metadonnees_du_chunk(
+    une_reponse_document,
+    une_reponse_chunk,
+    fichier_pdf,
+    un_executeur_de_requete,
+    une_reponse_attendue_OK,
+    un_chunker_avec_un_bloc_json,
+):
+    chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
+    executeur_de_requete = un_executeur_de_requete(
+        [
+            une_reponse_attendue_OK(une_reponse_document),
+            une_reponse_attendue_OK(une_reponse_chunk),
+        ]
+    )
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        un_chunker_avec_un_bloc_json(),
+        executeur_de_requete,
+        MultiProcesseurDeTest(),
+    )
+
+    indexeur.ajoute_documents(
+        [DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")],
+        "12345",
+    )
+
+    chunks = executeur_de_requete.payload_recu[
+        "http://albert.local/documents/doc123/chunks"
+    ]["chunks"]
+    assert chunks[0]["content"] == "R24\nTitre\nContenu"
+    assert chunks[0]["metadata"] == {
+        "source_url": "https://example.com/test.pdf",
+        "page": 2,
+        "position_page": 0,
+        "nom_document": "test.pdf",
+        "derniere_page": 3,
+        "type_de_bloc": "recommandation",
+        "code_recommandation": "R24",
+        "titre": "Titre",
+        "chemin_sections": '["Section 5"]',
+        "niveau": 1,
+    }
+
+
 def test_peut_indexer_plusieurs_documents(
     une_reponse_document_parametree,
     fichier_pdf,

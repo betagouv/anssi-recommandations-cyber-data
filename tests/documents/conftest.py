@@ -48,6 +48,7 @@ from documents.page import Page
 from documents.pdf.document_pdf import Position, PagePDF, BlocPagePDF
 from documents.pdf.assembleur_blocs_json import (
     BlocOcr,
+    ContexteDuBloc,
     PageOcr,
     ResultatOcrPdf,
     TypeDeBlocOcr,
@@ -225,6 +226,39 @@ def un_resultat_ocr() -> Callable[..., ResultatOcrPdf]:
         )
 
     return _cree_un_resultat_ocr
+
+
+class ChunkerAvecUnBlocJsonDeTest(ChunkerDoclingMQC):
+    def applique(self, document_a_indexer: DocumentAIndexer) -> Document:
+        document = Document(document_a_indexer)
+        page = PagePDF(2)
+        page.ajoute_bloc(
+            BlocPagePDF(
+                texte="R24\nTitre\nContenu",
+                numero_page=2,
+                position_page=0,
+                derniere_page=3,
+                pages=(2, 3),
+                contexte=ContexteDuBloc(
+                    type_de_bloc="recommandation",
+                    code_recommandation="R24",
+                    titre="Titre",
+                    section="Section 5",
+                    chemin_des_sections=("Section 5",),
+                    niveau=1,
+                ),
+            )
+        )
+        document.pages = {2: page, 3: PagePDF(3)}
+        return document
+
+
+@pytest.fixture
+def un_chunker_avec_un_bloc_json() -> Callable[[], ChunkerAvecUnBlocJsonDeTest]:
+    def _cree_un_chunker_avec_un_bloc_json() -> ChunkerAvecUnBlocJsonDeTest:
+        return ChunkerAvecUnBlocJsonDeTest()
+
+    return _cree_un_chunker_avec_un_bloc_json
 
 
 @pytest.fixture
