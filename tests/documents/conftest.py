@@ -48,7 +48,6 @@ from documents.page import ContexteDuBloc, Page
 from documents.pdf.document_pdf import Position, PagePDF, BlocPagePDF
 from documents.pdf.assembleur_blocs_json import (
     BlocOcr,
-    PageOcr,
     ResultatOcrPdf,
     TypeDeBlocOcr,
 )
