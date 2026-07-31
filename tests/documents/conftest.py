@@ -163,6 +163,20 @@ class RendeurDePagePdfDeTest:
         return f"image-page-{numero_page}"
 
 
+class ConvertisseurOcrJsonDeTest:
+    def __init__(self, resultat_ocr: ResultatOcrPdf):
+        self.resultat_ocr = resultat_ocr
+        self.plages_recues: list[list[tuple[int, int]] | None] = []
+
+    def convertit(
+        self,
+        chemin: str | Path,
+        plages_de_pages: list[tuple[int, int]] | None,
+    ) -> ResultatOcrPdf:
+        self.plages_recues.append(plages_de_pages)
+        return self.resultat_ocr
+
+
 @pytest.fixture
 def un_transport_http_ocr_json_de_test() -> Callable[..., TransportHttpOcrJsonDeTest]:
     def _cree_un_transport_http_ocr_json_de_test(
@@ -182,6 +196,16 @@ def un_rendeur_de_page_pdf_de_test() -> Callable[[int], RendeurDePagePdfDeTest]:
         return RendeurDePagePdfDeTest(nombre_de_pages)
 
     return _cree_un_rendeur_de_page_pdf_de_test
+
+
+@pytest.fixture
+def un_convertisseur_ocr_json_de_test() -> Callable[[ResultatOcrPdf], ConvertisseurOcrJsonDeTest]:
+    def _cree_un_convertisseur_ocr_json_de_test(
+        resultat_ocr: ResultatOcrPdf,
+    ) -> ConvertisseurOcrJsonDeTest:
+        return ConvertisseurOcrJsonDeTest(resultat_ocr)
+
+    return _cree_un_convertisseur_ocr_json_de_test
 
 
 @pytest.fixture
