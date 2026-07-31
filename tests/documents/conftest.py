@@ -46,6 +46,12 @@ from documents.indexeur.indexeur import (
 )
 from documents.page import Page
 from documents.pdf.document_pdf import Position, PagePDF, BlocPagePDF
+from documents.pdf.assembleur_blocs_json import (
+    BlocOcr,
+    PageOcr,
+    ResultatOcrPdf,
+    TypeDeBlocOcr,
+)
 from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
     ReponseDocumentOrigine,
@@ -83,6 +89,177 @@ def fichier_pdf(tmp_path) -> Callable[[str], Path]:
         return le_fichier
 
     return _cree_fichier_pdf
+
+
+@pytest.fixture
+def un_bloc_ocr_json() -> Callable[..., BlocOcr]:
+    def _cree_un_bloc_ocr_json(
+        texte: str = "Un texte",
+        type_de_bloc: TypeDeBlocOcr = TypeDeBlocOcr.PARAGRAPHE,
+        code: str | None = None,
+        titre: str | None = None,
+        niveau: int | None = None,
+        est_une_continuation: bool = False,
+        elements_de_liste: tuple[str, ...] = (),
+        lignes_de_tableau: tuple[tuple[str, ...], ...] = (),
+        est_decoratif: bool = False,
+    ) -> BlocOcr:
+        return BlocOcr(
+            type_de_bloc=type_de_bloc,
+            code=code,
+            titre=titre,
+            texte=texte,
+            niveau=niveau,
+            est_une_continuation=est_une_continuation,
+            elements_de_liste=elements_de_liste,
+            lignes_de_tableau=lignes_de_tableau,
+            est_decoratif=est_decoratif,
+        )
+
+    return _cree_un_bloc_ocr_json
+
+
+@pytest.fixture
+def un_resultat_ocr() -> Callable[..., ResultatOcrPdf]:
+    def _cree_un_resultat_ocr(
+        blocs_par_page: tuple[tuple[BlocOcr, ...], ...] = (),
+        nombre_de_pages: int | None = None,
+        pages_ocr: tuple[PageOcr, ...] | None = None,
+    ) -> ResultatOcrPdf:
+        pages = pages_ocr or tuple(
+            PageOcr(numero_page=index + 1, blocs=blocs)
+            for index, blocs in enumerate(blocs_par_page)
+        )
+        return ResultatOcrPdf(
+            nombre_de_pages=nombre_de_pages or len(pages),
+            pages=pages,
+        )
+
+    return _cree_un_resultat_ocr
+
+
+class ReponseHttpOcrJsonDeTest:
+    def __init__(self, contenu: object, code_http: int):
+        self.contenu = contenu
+        self.status_code = code_http
+
+    def json(self) -> object:
+        if isinstance(self.contenu, str):
+            return json.loads(self.contenu)
+        return {
+            "choices": [
+                {"message": {"content": json.dumps(self.contenu, ensure_ascii=False)}}
+            ]
+        }
+
+
+class TransportHttpOcrJsonDeTest:
+    def __init__(self, contenu: object, code_http: int):
+        self.reponse = ReponseHttpOcrJsonDeTest(contenu, code_http)
+        self.requetes: list[dict[str, object]] = []
+
+    def post(
+        self,
+        url: str,
+        headers: dict[str, str],
+        corps: dict[str, object],
+        timeout: int,
+    ) -> ReponseHttpOcrJsonDeTest:
+        self.requetes.append(
+            {"url": url, "headers": headers, "corps": corps, "timeout": timeout}
+        )
+        return self.reponse
+
+
+class RendeurDePagePdfDeTest:
+    def __init__(self, nombre_de_pages: int):
+        self.nombre_de_pages_total = nombre_de_pages
+        self.pages_rendues: list[int] = []
+
+    def nombre_de_pages(self, chemin: str | Path) -> int:
+        return self.nombre_de_pages_total
+
+    def encode_l_image(self, chemin: str | Path, numero_page: int) -> str:
+        self.pages_rendues.append(numero_page)
+        return f"image-page-{numero_page}"
+
+
+class ConvertisseurOcrJsonDeTest:
+    def __init__(self, resultat_ocr: ResultatOcrPdf):
+        self.resultat_ocr = resultat_ocr
+        self.plages_recues: list[list[tuple[int, int]] | None] = []
+
+    def convertit(
+        self,
+        chemin: str | Path,
+        plages_de_pages: list[tuple[int, int]] | None,
+    ) -> ResultatOcrPdf:
+        self.plages_recues.append(plages_de_pages)
+        return self.resultat_ocr
+
+
+@pytest.fixture
+def un_transport_http_ocr_json_de_test() -> Callable[..., TransportHttpOcrJsonDeTest]:
+    def _cree_un_transport_http_ocr_json_de_test(
+        contenu: object,
+        code_http: int = 200,
+    ) -> TransportHttpOcrJsonDeTest:
+        return TransportHttpOcrJsonDeTest(contenu, code_http)
+
+    return _cree_un_transport_http_ocr_json_de_test
+
+
+@pytest.fixture
+def un_rendeur_de_page_pdf_de_test() -> Callable[[int], RendeurDePagePdfDeTest]:
+    def _cree_un_rendeur_de_page_pdf_de_test(
+        nombre_de_pages: int,
+    ) -> RendeurDePagePdfDeTest:
+        return RendeurDePagePdfDeTest(nombre_de_pages)
+
+    return _cree_un_rendeur_de_page_pdf_de_test
+
+
+@pytest.fixture
+def un_convertisseur_ocr_json_de_test() -> Callable[[ResultatOcrPdf], ConvertisseurOcrJsonDeTest]:
+    def _cree_un_convertisseur_ocr_json_de_test(
+        resultat_ocr: ResultatOcrPdf,
+    ) -> ConvertisseurOcrJsonDeTest:
+        return ConvertisseurOcrJsonDeTest(resultat_ocr)
+
+    return _cree_un_convertisseur_ocr_json_de_test
+
+
+class ChunkerAvecUnBlocJsonDeTest(ChunkerDoclingMQC):
+    def applique(self, document_a_indexer: DocumentAIndexer) -> Document:
+        document = Document(document_a_indexer)
+        page = PagePDF(2)
+        page.ajoute_bloc(
+            BlocPagePDF(
+                texte="R24\nTitre\nContenu",
+                numero_page=2,
+                position_page=0,
+                derniere_page=3,
+                pages=(2, 3),
+                contexte=ContexteDuBloc(
+                    type_de_bloc="recommandation",
+                    code_recommandation="R24",
+                    titre="Titre",
+                    section="Section 5",
+                    chemin_des_sections=("Section 5",),
+                    niveau=1,
+                ),
+            )
+        )
+        document.pages = {2: page, 3: PagePDF(3)}
+        return document
+
+
+@pytest.fixture
+def un_chunker_avec_un_bloc_json() -> Callable[[], ChunkerAvecUnBlocJsonDeTest]:
+    def _cree_un_chunker_avec_un_bloc_json() -> ChunkerAvecUnBlocJsonDeTest:
+        return ChunkerAvecUnBlocJsonDeTest()
+
+    return _cree_un_chunker_avec_un_bloc_json
 
 
 @pytest.fixture
