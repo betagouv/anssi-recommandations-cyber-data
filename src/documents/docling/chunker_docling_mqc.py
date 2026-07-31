@@ -13,7 +13,7 @@ from documents.pdf.convertisseur_ocr_json import (
     ConvertisseurOcrJson,
 )
 from documents.pdf.document_pdf import BlocPagePDF, PagePDF
-from documents.page import ContexteDuBloc
+from documents.page import ContexteDuBloc, Page
 from documents.pdf.pages_avec_texte import (
     identifie_les_plages_de_pages_pdf_qui_contiennent_du_texte,
 )
@@ -35,9 +35,9 @@ class ChunkerDoclingMQC(ChunkerDocling):
             converter,
             cle_api,
             url_albert,
-            identifie_les_plages_de_pages_pdf,
         )
         self.type_fichier = TypeFichier.TEXTE
+        self.identifie_les_plages_de_pages_pdf = identifie_les_plages_de_pages_pdf
         self.convertisseur_ocr_json = convertisseur_ocr_json or ConvertisseurOcrJson(
             cle_api=cle_api,
             url_albert=url_albert,
@@ -70,7 +70,7 @@ class ChunkerDoclingMQC(ChunkerDocling):
             plages_de_pages_avec_du_contenu,
         )
         blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
-        pages = {
+        pages: dict[int, Page] = {
             numero_page: PagePDF(numero_page)
             for numero_page in range(1, resultat_ocr.nombre_de_pages + 1)
         }
