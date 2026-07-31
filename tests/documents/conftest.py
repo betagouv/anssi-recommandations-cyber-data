@@ -46,6 +46,10 @@ from documents.indexeur.indexeur import (
 )
 from documents.page import Page
 from documents.pdf.document_pdf import Position, PagePDF, BlocPagePDF
+from documents.pdf.assembleur_blocs_json import (
+    BlocOcr,
+    TypeDeBlocOcr,
+)
 from jeopardy.client_albert_jeopardy import (
     ClientAlbertJeopardy,
     ReponseDocumentOrigine,
@@ -83,6 +87,32 @@ def fichier_pdf(tmp_path) -> Callable[[str], Path]:
         return le_fichier
 
     return _cree_fichier_pdf
+
+
+@pytest.fixture
+def un_bloc_ocr_json() -> Callable[..., BlocOcr]:
+    def _cree_un_bloc_ocr_json(
+        texte: str = "Un texte",
+        type_de_bloc: TypeDeBlocOcr = TypeDeBlocOcr.PARAGRAPHE,
+        code: str | None = None,
+        titre: str | None = None,
+        niveau: int | None = None,
+        est_une_continuation: bool = False,
+        elements_de_liste: tuple[str, ...] = (),
+        lignes_de_tableau: tuple[tuple[str, ...], ...] = (),
+    ) -> BlocOcr:
+        return BlocOcr(
+            type_de_bloc=type_de_bloc,
+            code=code,
+            titre=titre,
+            texte=texte,
+            niveau=niveau,
+            est_une_continuation=est_une_continuation,
+            elements_de_liste=elements_de_liste,
+            lignes_de_tableau=lignes_de_tableau,
+        )
+
+    return _cree_un_bloc_ocr_json
 
 
 @pytest.fixture
