@@ -343,10 +343,12 @@ class AssembleurDeBlocsJson:
 
     @staticmethod
     def _determine_le_type_de_bloc_indexable(bloc_ocr: BlocOcr) -> TypeDeBlocOcr:
-        if bloc_ocr.type_de_bloc == TypeDeBlocOcr.RECOMMANDATION:
-            return TypeDeBlocOcr.RECOMMANDATION
-        if bloc_ocr.type_de_bloc == TypeDeBlocOcr.TABLEAU:
-            return TypeDeBlocOcr.TABLEAU
+        if bloc_ocr.type_de_bloc in {
+            TypeDeBlocOcr.RECOMMANDATION,
+            TypeDeBlocOcr.TABLEAU,
+            TypeDeBlocOcr.TABLE_DES_MATIERES,
+        }:
+            return bloc_ocr.type_de_bloc
         if bloc_ocr.elements_de_liste or AssembleurDeBlocsJson._est_une_puce_de_liste(
             bloc_ocr.texte
         ):
