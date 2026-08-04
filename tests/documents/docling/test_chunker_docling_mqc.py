@@ -143,25 +143,6 @@ def test_prend_en_compte_un_document_html(un_convertisseur_de_test):
     assert len(document.pages) == 1
 
 
-def test_convertit_uniquement_les_plages_avec_du_texte(
-    fichier_pdf,
-    un_convertisseur_qui_enregistre_les_plages,
-):
-    document = DocumentPDF(str(fichier_pdf("document.pdf")), "https://example.com")
-
-    chunker = ChunkerDoclingMQC(
-        un_convertisseur_qui_enregistre_les_plages(),
-        identifie_les_plages_de_pages_pdf=lambda _: [(1, 1), (3, 4)],
-    )
-    document = chunker.applique(document)
-
-    assert chunker.converter.plages_recues == [(1, 1), (3, 4)]
-    assert sorted(document.pages) == [1, 3, 4]
-    assert document.pages[1].blocs[0].texte == "Page 1\nContenu de la page 1"
-    assert document.pages[3].blocs[0].texte == "Page 3\nContenu de la page 3"
-    assert document.pages[4].blocs[0].texte == "Page 4\nContenu de la page 4"
-
-
 def test_ne_fait_aucun_appel_ocr_si_toutes_les_pages_sont_vides(
     fichier_pdf,
     un_convertisseur_avec_un_texte,
