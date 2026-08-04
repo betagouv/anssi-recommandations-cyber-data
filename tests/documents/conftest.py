@@ -48,6 +48,8 @@ from documents.page import Page
 from documents.pdf.document_pdf import Position, PagePDF, BlocPagePDF
 from documents.pdf.assembleur_blocs_json import (
     BlocOcr,
+    PageOcr,
+    ResultatOcrPdf,
     TypeDeBlocOcr,
 )
 from jeopardy.client_albert_jeopardy import (
@@ -113,6 +115,25 @@ def un_bloc_ocr_json() -> Callable[..., BlocOcr]:
         )
 
     return _cree_un_bloc_ocr_json
+
+
+@pytest.fixture
+def un_resultat_ocr() -> Callable[..., ResultatOcrPdf]:
+    def _cree_un_resultat_ocr(
+        blocs_par_page: tuple[tuple[BlocOcr, ...], ...] = (),
+        nombre_de_pages: int | None = None,
+        pages_ocr: tuple[PageOcr, ...] | None = None,
+    ) -> ResultatOcrPdf:
+        pages = pages_ocr or tuple(
+            PageOcr(numero_page=index + 1, blocs=blocs)
+            for index, blocs in enumerate(blocs_par_page)
+        )
+        return ResultatOcrPdf(
+            nombre_de_pages=nombre_de_pages or len(pages),
+            pages=pages,
+        )
+
+    return _cree_un_resultat_ocr
 
 
 @pytest.fixture
