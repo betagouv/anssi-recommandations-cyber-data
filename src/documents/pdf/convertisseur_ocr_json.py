@@ -332,23 +332,14 @@ class ConvertisseurOcrJson:
                 raise ErreurOcrJson("Le titre ou le texte d'un bloc OCR est invalide")
             if type_de_bloc == TypeDeBlocOcr.RECOMMANDATION.value and code:
                 code_normalise = re.fullmatch(r"(R\d+)-*", code)
-                if code_normalise is not None:
-                    code = code_normalise.group(1)
-                else:
-                    texte = "\n".join(
-                        partie for partie in (code, titre, texte) if partie
+                if code_normalise is None:
+                    raise ErreurOcrJson(
+                        "Un code de recommandation OCR est invalide"
                     )
-                    type_de_bloc = TypeDeBlocOcr.AUTRE.value
-                    code = None
-                    titre = None
+                code = code_normalise.group(1)
             if type_de_bloc != TypeDeBlocOcr.RECOMMANDATION.value:
                 code = None
-            if type_de_bloc != TypeDeBlocOcr.TITRE.value:
-                niveau = None
-            if niveau is not None and (
-                isinstance(niveau, bool) or not isinstance(niveau, int)
-            ):
-                raise ErreurOcrJson("Le niveau d'un bloc OCR est invalide")
+            niveau = ConvertisseurOcrJson._normalise_le_niveau(type_de_bloc, niveau)
             if not isinstance(est_une_continuation, bool):
                 raise ErreurOcrJson("La continuation d'un bloc OCR est invalide")
             if elements_de_liste is not None and (
@@ -380,3 +371,13 @@ class ConvertisseurOcrJson:
                 )
             )
         return blocs_ocr
+
+    @staticmethod
+    def _normalise_le_niveau(type_de_bloc: object, niveau: object) -> int | None:
+        if type_de_bloc != TypeDeBlocOcr.TITRE.value or niveau == 0:
+            return None
+        if niveau is not None and (
+            isinstance(niveau, bool) or not isinstance(niveau, int)
+        ):
+            raise ErreurOcrJson("Le niveau d'un bloc OCR est invalide")
+        return niveau
