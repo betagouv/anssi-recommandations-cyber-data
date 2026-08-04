@@ -122,6 +122,7 @@ class AssembleurDeBlocsJson:
                         page=page_ocr.numero_page,
                         chemin_des_sections=tuple(chemin_des_sections),
                     )
+                    est_le_premier_bloc_utile = False
                     if not texte_suivant:
                         continue
                     bloc_ocr = replace(
@@ -137,6 +138,7 @@ class AssembleurDeBlocsJson:
                     continue
 
                 texte = self._construit_le_texte(bloc_ocr)
+                type_de_bloc = self._determine_le_type_de_bloc_indexable(bloc_ocr)
                 chemin_du_bloc = tuple(chemin_des_sections)
                 titre_de_section = None
                 if titre_en_attente is not None:
@@ -148,7 +150,7 @@ class AssembleurDeBlocsJson:
                     titre_en_attente = None
 
                 contexte = ContexteDuBloc(
-                    type_de_bloc=bloc_ocr.type_de_bloc.value,
+                    type_de_bloc=type_de_bloc.value,
                     code_recommandation=bloc_ocr.code,
                     titre=bloc_ocr.titre or titre_de_section,
                     section=chemin_du_bloc[-1] if chemin_du_bloc else None,
@@ -162,11 +164,19 @@ class AssembleurDeBlocsJson:
                 )
                 est_une_continuation = bloc_ocr.est_une_continuation or (
                     est_le_premier_bloc_utile
-                    and self._semble_etre_la_suite_d_un_paragraphe(
-                        blocs_indexables[-1] if blocs_indexables else None,
-                        bloc_indexable,
+                    and (
+                        self._est_une_puce_de_liste(bloc_ocr.texte)
+                        or self._semble_etre_la_suite_d_un_paragraphe(
+                            blocs_indexables[-1] if blocs_indexables else None,
+                            bloc_indexable,
+                        )
                     )
                 )
+                if blocs_indexables and self._est_une_liste_identique_repetee(
+                    blocs_indexables[-1],
+                    bloc_indexable,
+                ):
+                    continue
                 if blocs_indexables and self._peut_fusionner(
                     blocs_indexables[-1],
                     bloc_indexable,
@@ -175,6 +185,15 @@ class AssembleurDeBlocsJson:
                     blocs_indexables[-1] = self._fusionne_les_blocs(
                         blocs_indexables[-1],
                         bloc_indexable,
+                    )
+                elif blocs_indexables and self._peut_joindre_une_liste_a_son_introduction(
+                    blocs_indexables[-1],
+                    bloc_indexable,
+                ):
+                    blocs_indexables[-1] = self._fusionne_les_blocs(
+                        blocs_indexables[-1],
+                        bloc_indexable,
+                        bloc_indexable.contexte,
                     )
                 else:
                     blocs_indexables.append(bloc_indexable)
@@ -223,19 +242,39 @@ class AssembleurDeBlocsJson:
     def _est_un_bloc_a_ignorer(bloc_ocr: BlocOcr) -> bool:
         if bloc_ocr.est_decoratif:
             return True
-        return not bloc_ocr.texte.strip() and not bloc_ocr.titre and not bloc_ocr.code
+        texte = bloc_ocr.texte.strip()
+        if bloc_ocr.type_de_bloc == TypeDeBlocOcr.LISTE:
+            return not texte and not bloc_ocr.elements_de_liste
+        if bloc_ocr.type_de_bloc == TypeDeBlocOcr.TABLEAU:
+            return not texte and not bloc_ocr.lignes_de_tableau
+        return not texte and not bloc_ocr.titre and not bloc_ocr.code
 
     @classmethod
     def _construit_le_texte(cls, bloc_ocr: BlocOcr) -> str:
         texte = bloc_ocr.texte.strip()
+        if cls._est_une_puce_de_liste(texte):
+            texte = cls._formate_l_element_de_liste(texte)
+        elements_de_texte = {
+            cls._retire_le_marqueur_de_liste(ligne)
+            for ligne in texte.splitlines()
+        }
+        parties = [texte]
+        parties.extend(
+            cls._formate_l_element_de_liste(element)
+            for element in bloc_ocr.elements_de_liste
+            if cls._retire_le_marqueur_de_liste(element) not in elements_de_texte
+        )
+        parties.extend("\t".join(ligne) for ligne in bloc_ocr.lignes_de_tableau)
+        texte = "\n".join(partie for partie in dict.fromkeys(parties) if partie)
         if bloc_ocr.type_de_bloc != TypeDeBlocOcr.RECOMMANDATION:
             return texte
-        parties = [
+
+        parties_recommandation = [
             partie
             for partie in (bloc_ocr.code, bloc_ocr.titre, texte)
             if partie and partie.strip()
         ]
-        return "\n".join(dict.fromkeys(parties))
+        return "\n".join(dict.fromkeys(parties_recommandation))
 
     @staticmethod
     def _separe_le_titre_du_texte(
@@ -251,6 +290,65 @@ class AssembleurDeBlocsJson:
         if texte_nettoye == titre_nettoye:
             return titre_nettoye, ""
         return titre_nettoye, texte_nettoye
+
+    @staticmethod
+    def _determine_le_type_de_bloc_indexable(bloc_ocr: BlocOcr) -> TypeDeBlocOcr:
+        if bloc_ocr.type_de_bloc == TypeDeBlocOcr.RECOMMANDATION:
+            return TypeDeBlocOcr.RECOMMANDATION
+        if bloc_ocr.type_de_bloc == TypeDeBlocOcr.TABLEAU:
+            return TypeDeBlocOcr.TABLEAU
+        if bloc_ocr.elements_de_liste or AssembleurDeBlocsJson._est_une_puce_de_liste(
+            bloc_ocr.texte
+        ):
+            return TypeDeBlocOcr.LISTE
+        return bloc_ocr.type_de_bloc
+
+    @staticmethod
+    def _formate_l_element_de_liste(element: str) -> str:
+        element_nettoye = AssembleurDeBlocsJson._retire_le_marqueur_de_liste(element)
+        return f"- {element_nettoye}"
+
+    @staticmethod
+    def _est_une_puce_de_liste(texte: str) -> bool:
+        texte_nettoye = texte.lstrip()
+        return texte_nettoye.startswith(("■", "•", "▪", "◦", "‣", "- "))
+
+    @classmethod
+    def _semble_etre_la_suite_d_un_paragraphe(
+        cls,
+        bloc_precedent: BlocIndexable | None,
+        bloc_suivant: BlocIndexable,
+    ) -> bool:
+        if bloc_precedent is None:
+            return False
+        types_compatibles = (
+            bloc_precedent.contexte.type_de_bloc
+            == bloc_suivant.contexte.type_de_bloc
+            == TypeDeBlocOcr.PARAGRAPHE.value
+            or (
+                bloc_precedent.contexte.type_de_bloc == TypeDeBlocOcr.LISTE.value
+                and bloc_suivant.contexte.type_de_bloc
+                == TypeDeBlocOcr.PARAGRAPHE.value
+            )
+        )
+        if not types_compatibles:
+            return False
+        texte_precedent = bloc_precedent.texte.rstrip()
+        texte_suivant = bloc_suivant.texte.lstrip()
+        if not texte_precedent or not texte_suivant:
+            return False
+        if texte_precedent.endswith((".", "!", "?", ";", ":", "…")):
+            return False
+        return texte_suivant[0].islower()
+
+    @staticmethod
+    def _retire_le_marqueur_de_liste(texte: str) -> str:
+        texte_nettoye = texte.strip()
+        if texte_nettoye.startswith(("■", "•", "▪", "◦", "‣")):
+            return texte_nettoye[1:].lstrip()
+        if texte_nettoye.startswith("- "):
+            return texte_nettoye[2:].lstrip()
+        return texte_nettoye
 
     @staticmethod
     def _ajoute_le_titre_au_premier_contenu(titre: str, texte: str) -> str:
@@ -274,26 +372,6 @@ class AssembleurDeBlocsJson:
             contexte=contexte,
         )
 
-    @classmethod
-    def _semble_etre_la_suite_d_un_paragraphe(
-        cls,
-        bloc_precedent: BlocIndexable | None,
-        bloc_suivant: BlocIndexable,
-    ) -> bool:
-        if bloc_precedent is None:
-            return False
-        if bloc_precedent.contexte.type_de_bloc != TypeDeBlocOcr.PARAGRAPHE.value:
-            return False
-        if bloc_suivant.contexte.type_de_bloc != TypeDeBlocOcr.PARAGRAPHE.value:
-            return False
-        texte_precedent = bloc_precedent.texte.rstrip()
-        texte_suivant = bloc_suivant.texte.lstrip()
-        if not texte_precedent or not texte_suivant:
-            return False
-        if texte_precedent.endswith((".", "!", "?", ";", ":", "…")):
-            return False
-        return texte_suivant[0].islower()
-
     @staticmethod
     def _peut_fusionner(
         bloc_precedent: BlocIndexable,
@@ -302,24 +380,77 @@ class AssembleurDeBlocsJson:
     ) -> bool:
         if not est_une_continuation:
             return False
-        if bloc_precedent.page_fin + 1 != bloc_suivant.page_debut:
+        pages_contigues = bloc_precedent.page_fin + 1 == bloc_suivant.page_debut
+        deux_listes_sur_la_meme_page = (
+            bloc_precedent.page_fin == bloc_suivant.page_debut
+            and bloc_precedent.contexte.type_de_bloc
+            == bloc_suivant.contexte.type_de_bloc
+            == TypeDeBlocOcr.LISTE.value
+        )
+        if not pages_contigues and not deux_listes_sur_la_meme_page:
             return False
         if bloc_precedent.contexte.chemin_des_sections != bloc_suivant.contexte.chemin_des_sections:
             return False
-        return bloc_precedent.contexte.type_de_bloc == bloc_suivant.contexte.type_de_bloc == TypeDeBlocOcr.PARAGRAPHE.value
+        types_compatibles = (
+            bloc_precedent.contexte.type_de_bloc
+            == bloc_suivant.contexte.type_de_bloc
+            and bloc_suivant.contexte.type_de_bloc
+            in {TypeDeBlocOcr.PARAGRAPHE.value, TypeDeBlocOcr.LISTE.value}
+        )
+        return types_compatibles or (
+            bloc_precedent.contexte.type_de_bloc == TypeDeBlocOcr.LISTE.value
+            and bloc_suivant.contexte.type_de_bloc == TypeDeBlocOcr.PARAGRAPHE.value
+        )
+
+    @staticmethod
+    def _est_une_liste_identique_repetee(
+        bloc_precedent: BlocIndexable,
+        bloc_suivant: BlocIndexable,
+    ) -> bool:
+        return (
+            bloc_precedent.page_debut == bloc_suivant.page_debut
+            and bloc_precedent.page_fin == bloc_suivant.page_fin
+            and bloc_precedent.contexte.chemin_des_sections
+            == bloc_suivant.contexte.chemin_des_sections
+            and bloc_precedent.contexte.type_de_bloc == TypeDeBlocOcr.LISTE.value
+            and bloc_suivant.contexte.type_de_bloc == TypeDeBlocOcr.LISTE.value
+            and bloc_precedent.texte == bloc_suivant.texte
+        )
+
+    @staticmethod
+    def _peut_joindre_une_liste_a_son_introduction(
+        bloc_precedent: BlocIndexable,
+        bloc_suivant: BlocIndexable,
+    ) -> bool:
+        if bloc_precedent.page_fin != bloc_suivant.page_debut:
+            return False
+        if bloc_precedent.contexte.chemin_des_sections != bloc_suivant.contexte.chemin_des_sections:
+            return False
+        if bloc_precedent.contexte.type_de_bloc != TypeDeBlocOcr.PARAGRAPHE.value:
+            return False
+        if bloc_suivant.contexte.type_de_bloc != TypeDeBlocOcr.LISTE.value:
+            return False
+        return bloc_precedent.texte.rstrip().endswith(":")
 
     @staticmethod
     def _fusionne_les_blocs(
         bloc_precedent: BlocIndexable,
         bloc_suivant: BlocIndexable,
+        contexte: ContexteDuBloc | None = None,
     ) -> BlocIndexable:
+        texte = (
+            bloc_precedent.texte
+            if bloc_precedent.texte == bloc_suivant.texte
+            else f"{bloc_precedent.texte}\n{bloc_suivant.texte}"
+        )
         return replace(
             bloc_precedent,
-            texte=f"{bloc_precedent.texte}\n{bloc_suivant.texte}",
+            texte=texte,
             page_fin=bloc_suivant.page_fin,
             pages_couvertes=tuple(
                 dict.fromkeys(
                     bloc_precedent.pages_couvertes + bloc_suivant.pages_couvertes
                 )
             ),
+            contexte=contexte or bloc_precedent.contexte,
         )

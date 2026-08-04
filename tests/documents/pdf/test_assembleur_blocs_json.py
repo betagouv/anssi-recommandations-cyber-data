@@ -7,18 +7,15 @@ from documents.pdf.assembleur_blocs_json import (
 )
 
 
-def test_conserve_les_blocs_distincts_d_une_meme_page(un_bloc_ocr_json):
-    resultat_ocr = ResultatOcrPdf(
-        nombre_de_pages=1,
-        pages=(
-            PageOcr(
-                numero_page=1,
-                blocs=(
-                    un_bloc_ocr_json(texte="Premier paragraphe"),
-                    un_bloc_ocr_json(texte="Deuxième paragraphe"),
-                ),
-            ),
-        ),
+def test_conserve_les_blocs_distincts_d_une_meme_page(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        ((
+            un_bloc_ocr_json(texte="Premier paragraphe"),
+            un_bloc_ocr_json(texte="Deuxième paragraphe"),
+        ),)
     )
 
     blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
@@ -28,19 +25,16 @@ def test_conserve_les_blocs_distincts_d_une_meme_page(un_bloc_ocr_json):
     assert blocs_indexables[1].texte == "Deuxième paragraphe"
 
 
-def test_conserve_l_ordre_des_blocs_d_une_page(un_bloc_ocr_json):
-    resultat_ocr = ResultatOcrPdf(
-        nombre_de_pages=1,
-        pages=(
-            PageOcr(
-                numero_page=1,
-                blocs=(
-                    un_bloc_ocr_json(texte="Premier"),
-                    un_bloc_ocr_json(texte="Deuxième"),
-                    un_bloc_ocr_json(texte="Troisième"),
-                ),
-            ),
-        ),
+def test_conserve_l_ordre_des_blocs_d_une_page(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        ((
+            un_bloc_ocr_json(texte="Premier"),
+            un_bloc_ocr_json(texte="Deuxième"),
+            un_bloc_ocr_json(texte="Troisième"),
+        ),)
     )
 
     blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
@@ -51,16 +45,19 @@ def test_conserve_l_ordre_des_blocs_d_une_page(un_bloc_ocr_json):
     assert blocs_indexables[2].texte == "Troisième"
 
 
-def test_cree_un_bloc_indexable_avec_son_type_son_code_et_son_titre():
-    bloc_ocr = BlocOcr(
-        type_de_bloc=TypeDeBlocOcr.RECOMMANDATION,
-        code="R24",
-        titre="Protéger le système",
-        texte="Le système doit être protégé.",
-    )
-    resultat_ocr = ResultatOcrPdf(
-        nombre_de_pages=1,
-        pages=(PageOcr(numero_page=1, blocs=(bloc_ocr,)),),
+def test_cree_un_bloc_indexable_avec_son_type_son_code_et_son_titre(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        ((
+            un_bloc_ocr_json(
+                type_de_bloc=TypeDeBlocOcr.RECOMMANDATION,
+                code="R24",
+                titre="Protéger le système",
+                texte="Le système doit être protégé.",
+            ),
+        ),)
     )
 
     bloc_indexable = AssembleurDeBlocsJson().assemble(resultat_ocr)[0]
@@ -73,13 +70,16 @@ def test_cree_un_bloc_indexable_avec_son_type_son_code_et_son_titre():
     assert bloc_indexable.contexte.titre == "Protéger le système"
 
 
-def test_conserve_les_pages_couvertes_par_un_bloc(un_bloc_ocr_json):
-    resultat_ocr = ResultatOcrPdf(
-        nombre_de_pages=3,
-        pages=(
+def test_conserve_les_pages_couvertes_par_un_bloc(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        pages_ocr=(
             PageOcr(numero_page=1, blocs=(un_bloc_ocr_json(texte="Page 1"),)),
             PageOcr(numero_page=3, blocs=(un_bloc_ocr_json(texte="Page 3"),)),
         ),
+        nombre_de_pages=3,
     )
 
     blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
@@ -93,113 +93,19 @@ def test_conserve_les_pages_couvertes_par_un_bloc(un_bloc_ocr_json):
     assert blocs_indexables[1].pages_couvertes == (3,)
 
 
-def test_met_a_jour_le_chemin_des_sections_selon_le_niveau_du_titre(
-    un_bloc_ocr_json,
-    un_resultat_ocr,
-):
-    resultat_ocr = un_resultat_ocr(
-        blocs_par_page=(
-            (un_bloc_ocr_json(type_de_bloc=TypeDeBlocOcr.TITRE, titre="1", texte=""),),
-            (
-                un_bloc_ocr_json(
-                    type_de_bloc=TypeDeBlocOcr.TITRE,
-                    titre="1.1 Introduction",
-                    texte="",
-                ),
-                un_bloc_ocr_json(texte="Contenu"),
-            ),
-        )
-    )
-
-    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
-
-    assert len(blocs_indexables) == 2
-    assert blocs_indexables[0].contexte.chemin_des_sections == ("1",)
-    assert blocs_indexables[1].contexte.chemin_des_sections == (
-        "1",
-        "1.1 Introduction",
-    )
-
-
-def test_conserve_le_titre_dans_le_premier_bloc_de_la_section(
-    un_bloc_ocr_json,
-    un_resultat_ocr,
-):
-    resultat_ocr = un_resultat_ocr(
-        blocs_par_page=(
-            (
-                un_bloc_ocr_json(
-                    type_de_bloc=TypeDeBlocOcr.TITRE,
-                    titre="6.1 Services fournis",
-                    texte="",
-                ),
-                un_bloc_ocr_json(texte="Le service est décrit ici."),
-            ),
-        )
-    )
-
-    bloc_indexable = AssembleurDeBlocsJson().assemble(resultat_ocr)[0]
-
-    assert bloc_indexable.texte == "6.1 Services fournis\nLe service est décrit ici."
-    assert bloc_indexable.contexte.titre == "6.1 Services fournis"
-    assert bloc_indexable.contexte.niveau is None
-
-
-def test_cree_un_bloc_autonome_pour_un_titre_sans_contenu(
-    un_bloc_ocr_json,
-    un_resultat_ocr,
-):
-    resultat_ocr = un_resultat_ocr(
-        blocs_par_page=(
-            (
-                un_bloc_ocr_json(
-                    type_de_bloc=TypeDeBlocOcr.TITRE,
-                    titre="6 Fonctionnement d’IPsec",
-                    texte="",
-                ),
-            ),
-        )
-    )
-
-    bloc_indexable = AssembleurDeBlocsJson().assemble(resultat_ocr)[0]
-
-    assert bloc_indexable.texte == "6 Fonctionnement d’IPsec"
-    assert bloc_indexable.contexte.type_de_bloc == "heading"
-    assert bloc_indexable.contexte.niveau == 1
-
-
-def test_conserve_un_titre_place_par_erreur_sur_un_paragraphe(
-    un_bloc_ocr_json,
-    un_resultat_ocr,
-):
-    resultat_ocr = un_resultat_ocr(
-        blocs_par_page=(
-            (
-                un_bloc_ocr_json(
-                    type_de_bloc=TypeDeBlocOcr.PARAGRAPHE,
-                    titre="6.1.2 ESP",
-                    texte="Le protocole ESP est décrit ici.",
-                ),
-            ),
-        )
-    )
-
-    bloc_indexable = AssembleurDeBlocsJson().assemble(resultat_ocr)[0]
-
-    assert bloc_indexable.texte == "6.1.2 ESP\nLe protocole ESP est décrit ici."
-    assert bloc_indexable.contexte.type_de_bloc == "paragraph"
-    assert bloc_indexable.contexte.titre == "6.1.2 ESP"
-    assert bloc_indexable.contexte.niveau is None
-
-
 def test_fusionne_un_paragraphe_qui_continue_sur_la_page_suivante(
     un_bloc_ocr_json,
     un_resultat_ocr,
 ):
     resultat_ocr = un_resultat_ocr(
-        blocs_par_page=(
+        (
             (un_bloc_ocr_json(texte="Début"),),
-            (un_bloc_ocr_json(texte="Suite", est_une_continuation=True),),
+            (
+                un_bloc_ocr_json(
+                    texte="Suite",
+                    est_une_continuation=True,
+                ),
+            ),
         )
     )
 
@@ -217,7 +123,7 @@ def test_fusionne_un_paragraphe_coupe_sans_marqueur_de_continuation(
     un_resultat_ocr,
 ):
     resultat_ocr = un_resultat_ocr(
-        blocs_par_page=(
+        (
             (un_bloc_ocr_json(texte="Le coût du chiffrement"),),
             (un_bloc_ocr_json(texte="est généralement négligeable."),),
         )
@@ -237,7 +143,7 @@ def test_ne_fusionne_pas_un_paragraphe_apres_une_phrase_terminee(
     un_resultat_ocr,
 ):
     resultat_ocr = un_resultat_ocr(
-        blocs_par_page=(
+        (
             (un_bloc_ocr_json(texte="Le paragraphe est terminé."),),
             (un_bloc_ocr_json(texte="Une nouvelle information."),),
         )
@@ -255,7 +161,7 @@ def test_ne_fusionne_pas_un_paragraphe_commencant_une_nouvelle_phrase(
     un_resultat_ocr,
 ):
     resultat_ocr = un_resultat_ocr(
-        blocs_par_page=(
+        (
             (un_bloc_ocr_json(texte="Le paragraphe semble incomplet"),),
             (un_bloc_ocr_json(texte="Nouvelle information."),),
         )
@@ -268,13 +174,16 @@ def test_ne_fusionne_pas_un_paragraphe_commencant_une_nouvelle_phrase(
     assert blocs_indexables[1].texte == "Nouvelle information."
 
 
-def test_ne_fusionne_pas_un_paragraphe_apres_une_page_vide(
+def test_ne_fusionne_pas_un_paragraphe_continu_apres_une_page_vide(
     un_bloc_ocr_json,
     un_resultat_ocr,
 ):
     resultat_ocr = un_resultat_ocr(
         pages_ocr=(
-            PageOcr(numero_page=1, blocs=(un_bloc_ocr_json(texte="Début"),)),
+            PageOcr(
+                numero_page=1,
+                blocs=(un_bloc_ocr_json(texte="Le paragraphe semble incomplet"),),
+            ),
             PageOcr(numero_page=2, blocs=()),
             PageOcr(
                 numero_page=3,
@@ -287,7 +196,7 @@ def test_ne_fusionne_pas_un_paragraphe_apres_une_page_vide(
     blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
 
     assert len(blocs_indexables) == 2
-    assert blocs_indexables[0].texte == "Début"
+    assert blocs_indexables[0].texte == "Le paragraphe semble incomplet"
     assert blocs_indexables[1].texte == "est continué ici."
 
 
@@ -296,12 +205,10 @@ def test_ne_fusionne_pas_deux_paragraphes_distincts_sur_la_meme_page(
     un_resultat_ocr,
 ):
     resultat_ocr = un_resultat_ocr(
-        blocs_par_page=(
-            (
-                un_bloc_ocr_json(texte="Premier"),
-                un_bloc_ocr_json(texte="Deuxième", est_une_continuation=True),
-            ),
-        )
+        ((
+            un_bloc_ocr_json(texte="Premier"),
+            un_bloc_ocr_json(texte="Deuxième", est_une_continuation=True),
+        ),)
     )
 
     blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
@@ -316,13 +223,13 @@ def test_ne_fusionne_pas_un_paragraphe_apres_un_titre(
     un_resultat_ocr,
 ):
     resultat_ocr = un_resultat_ocr(
-        blocs_par_page=(
+        (
             (un_bloc_ocr_json(texte="Début"),),
             (
                 un_bloc_ocr_json(
                     type_de_bloc=TypeDeBlocOcr.TITRE,
-                    titre="Nouvelle section",
                     texte="Nouvelle section",
+                    titre="Nouvelle section",
                     niveau=1,
                 ),
                 un_bloc_ocr_json(
@@ -340,7 +247,7 @@ def test_ne_fusionne_pas_un_paragraphe_apres_un_titre(
     assert blocs_indexables[1].texte == "Nouvelle section\nNouveau contenu"
 
 
-def test_ne_fusionne_pas_un_paragraphe_apres_une_page_non_contigue(
+def test_ne_fusionne_pas_un_paragraphe_apres_une_page_vide(
     un_bloc_ocr_json,
     un_resultat_ocr,
 ):
@@ -365,3 +272,607 @@ def test_ne_fusionne_pas_un_paragraphe_apres_une_page_non_contigue(
     assert len(blocs_indexables) == 2
     assert blocs_indexables[0].texte == "Début"
     assert blocs_indexables[1].texte == "Suite"
+
+
+def test_met_a_jour_le_chemin_des_sections_selon_le_niveau_du_titre(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        ((
+            un_bloc_ocr_json(
+                type_de_bloc=TypeDeBlocOcr.TITRE,
+                texte="Section 1",
+                titre="Section 1",
+                niveau=1,
+            ),
+            un_bloc_ocr_json(
+                type_de_bloc=TypeDeBlocOcr.TITRE,
+                texte="Section 1.1",
+                titre="Section 1.1",
+                niveau=2,
+            ),
+            un_bloc_ocr_json(texte="Contenu"),
+        ),)
+    )
+
+    bloc_indexable = AssembleurDeBlocsJson().assemble(resultat_ocr)[-1]
+
+    assert bloc_indexable.contexte.chemin_des_sections == (
+        "Section 1",
+        "Section 1.1",
+    )
+
+
+def test_conserve_le_titre_dans_le_premier_bloc_de_la_section(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        ((
+            un_bloc_ocr_json(
+                type_de_bloc=TypeDeBlocOcr.TITRE,
+                texte="Section",
+                titre="Section",
+                niveau=1,
+            ),
+            un_bloc_ocr_json(texte="Premier paragraphe"),
+            un_bloc_ocr_json(texte="Deuxième paragraphe"),
+        ),)
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Section\nPremier paragraphe"
+    assert blocs_indexables[1].texte == "Deuxième paragraphe"
+
+
+def test_cree_un_bloc_autonome_pour_un_titre_sans_contenu(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        ((
+            un_bloc_ocr_json(
+                type_de_bloc=TypeDeBlocOcr.TITRE,
+                texte="Section vide",
+                titre="Section vide",
+                niveau=1,
+            ),
+        ),)
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].texte == "Section vide"
+
+
+def test_conserve_un_titre_place_par_erreur_sur_un_paragraphe(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        ((
+            un_bloc_ocr_json(
+                type_de_bloc=TypeDeBlocOcr.TITRE,
+                titre="6 Fonctionnement d’IPsec",
+                texte="",
+                niveau=1,
+            ),
+            un_bloc_ocr_json(
+                type_de_bloc=TypeDeBlocOcr.TITRE,
+                titre="6.1 Services fournis par IPsec",
+                texte="",
+                niveau=2,
+            ),
+            un_bloc_ocr_json(
+                type_de_bloc=TypeDeBlocOcr.PARAGRAPHE,
+                titre=(
+                    "6.1.2 ESP : confidentialité, intégrité et "
+                    "authentification des paquets"
+                ),
+                texte="Le protocole ESP protège les données.",
+                niveau=0,
+            ),
+        ),)
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert blocs_indexables[-1].texte == (
+        "6.1.2 ESP : confidentialité, intégrité et authentification des paquets\n"
+        "Le protocole ESP protège les données."
+    )
+    assert blocs_indexables[-1].contexte.chemin_des_sections == (
+        "6 Fonctionnement d’IPsec",
+        "6.1 Services fournis par IPsec",
+        "6.1.2 ESP : confidentialité, intégrité et authentification des paquets",
+    )
+
+
+def test_conserve_les_pages_de_debut_et_de_fin_d_un_bloc(un_bloc_ocr_json):
+    resultat_ocr = ResultatOcrPdf(
+        nombre_de_pages=2,
+        pages=(
+            PageOcr(numero_page=1, blocs=(un_bloc_ocr_json(texte="Début"),)),
+            PageOcr(
+                numero_page=2,
+                blocs=(
+                    un_bloc_ocr_json(
+                        texte="Fin",
+                        est_une_continuation=True,
+                    ),
+                ),
+            ),
+        ),
+    )
+
+    bloc_indexable = AssembleurDeBlocsJson().assemble(resultat_ocr)[0]
+
+    assert bloc_indexable.page_debut == 1
+    assert bloc_indexable.page_fin == 2
+    assert bloc_indexable.pages_couvertes == (1, 2)
+
+
+def test_ne_fusionne_pas_une_recommandation_avec_un_paragraphe(un_bloc_ocr_json):
+    resultat_ocr = ResultatOcrPdf(
+        nombre_de_pages=2,
+        pages=(
+            PageOcr(numero_page=1, blocs=(un_bloc_ocr_json(texte="Contexte"),)),
+            PageOcr(
+                numero_page=2,
+                blocs=(
+                    un_bloc_ocr_json(
+                        type_de_bloc=TypeDeBlocOcr.RECOMMANDATION,
+                        code="R2",
+                        titre="Recommandation",
+                        texte="Contenu",
+                        est_une_continuation=True,
+                    ),
+                ),
+            ),
+        ),
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[1].contexte.code_recommandation == "R2"
+
+
+def test_conserve_une_liste_comme_un_bloc(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        ((
+            un_bloc_ocr_json(
+                type_de_bloc=TypeDeBlocOcr.LISTE,
+                texte="Premier élément\nDeuxième élément",
+                elements_de_liste=("Premier élément", "Deuxième élément"),
+            ),
+        ),)
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].texte == "Premier élément\nDeuxième élément"
+    assert blocs_indexables[0].contexte.type_de_bloc == "list"
+
+
+def test_fusionne_deux_parties_de_liste_si_elles_se_suivent(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        (
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.LISTE,
+                    texte="Premier élément",
+                ),
+            ),
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.LISTE,
+                    texte="Deuxième élément",
+                    est_une_continuation=True,
+                ),
+            ),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].texte == "Premier élément\nDeuxième élément"
+
+
+def test_ne_fusionne_pas_deux_listes_distinctes(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        (
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.LISTE,
+                    texte="Première liste",
+                ),
+            ),
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.LISTE,
+                    texte="Deuxième liste",
+                ),
+            ),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Première liste"
+    assert blocs_indexables[1].texte == "Deuxième liste"
+
+
+def test_supprime_une_liste_identique_repetee_sur_la_meme_page(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    texte_de_la_liste = "- Première recommandation\n- Deuxième recommandation"
+    resultat_ocr = un_resultat_ocr(
+        (
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.LISTE,
+                    texte=texte_de_la_liste,
+                ),
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.LISTE,
+                    texte=texte_de_la_liste,
+                ),
+            ),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].texte == texte_de_la_liste
+    assert blocs_indexables[0].pages_couvertes == (1,)
+
+
+def test_fusionne_la_fin_d_une_puce_avec_le_paragraphe_de_la_page_suivante(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        (
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.LISTE,
+                    texte="- Attaquant hors ligne : les données sont protégées par",
+                ),
+            ),
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.PARAGRAPHE,
+                    texte="exemple en utilisant des fonctions de hachage dédiées.",
+                ),
+            ),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].texte == (
+        "- Attaquant hors ligne : les données sont protégées par\n"
+        "exemple en utilisant des fonctions de hachage dédiées."
+    )
+    assert blocs_indexables[0].page_debut == 1
+    assert blocs_indexables[0].page_fin == 2
+    assert blocs_indexables[0].pages_couvertes == (1, 2)
+
+
+def test_conserve_un_tableau_comme_un_bloc(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+): 
+    bloc_tableau = un_bloc_ocr_json(
+        type_de_bloc=TypeDeBlocOcr.TABLEAU,
+        texte="",
+        lignes_de_tableau=(("Nom", "Valeur"), ("Risque", "Élevé")),
+    )
+    resultat_ocr = un_resultat_ocr(
+        ((bloc_tableau,),)
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].contexte.type_de_bloc == "table"
+    assert blocs_indexables[0].texte == "Nom\tValeur\nRisque\tÉlevé"
+
+
+def test_conserve_les_lignes_et_cellules_d_un_tableau(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+): 
+    bloc_tableau = un_bloc_ocr_json(
+        type_de_bloc=TypeDeBlocOcr.TABLEAU,
+        texte="Contenu du tableau",
+        lignes_de_tableau=(("Nom", "Valeur"),),
+    )
+    resultat_ocr = un_resultat_ocr(
+        ((bloc_tableau,),)
+    )
+
+    bloc_indexable = AssembleurDeBlocsJson().assemble(resultat_ocr)[0]
+
+    assert bloc_tableau.lignes_de_tableau == (("Nom", "Valeur"),)
+    assert bloc_indexable.texte == "Contenu du tableau\nNom\tValeur"
+
+
+def test_ignore_un_pied_de_page(un_bloc_ocr_json, un_resultat_ocr):
+    resultat_ocr = un_resultat_ocr(
+        ((
+            un_bloc_ocr_json(
+                type_de_bloc=TypeDeBlocOcr.PIED_DE_PAGE,
+                texte="1",
+            ),
+            un_bloc_ocr_json(texte="Contenu utile"),
+        ),)
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].texte == "Contenu utile"
+
+
+def test_ignore_un_bloc_vide(un_bloc_ocr_json, un_resultat_ocr):
+    resultat_ocr = un_resultat_ocr(
+        ((
+            un_bloc_ocr_json(texte=""),
+            un_bloc_ocr_json(texte="Contenu utile"),
+        ),)
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].texte == "Contenu utile"
+
+
+def test_conserve_le_libelle_d_un_titre_numerote(un_bloc_ocr_json):
+    resultat_ocr = ResultatOcrPdf(
+        nombre_de_pages=1,
+        pages=(
+            PageOcr(
+                numero_page=1,
+                blocs=(
+                    un_bloc_ocr_json(
+                        type_de_bloc=TypeDeBlocOcr.TITRE,
+                        titre="5",
+                        texte="Recommandations",
+                        niveau=1,
+                    ),
+                    un_bloc_ocr_json(
+                        type_de_bloc=TypeDeBlocOcr.TITRE,
+                        titre="5.1",
+                        texte="Recommandations générales",
+                        niveau=2,
+                    ),
+                    un_bloc_ocr_json(texte="Contenu de la section"),
+                ),
+            ),
+        ),
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "5 Recommandations"
+    assert blocs_indexables[1].texte == (
+        "5.1 Recommandations générales\nContenu de la section"
+    )
+    assert blocs_indexables[1].contexte.chemin_des_sections == (
+        "5 Recommandations",
+        "5.1 Recommandations générales",
+    )
+
+
+def test_conserve_le_paragraphe_associe_a_un_titre_deja_complet(
+    un_bloc_ocr_json,
+):
+    resultat_ocr = ResultatOcrPdf(
+        nombre_de_pages=1,
+        pages=(
+            PageOcr(
+                numero_page=1,
+                blocs=(
+                    un_bloc_ocr_json(
+                        type_de_bloc=TypeDeBlocOcr.TITRE,
+                        titre="5.2 Recommandations pour l'entraînement",
+                        texte="Le paragraphe qui suit le titre doit être conservé.",
+                        niveau=2,
+                    ),
+                ),
+            ),
+        ),
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].texte == (
+        "5.2 Recommandations pour l'entraînement\n"
+        "Le paragraphe qui suit le titre doit être conservé."
+    )
+    assert blocs_indexables[0].contexte.section == (
+        "5.2 Recommandations pour l'entraînement"
+    )
+
+
+def test_conserve_les_elements_de_liste_avec_un_texte_d_introduction():
+    bloc_ocr = BlocOcr(
+        type_de_bloc=TypeDeBlocOcr.PARAGRAPHE,
+        code=None,
+        titre=None,
+        texte="Introduction de la liste",
+        elements_de_liste=("Premier élément", "Deuxième élément"),
+    )
+    resultat_ocr = ResultatOcrPdf(
+        nombre_de_pages=1,
+        pages=(PageOcr(numero_page=1, blocs=(bloc_ocr,)),),
+    )
+
+    bloc_indexable = AssembleurDeBlocsJson().assemble(resultat_ocr)[0]
+
+    assert bloc_indexable.texte == (
+        "Introduction de la liste\n- Premier élément\n- Deuxième élément"
+    )
+    assert bloc_indexable.contexte.type_de_bloc == "list"
+
+
+def test_fusionne_un_paragraphe_qui_introduit_une_liste():
+    resultat_ocr = ResultatOcrPdf(
+        nombre_de_pages=1,
+        pages=(
+            PageOcr(
+                numero_page=1,
+                blocs=(
+                    BlocOcr(
+                        type_de_bloc=TypeDeBlocOcr.PARAGRAPHE,
+                        code=None,
+                        titre=None,
+                        texte="Les raisons sont les suivantes :",
+                    ),
+                    BlocOcr(
+                        type_de_bloc=TypeDeBlocOcr.LISTE,
+                        code=None,
+                        titre=None,
+                        texte="",
+                        elements_de_liste=("Première raison", "Deuxième raison"),
+                    ),
+                ),
+            ),
+        ),
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].texte == (
+        "Les raisons sont les suivantes :\n- Première raison\n- Deuxième raison"
+    )
+    assert blocs_indexables[0].contexte.type_de_bloc == "list"
+    assert blocs_indexables[0].pages_couvertes == (1,)
+
+
+def test_conserve_les_elements_de_liste_d_une_recommandation():
+    bloc_ocr = BlocOcr(
+        type_de_bloc=TypeDeBlocOcr.RECOMMANDATION,
+        code="R2",
+        titre="Protéger les données",
+        texte="La recommandation contient les actions suivantes :",
+        elements_de_liste=("Première action", "Deuxième action"),
+    )
+    resultat_ocr = ResultatOcrPdf(
+        nombre_de_pages=1,
+        pages=(PageOcr(numero_page=1, blocs=(bloc_ocr,)),),
+    )
+
+    bloc_indexable = AssembleurDeBlocsJson().assemble(resultat_ocr)[0]
+
+    assert bloc_indexable.texte == (
+        "R2\nProtéger les données\n"
+        "La recommandation contient les actions suivantes :\n"
+        "- Première action\n- Deuxième action"
+    )
+    assert bloc_indexable.contexte.type_de_bloc == "recommendation"
+
+
+def test_conserve_le_texte_et_les_lignes_d_un_tableau():
+    bloc_ocr = BlocOcr(
+        type_de_bloc=TypeDeBlocOcr.TABLEAU,
+        code=None,
+        titre=None,
+        texte="Titre du tableau",
+        lignes_de_tableau=(("Nom", "Valeur"),),
+    )
+    resultat_ocr = ResultatOcrPdf(
+        nombre_de_pages=1,
+        pages=(PageOcr(numero_page=1, blocs=(bloc_ocr,)),),
+    )
+
+    bloc_indexable = AssembleurDeBlocsJson().assemble(resultat_ocr)[0]
+
+    assert bloc_indexable.texte == "Titre du tableau\nNom\tValeur"
+
+
+def test_fusionne_la_puce_en_debut_de_page_avec_la_liste_precedente():
+    resultat_ocr = ResultatOcrPdf(
+        nombre_de_pages=2,
+        pages=(
+            PageOcr(
+                numero_page=1,
+                blocs=(
+                    BlocOcr(
+                        type_de_bloc=TypeDeBlocOcr.PARAGRAPHE,
+                        code=None,
+                        titre=None,
+                        texte="Introduction de la liste",
+                        elements_de_liste=("Premier élément",),
+                    ),
+                ),
+            ),
+            PageOcr(
+                numero_page=2,
+                blocs=(
+                    BlocOcr(
+                        type_de_bloc=TypeDeBlocOcr.PARAGRAPHE,
+                        code=None,
+                        titre=None,
+                        texte="■ Deuxième élément",
+                    ),
+                ),
+            ),
+        ),
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].texte == (
+        "Introduction de la liste\n- Premier élément\n- Deuxième élément"
+    )
+    assert blocs_indexables[0].pages_couvertes == (1, 2)
+
+
+def test_ne_fusionne_pas_une_puce_en_debut_de_page_sans_liste_precedente(
+    un_bloc_ocr_json,
+):
+    resultat_ocr = ResultatOcrPdf(
+        nombre_de_pages=2,
+        pages=(
+            PageOcr(numero_page=1, blocs=(un_bloc_ocr_json(texte="Paragraphe"),)),
+            PageOcr(
+                numero_page=2,
+                blocs=(
+                    un_bloc_ocr_json(texte="■ Nouvelle liste"),
+                ),
+            ),
+        ),
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Paragraphe"
+    assert blocs_indexables[1].texte == "- Nouvelle liste"
