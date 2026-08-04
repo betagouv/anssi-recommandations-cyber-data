@@ -72,6 +72,7 @@ class AssembleurDeBlocsJson:
         titre_en_attente: _TitreEnAttente | None = None
 
         for page_ocr in sorted(resultat_ocr.pages, key=lambda page: page.numero_page):
+            est_le_premier_bloc_utile = True
             for bloc_ocr in page_ocr.blocs:
                 if bloc_ocr.type_de_bloc == TypeDeBlocOcr.PIED_DE_PAGE:
                     continue
@@ -154,13 +155,30 @@ class AssembleurDeBlocsJson:
                     chemin_des_sections=chemin_du_bloc,
                     niveau=bloc_ocr.niveau,
                 )
-                blocs_indexables.append(
-                    self._cree_un_bloc_indexable(
-                        texte=texte,
-                        numero_page=page_ocr.numero_page,
-                        contexte=contexte,
+                bloc_indexable = self._cree_un_bloc_indexable(
+                    texte=texte,
+                    numero_page=page_ocr.numero_page,
+                    contexte=contexte,
+                )
+                est_une_continuation = bloc_ocr.est_une_continuation or (
+                    est_le_premier_bloc_utile
+                    and self._semble_etre_la_suite_d_un_paragraphe(
+                        blocs_indexables[-1] if blocs_indexables else None,
+                        bloc_indexable,
                     )
                 )
+                if blocs_indexables and self._peut_fusionner(
+                    blocs_indexables[-1],
+                    bloc_indexable,
+                    est_une_continuation,
+                ):
+                    blocs_indexables[-1] = self._fusionne_les_blocs(
+                        blocs_indexables[-1],
+                        bloc_indexable,
+                    )
+                else:
+                    blocs_indexables.append(bloc_indexable)
+                est_le_premier_bloc_utile = False
 
         if titre_en_attente is not None:
             blocs_indexables.append(
@@ -254,4 +272,54 @@ class AssembleurDeBlocsJson:
             page_fin=numero_page,
             pages_couvertes=(numero_page,),
             contexte=contexte,
+        )
+
+    @classmethod
+    def _semble_etre_la_suite_d_un_paragraphe(
+        cls,
+        bloc_precedent: BlocIndexable | None,
+        bloc_suivant: BlocIndexable,
+    ) -> bool:
+        if bloc_precedent is None:
+            return False
+        if bloc_precedent.contexte.type_de_bloc != TypeDeBlocOcr.PARAGRAPHE.value:
+            return False
+        if bloc_suivant.contexte.type_de_bloc != TypeDeBlocOcr.PARAGRAPHE.value:
+            return False
+        texte_precedent = bloc_precedent.texte.rstrip()
+        texte_suivant = bloc_suivant.texte.lstrip()
+        if not texte_precedent or not texte_suivant:
+            return False
+        if texte_precedent.endswith((".", "!", "?", ";", ":", "…")):
+            return False
+        return texte_suivant[0].islower()
+
+    @staticmethod
+    def _peut_fusionner(
+        bloc_precedent: BlocIndexable,
+        bloc_suivant: BlocIndexable,
+        est_une_continuation: bool,
+    ) -> bool:
+        if not est_une_continuation:
+            return False
+        if bloc_precedent.page_fin + 1 != bloc_suivant.page_debut:
+            return False
+        if bloc_precedent.contexte.chemin_des_sections != bloc_suivant.contexte.chemin_des_sections:
+            return False
+        return bloc_precedent.contexte.type_de_bloc == bloc_suivant.contexte.type_de_bloc == TypeDeBlocOcr.PARAGRAPHE.value
+
+    @staticmethod
+    def _fusionne_les_blocs(
+        bloc_precedent: BlocIndexable,
+        bloc_suivant: BlocIndexable,
+    ) -> BlocIndexable:
+        return replace(
+            bloc_precedent,
+            texte=f"{bloc_precedent.texte}\n{bloc_suivant.texte}",
+            page_fin=bloc_suivant.page_fin,
+            pages_couvertes=tuple(
+                dict.fromkeys(
+                    bloc_precedent.pages_couvertes + bloc_suivant.pages_couvertes
+                )
+            ),
         )

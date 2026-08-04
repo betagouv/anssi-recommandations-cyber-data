@@ -190,3 +190,178 @@ def test_conserve_un_titre_place_par_erreur_sur_un_paragraphe(
     assert bloc_indexable.contexte.type_de_bloc == "paragraph"
     assert bloc_indexable.contexte.titre == "6.1.2 ESP"
     assert bloc_indexable.contexte.niveau is None
+
+
+def test_fusionne_un_paragraphe_qui_continue_sur_la_page_suivante(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (un_bloc_ocr_json(texte="Début"),),
+            (un_bloc_ocr_json(texte="Suite", est_une_continuation=True),),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].texte == "Début\nSuite"
+    assert blocs_indexables[0].pages_couvertes == (1, 2)
+    assert blocs_indexables[0].page_debut == 1
+    assert blocs_indexables[0].page_fin == 2
+
+
+def test_fusionne_un_paragraphe_coupe_sans_marqueur_de_continuation(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (un_bloc_ocr_json(texte="Le coût du chiffrement"),),
+            (un_bloc_ocr_json(texte="est généralement négligeable."),),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].texte == (
+        "Le coût du chiffrement\nest généralement négligeable."
+    )
+    assert blocs_indexables[0].pages_couvertes == (1, 2)
+
+
+def test_ne_fusionne_pas_un_paragraphe_apres_une_phrase_terminee(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (un_bloc_ocr_json(texte="Le paragraphe est terminé."),),
+            (un_bloc_ocr_json(texte="Une nouvelle information."),),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Le paragraphe est terminé."
+    assert blocs_indexables[1].texte == "Une nouvelle information."
+
+
+def test_ne_fusionne_pas_un_paragraphe_commencant_une_nouvelle_phrase(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (un_bloc_ocr_json(texte="Le paragraphe semble incomplet"),),
+            (un_bloc_ocr_json(texte="Nouvelle information."),),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Le paragraphe semble incomplet"
+    assert blocs_indexables[1].texte == "Nouvelle information."
+
+
+def test_ne_fusionne_pas_un_paragraphe_apres_une_page_vide(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        pages_ocr=(
+            PageOcr(numero_page=1, blocs=(un_bloc_ocr_json(texte="Début"),)),
+            PageOcr(numero_page=2, blocs=()),
+            PageOcr(
+                numero_page=3,
+                blocs=(un_bloc_ocr_json(texte="est continué ici."),),
+            ),
+        ),
+        nombre_de_pages=3,
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Début"
+    assert blocs_indexables[1].texte == "est continué ici."
+
+
+def test_ne_fusionne_pas_deux_paragraphes_distincts_sur_la_meme_page(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (
+                un_bloc_ocr_json(texte="Premier"),
+                un_bloc_ocr_json(texte="Deuxième", est_une_continuation=True),
+            ),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Premier"
+    assert blocs_indexables[1].texte == "Deuxième"
+
+
+def test_ne_fusionne_pas_un_paragraphe_apres_un_titre(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (un_bloc_ocr_json(texte="Début"),),
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.TITRE,
+                    titre="Nouvelle section",
+                    texte="Nouvelle section",
+                    niveau=1,
+                ),
+                un_bloc_ocr_json(
+                    texte="Nouveau contenu",
+                    est_une_continuation=True,
+                ),
+            ),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Début"
+    assert blocs_indexables[1].texte == "Nouvelle section\nNouveau contenu"
+
+
+def test_ne_fusionne_pas_un_paragraphe_apres_une_page_non_contigue(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        pages_ocr=(
+            PageOcr(numero_page=1, blocs=(un_bloc_ocr_json(texte="Début"),)),
+            PageOcr(
+                numero_page=3,
+                blocs=(
+                    un_bloc_ocr_json(
+                        texte="Suite",
+                        est_une_continuation=True,
+                    ),
+                ),
+            ),
+        ),
+        nombre_de_pages=3,
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Début"
+    assert blocs_indexables[1].texte == "Suite"
