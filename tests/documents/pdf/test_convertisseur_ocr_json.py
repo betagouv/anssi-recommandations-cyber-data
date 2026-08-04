@@ -311,3 +311,8 @@ def test_le_prompt_demande_une_liste_avec_son_introduction():
 def test_le_prompt_demande_la_continuation_d_une_liste_en_debut_de_page():
     assert "commence par une puce qui poursuit une liste" in PROMPT_OCR_JSON
     assert "continues_previous vaut true" in PROMPT_OCR_JSON
+
+
+def test_le_prompt_demande_de_conserver_le_texte_et_les_lignes_d_un_tableau():
+    assert "conserve à la fois le texte éventuel dans text et" in PROMPT_OCR_JSON
+    assert "Renseigne toujours les huit propriétés attendues" in PROMPT_OCR_JSON

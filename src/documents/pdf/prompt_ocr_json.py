@@ -20,4 +20,7 @@ Une liste avec une introduction est un unique bloc list : text contient l'introd
 Une recommandation conserve son code, son titre, son contenu et ses puces éventuelles dans items. Lorsqu'un
 premier bloc utile commence par une puce qui poursuit une liste de la page
 précédente, continues_previous vaut true. N'invente aucun texte, code, titre
-ou bloc. N'utilise ni Markdown ni commentaire."""
+ou bloc. Pour un tableau, conserve à la fois le texte éventuel dans text et
+les cellules dans rows. Renseigne toujours les huit propriétés attendues,
+avec null pour code, title, items ou rows lorsqu'elles ne s'appliquent pas.
+N'utilise ni Markdown ni commentaire."""
