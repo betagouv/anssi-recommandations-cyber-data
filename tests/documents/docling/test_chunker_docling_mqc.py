@@ -3,42 +3,39 @@ import pytest
 from documents.docling.chunker_docling import TypeFichier
 from documents.docling.chunker_docling_mqc import ChunkerDoclingMQC
 from documents.html.document_html import DocumentHTML
-from documents.pdf.assembleur_blocs_json import (
-    BlocOcr,
-    PageOcr,
-    ResultatOcrPdf,
-    TypeDeBlocOcr,
-)
+from documents.pdf.assembleur_blocs_json import TypeDeBlocOcr
 from documents.pdf.document_pdf import DocumentPDF
 
 
-def test_retourne_les_blocs_ocr_json_d_un_pdf(
+@pytest.fixture
+def un_chunker_ocr_json(
     un_convertisseur_avec_un_texte,
     un_convertisseur_ocr_json_de_test,
 ):
-    document = DocumentPDF("mon_document.pdf", url_pdf="http://mon-document.pdf")
-    resultat_ocr = ResultatOcrPdf(
-        nombre_de_pages=1,
-        pages=(
-            PageOcr(
-                numero_page=1,
-                blocs=(
-                    BlocOcr(
-                        type_de_bloc=TypeDeBlocOcr.PARAGRAPHE,
-                        code=None,
-                        titre=None,
-                        texte="Un texte OCR",
-                    ),
-                ),
-            ),
-        ),
-    )
+    def _cree_un_chunker_ocr_json(resultat_ocr, plages_de_pages=None):
+        convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(resultat_ocr)
+        chunker = ChunkerDoclingMQC(
+            converter=un_convertisseur_avec_un_texte(),
+            identifie_les_plages_de_pages_pdf=lambda _: plages_de_pages,
+            convertisseur_ocr_json=convertisseur_ocr_json,
+        )
+        return chunker, convertisseur_ocr_json
 
-    convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(resultat_ocr)
-    document = ChunkerDoclingMQC(
-        converter=un_convertisseur_avec_un_texte(),
-        convertisseur_ocr_json=convertisseur_ocr_json,
-    ).applique(document=document)
+    return _cree_un_chunker_ocr_json
+
+
+def test_retourne_les_blocs_ocr_json_d_un_pdf(
+    un_chunker_ocr_json,
+    un_resultat_ocr,
+    un_bloc_ocr_json,
+):
+    document = DocumentPDF("mon_document.pdf", url_pdf="http://mon-document.pdf")
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=((un_bloc_ocr_json(texte="Un texte OCR"),),)
+    )
+    chunker, _ = un_chunker_ocr_json(resultat_ocr)
+
+    document = chunker.applique(document=document)
 
     assert len(document.pages) == 1
     assert document.pages[1].numero_page == 1
@@ -46,42 +43,29 @@ def test_retourne_les_blocs_ocr_json_d_un_pdf(
 
 
 def test_ocr_les_pages_des_plages_avec_du_contenu(
-    un_convertisseur_avec_un_texte,
-    un_convertisseur_ocr_json_de_test,
+    un_chunker_ocr_json,
+    un_resultat_ocr,
 ):
     document = DocumentPDF("mon_document.pdf", url_pdf="http://mon-document.pdf")
-    resultat_ocr = ResultatOcrPdf(
-        nombre_de_pages=3,
-        pages=(
-            PageOcr(numero_page=1, blocs=()),
-            PageOcr(numero_page=3, blocs=()),
-        ),
+    resultat_ocr = un_resultat_ocr(blocs_par_page=((), (), ()))
+    chunker, convertisseur_ocr_json = un_chunker_ocr_json(
+        resultat_ocr,
+        plages_de_pages=[(1, 1), (3, 3)],
     )
-    convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(resultat_ocr)
 
-    chunker = ChunkerDoclingMQC(
-        converter=un_convertisseur_avec_un_texte(),
-        identifie_les_plages_de_pages_pdf=lambda _: [(1, 1), (3, 3)],
-        convertisseur_ocr_json=convertisseur_ocr_json,
-    )
     chunker.applique(document)
 
     assert convertisseur_ocr_json.plages_recues == [[(1, 1), (3, 3)]]
 
 
 def test_ocr_toutes_les_pages_si_le_prediagnostic_est_indisponible(
-    un_convertisseur_avec_un_texte,
-    un_convertisseur_ocr_json_de_test,
+    un_chunker_ocr_json,
+    un_resultat_ocr,
 ):
     document = DocumentPDF("mon_document.pdf", url_pdf="http://mon-document.pdf")
-    resultat_ocr = ResultatOcrPdf(nombre_de_pages=2, pages=())
-    convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(resultat_ocr)
+    resultat_ocr = un_resultat_ocr(nombre_de_pages=2)
+    chunker, convertisseur_ocr_json = un_chunker_ocr_json(resultat_ocr)
 
-    chunker = ChunkerDoclingMQC(
-        converter=un_convertisseur_avec_un_texte(),
-        identifie_les_plages_de_pages_pdf=lambda _: None,
-        convertisseur_ocr_json=convertisseur_ocr_json,
-    )
     chunker.applique(document)
 
     assert convertisseur_ocr_json.plages_recues == [None]
@@ -89,38 +73,27 @@ def test_ocr_toutes_les_pages_si_le_prediagnostic_est_indisponible(
 
 def test_le_document_retourne_le_nom_du_document(
     fichier_pdf,
-    un_convertisseur_avec_un_texte,
-    un_convertisseur_ocr_json_de_test,
+    un_chunker_ocr_json,
+    un_resultat_ocr,
 ):
     chemin_fichier_de_test = str(fichier_pdf("document_mqc.pdf").resolve())
     document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
+    chunker, _ = un_chunker_ocr_json(un_resultat_ocr(nombre_de_pages=1))
 
-    convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(
-        ResultatOcrPdf(nombre_de_pages=1, pages=())
-    )
-    document = ChunkerDoclingMQC(
-        converter=un_convertisseur_avec_un_texte(),
-        convertisseur_ocr_json=convertisseur_ocr_json,
-    ).applique(document=document)
+    document = chunker.applique(document=document)
 
     assert document.nom_document == "document_mqc.pdf"
 
 
 def test_retourne_le_nom_du_fichier(
     fichier_pdf,
-    un_convertisseur_avec_un_texte,
-    un_convertisseur_ocr_json_de_test,
+    un_chunker_ocr_json,
+    un_resultat_ocr,
 ):
     chemin_fichier_de_test = str(fichier_pdf("document_mqc.pdf").resolve())
     document = DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")
+    chunker, _ = un_chunker_ocr_json(un_resultat_ocr(nombre_de_pages=1))
 
-    convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(
-        ResultatOcrPdf(nombre_de_pages=1, pages=())
-    )
-    chunker = ChunkerDoclingMQC(
-        converter=un_convertisseur_avec_un_texte(),
-        convertisseur_ocr_json=convertisseur_ocr_json,
-    )
     chunker.applique(document=document)
 
     assert chunker.nom_fichier == "document_mqc.txt"
@@ -145,56 +118,41 @@ def test_prend_en_compte_un_document_html(un_convertisseur_de_test):
 
 def test_ne_fait_aucun_appel_ocr_si_toutes_les_pages_sont_vides(
     fichier_pdf,
-    un_convertisseur_avec_un_texte,
-    un_convertisseur_ocr_json_de_test,
+    un_chunker_ocr_json,
+    un_resultat_ocr,
 ):
     document = DocumentPDF(str(fichier_pdf("document.pdf")), "https://example.com")
-    convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(
-        ResultatOcrPdf(nombre_de_pages=2, pages=())
+    resultat_ocr = un_resultat_ocr(nombre_de_pages=2)
+    chunker, convertisseur_ocr_json = un_chunker_ocr_json(
+        resultat_ocr,
+        plages_de_pages=[],
     )
 
-    chunker = ChunkerDoclingMQC(
-        converter=un_convertisseur_avec_un_texte(),
-        identifie_les_plages_de_pages_pdf=lambda _: [],
-        convertisseur_ocr_json=convertisseur_ocr_json,
-    )
     document = chunker.applique(document)
 
     assert convertisseur_ocr_json.plages_recues == []
     assert len(document.pages) == 1
     assert document.pages[1].blocs == []
-    
 
 
 def test_conserve_la_page_3_apres_une_page_2_vide(
-    un_convertisseur_avec_un_texte,
-    un_convertisseur_ocr_json_de_test,
+    un_chunker_ocr_json,
+    un_resultat_ocr,
+    un_bloc_ocr_json,
 ):
     document = DocumentPDF("mon_document.pdf", url_pdf="http://mon-document.pdf")
-    resultat_ocr = ResultatOcrPdf(
-        nombre_de_pages=3,
-        pages=(
-            PageOcr(numero_page=1, blocs=()),
-            PageOcr(
-                numero_page=3,
-                blocs=(
-                    BlocOcr(
-                        type_de_bloc=TypeDeBlocOcr.PARAGRAPHE,
-                        code=None,
-                        titre=None,
-                        texte="Contenu page 3",
-                    ),
-                ),
-            ),
-        ),
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (),
+            (),
+            (un_bloc_ocr_json(texte="Contenu page 3"),),
+        )
     )
-    convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(resultat_ocr)
+    chunker, _ = un_chunker_ocr_json(
+        resultat_ocr,
+        plages_de_pages=[(1, 1), (3, 3)],
+    )
 
-    chunker = ChunkerDoclingMQC(
-        converter=un_convertisseur_avec_un_texte(),
-        identifie_les_plages_de_pages_pdf=lambda _: [(1, 1), (3, 3)],
-        convertisseur_ocr_json=convertisseur_ocr_json,
-    )
     document = chunker.applique(document)
 
     assert sorted(document.pages) == [1, 2, 3]
@@ -204,45 +162,19 @@ def test_conserve_la_page_3_apres_une_page_2_vide(
 
 
 def test_conserve_les_blocs_multi_pages(
-    un_convertisseur_avec_un_texte,
-    un_convertisseur_ocr_json_de_test,
+    un_chunker_ocr_json,
+    un_resultat_ocr,
+    un_bloc_ocr_json,
 ):
     document = DocumentPDF("mon_document.pdf", url_pdf="http://mon-document.pdf")
-    resultat_ocr = ResultatOcrPdf(
-        nombre_de_pages=2,
-        pages=(
-            PageOcr(
-                numero_page=1,
-                blocs=(
-                    BlocOcr(
-                        type_de_bloc=TypeDeBlocOcr.PARAGRAPHE,
-                        code=None,
-                        titre=None,
-                        texte="Début",
-                    ),
-                ),
-            ),
-            PageOcr(
-                numero_page=2,
-                blocs=(
-                    BlocOcr(
-                        type_de_bloc=TypeDeBlocOcr.PARAGRAPHE,
-                        code=None,
-                        titre=None,
-                        texte="Suite",
-                        est_une_continuation=True,
-                    ),
-                ),
-            ),
-        ),
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (un_bloc_ocr_json(texte="Début"),),
+            (un_bloc_ocr_json(texte="Suite", est_une_continuation=True),),
+        )
     )
-    convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(resultat_ocr)
+    chunker, _ = un_chunker_ocr_json(resultat_ocr)
 
-    chunker = ChunkerDoclingMQC(
-        converter=un_convertisseur_avec_un_texte(),
-        identifie_les_plages_de_pages_pdf=lambda _: None,
-        convertisseur_ocr_json=convertisseur_ocr_json,
-    )
     document = chunker.applique(document)
 
     assert len(document.pages[1].blocs) == 1
@@ -261,6 +193,7 @@ def test_echoue_si_la_reponse_ocr_json_est_invalide(
     chunker = ChunkerDoclingMQC(
         converter=un_convertisseur_avec_un_texte(),
         convertisseur_ocr_json=ConvertisseurOcrJsonEnErreur(),
+        identifie_les_plages_de_pages_pdf=lambda _: None,
     )
 
     with pytest.raises(ValueError, match="JSON invalide"):
@@ -269,14 +202,16 @@ def test_echoue_si_la_reponse_ocr_json_est_invalide(
 
 def test_n_utilise_pas_docling_pour_un_pdf(
     un_convertisseur_ocr_json_de_test,
+    un_resultat_ocr,
 ):
     class ConvertisseurDoclingInterdit:
         def convert(self, *args, **kwargs):
             raise AssertionError("Docling ne doit pas être appelé pour un PDF")
 
     document = DocumentPDF("mon_document.pdf", url_pdf="http://mon-document.pdf")
-    resultat_ocr = ResultatOcrPdf(nombre_de_pages=1, pages=())
-    convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(resultat_ocr)
+    convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(
+        un_resultat_ocr(nombre_de_pages=1)
+    )
     chunker = ChunkerDoclingMQC(
         converter=ConvertisseurDoclingInterdit,
         convertisseur_ocr_json=convertisseur_ocr_json,
@@ -287,38 +222,30 @@ def test_n_utilise_pas_docling_pour_un_pdf(
 
 
 def test_conserve_les_sections_et_recommandations_dans_le_chunker(
-    un_convertisseur_avec_un_texte,
-    un_convertisseur_ocr_json_de_test,
+    un_chunker_ocr_json,
+    un_resultat_ocr,
+    un_bloc_ocr_json,
 ):
     document = DocumentPDF("mon_document.pdf", url_pdf="http://mon-document.pdf")
-    resultat_ocr = ResultatOcrPdf(
-        nombre_de_pages=1,
-        pages=(
-            PageOcr(
-                numero_page=1,
-                blocs=(
-                    BlocOcr(
-                        type_de_bloc=TypeDeBlocOcr.TITRE,
-                        code=None,
-                        titre="Section 5",
-                        texte="Section 5",
-                        niveau=1,
-                    ),
-                    BlocOcr(
-                        type_de_bloc=TypeDeBlocOcr.RECOMMANDATION,
-                        code="R24",
-                        titre="Titre de la recommandation",
-                        texte="Contenu de la recommandation",
-                    ),
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.TITRE,
+                    titre="Section 5",
+                    texte="Section 5",
+                    niveau=1,
+                ),
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.RECOMMANDATION,
+                    code="R24",
+                    titre="Titre de la recommandation",
+                    texte="Contenu de la recommandation",
                 ),
             ),
-        ),
+        )
     )
-    convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(resultat_ocr)
-    chunker = ChunkerDoclingMQC(
-        converter=un_convertisseur_avec_un_texte(),
-        convertisseur_ocr_json=convertisseur_ocr_json,
-    )
+    chunker, _ = un_chunker_ocr_json(resultat_ocr)
 
     document = chunker.applique(document)
     bloc = document.pages[1].blocs[0]
