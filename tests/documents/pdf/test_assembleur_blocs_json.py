@@ -582,12 +582,16 @@ def test_conserve_la_table_des_matieres_dans_un_unique_bloc(assemble_les_blocs):
             {
                 "type_de_bloc": TypeDeBlocOcr.TABLE_DES_MATIERES,
                 "titre": "Sommaire",
-                "texte": "1 Introduction\n2 Authentification",
+                "texte": "",
+                "elements_de_liste": (
+                    "1 Introduction",
+                    "2 Authentification",
+                ),
             }
         )
     )
 
-    verifie_un_bloc(blocs_indexables, "1 Introduction\n2 Authentification")
+    verifie_un_bloc(blocs_indexables, "- 1 Introduction\n- 2 Authentification")
     assert blocs_indexables[0].contexte.type_de_bloc == "table_des_matieres"
     assert blocs_indexables[0].contexte.chemin_des_sections == ()
 
