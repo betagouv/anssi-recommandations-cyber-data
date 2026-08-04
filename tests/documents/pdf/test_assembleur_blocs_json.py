@@ -502,6 +502,96 @@ def test_conserve_un_titre_place_par_erreur_sur_un_paragraphe(assemble_les_blocs
     )
 
 
+def test_promeut_un_titre_numerote_mal_classe_dans_le_meme_chapitre(
+    assemble_les_blocs,
+):
+    titre = "2.4 Authentification multifacteur"
+    blocs_indexables = assemble_les_blocs(
+        _une_page(
+            _un_titre("2 Authentification", 1),
+            _un_titre("2.3 Mots de passe", 2),
+            {
+                "type_de_bloc": TypeDeBlocOcr.PARAGRAPHE,
+                "titre": titre,
+                "texte": "Le contenu de la section.",
+            },
+        )
+    )
+
+    bloc_indexable = blocs_indexables[-1]
+    assert bloc_indexable.texte == f"{titre}\nLe contenu de la section."
+    assert bloc_indexable.contexte.chemin_des_sections == (
+        "2 Authentification",
+        titre,
+    )
+
+
+def test_conserve_un_titre_local_lorsque_le_chapitre_est_incoherent(
+    assemble_les_blocs,
+):
+    titre = "6.1 Élément sans rapport"
+    blocs_indexables = assemble_les_blocs(
+        _une_page(
+            _un_titre("2 Authentification", 1),
+            _un_titre("2.4 Authentification multifacteur", 2),
+            {
+                "type_de_bloc": TypeDeBlocOcr.PARAGRAPHE,
+                "titre": titre,
+                "texte": "Le contenu reste local.",
+            },
+        )
+    )
+
+    bloc_indexable = blocs_indexables[-1]
+    assert bloc_indexable.texte == (
+        "2.4 Authentification multifacteur\n"
+        f"{titre}\nLe contenu reste local."
+    )
+    assert bloc_indexable.contexte.titre == titre
+    assert bloc_indexable.contexte.chemin_des_sections == (
+        "2 Authentification",
+        "2.4 Authentification multifacteur",
+    )
+
+
+def test_conserve_un_titre_non_numerote_comme_information_locale(
+    assemble_les_blocs,
+):
+    blocs_indexables = assemble_les_blocs(
+        _une_page(
+            _un_titre("2 Authentification", 1),
+            {
+                "type_de_bloc": TypeDeBlocOcr.PARAGRAPHE,
+                "titre": "Attention",
+                "texte": "Un encadré important.",
+            },
+        )
+    )
+
+    bloc_indexable = blocs_indexables[-1]
+    assert bloc_indexable.texte == (
+        "2 Authentification\nAttention\nUn encadré important."
+    )
+    assert bloc_indexable.contexte.titre == "Attention"
+    assert bloc_indexable.contexte.chemin_des_sections == ("2 Authentification",)
+
+
+def test_conserve_la_table_des_matieres_dans_un_unique_bloc(assemble_les_blocs):
+    blocs_indexables = assemble_les_blocs(
+        _une_page(
+            {
+                "type_de_bloc": TypeDeBlocOcr.TABLE_DES_MATIERES,
+                "titre": "Sommaire",
+                "texte": "1 Introduction\n2 Authentification",
+            }
+        )
+    )
+
+    verifie_un_bloc(blocs_indexables, "1 Introduction\n2 Authentification")
+    assert blocs_indexables[0].contexte.type_de_bloc == "table_des_matieres"
+    assert blocs_indexables[0].contexte.chemin_des_sections == ()
+
+
 def test_ne_fusionne_pas_une_recommandation_avec_un_paragraphe(
     assemble_les_blocs,
 ):

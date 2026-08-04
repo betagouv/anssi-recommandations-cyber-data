@@ -9,6 +9,7 @@ class TypeDeBlocOcr(StrEnum):
     PARAGRAPHE = "paragraphe"
     LISTE = "liste"
     TABLEAU = "tableau"
+    TABLE_DES_MATIERES = "table_des_matieres"
     AUTRE = "autre"
     PIED_DE_PAGE = "pied_de_page"
 
@@ -76,9 +77,9 @@ class AssembleurDeBlocsJson:
                 if bloc_ocr.type_de_bloc == TypeDeBlocOcr.PIED_DE_PAGE:
                     continue
 
-                if (
-                    bloc_ocr.type_de_bloc == TypeDeBlocOcr.PARAGRAPHE
-                    and bloc_ocr.titre
+                if self._doit_promouvoir_le_titre_local_en_section(
+                    bloc_ocr,
+                    chemin_des_sections,
                 ):
                     bloc_ocr = replace(
                         bloc_ocr,
@@ -137,6 +138,14 @@ class AssembleurDeBlocsJson:
                     continue
 
                 texte = self._construit_le_texte(bloc_ocr)
+                if (
+                    bloc_ocr.type_de_bloc == TypeDeBlocOcr.PARAGRAPHE
+                    and bloc_ocr.titre
+                ):
+                    texte = self._ajoute_le_titre_au_premier_contenu(
+                        bloc_ocr.titre,
+                        texte,
+                    )
                 type_de_bloc = self._determine_le_type_de_bloc_indexable(bloc_ocr)
                 chemin_du_bloc = tuple(chemin_des_sections)
                 titre_de_section = None
@@ -235,6 +244,47 @@ class AssembleurDeBlocsJson:
             return correspondance.group(1).count(".") + 1
         if niveau is not None and niveau > 0:
             return niveau
+        return None
+
+    @classmethod
+    def _doit_promouvoir_le_titre_local_en_section(
+        cls,
+        bloc_ocr: BlocOcr,
+        chemin_des_sections: list[str],
+    ) -> bool:
+        if bloc_ocr.type_de_bloc != TypeDeBlocOcr.PARAGRAPHE or not bloc_ocr.titre:
+            return False
+        numero_de_section = cls._extrait_le_numero_de_section(bloc_ocr.titre)
+        if numero_de_section is None:
+            return False
+        niveau = numero_de_section.count(".") + 1
+        chapitre_courant = cls._extrait_le_chapitre_courant(chemin_des_sections)
+        chapitre_du_titre = numero_de_section.split(".")[0]
+        if chapitre_courant is None:
+            return niveau == 1
+        if niveau == 1:
+            return int(chapitre_du_titre) in {
+                int(chapitre_courant),
+                int(chapitre_courant) + 1,
+            }
+        return chapitre_du_titre == chapitre_courant
+
+    @staticmethod
+    def _extrait_le_numero_de_section(titre: str) -> str | None:
+        correspondance = re.match(r"\s*(\d+(?:\.\d+)*)\b", titre)
+        if correspondance is None:
+            return None
+        return correspondance.group(1)
+
+    @classmethod
+    def _extrait_le_chapitre_courant(
+        cls,
+        chemin_des_sections: list[str],
+    ) -> str | None:
+        for section in chemin_des_sections:
+            numero_de_section = cls._extrait_le_numero_de_section(section)
+            if numero_de_section is not None:
+                return numero_de_section.split(".")[0]
         return None
 
     @staticmethod
