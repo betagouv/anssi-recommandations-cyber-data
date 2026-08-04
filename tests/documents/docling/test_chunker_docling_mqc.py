@@ -3,7 +3,7 @@ import pytest
 from documents.docling.chunker_docling import TypeFichier
 from documents.docling.chunker_docling_mqc import ChunkerDoclingMQC
 from documents.html.document_html import DocumentHTML
-from documents.pdf.assembleur_blocs_json import TypeDeBlocOcr
+from documents.pdf.assembleur_blocs_json import PageOcr, TypeDeBlocOcr
 from documents.pdf.document_pdf import DocumentPDF
 
 
@@ -260,51 +260,73 @@ def test_conserve_les_sections_et_recommandations_dans_le_chunker(
     assert metadata["chemin_sections"] == '["Section 5"]'
 
 
-def test_conserve_une_recommandation_codee_coupee_sur_deux_pages(
-    un_convertisseur_avec_un_texte,
-    un_convertisseur_ocr_json_de_test,
+def test_conserve_la_table_des_matieres_comme_un_chunk_pdf_unique(
+    un_chunker_ocr_json,
+    un_resultat_ocr,
+    un_bloc_ocr_json,
 ):
     document = DocumentPDF("mon_document.pdf", url_pdf="http://mon-document.pdf")
-    resultat_ocr = ResultatOcrPdf(
-        nombre_de_pages=2,
-        pages=(
-            PageOcr(
-                numero_page=1,
-                blocs=(
-                    BlocOcr(
-                        type_de_bloc=TypeDeBlocOcr.RECOMMANDATION,
-                        code="R23",
-                        titre="Réviser la politique",
-                        texte="La politique d'authentification",
-                    ),
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.TABLE_DES_MATIERES,
+                    titre="Sommaire",
+                    texte="1 Introduction\n2 Authentification",
+                    niveau=1,
                 ),
             ),
-            PageOcr(
-                numero_page=2,
-                blocs=(
-                    BlocOcr(
-                        type_de_bloc=TypeDeBlocOcr.PARAGRAPHE,
-                        code=None,
-                        titre=None,
-                        texte="doit être révisée.",
-                    ),
+        )
+    )
+    chunker, _ = un_chunker_ocr_json(resultat_ocr)
+
+    document = chunker.applique(document)
+    bloc = document.pages[1].blocs[0]
+    metadata = document.metadata(bloc)
+
+    assert len(document.pages[1].blocs) == 1
+    assert bloc.texte == "1 Introduction\n2 Authentification"
+    assert metadata["source_url"] == "http://mon-document.pdf"
+    assert metadata["page"] == 1
+    assert metadata["nom_document"] == "mon_document.pdf"
+    assert metadata["type_de_bloc"] == "table_des_matieres"
+    assert metadata["niveau"] == 1
+    assert "chemin_sections" not in metadata
+
+
+def test_conserve_une_recommandation_codee_coupee_sur_deux_pages(
+    un_chunker_ocr_json,
+    un_resultat_ocr,
+    un_bloc_ocr_json,
+):
+    document = DocumentPDF("mon_document.pdf", url_pdf="http://mon-document.pdf")
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.TITRE,
+                    titre="Section 5",
+                    texte="Section 5",
+                    niveau=1,
+                ),
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.RECOMMANDATION,
+                    code="R23",
+                    titre="Réviser la politique",
+                    texte="La politique d'authentification",
                 ),
             ),
-        ),
+            (un_bloc_ocr_json(texte="doit être révisée."),),
+        )
     )
-    convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(resultat_ocr)
-    chunker = ChunkerDoclingMQC(
-        converter=un_convertisseur_avec_un_texte(),
-        convertisseur_ocr_json=convertisseur_ocr_json,
-        identifie_les_plages_de_pages_pdf=lambda _: None,
-    )
+    chunker, _ = un_chunker_ocr_json(resultat_ocr)
 
     document = chunker.applique(document)
     bloc = document.pages[1].blocs[0]
     metadata = document.metadata(bloc)
 
     assert bloc.texte == (
-        "R23\nRéviser la politique\n"
+        "Section 5\nR23\nRéviser la politique\n"
         "La politique d'authentification\ndoit être révisée."
     )
     assert metadata["type_de_bloc"] == "recommandation"
@@ -366,36 +388,26 @@ def test_conserve_une_recommandation_avec_une_liste_sur_deux_pages(
 
 
 def test_conserve_une_liste_de_recommandations_sans_code(
-    un_convertisseur_avec_un_texte,
-    un_convertisseur_ocr_json_de_test,
+    un_chunker_ocr_json,
+    un_resultat_ocr,
+    un_bloc_ocr_json,
 ):
     document = DocumentPDF("mon_document.pdf", url_pdf="http://mon-document.pdf")
-    resultat_ocr = ResultatOcrPdf(
-        nombre_de_pages=1,
-        pages=(
-            PageOcr(
-                numero_page=1,
-                blocs=(
-                    BlocOcr(
-                        type_de_bloc=TypeDeBlocOcr.LISTE,
-                        code=None,
-                        titre=None,
-                        texte="Les mesures recommandées sont les suivantes :",
-                        elements_de_liste=(
-                            "Analyser les risques.",
-                            "Protéger les accès.",
-                        ),
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.LISTE,
+                    texte="Les mesures recommandées sont les suivantes :",
+                    elements_de_liste=(
+                        "Analyser les risques.",
+                        "Protéger les accès.",
                     ),
                 ),
             ),
-        ),
+        )
     )
-    convertisseur_ocr_json = un_convertisseur_ocr_json_de_test(resultat_ocr)
-    chunker = ChunkerDoclingMQC(
-        converter=un_convertisseur_avec_un_texte(),
-        convertisseur_ocr_json=convertisseur_ocr_json,
-        identifie_les_plages_de_pages_pdf=lambda _: None,
-    )
+    chunker, _ = un_chunker_ocr_json(resultat_ocr)
 
     document = chunker.applique(document)
     bloc = document.pages[1].blocs[0]
