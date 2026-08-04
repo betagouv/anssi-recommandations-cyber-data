@@ -219,6 +219,32 @@ def test_cree_un_bloc_autonome_pour_un_titre_sans_contenu(
     assert bloc_indexable.contexte.niveau == 1
 
 
+def test_conserve_un_titre_sans_contenu_avant_une_continuation(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (un_bloc_ocr_json(texte="Début"),),
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.TITRE,
+                    titre="Nouvelle section",
+                    texte="",
+                ),
+                un_bloc_ocr_json(texte="Suite", est_une_continuation=True),
+            ),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert [bloc.texte for bloc in blocs_indexables] == [
+        "Début",
+        "Nouvelle section\nSuite",
+    ]
+
+
 def test_conserve_un_titre_place_par_erreur_sur_un_paragraphe(
     un_bloc_ocr_json,
     un_resultat_ocr,
@@ -241,3 +267,238 @@ def test_conserve_un_titre_place_par_erreur_sur_un_paragraphe(
     assert bloc_indexable.contexte.type_de_bloc == "paragraphe"
     assert bloc_indexable.contexte.titre == "6.1.2 ESP"
     assert bloc_indexable.contexte.niveau is None
+
+
+def test_fusionne_un_paragraphe_qui_continue_sur_la_page_suivante(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (un_bloc_ocr_json(texte="Début"),),
+            (un_bloc_ocr_json(texte="Suite", est_une_continuation=True),),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].texte == "Début\nSuite"
+    assert blocs_indexables[0].pages_couvertes == (1, 2)
+    assert blocs_indexables[0].page_debut == 1
+    assert blocs_indexables[0].page_fin == 2
+
+
+def test_fusionne_un_paragraphe_coupe_sans_marqueur_de_continuation(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (un_bloc_ocr_json(texte="Le coût du chiffrement"),),
+            (un_bloc_ocr_json(texte="est généralement négligeable."),),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 1
+    assert blocs_indexables[0].texte == (
+        "Le coût du chiffrement\nest généralement négligeable."
+    )
+    assert blocs_indexables[0].pages_couvertes == (1, 2)
+
+
+def test_fusionne_la_suite_d_une_recommandation_sur_la_page_suivante(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        pages_ocr=(
+            PageOcr(
+                numero_page=8,
+                blocs=(
+                    un_bloc_ocr_json(
+                        type_de_bloc=TypeDeBlocOcr.TITRE,
+                        titre="3 Recommandations",
+                        texte="",
+                        niveau=1,
+                    ),
+                    un_bloc_ocr_json(
+                        type_de_bloc=TypeDeBlocOcr.TITRE,
+                        titre="3.2 Opérations",
+                        texte="",
+                        niveau=2,
+                    ),
+                    un_bloc_ocr_json(
+                        type_de_bloc=TypeDeBlocOcr.RECOMMANDATION,
+                        code="R23",
+                        titre="Définir une stratégie de restauration",
+                        texte=(
+                            "La stratégie tient compte des services "
+                            "d'infrastructure, comme l'an-"
+                        ),
+                    ),
+                ),
+            ),
+            PageOcr(
+                numero_page=9,
+                blocs=(un_bloc_ocr_json(texte="nuaire, le DNS et le NTP."),),
+            ),
+        ),
+        nombre_de_pages=9,
+    )
+
+    bloc_recommandation = AssembleurDeBlocsJson().assemble(resultat_ocr)[-1]
+
+    assert bloc_recommandation.texte == (
+        "3.2 Opérations\n"
+        "R23\n"
+        "Définir une stratégie de restauration\n"
+        "La stratégie tient compte des services d'infrastructure, comme l'an-\n"
+        "nuaire, le DNS et le NTP."
+    )
+    assert bloc_recommandation.contexte.type_de_bloc == "recommandation"
+    assert bloc_recommandation.contexte.code_recommandation == "R23"
+    assert bloc_recommandation.contexte.chemin_des_sections == (
+        "3 Recommandations",
+        "3.2 Opérations",
+    )
+    assert bloc_recommandation.page_debut == 8
+    assert bloc_recommandation.page_fin == 9
+    assert bloc_recommandation.pages_couvertes == (8, 9)
+
+
+def test_ne_fusionne_pas_un_paragraphe_apres_une_phrase_terminee(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (un_bloc_ocr_json(texte="Le paragraphe est terminé."),),
+            (un_bloc_ocr_json(texte="Une nouvelle information."),),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Le paragraphe est terminé."
+    assert blocs_indexables[1].texte == "Une nouvelle information."
+
+
+def test_ne_fusionne_pas_un_paragraphe_commencant_une_nouvelle_phrase(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (un_bloc_ocr_json(texte="Le paragraphe semble incomplet"),),
+            (un_bloc_ocr_json(texte="Nouvelle information."),),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Le paragraphe semble incomplet"
+    assert blocs_indexables[1].texte == "Nouvelle information."
+
+
+def test_ne_fusionne_pas_un_paragraphe_apres_une_page_vide(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        pages_ocr=(
+            PageOcr(numero_page=1, blocs=(un_bloc_ocr_json(texte="Début"),)),
+            PageOcr(numero_page=2, blocs=()),
+            PageOcr(
+                numero_page=3,
+                blocs=(un_bloc_ocr_json(texte="est continué ici."),),
+            ),
+        ),
+        nombre_de_pages=3,
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Début"
+    assert blocs_indexables[1].texte == "est continué ici."
+
+
+def test_ne_fusionne_pas_deux_paragraphes_distincts_sur_la_meme_page(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (
+                un_bloc_ocr_json(texte="Premier"),
+                un_bloc_ocr_json(texte="Deuxième", est_une_continuation=True),
+            ),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Premier"
+    assert blocs_indexables[1].texte == "Deuxième"
+
+
+def test_ne_fusionne_pas_un_paragraphe_apres_un_titre(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (un_bloc_ocr_json(texte="Début"),),
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.TITRE,
+                    titre="Nouvelle section",
+                    texte="Nouvelle section",
+                    niveau=1,
+                ),
+                un_bloc_ocr_json(
+                    texte="Nouveau contenu",
+                    est_une_continuation=True,
+                ),
+            ),
+        )
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Début"
+    assert blocs_indexables[1].texte == "Nouvelle section\nNouveau contenu"
+
+
+def test_ne_fusionne_pas_un_paragraphe_apres_une_page_non_contigue(
+    un_bloc_ocr_json,
+    un_resultat_ocr,
+):
+    resultat_ocr = un_resultat_ocr(
+        pages_ocr=(
+            PageOcr(numero_page=1, blocs=(un_bloc_ocr_json(texte="Début"),)),
+            PageOcr(
+                numero_page=3,
+                blocs=(
+                    un_bloc_ocr_json(
+                        texte="Suite",
+                        est_une_continuation=True,
+                    ),
+                ),
+            ),
+        ),
+        nombre_de_pages=3,
+    )
+
+    blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
+
+    assert len(blocs_indexables) == 2
+    assert blocs_indexables[0].texte == "Début"
+    assert blocs_indexables[1].texte == "Suite"
