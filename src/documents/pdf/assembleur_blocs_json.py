@@ -1,5 +1,5 @@
 import re
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from enum import StrEnum
 
 
@@ -65,11 +65,28 @@ class _TitreEnAttente:
     chemin_des_sections: tuple[str, ...]
 
 
+@dataclass
+class _EtatAssemblage:
+    chemin_des_sections: list[str] = field(default_factory=list)
+    titre_en_attente: _TitreEnAttente | None = None
+    blocs_indexables: list[BlocIndexable] = field(default_factory=list)
+
+    @property
+    def dernier_bloc_indexable(self) -> BlocIndexable | None:
+        if not self.blocs_indexables:
+            return None
+        return self.blocs_indexables[-1]
+
+    def ajoute_le_bloc(self, bloc_indexable: BlocIndexable) -> None:
+        self.blocs_indexables.append(bloc_indexable)
+
+    def remplace_le_dernier_bloc(self, bloc_indexable: BlocIndexable) -> None:
+        self.blocs_indexables[-1] = bloc_indexable
+
+
 class AssembleurDeBlocsJson:
     def assemble(self, resultat_ocr: ResultatOcrPdf) -> list[BlocIndexable]:
-        blocs_indexables: list[BlocIndexable] = []
-        chemin_des_sections: list[str] = []
-        titre_en_attente: _TitreEnAttente | None = None
+        etat_assemblage = _EtatAssemblage()
 
         for page_ocr in sorted(resultat_ocr.pages, key=lambda page: page.numero_page):
             est_le_premier_bloc_utile = True
@@ -79,7 +96,7 @@ class AssembleurDeBlocsJson:
 
                 if self._doit_promouvoir_le_titre_local_en_section(
                     bloc_ocr,
-                    chemin_des_sections,
+                    etat_assemblage.chemin_des_sections,
                 ):
                     bloc_ocr = replace(
                         bloc_ocr,
@@ -87,40 +104,29 @@ class AssembleurDeBlocsJson:
                     )
 
                 if bloc_ocr.type_de_bloc == TypeDeBlocOcr.TITRE:
-                    if titre_en_attente is not None:
-                        blocs_indexables.append(
-                            self._cree_un_bloc_indexable(
-                                texte=titre_en_attente.texte,
-                                numero_page=titre_en_attente.page,
-                                contexte=ContexteDuBloc(
-                                    type_de_bloc=TypeDeBlocOcr.TITRE.value,
-                                    titre=titre_en_attente.texte,
-                                    section=titre_en_attente.texte,
-                                    chemin_des_sections=titre_en_attente.chemin_des_sections,
-                                    niveau=titre_en_attente.niveau,
-                                ),
-                            )
-                        )
                     titre, texte_suivant = self._separe_le_titre_du_texte(
                         bloc_ocr.titre,
                         bloc_ocr.texte,
                     )
                     if not titre:
                         continue
+                    self._ajoute_le_titre_en_attente(etat_assemblage)
                     niveau_du_titre = self._determine_le_niveau_du_titre(
                         titre,
                         bloc_ocr.niveau,
                     )
-                    chemin_des_sections = self._met_a_jour_le_chemin_des_sections(
-                        chemin_des_sections,
+                    etat_assemblage.chemin_des_sections = (
+                        self._met_a_jour_le_chemin_des_sections(
+                            etat_assemblage.chemin_des_sections,
+                            titre,
+                            niveau_du_titre,
+                        )
+                    )
+                    etat_assemblage.titre_en_attente = _TitreEnAttente(
                         titre,
                         niveau_du_titre,
-                    )
-                    titre_en_attente = _TitreEnAttente(
-                        texte=titre,
-                        niveau=niveau_du_titre,
-                        page=page_ocr.numero_page,
-                        chemin_des_sections=tuple(chemin_des_sections),
+                        page_ocr.numero_page,
+                        tuple(etat_assemblage.chemin_des_sections),
                     )
                     est_le_premier_bloc_utile = False
                     if not texte_suivant:
@@ -138,24 +144,21 @@ class AssembleurDeBlocsJson:
                     continue
 
                 texte = self._construit_le_texte(bloc_ocr)
-                if (
-                    bloc_ocr.type_de_bloc == TypeDeBlocOcr.PARAGRAPHE
-                    and bloc_ocr.titre
-                ):
+                if bloc_ocr.type_de_bloc == TypeDeBlocOcr.PARAGRAPHE and bloc_ocr.titre:
                     texte = self._ajoute_le_titre_au_premier_contenu(
                         bloc_ocr.titre,
                         texte,
                     )
                 type_de_bloc = self._determine_le_type_de_bloc_indexable(bloc_ocr)
-                chemin_du_bloc = tuple(chemin_des_sections)
+                chemin_du_bloc = tuple(etat_assemblage.chemin_des_sections)
                 titre_de_section = None
-                if titre_en_attente is not None:
-                    titre_de_section = titre_en_attente.texte
+                if etat_assemblage.titre_en_attente is not None:
+                    titre_de_section = etat_assemblage.titre_en_attente.texte
                     texte = self._ajoute_le_titre_au_premier_contenu(
-                        titre_en_attente.texte,
+                        etat_assemblage.titre_en_attente.texte,
                         texte,
                     )
-                    titre_en_attente = None
+                    etat_assemblage.titre_en_attente = None
 
                 contexte = ContexteDuBloc(
                     type_de_bloc=type_de_bloc.value,
@@ -175,54 +178,70 @@ class AssembleurDeBlocsJson:
                     and (
                         self._est_une_puce_de_liste(bloc_ocr.texte)
                         or self._semble_etre_la_suite_d_un_paragraphe(
-                            blocs_indexables[-1] if blocs_indexables else None,
+                            etat_assemblage.dernier_bloc_indexable,
                             bloc_indexable,
                         )
                     )
                 )
-                if blocs_indexables and self._est_une_liste_identique_repetee(
-                    blocs_indexables[-1],
-                    bloc_indexable,
+                if (
+                    etat_assemblage.dernier_bloc_indexable
+                    and self._est_une_liste_identique_repetee(
+                        etat_assemblage.dernier_bloc_indexable,
+                        bloc_indexable,
+                    )
                 ):
                     continue
-                if blocs_indexables and self._peut_fusionner(
-                    blocs_indexables[-1],
+                if etat_assemblage.dernier_bloc_indexable and self._peut_fusionner(
+                    etat_assemblage.dernier_bloc_indexable,
                     bloc_indexable,
                     est_une_continuation,
                 ):
-                    blocs_indexables[-1] = self._fusionne_les_blocs(
-                        blocs_indexables[-1],
+                    etat_assemblage.remplace_le_dernier_bloc(
+                        self._fusionne_les_blocs(
+                            etat_assemblage.dernier_bloc_indexable,
+                            bloc_indexable,
+                        )
+                    )
+                elif (
+                    etat_assemblage.dernier_bloc_indexable
+                    and self._peut_joindre_une_liste_a_son_introduction(
+                        etat_assemblage.dernier_bloc_indexable,
                         bloc_indexable,
                     )
-                elif blocs_indexables and self._peut_joindre_une_liste_a_son_introduction(
-                    blocs_indexables[-1],
-                    bloc_indexable,
                 ):
-                    blocs_indexables[-1] = self._fusionne_les_blocs(
-                        blocs_indexables[-1],
-                        bloc_indexable,
-                        bloc_indexable.contexte,
+                    etat_assemblage.remplace_le_dernier_bloc(
+                        self._fusionne_les_blocs(
+                            etat_assemblage.dernier_bloc_indexable,
+                            bloc_indexable,
+                            bloc_indexable.contexte,
+                        )
                     )
                 else:
-                    blocs_indexables.append(bloc_indexable)
+                    etat_assemblage.ajoute_le_bloc(bloc_indexable)
                 est_le_premier_bloc_utile = False
 
-        if titre_en_attente is not None:
-            blocs_indexables.append(
-                self._cree_un_bloc_indexable(
-                    texte=titre_en_attente.texte,
-                    numero_page=titre_en_attente.page,
-                    contexte=ContexteDuBloc(
-                        type_de_bloc=TypeDeBlocOcr.TITRE.value,
-                        titre=titre_en_attente.texte,
-                        section=titre_en_attente.texte,
-                        chemin_des_sections=titre_en_attente.chemin_des_sections,
-                        niveau=titre_en_attente.niveau,
-                    ),
-                )
-            )
+        self._ajoute_le_titre_en_attente(etat_assemblage)
 
-        return blocs_indexables
+        return etat_assemblage.blocs_indexables
+
+    def _ajoute_le_titre_en_attente(self, etat_assemblage: _EtatAssemblage) -> None:
+        titre_en_attente = etat_assemblage.titre_en_attente
+        if titre_en_attente is None:
+            return
+        etat_assemblage.ajoute_le_bloc(
+            self._cree_un_bloc_indexable(
+                texte=titre_en_attente.texte,
+                numero_page=titre_en_attente.page,
+                contexte=ContexteDuBloc(
+                    type_de_bloc=TypeDeBlocOcr.TITRE.value,
+                    titre=titre_en_attente.texte,
+                    section=titre_en_attente.texte,
+                    chemin_des_sections=titre_en_attente.chemin_des_sections,
+                    niveau=titre_en_attente.niveau,
+                ),
+            )
+        )
+        etat_assemblage.titre_en_attente = None
 
     @staticmethod
     def _met_a_jour_le_chemin_des_sections(
@@ -302,8 +321,7 @@ class AssembleurDeBlocsJson:
         if cls._est_une_puce_de_liste(texte):
             texte = cls._formate_l_element_de_liste(texte)
         elements_de_texte = {
-            cls._retire_le_marqueur_de_liste(ligne)
-            for ligne in texte.splitlines()
+            cls._retire_le_marqueur_de_liste(ligne) for ligne in texte.splitlines()
         }
         parties = [texte]
         parties.extend(
@@ -379,8 +397,7 @@ class AssembleurDeBlocsJson:
             == TypeDeBlocOcr.PARAGRAPHE.value
             or (
                 bloc_precedent.contexte.type_de_bloc == TypeDeBlocOcr.LISTE.value
-                and bloc_suivant.contexte.type_de_bloc
-                == TypeDeBlocOcr.PARAGRAPHE.value
+                and bloc_suivant.contexte.type_de_bloc == TypeDeBlocOcr.PARAGRAPHE.value
             )
             or (
                 bloc_precedent.contexte.type_de_bloc
@@ -447,11 +464,13 @@ class AssembleurDeBlocsJson:
         )
         if not pages_contigues and not deux_listes_sur_la_meme_page:
             return False
-        if bloc_precedent.contexte.chemin_des_sections != bloc_suivant.contexte.chemin_des_sections:
+        if (
+            bloc_precedent.contexte.chemin_des_sections
+            != bloc_suivant.contexte.chemin_des_sections
+        ):
             return False
         types_compatibles = (
-            bloc_precedent.contexte.type_de_bloc
-            == bloc_suivant.contexte.type_de_bloc
+            bloc_precedent.contexte.type_de_bloc == bloc_suivant.contexte.type_de_bloc
             and bloc_suivant.contexte.type_de_bloc
             in {TypeDeBlocOcr.PARAGRAPHE.value, TypeDeBlocOcr.LISTE.value}
         )
@@ -499,7 +518,10 @@ class AssembleurDeBlocsJson:
     ) -> bool:
         if bloc_precedent.page_fin != bloc_suivant.page_debut:
             return False
-        if bloc_precedent.contexte.chemin_des_sections != bloc_suivant.contexte.chemin_des_sections:
+        if (
+            bloc_precedent.contexte.chemin_des_sections
+            != bloc_suivant.contexte.chemin_des_sections
+        ):
             return False
         if bloc_precedent.contexte.type_de_bloc != TypeDeBlocOcr.PARAGRAPHE.value:
             return False
