@@ -69,6 +69,7 @@ from documents.service_indexation_documents import (
     ServiceIndexationNouveauxDocuments,
     fabrique_service_indexation_de_documents,
 )
+from documents.indexeur.indexeur import ReponseDocument
 from evaluation.evaluateur_deepeval import EvaluateurDeepeval
 from evaluation.evaluation_en_cours import (
     EntrepotEvaluationEnCoursMemoire,
@@ -332,6 +333,7 @@ class ServiceIndexationNouveauxDocumentsDeTest(ServiceIndexationNouveauxDocument
         self.documents_ajoutes = []
         self.documents_supprimes = []
         self.url_a_ajouter = None
+        self.resultats_indexation: list[ReponseDocument] = []
 
     def indexe_documents(
         self,
@@ -343,6 +345,7 @@ class ServiceIndexationNouveauxDocumentsDeTest(ServiceIndexationNouveauxDocument
         self.documents_ajoutes = documents_a_ajouter
         self.documents_supprimes = documents_a_supprimer
         self.url_a_ajouter = url_a_ajouter
+        return self.resultats_indexation
 
 
 class ServiceIndexationNouvellesCollectionsDeTest(

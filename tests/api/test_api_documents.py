@@ -1,5 +1,7 @@
 from fastapi.testclient import TestClient
 
+from documents.indexeur.indexeur import ReponseDocumentEnErreur
+
 
 def test_ajoute_un_document(un_serveur_de_test_complet):
     (serveur, _, _, _, _, _, _) = un_serveur_de_test_complet(None)
@@ -12,7 +14,9 @@ def test_ajoute_un_document(un_serveur_de_test_complet):
     )
 
     assert reponse.status_code == 200
-    assert reponse.json() == {"message": "Indexation en cours d’exécution..."}
+    contenu = reponse.json()
+    assert contenu["message"] == "Indexation en cours d’exécution..."
+    assert contenu["identifiant_operation"]
 
 
 def test_appelle_le_service_d_indexation_de_documents(un_serveur_de_test_complet):
@@ -59,6 +63,91 @@ def test_securise_la_route_documents(un_serveur_de_test_complet):
     )
 
     assert reponse.status_code == 401
+
+
+def test_retourne_un_identifiant_de_suivi_de_l_indexation(
+    un_serveur_de_test_complet,
+):
+    (serveur, _, _, _, _, _, _) = un_serveur_de_test_complet(None)
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.post(
+        "/api/documents/",
+        json={"fichiers_ajoutes": ["doc-1.pdf"]},
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert reponse.json()["identifiant_operation"]
+
+
+def test_retourne_le_statut_termine_sans_erreur(un_serveur_de_test_complet):
+    (serveur, _, _, _, _, _, _) = un_serveur_de_test_complet(None)
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.post(
+        "/api/documents/",
+        json={"fichiers_ajoutes": ["doc-1.pdf"]},
+        headers={"Authorization": "Bearer token-valide"},
+    )
+    identifiant_operation = reponse.json()["identifiant_operation"]
+
+    statut = client.get(
+        f"/api/documents/indexation/{identifiant_operation}",
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert statut.json() == {"statut": "terminee", "erreurs": []}
+
+
+def test_retourne_le_statut_en_erreur_avec_le_document_et_le_detail(
+    un_serveur_de_test_complet,
+):
+    (serveur, _, _, _, _, _, service_indexation_document) = (
+        un_serveur_de_test_complet(None)
+    )
+    service_indexation_document.resultats_indexation = [
+        ReponseDocumentEnErreur(
+            detail="ReadTimeout après 300 secondes",
+            document_en_erreur="doc-1.pdf",
+        )
+    ]
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.post(
+        "/api/documents/",
+        json={"fichiers_ajoutes": ["doc-1.pdf"]},
+        headers={"Authorization": "Bearer token-valide"},
+    )
+    identifiant_operation = reponse.json()["identifiant_operation"]
+
+    statut = client.get(
+        f"/api/documents/indexation/{identifiant_operation}",
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert statut.json() == {
+        "statut": "terminee_avec_erreurs",
+        "erreurs": [
+            {
+                "document": "doc-1.pdf",
+                "detail": "ReadTimeout après 300 secondes",
+            }
+        ],
+    }
+
+
+def test_retourne_une_erreur_pour_un_identifiant_de_suivi_inconnu(
+    un_serveur_de_test_complet,
+):
+    (serveur, _, _, _, _, _, _) = un_serveur_de_test_complet(None)
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.get(
+        "/api/documents/indexation/inconnu",
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert reponse.status_code == 404
 
 
 def test_appelle_le_service_d_indexation_de_documents_pour_modifier_des_documents(

@@ -3,6 +3,11 @@ from configuration import recupere_configuration, MSC, CollectionsMQC
 from documents.html.document_html import DocumentHTML
 from documents.indexe_documents_rag import fabrique_client_albert
 from documents.indexeur.indexeur import DocumentAIndexer
+from documents.indexeur.indexeur import (
+    ReponseDocument,
+    ReponseDocumentEnSucces,
+    ReponseDocumentMaitriseEnSucces,
+)
 from documents.pdf.cree_document_pdf import normalise_url
 from documents.pdf.document_pdf import DocumentPDFDistant
 from jeopardy.service import ServiceJeopardyse, ListeDeDocuments
@@ -31,7 +36,7 @@ class ServiceIndexationNouveauxDocuments:
         documents: list[str],
         documents_a_supprimer: list[str] = [],
         url_a_ajouter: str | None = None,
-    ):
+    ) -> list[ReponseDocument]:
         self._client_indexation.attribue_collection(self._id_collection)
         documents_a_indexer: list[DocumentAIndexer] = [
             DocumentPDFDistant(document, normalise_url(document, self._configuration_MSC))
@@ -63,16 +68,24 @@ class ServiceIndexationNouveauxDocuments:
                 documents_indexes.append(document)
             except Exception:
                 continue
-        self._client_indexation.ajoute_documents(
+        resultats: list[ReponseDocument] = self._client_indexation.ajoute_documents(
             documents_indexes
         )
-        self._service_jeopardy.jeopardyse(
-            ListeDeDocuments(
-                noms_documents=[document.nom_document for document in documents_indexes],
-                id_collection_jeopardy=self._id_collection_jeopardy,
-                id_collection_mqc=self._id_collection,
+        noms_documents_indexes = [
+            resultat.name
+            for resultat in resultats
+            if isinstance(
+                resultat, (ReponseDocumentEnSucces, ReponseDocumentMaitriseEnSucces)
             )
-        )
+        ]
+        if noms_documents_indexes:
+            self._service_jeopardy.jeopardyse(
+                ListeDeDocuments(
+                    noms_documents=noms_documents_indexes,
+                    id_collection_jeopardy=self._id_collection_jeopardy,
+                    id_collection_mqc=self._id_collection,
+                )
+            )
         for document_a_supprimer in documents_a_supprimer:
             identifiant_document_existant = self._client_indexation.document_existe(
                 document_a_supprimer, self._id_collection
@@ -85,10 +98,13 @@ class ServiceIndexationNouveauxDocuments:
                     document_a_supprimer, self._id_collection_jeopardy
                 )
             )
+
             if identifiant_document_jeopardy_existant:
                 self._client_indexation.supprime_document(
                     identifiant_document_jeopardy_existant
                 )
+
+        return resultats
 
 
 def fabrique_service_indexation_de_documents() -> ServiceIndexationNouveauxDocuments:

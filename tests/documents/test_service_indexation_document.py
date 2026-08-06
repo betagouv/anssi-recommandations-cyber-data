@@ -1,6 +1,12 @@
 from adaptateurs.clients_albert import ClientAlbertIndexation, ReponseCreationCollection
 from configuration import MSC, CollectionsMQC
-from documents.indexeur.indexeur import DocumentAIndexer, ReponseDocument, Indexeur
+from documents.indexeur.indexeur import (
+    DocumentAIndexer,
+    Indexeur,
+    ReponseDocument,
+    ReponseDocumentEnErreur,
+    ReponseDocumentEnSucces,
+)
 from documents.html.document_html import DocumentHTML
 from documents.service_indexation_documents import ServiceIndexationNouveauxDocuments
 from infra.memoire.executeur_de_requete_memoire import ExecuteurDeRequeteDeTest
@@ -30,6 +36,7 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
         self.documents_supprimes = {}
         self.documents_jeopardy_existants = []
         self.documents_jeopardy_supprimes = []
+        self.reponses_documents: list[ReponseDocument] | None = None
 
     def attribue_collection(self, id_collection: str) -> bool:
         self.id_collection = id_collection
@@ -39,7 +46,18 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
         self, documents: list[DocumentAIndexer]
     ) -> list[ReponseDocument]:
         self.documents_ajoutes = documents
-        return []
+        if self.reponses_documents is not None:
+            return self.reponses_documents
+        return [
+            ReponseDocumentEnSucces(
+                id=f"id-{document.nom_document}",
+                name=document.nom_document,
+                collection_id=self.id_collection,
+                created_at="",
+                updated_at="",
+            )
+            for document in documents
+        ]
 
     def document_existe(self, nom_document: str, id_collection: str) -> str | None:
         if (
@@ -384,3 +402,109 @@ def test_ne_supprime_rien_cote_jeopardy_si_le_document_jeopardy_n_existe_pas(
     ).indexe_documents([], ["doc-2.pdf"])
 
     assert client_indexation.documents_supprimes.get("collection-jeopardy") is None
+
+
+def test_transmet_uniquement_les_documents_indexes_a_jeopardy(un_service_jeopardy):
+    client_indexation = ClientAlbertIndexationDeTest()
+    client_indexation.reponses_documents = [
+        ReponseDocumentEnSucces(
+            id="id-1",
+            name="doc-1.pdf",
+            collection_id="collection-1",
+            created_at="",
+            updated_at="",
+        ),
+        ReponseDocumentEnErreur(
+            detail="Échec OCR",
+            document_en_erreur="doc-2.pdf",
+        ),
+    ]
+
+    resultats = ServiceIndexationNouveauxDocuments(
+        client_indexation,
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents(["doc-1.pdf", "doc-2.pdf"])
+
+    assert resultats == client_indexation.reponses_documents
+    assert un_service_jeopardy.donnees_recues.noms_documents == ["doc-1.pdf"]
+
+
+def test_continue_les_autres_documents_apres_une_erreur(un_service_jeopardy):
+    client_indexation = ClientAlbertIndexationDeTest()
+    client_indexation.reponses_documents = [
+        ReponseDocumentEnErreur(
+            detail="Timeout OCR page 10",
+            document_en_erreur="doc-1.pdf",
+        ),
+        ReponseDocumentEnSucces(
+            id="id-2",
+            name="doc-2.pdf",
+            collection_id="collection-1",
+            created_at="",
+            updated_at="",
+        ),
+    ]
+
+    ServiceIndexationNouveauxDocuments(
+        client_indexation,
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents(["doc-1.pdf", "doc-2.pdf"])
+
+    assert len(client_indexation.documents_ajoutes) == 2
+    assert un_service_jeopardy.donnees_recues.noms_documents == ["doc-2.pdf"]
+
+
+def test_ne_lance_pas_jeopardy_si_aucun_document_n_est_indexe(un_service_jeopardy):
+    client_indexation = ClientAlbertIndexationDeTest()
+    client_indexation.reponses_documents = [
+        ReponseDocumentEnErreur(
+            detail="Échec OCR",
+            document_en_erreur="doc-1.pdf",
+        )
+    ]
+
+    ServiceIndexationNouveauxDocuments(
+        client_indexation,
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents(["doc-1.pdf"])
+
+    assert not un_service_jeopardy.jeopardyse_appele
+
+
+def test_retourne_le_nom_et_le_detail_du_document_en_erreur(un_service_jeopardy):
+    client_indexation = ClientAlbertIndexationDeTest()
+    client_indexation.reponses_documents = [
+        ReponseDocumentEnErreur(
+            detail="ReadTimeout après 300 secondes",
+            document_en_erreur="doc-1.pdf",
+        )
+    ]
+
+    resultats = ServiceIndexationNouveauxDocuments(
+        client_indexation,
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents(["doc-1.pdf"])
+
+    assert isinstance(resultats[0], ReponseDocumentEnErreur)
+    assert resultats[0].document_en_erreur == "doc-1.pdf"
+    assert resultats[0].detail == "ReadTimeout après 300 secondes"
