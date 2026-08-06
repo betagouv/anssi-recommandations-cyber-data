@@ -4,6 +4,34 @@
   let fichiersAModifier = $state<string>('');
   let fichiersASupprimer = $state<string>('');
   let reponseMiseAJourDocuments = $state<string | undefined>(undefined);
+  let indexationEnCours = $state(false);
+  let erreursIndexation = $state<{ document: string; detail: string }[]>([]);
+
+  const attendsUneSeconde = () =>
+    new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
+
+  const suitLIndexation = async (identifiantOperation: string) => {
+    let statutIndexation = 'en_cours';
+
+    while (statutIndexation === 'en_cours') {
+      await attendsUneSeconde();
+      const reponseStatut = await fetch(
+        `/api/documents/indexation/${identifiantOperation}`,
+      );
+      const contenuStatut = await reponseStatut.json();
+      statutIndexation = contenuStatut.statut;
+
+      if (statutIndexation !== 'en_cours') {
+        erreursIndexation = contenuStatut.erreurs ?? [];
+        indexationEnCours = false;
+        reponseMiseAJourDocuments = erreursIndexation.length
+          ? 'L’indexation est terminée avec des erreurs.'
+          : 'Tous les documents ont été indexés avec succès.';
+      }
+    }
+  };
 
   const metsAJourLaCollection = async () => {
     const recupereLesFichiers = (fichiers: string): string[] =>
@@ -27,6 +55,9 @@
 
     const contenuReponse = await reponse.json();
     reponseMiseAJourDocuments = contenuReponse.message;
+    erreursIndexation = [];
+    indexationEnCours = true;
+    await suitLIndexation(contenuReponse.identifiant_operation);
   };
 </script>
 
@@ -104,7 +135,7 @@
       </button>
     </div>
 
-    {#if reponseMiseAJourDocuments}
+    {#if reponseMiseAJourDocuments && indexationEnCours}
       <div
         class="mt-4 p-4 bg-blue-50 text-blue-700 rounded-lg border border-blue-100 flex items-center animate-in fade-in slide-in-from-top-2"
       >
@@ -120,6 +151,27 @@
           />
         </svg>
         <p class="text-sm">{reponseMiseAJourDocuments}</p>
+      </div>
+    {/if}
+
+    {#if reponseMiseAJourDocuments && !indexationEnCours && erreursIndexation.length === 0}
+      <div
+        class="mt-4 p-4 bg-blue-50 text-blue-700 rounded-lg border border-blue-100 flex items-center animate-in fade-in slide-in-from-top-2"
+      >
+        <p class="text-sm">{reponseMiseAJourDocuments}</p>
+      </div>
+    {/if}
+
+    {#if !indexationEnCours && erreursIndexation.length > 0}
+      <div
+        class="mt-4 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200 animate-in fade-in slide-in-from-top-2"
+      >
+        <p class="text-sm font-medium">{reponseMiseAJourDocuments}</p>
+        <ul class="mt-2 list-disc list-inside text-sm">
+          {#each erreursIndexation as erreur (erreur.document)}
+            <li><strong>{erreur.document}</strong> : {erreur.detail}</li>
+          {/each}
+        </ul>
       </div>
     {/if}
   </section>
