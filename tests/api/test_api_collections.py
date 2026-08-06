@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 import jwt
+from documents.indexeur.indexeur import ReponseDocumentEnErreur
 
 
 def test_cree_une_nouvelle_collection(un_serveur_de_test_complet):
@@ -18,7 +19,47 @@ def test_cree_une_nouvelle_collection(un_serveur_de_test_complet):
     )
 
     assert reponse.status_code == 200
-    assert reponse.json() == {"message": "Indexation en cours d'exécution..."}
+    assert reponse.json()["message"] == "Indexation en cours d'exécution..."
+    assert reponse.json()["identifiant_operation"]
+
+
+def test_retourne_le_statut_en_erreur_lors_de_la_creation_d_une_collection(
+    un_serveur_de_test_pour_collections,
+):
+    serveur, service, _ = un_serveur_de_test_pour_collections()
+    service.resultats_indexation = [
+        ReponseDocumentEnErreur(
+            document_en_erreur="doc-1.pdf",
+            detail="La réponse OCR ne contient pas de JSON exploitable",
+        )
+    ]
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.post(
+        "/api/collections/",
+        json={
+            "nom": "ma-collection",
+            "description": "une description",
+            "fichiers": ["doc-1.pdf"],
+        },
+        headers={"Authorization": "Bearer token-valide"},
+    )
+    identifiant_operation = reponse.json()["identifiant_operation"]
+
+    statut = client.get(
+        f"/api/documents/indexation/{identifiant_operation}",
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert statut.json() == {
+        "statut": "terminee_avec_erreurs",
+        "erreurs": [
+            {
+                "document": "doc-1.pdf",
+                "detail": "La réponse OCR ne contient pas de JSON exploitable",
+            }
+        ],
+    }
 
 
 def test_appelle_le_service_indexation_collections(un_serveur_de_test_pour_collections):
@@ -73,7 +114,8 @@ def test_valide_le_token_jwt_dans_un_cookie_de_session(un_serveur_de_test_comple
     )
 
     assert reponse.status_code == 200
-    assert reponse.json() == {"message": "Indexation en cours d'exécution..."}
+    assert reponse.json()["message"] == "Indexation en cours d'exécution..."
+    assert reponse.json()["identifiant_operation"]
 
 
 def test_recupere_la_collection_d_indexation(un_serveur_de_test_pour_collections):
