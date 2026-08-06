@@ -111,13 +111,14 @@ class ServiceIndexationNouvellesCollections:
                 f"Erreur : {document_en_erreur.detail}",
             )
 
-        self._service_jeopardy.jeopardyse(
-            CollectionEntiere(
-                id_collection=reponse_collection.id,
-                nom_collection=f"Jeopardy - {nom}",
-                description_collection=description,
+        if les_documents_en_succes:
+            self._service_jeopardy.jeopardyse(
+                CollectionEntiere(
+                    id_collection=reponse_collection.id,
+                    nom_collection=f"Jeopardy - {nom}",
+                    description_collection=description,
+                )
             )
-        )
         return resultats
 
 

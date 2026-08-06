@@ -356,6 +356,7 @@ class ServiceIndexationNouvellesCollectionsDeTest(
         self.nom: str | None = None
         self.description: str | None = None
         self.sources: DocumentsSources = DocumentsSources()
+        self.resultats_indexation: list[ReponseDocument] = []
 
     def indexe_documents(
         self,
@@ -367,6 +368,7 @@ class ServiceIndexationNouvellesCollectionsDeTest(
         self.nom = nom
         self.description = description
         self.sources = sources
+        return self.resultats_indexation
 
 
 class ServiceCollectionsDeTest(ServiceCollections):

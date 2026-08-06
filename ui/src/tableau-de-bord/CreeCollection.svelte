@@ -3,6 +3,34 @@
   let descriptionCollection = $state('');
   let fichiersCollection = $state('');
   let reponseCreationCollection = $state<string | undefined>(undefined);
+  let indexationEnCours = $state(false);
+  let erreursIndexation = $state<{ document: string; detail: string }[]>([]);
+
+  const attendsUneSeconde = () =>
+    new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
+
+  const suitLIndexation = async (identifiantOperation: string) => {
+    let statutIndexation = 'en_cours';
+
+    while (statutIndexation === 'en_cours') {
+      await attendsUneSeconde();
+      const reponseStatut = await fetch(
+        `/api/documents/indexation/${identifiantOperation}`,
+      );
+      const contenuStatut = await reponseStatut.json();
+      statutIndexation = contenuStatut.statut;
+
+      if (statutIndexation !== 'en_cours') {
+        erreursIndexation = contenuStatut.erreurs ?? [];
+        indexationEnCours = false;
+        reponseCreationCollection = erreursIndexation.length
+          ? 'L’indexation est terminée avec des erreurs.'
+          : 'Tous les documents ont été indexés avec succès.';
+      }
+    }
+  };
 
   const creeCollection = async () => {
     if (
@@ -26,6 +54,9 @@
 
     const contenuReponse = await reponse.json();
     reponseCreationCollection = contenuReponse.message;
+    erreursIndexation = [];
+    indexationEnCours = true;
+    await suitLIndexation(contenuReponse.identifiant_operation);
   };
 </script>
 
@@ -88,9 +119,9 @@
       </button>
     </div>
 
-    {#if reponseCreationCollection}
+    {#if reponseCreationCollection && indexationEnCours}
       <div
-        class="mt-4 p-4 bg-green-50 text-green-700 rounded-lg border border-green-100 flex items-center animate-in fade-in slide-in-from-top-2"
+        class="mt-4 p-4 bg-blue-50 text-blue-700 rounded-lg border border-blue-100 flex items-center animate-in fade-in slide-in-from-top-2"
       >
         <svg
           class="w-5 h-5 mr-3 flex-shrink-0"
@@ -104,6 +135,27 @@
           />
         </svg>
         <p class="text-sm">{reponseCreationCollection}</p>
+      </div>
+    {/if}
+
+    {#if reponseCreationCollection && !indexationEnCours && erreursIndexation.length === 0}
+      <div
+        class="mt-4 p-4 bg-green-50 text-green-700 rounded-lg border border-green-100 flex items-center animate-in fade-in slide-in-from-top-2"
+      >
+        <p class="text-sm">{reponseCreationCollection}</p>
+      </div>
+    {/if}
+
+    {#if !indexationEnCours && erreursIndexation.length > 0}
+      <div
+        class="mt-4 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200 animate-in fade-in slide-in-from-top-2"
+      >
+        <p class="text-sm font-medium">{reponseCreationCollection}</p>
+        <ul class="mt-2 list-disc list-inside text-sm">
+          {#each erreursIndexation as erreur (erreur.document)}
+            <li><strong>{erreur.document}</strong> : {erreur.detail}</li>
+          {/each}
+        </ul>
       </div>
     {/if}
   </section>

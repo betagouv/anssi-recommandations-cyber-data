@@ -6,6 +6,7 @@ from documents.indexeur.indexeur import (
     Indexeur,
     DocumentAIndexer,
     ReponseDocument,
+    ReponseDocumentEnErreur,
     ReponseDocumentEnSucces,
 )
 from documents.service_indexation_collections import (
@@ -34,6 +35,7 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
         )
         self.documents_ajoutes = []
         self.collections_creees = {}
+        self.resultats_indexation: list[ReponseDocument] | None = None
 
     def attribue_collection(self, id_collection: str) -> bool:
         self.id_collection = id_collection
@@ -43,6 +45,8 @@ class ClientAlbertIndexationDeTest(ClientAlbertIndexation):
         self, documents: list[DocumentAIndexer]
     ) -> list[ReponseDocument]:
         self.documents_ajoutes = documents
+        if self.resultats_indexation is not None:
+            return self.resultats_indexation
         resultat: list[ReponseDocument] = []
         for document in documents:
             resultat.append(
@@ -142,3 +146,24 @@ def test_jeopardyse_un_guide_de_l_anssi(un_service_jeopardy):
         un_service_jeopardy.donnees_recues.nom_collection == "Jeopardy - le_nouveau_nom"
     )
     assert un_service_jeopardy.donnees_recues.description_collection == "pour tester"
+
+
+def test_ne_jeopardyse_pas_une_collection_sans_document_indexe(un_service_jeopardy):
+    client_indexation = ClientAlbertIndexationDeTest()
+    client_indexation.resultats_indexation = [
+        ReponseDocumentEnErreur(
+            document_en_erreur="doc-1.pdf",
+            detail="La réponse OCR ne contient pas de JSON exploitable",
+        )
+    ]
+
+    ServiceIndexationNouvellesCollections(
+        client_indexation,
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+        CollecteurDocumentsAdditionnelsDeTest(),
+    ).indexe_documents(
+        "le_nouveau_nom", "pour tester", DocumentsSources(fichiers=["doc-1.pdf"])
+    )
+
+    assert not un_service_jeopardy.jeopardyse_appele
