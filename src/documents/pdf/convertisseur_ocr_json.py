@@ -1,22 +1,25 @@
 from __future__ import annotations
 
-import base64
 import json
 import logging
 import re
 import time
-from io import BytesIO
 from pathlib import Path
 from typing import Protocol
 
-import pypdfium2
 import requests
+from pydantic import ValidationError
 
 from documents.pdf.assembleur_blocs_json import (
     BlocOcr,
     PageOcr,
     ResultatOcrPdf,
     TypeDeBlocOcr,
+)
+from documents.pdf._contrat_ocr_json import SCHEMA_BLOCS_OCR, _ReponseOcrJson
+from documents.pdf._rendeur_pages_pdf import (
+    RendeurDePagesPdf,
+    RendeurDePagesPdfPypdfium2,
 )
 from documents.pdf.prompt_ocr_json import PROMPT_OCR_JSON
 
@@ -25,66 +28,8 @@ _log = logging.getLogger(__name__)
 
 
 MODELE_OCR_PAR_DEFAUT = "mistralai/Mistral-Small-3.2-24B-Instruct-2506"
-ECHELLE_DE_RENDU_OCR = 3.0
 DELAI_MAXIMAL_OCR = 300
 NOMBRE_MAXIMAL_DE_TOKENS_DE_COMPLETION_OCR = 8000
-TYPES_DE_BLOCS_OCR = {type_de_bloc.value for type_de_bloc in TypeDeBlocOcr}
-
-
-def _valeur_nullable(type_json: str) -> dict[str, object]:
-    return {"anyOf": [{"type": type_json}, {"type": "null"}]}
-
-
-SCHEMA_BLOCS_OCR: dict[str, object] = {
-    "type": "object",
-    "additionalProperties": False,
-    "properties": {
-        "blocs": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "additionalProperties": False,
-                "properties": {
-                    "type_de_bloc": {"type": "string", "enum": sorted(TYPES_DE_BLOCS_OCR)},
-                    "code_recommandation": _valeur_nullable("string"),
-                    "titre": _valeur_nullable("string"),
-                    "texte": {"type": "string"},
-                    "niveau": _valeur_nullable("integer"),
-                    "est_une_continuation": {"type": "boolean"},
-                    "elements_de_liste": {
-                        "anyOf": [
-                            {"type": "array", "items": {"type": "string"}},
-                            {"type": "null"},
-                        ]
-                    },
-                    "lignes_de_tableau": {
-                        "anyOf": [
-                            {
-                                "type": "array",
-                                "items": {
-                                    "type": "array",
-                                    "items": {"type": "string"},
-                                },
-                            },
-                            {"type": "null"},
-                        ]
-                    },
-                },
-                "required": [
-                    "type_de_bloc",
-                    "code_recommandation",
-                    "titre",
-                    "texte",
-                    "niveau",
-                    "est_une_continuation",
-                    "elements_de_liste",
-                    "lignes_de_tableau",
-                ],
-            },
-        }
-    },
-    "required": ["blocs"],
-}
 
 
 class ErreurOcrJson(RuntimeError):
@@ -109,15 +54,7 @@ class TransportHttp(Protocol):
         ...
 
 
-class RendeurDePagePdf(Protocol):
-    def nombre_de_pages(self, chemin: str | Path) -> int:
-        ...
-
-    def encode_l_image(self, chemin: str | Path, numero_page: int) -> str:
-        ...
-
-
-class ConvertisseurDePagesOcrJson(Protocol):
+class ExtracteurDeBlocsOcr(Protocol):
     def convertit(
         self,
         chemin: str | Path,
@@ -136,38 +73,7 @@ class TransportHttpAlbert:
     ) -> requests.Response:
         return requests.post(url, headers=headers, json=corps, timeout=timeout)
 
-
-class RendeurDePagePdfPypdfium2:
-    def nombre_de_pages(self, chemin: str | Path) -> int:
-        document_pdf = self._ouvre_le_pdf(chemin)
-        try:
-            return len(document_pdf)
-        finally:
-            document_pdf.close()
-
-    def encode_l_image(self, chemin: str | Path, numero_page: int) -> str:
-        document_pdf = self._ouvre_le_pdf(chemin)
-        try:
-            image = document_pdf[numero_page - 1].render(
-                scale=ECHELLE_DE_RENDU_OCR
-            ).to_pil()
-            with BytesIO() as flux:
-                image.save(flux, format="PNG")
-                return base64.b64encode(flux.getvalue()).decode("ascii")
-        finally:
-            document_pdf.close()
-
-    @staticmethod
-    def _ouvre_le_pdf(chemin: str | Path):
-        chemin_pdf = Path(chemin)
-        if chemin_pdf.exists():
-            return pypdfium2.PdfDocument(chemin_pdf)
-        reponse = requests.get(str(chemin), timeout=30)
-        reponse.raise_for_status()
-        return pypdfium2.PdfDocument(BytesIO(reponse.content))
-
-
-class ConvertisseurOcrJson:
+class ExtracteurDeBlocsOcrDepuisUnPdf:
     def __init__(
         self,
         cle_api: str,
@@ -175,21 +81,21 @@ class ConvertisseurOcrJson:
         modele: str = MODELE_OCR_PAR_DEFAUT,
         delai: int = DELAI_MAXIMAL_OCR,
         transport_http: TransportHttp | None = None,
-        rendeur_de_page: RendeurDePagePdf | None = None,
+        rendeur_de_pages: RendeurDePagesPdf | None = None,
     ):
         self.cle_api = cle_api
         self.url_albert = url_albert.rstrip("/")
         self.modele = modele
         self.delai = delai
         self.transport_http = transport_http or TransportHttpAlbert()
-        self.rendeur_de_page = rendeur_de_page or RendeurDePagePdfPypdfium2()
+        self.rendeur_de_pages = rendeur_de_pages or RendeurDePagesPdfPypdfium2()
 
     def convertit(
         self,
         chemin: str | Path,
         plages_de_pages: list[tuple[int, int]] | None,
     ) -> ResultatOcrPdf:
-        nombre_de_pages = self.rendeur_de_page.nombre_de_pages(chemin)
+        nombre_de_pages = self.rendeur_de_pages.nombre_de_pages(chemin)
         pages_a_ocr = self._determine_les_pages_a_ocr(
             nombre_de_pages,
             plages_de_pages,
@@ -200,7 +106,7 @@ class ConvertisseurOcrJson:
             debut_ocr = time.perf_counter()
             blocs_ocr = self._decode_les_blocs(
                 self._appelle_ocr(
-                    self.rendeur_de_page.encode_l_image(chemin, numero_page)
+                    self.rendeur_de_pages.encode_l_image(chemin, numero_page)
                 )
             )
             _log.info(
@@ -292,74 +198,42 @@ class ConvertisseurOcrJson:
 
     @staticmethod
     def _decode_les_blocs(annotation: object) -> list[BlocOcr]:
-        if not isinstance(annotation, dict) or not isinstance(
-            annotation.get("blocs"), list
-        ):
-            raise ErreurOcrJson("La sortie OCR ne contient pas de liste de blocs")
+        try:
+            reponse_ocr = _ReponseOcrJson.model_validate(annotation)
+        except ValidationError as erreur:
+            raise ErreurOcrJson("La sortie OCR ne respecte pas le contrat JSON") from erreur
 
         blocs_ocr: list[BlocOcr] = []
-        for bloc_json in annotation["blocs"]:
-            if not isinstance(bloc_json, dict):
-                raise ErreurOcrJson("Un bloc OCR n'est pas un objet JSON")
-            champs_obligatoires = {
-                "type_de_bloc",
-                "code_recommandation",
-                "titre",
-                "texte",
-                "niveau",
-                "est_une_continuation",
-                "elements_de_liste",
-                "lignes_de_tableau",
-            }
-            if champs_obligatoires - bloc_json.keys():
-                raise ErreurOcrJson("Un bloc OCR ne contient pas toutes ses propriétés")
-            type_de_bloc = bloc_json["type_de_bloc"]
-            if type_de_bloc not in TYPES_DE_BLOCS_OCR:
-                raise ErreurOcrJson("Un bloc OCR possède un type inconnu")
-            code = bloc_json["code_recommandation"]
+        for bloc_json in reponse_ocr.blocs:
+            type_de_bloc = bloc_json.type_de_bloc.value
+            code = bloc_json.code_recommandation
             if code == "":
                 code = None
-            if code is not None and not isinstance(code, str):
-                raise ErreurOcrJson("Un code de recommandation OCR est invalide")
-            titre = bloc_json["titre"]
+            titre = bloc_json.titre
             if titre == "":
                 titre = None
-            texte = bloc_json["texte"]
-            niveau = bloc_json["niveau"]
-            est_une_continuation = bloc_json["est_une_continuation"]
-            elements_de_liste = bloc_json["elements_de_liste"]
-            lignes_de_tableau = bloc_json["lignes_de_tableau"]
-            if not isinstance(titre, (str, type(None))) or not isinstance(texte, str):
-                raise ErreurOcrJson("Le titre ou le texte d'un bloc OCR est invalide")
+            texte = bloc_json.texte
+            niveau = bloc_json.niveau
+            est_une_continuation = bloc_json.est_une_continuation
+            elements_de_liste = bloc_json.elements_de_liste
             if type_de_bloc == TypeDeBlocOcr.RECOMMANDATION.value:
+                code_normalise = re.fullmatch(r"(R\d+)-*", code) if code else None
                 if code is None:
                     type_de_bloc = TypeDeBlocOcr.LISTE.value
+                elif code_normalise is None:
+                    texte = "\n".join(
+                        partie for partie in (code, titre, texte) if partie
+                    )
+                    type_de_bloc = TypeDeBlocOcr.AUTRE.value
+                    code = None
+                    titre = None
                 else:
-                    code_normalise = re.fullmatch(r"(R\d+)-*", code)
-                    if code_normalise is None:
-                        raise ErreurOcrJson(
-                            "Un code de recommandation OCR est invalide"
-                        )
                     code = code_normalise.group(1)
             if type_de_bloc != TypeDeBlocOcr.RECOMMANDATION.value:
                 code = None
-            niveau = ConvertisseurOcrJson._normalise_le_niveau(type_de_bloc, niveau)
-            if not isinstance(est_une_continuation, bool):
-                raise ErreurOcrJson("La continuation d'un bloc OCR est invalide")
-            if elements_de_liste is not None and (
-                not isinstance(elements_de_liste, list)
-                or not all(isinstance(element, str) for element in elements_de_liste)
-            ):
-                raise ErreurOcrJson("Les éléments de liste d'un bloc OCR sont invalides")
-            if lignes_de_tableau is not None and (
-                not isinstance(lignes_de_tableau, list)
-                or not all(
-                    isinstance(ligne, list)
-                    and all(isinstance(cellule, str) for cellule in ligne)
-                    for ligne in lignes_de_tableau
-                )
-            ):
-                raise ErreurOcrJson("Les lignes de tableau d'un bloc OCR sont invalides")
+            niveau = ExtracteurDeBlocsOcrDepuisUnPdf._normalise_le_niveau(
+                type_de_bloc, niveau
+            )
             blocs_ocr.append(
                 BlocOcr(
                     type_de_bloc=TypeDeBlocOcr(type_de_bloc),
@@ -369,9 +243,6 @@ class ConvertisseurOcrJson:
                     niveau=niveau,
                     est_une_continuation=est_une_continuation,
                     elements_de_liste=tuple(elements_de_liste or ()),
-                    lignes_de_tableau=tuple(
-                        tuple(ligne) for ligne in (lignes_de_tableau or ())
-                    ),
                 )
             )
         return blocs_ocr
