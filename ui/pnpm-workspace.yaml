@@ -6,3 +6,5 @@ preferFrozenLockfile: true
 minimumReleaseAgeExclude:
   - flatted@3.4.2
   - prettier@3.9.4
+  # Renovate security update: postcss@8.5.18
+  - postcss@8.5.18
