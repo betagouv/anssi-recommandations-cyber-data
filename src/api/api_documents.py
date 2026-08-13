@@ -94,7 +94,11 @@ def recupere_le_suivi_de_l_indexation(
     suivi = recupere_un_suivi(identifiant_operation)
     if suivi is None:
         raise HTTPException(status_code=404, detail="Identifiant de suivi inconnu")
-    return {"statut": suivi.statut, "erreurs": suivi.erreurs}
+    return {
+        "statut": suivi.statut,
+        "erreurs": suivi.erreurs,
+        "documents_partiels": suivi.documents_partiels,
+    }
 
 
 @api_documents.post("/supprimer", status_code=200)

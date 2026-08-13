@@ -18,6 +18,7 @@ from documents.indexeur.indexeur import (
     ReponseDocumentEnErreur,
     ReponseDocumentEnSucces,
     ReponseDocumentMaitriseEnSucces,
+    ReponseDocumentIndexePartiellement,
 )
 from documents.page import BlocPage
 from infra.executeur_requete import ExecuteurDeRequete
@@ -157,8 +158,25 @@ class IndexeurDocling(Indexeur):
                 for bloc in les_blocs_non_vides
                 if isinstance(bloc, BlocPageReponse) and bloc.id_reponse
             }
-            if mapping:
-                resultat_indexation: ReponseDocument = ReponseDocumentMaitriseEnSucces(
+            resultat_indexation: ReponseDocument
+            if document.erreurs_pages:
+                resultat_indexation = ReponseDocumentIndexePartiellement(
+                    id=resultat["id"],
+                    nom=resultat.get("name", nom_du_document),
+                    id_collection=resultat.get(
+                        "collection_id", str(id_collection)
+                    ),
+                    date_creation=resultat.get("created_at", ""),
+                    date_mise_a_jour=resultat.get("updated_at", ""),
+                    pages_non_indexees=tuple(
+                        erreur.numero_page for erreur in document.erreurs_pages
+                    ),
+                    erreurs=tuple(
+                        erreur.detail for erreur in document.erreurs_pages
+                    ),
+                )
+            elif mapping:
+                resultat_indexation = ReponseDocumentMaitriseEnSucces(
                     id=resultat["id"],
                     name=resultat.get("name", nom_du_document),
                     collection_id=resultat.get("collection_id", str(id_collection)),

@@ -7,6 +7,7 @@ from documents.elements_filtres import ElementsFiltres
 from documents.generateur_de_pages import GenerateurDePages
 from documents.indexeur.indexeur import DocumentAIndexer
 from documents.page import Page, BlocPage
+from documents.pdf.modeles_ocr_json import ErreurPageOcr
 
 
 LONGUEUR_MAXIMALE_D_UNE_METADATA = 255
@@ -21,6 +22,7 @@ class Document:
         self._url = document_a_indexer.url
         self._reponse_maitrisee = reponse_maitrisee
         self.pages: dict[int, Page] = {}
+        self.erreurs_pages: tuple[ErreurPageOcr, ...] = ()
 
     @property
     def nom_document(self):

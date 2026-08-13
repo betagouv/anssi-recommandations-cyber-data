@@ -69,13 +69,26 @@ class ReponseDocumentMaitriseEnSucces(NamedTuple):
     chemin_source: str
 
 
+class ReponseDocumentIndexePartiellement(NamedTuple):
+    id: str
+    nom: str
+    id_collection: str
+    date_creation: str
+    date_mise_a_jour: str
+    pages_non_indexees: tuple[int, ...]
+    erreurs: tuple[str, ...]
+
+
 class ReponseDocumentEnErreur(NamedTuple):
     detail: str
     document_en_erreur: str
 
 
 type ReponseDocument = Union[
-    ReponseDocumentEnSucces, ReponseDocumentMaitriseEnSucces, ReponseDocumentEnErreur
+    ReponseDocumentEnSucces,
+    ReponseDocumentMaitriseEnSucces,
+    ReponseDocumentIndexePartiellement,
+    ReponseDocumentEnErreur,
 ]
 
 
