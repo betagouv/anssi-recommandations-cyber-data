@@ -1,11 +1,13 @@
 <script lang="ts">
+  import { filtreCollectionsSource } from './collection-filters';
   import { collectionsDisponiblesStore } from './store/collections-disponibles.store';
 
   interface Props {
     value: string;
+    exclutJeopardy?: boolean;
   }
 
-  let { value = $bindable('') }: Props = $props();
+  let { value = $bindable(''), exclutJeopardy = false }: Props = $props();
 
   $effect(() => {
     collectionsDisponiblesStore
@@ -19,6 +21,12 @@
       month: 'long',
       day: 'numeric',
     });
+
+  let collections = $derived(
+    exclutJeopardy
+      ? filtreCollectionsSource($collectionsDisponiblesStore ?? [])
+      : ($collectionsDisponiblesStore ?? []),
+  );
 </script>
 
 <select
@@ -26,7 +34,7 @@
   class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
 >
   <option value="" disabled selected>Sélectionner une collection</option>
-  {#each $collectionsDisponiblesStore ?? [] as collection (collection.id)}
+  {#each collections as collection (collection.id)}
     <option value={collection.id}>
       {collection.nom} (id : {collection.id}) — {formaterDate(collection.date_de_creation)}
     </option>

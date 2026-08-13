@@ -3,7 +3,9 @@
     messageResultatIndexation,
     type DocumentPartiel,
   } from './indexation';
+  import SelecteurCollection from './SelecteurCollection.svelte';
 
+  let idCollectionIndexee = $state('');
   let fichiersAAjouter = $state<string>('');
   let urlAAjouter = $state<string>('');
   let fichiersAModifier = $state<string>('');
@@ -58,6 +60,7 @@
         fichiers_modifies: fichiersModifies,
         fichiers_supprimes: fichiersSupprimes,
         url_a_ajouter: urlAAjouter.trim() || null,
+        id_collection_indexee: idCollectionIndexee || null,
       }),
     });
 
@@ -76,6 +79,13 @@
   </div>
 
   <section class="grid gap-6">
+    <div class="flex flex-col gap-1.5">
+      <label for="id-collection-indexee" class="text-sm font-medium text-gray-700"
+        >Collection à modifier :</label
+      >
+      <SelecteurCollection bind:value={idCollectionIndexee} exclutJeopardy />
+    </div>
+
     <div class="flex flex-col gap-1.5">
       <label for="fichiers-a-ajouter" class="text-sm font-medium text-gray-700"
         >Fichiers à ajouter :</label
@@ -138,6 +148,7 @@
       <button
         type="button"
         onclick={metsAJourLaCollection}
+        disabled={!idCollectionIndexee || indexationEnCours}
         class="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Mettre à jour les documents
