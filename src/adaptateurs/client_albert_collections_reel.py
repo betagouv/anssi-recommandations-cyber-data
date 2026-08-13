@@ -72,18 +72,48 @@ class ClientAlbertCollectionsReel(ClientAlbertCollections):
         return ReponseDocuments(indexee=documents_indexes, jeopardy=documents_jeopardy)
 
     def liste_les_collections_disponibles(self) -> list[ReponseCollection]:
-        params = {
-            "limit": 10,
-            "order_by": "created",
-            "order_direction": "desc",
-            "visibility": "private",
-        }
-        reponse = self.executeur_de_requete.recupere(
-            f"{self.url}/collections", params
-        )
-        return [
-            self._en_reponse_collection(c) for c in reponse.json()["data"]
-        ]
+        collections: list[ReponseCollection] = []
+        offset = 0
+        while True:
+            params = {
+                "limit": 100,
+                "offset": offset,
+                "order_by": "created",
+                "order_direction": "desc",
+                "visibility": "private",
+            }
+            reponse = self.executeur_de_requete.recupere(
+                f"{self.url}/collections", params
+            )
+            page = reponse.json()["data"]
+            collections.extend(self._en_reponse_collection(collection) for collection in page)
+            if len(page) < 100:
+                return collections
+            offset += len(page)
+
+    def liste_documents_d_une_collection(
+        self, id_collection: str
+    ) -> list[ReponseDocumentCollection]:
+        documents: list[ReponseDocumentCollection] = []
+        offset = 0
+        while True:
+            params = {"collection_id": id_collection, "limit": 100, "offset": offset}
+            reponse = self.executeur_de_requete.recupere(
+                f"{self.url}/documents", params
+            )
+            page = reponse.json()["data"]
+            documents.extend(
+                ReponseDocumentCollection(
+                    id=document["id"],
+                    name=document["name"],
+                    created=document["created"],
+                    chunks=document["chunks"],
+                )
+                for document in page
+            )
+            if len(page) < 100:
+                return documents
+            offset += len(page)
 
     def _en_reponse_collection(self, donnees_collection_indexee) -> ReponseCollection:
         return ReponseCollection(

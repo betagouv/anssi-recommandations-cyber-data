@@ -7,3 +7,6 @@ const estUneCollectionJeopardy = (collection: CollectionDisponible) =>
 
 export const filtreCollectionsSource = (collections: CollectionDisponible[]) =>
   collections.filter((collection) => !estUneCollectionJeopardy(collection));
+
+export const filtreCollectionsJeopardy = (collections: CollectionDisponible[]) =>
+  collections.filter(estUneCollectionJeopardy);

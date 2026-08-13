@@ -221,7 +221,8 @@ def test_liste_les_collections_disponibles_avec_les_bons_parametres(
     resultat = client.liste_les_collections_disponibles()
 
     assert executeur.parametres_recus["https://test.api/collections"] == {
-        "limit": 10,
+        "limit": 100,
+        "offset": 0,
         "order_by": "created",
         "order_direction": "desc",
         "visibility": "private",

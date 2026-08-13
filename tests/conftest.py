@@ -470,6 +470,24 @@ class ClientAlbertCollectionsDeTest(ClientAlbertCollections):
             ),
         ]
 
+    def liste_documents_d_une_collection(
+        self, id_collection: str
+    ) -> list[ReponseDocumentCollection]:
+        return [
+            ReponseDocumentCollection(
+                chunks=2,
+                id="2",
+                name="doc-2.pdf",
+                created="1672531200",
+            ),
+            ReponseDocumentCollection(
+                chunks=2,
+                id="1",
+                name="doc-1.pdf",
+                created="1672531200",
+            ),
+        ]
+
 
 @pytest.fixture()
 def un_client_albert_collection() -> ClientAlbertCollections:

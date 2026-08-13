@@ -125,5 +125,11 @@ class ClientAlbertCollections(ABC):
         pass
 
     @abstractmethod
+    def liste_documents_d_une_collection(
+        self, id_collection: str
+    ) -> list[ReponseDocumentCollection]:
+        pass
+
+    @abstractmethod
     def liste_les_collections_disponibles(self) -> list[ReponseCollection]:
         pass

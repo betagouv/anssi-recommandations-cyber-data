@@ -58,6 +58,44 @@ def test_transmet_l_identifiant_de_la_collection_source_selectionnee(
     assert service_indexation_document.id_collection_indexee == "collection-selectionnee"
 
 
+def test_transmet_l_identifiant_de_la_collection_jeopardy_selectionnee(
+    un_serveur_de_test_complet,
+):
+    (serveur, _, _, _, _, _, service_indexation_document) = un_serveur_de_test_complet(
+        None
+    )
+    client: TestClient = TestClient(serveur)
+
+    client.post(
+        "/api/documents/",
+        json={
+            "fichiers_ajoutes": ["doc-1.pdf"],
+            "id_collection_jeopardy": "jeopardy-selectionnee",
+        },
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert service_indexation_document.id_collection_jeopardy == "jeopardy-selectionnee"
+
+
+def test_retourne_les_documents_d_une_collection_tries_par_nom(
+    un_serveur_de_test_pour_collections,
+):
+    (serveur, *_) = un_serveur_de_test_pour_collections()
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.get(
+        "/api/collections/1/documents",
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert reponse.status_code == 200
+    assert [document["nom"] for document in reponse.json()["documents"]] == [
+        "doc-1.pdf",
+        "doc-2.pdf",
+    ]
+
+
 def test_transmet_l_url_du_document_a_ajouter_au_service_d_indexation(
     un_serveur_de_test_complet,
 ):
