@@ -65,16 +65,16 @@
       });
   });
 
-  const attendsUneSeconde = () =>
+  const attendsTrenteSecondes = () =>
     new Promise((resolve) => {
-      setTimeout(resolve, 1000);
+      setTimeout(resolve, 30_000);
     });
 
   const suitLIndexation = async (identifiantOperation: string) => {
     let statutIndexation = 'en_cours';
 
     while (statutIndexation === 'en_cours') {
-      await attendsUneSeconde();
+      await attendsTrenteSecondes();
       const reponseStatut = await fetch(
         `/api/documents/indexation/${identifiantOperation}`,
       );
