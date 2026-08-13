@@ -69,6 +69,7 @@ class ChunkerDoclingMQC(ChunkerDocling):
             document_a_indexer.chemin,
             plages_de_pages_avec_du_contenu,
         )
+        document.erreurs_pages = resultat_ocr.erreurs
         blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
         pages: dict[int, Page] = {
             numero_page: PagePDF(numero_page)

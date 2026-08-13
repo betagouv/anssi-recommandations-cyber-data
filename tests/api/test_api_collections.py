@@ -59,6 +59,7 @@ def test_retourne_le_statut_en_erreur_lors_de_la_creation_d_une_collection(
                 "detail": "La réponse OCR ne contient pas de JSON exploitable",
             }
         ],
+        "documents_partiels": [],
     }
 
 

@@ -1,6 +1,9 @@
 from fastapi.testclient import TestClient
 
-from documents.indexeur.indexeur import ReponseDocumentEnErreur
+from documents.indexeur.indexeur import (
+    ReponseDocumentEnErreur,
+    ReponseDocumentIndexePartiellement,
+)
 
 
 def test_ajoute_un_document(un_serveur_de_test_complet):
@@ -96,7 +99,11 @@ def test_retourne_le_statut_termine_sans_erreur(un_serveur_de_test_complet):
         headers={"Authorization": "Bearer token-valide"},
     )
 
-    assert statut.json() == {"statut": "terminee", "erreurs": []}
+    assert statut.json() == {
+        "statut": "terminee",
+        "erreurs": [],
+        "documents_partiels": [],
+    }
 
 
 def test_retourne_le_statut_en_erreur_avec_le_document_et_le_detail(
@@ -131,6 +138,52 @@ def test_retourne_le_statut_en_erreur_avec_le_document_et_le_detail(
             {
                 "document": "doc-1.pdf",
                 "detail": "ReadTimeout après 300 secondes",
+            }
+        ],
+        "documents_partiels": [],
+    }
+
+
+def test_retourne_le_statut_partiel_et_les_pages_non_indexees(
+    un_serveur_de_test_complet,
+) -> None:
+    (serveur, _, _, _, _, _, service_indexation_document) = (
+        un_serveur_de_test_complet(None)
+    )
+    service_indexation_document.resultats_indexation = [
+        ReponseDocumentIndexePartiellement(
+            id="doc-1",
+            nom="doc-1.pdf",
+            id_collection="123",
+            date_creation="",
+            date_mise_a_jour="",
+            pages_non_indexees=(18,),
+            erreurs=("Réponse JSON invalide",),
+        )
+    ]
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.post(
+        "/api/documents/",
+        json={"fichiers_ajoutes": ["doc-1.pdf"]},
+        headers={"Authorization": "Bearer token-valide"},
+    )
+    identifiant_operation = reponse.json()["identifiant_operation"]
+
+    statut = client.get(
+        f"/api/documents/indexation/{identifiant_operation}",
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert statut.json() == {
+        "statut": "terminee_partiellement",
+        "erreurs": [],
+        "documents_partiels": [
+            {
+                "document": "doc-1.pdf",
+                "id": "doc-1",
+                "pages_non_indexees": [18],
+                "erreurs": ["Réponse JSON invalide"],
             }
         ],
     }

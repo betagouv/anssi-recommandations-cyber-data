@@ -1,13 +1,18 @@
 import json
 
+from documents.docling.document import Document
+from documents.docling.chunker_docling_mqc import ChunkerDoclingMQC
 from documents.docling.multi_processeur import Multiprocesseur
 from documents.html.document_html import DocumentReponsesMaitrisees
 from documents.indexeur.indexeur import (
     ReponseDocumentEnErreur,
+    DocumentAIndexer,
     ReponseDocumentMaitriseEnSucces,
+    ReponseDocumentIndexePartiellement,
 )
 from documents.indexeur.indexeur_docling import IndexeurDocling
-from documents.pdf.document_pdf import DocumentPDF
+from documents.pdf.document_pdf import BlocPagePDF, DocumentPDF, PagePDF
+from documents.pdf.modeles_ocr_json import ErreurPageOcr
 
 
 class MultiProcesseurDeTest(Multiprocesseur):
@@ -16,6 +21,49 @@ class MultiProcesseurDeTest(Multiprocesseur):
         for chunk in iterable:
             resultats.append(func(chunk))
         return resultats
+
+
+class ChunkerPartielDeTest(ChunkerDoclingMQC):
+    def applique(self, document_a_indexer: DocumentAIndexer) -> Document:
+        document = Document(document_a_indexer)
+        document.pages = {
+            1: PagePDF(1, [BlocPagePDF(texte="Un contenu", numero_page=1)])
+        }
+        document.erreurs_pages = (ErreurPageOcr(18, "Réponse JSON invalide"),)
+        return document
+
+
+def test_retourne_un_document_partiel_quand_une_page_a_echoue(
+    une_reponse_document,
+    fichier_pdf,
+    un_executeur_de_requete,
+    une_reponse_attendue_OK,
+    une_reponse_chunk,
+) -> None:
+    chemin_fichier = str(fichier_pdf("test.pdf").resolve())
+    executeur_de_requete = un_executeur_de_requete(
+        [
+            une_reponse_attendue_OK(une_reponse_document),
+            une_reponse_attendue_OK(une_reponse_chunk),
+        ]
+    )
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        ChunkerPartielDeTest(),
+        executeur_de_requete,
+        MultiProcesseurDeTest(),
+    )
+
+    reponses = indexeur.ajoute_documents(
+        [DocumentPDF(chemin_fichier, "https://example.com/test.pdf")], "12345"
+    )
+
+    assert isinstance(reponses[0], ReponseDocumentIndexePartiellement)
+    assert reponses[0].nom == "test.pdf"
+    assert reponses[0].id_collection == "12345"
+    assert reponses[0].pages_non_indexees == (18,)
+    assert reponses[0].erreurs == ("Réponse JSON invalide",)
 
 
 def test_peut_indexer_un_document_pdf(

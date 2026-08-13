@@ -7,6 +7,7 @@ from documents.indexeur.indexeur import (
     ReponseDocument,
     ReponseDocumentEnSucces,
     ReponseDocumentMaitriseEnSucces,
+    ReponseDocumentIndexePartiellement,
 )
 from documents.pdf.cree_document_pdf import normalise_url
 from documents.pdf.document_pdf import DocumentPDFDistant
@@ -72,10 +73,19 @@ class ServiceIndexationNouveauxDocuments:
             documents_indexes
         )
         noms_documents_indexes = [
-            resultat.name
+            (
+                resultat.nom
+                if isinstance(resultat, ReponseDocumentIndexePartiellement)
+                else resultat.name
+            )
             for resultat in resultats
             if isinstance(
-                resultat, (ReponseDocumentEnSucces, ReponseDocumentMaitriseEnSucces)
+                resultat,
+                (
+                    ReponseDocumentEnSucces,
+                    ReponseDocumentMaitriseEnSucces,
+                    ReponseDocumentIndexePartiellement,
+                ),
             )
         ]
         if noms_documents_indexes:
