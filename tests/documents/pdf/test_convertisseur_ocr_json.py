@@ -1,14 +1,51 @@
+import json
+
 import pytest
 
 from documents.pdf.assembleur_blocs_json import TypeDeBlocOcr
 from documents.pdf.convertisseur_ocr_json import (
     ExtracteurDeBlocsOcrDepuisUnPdf,
     DELAI_MAXIMAL_OCR,
-    ErreurOcrJson,
     MODELE_OCR_PAR_DEFAUT,
     NOMBRE_MAXIMAL_DE_TOKENS_DE_COMPLETION_OCR,
+    ReponseHttp,
     SCHEMA_BLOCS_OCR,
 )
+
+
+class TransportHttpOcrJsonParPage:
+    def __init__(self, contenus_par_page: dict[int, object]) -> None:
+        self.contenus_par_page = contenus_par_page
+        self.requetes: list[int] = []
+
+    def post(
+        self,
+        url: str,
+        headers: dict[str, str],
+        corps: dict[str, object],
+        timeout: int,
+    ) -> ReponseHttp:
+        numero_page = len(self.requetes) + 1
+        self.requetes.append(numero_page)
+        contenu = self.contenus_par_page[numero_page]
+        if isinstance(contenu, Exception):
+            raise contenu
+        return ReponseHttpOcrJsonDeTest(contenu, 200)
+
+
+class ReponseHttpOcrJsonDeTest:
+    def __init__(self, contenu: object, code_http: int) -> None:
+        self.contenu = contenu
+        self.status_code = code_http
+
+    def json(self) -> object:
+        return {
+            "choices": [
+                {"message": {"content": json.dumps(self.contenu, ensure_ascii=False)}}
+            ]
+        }
+
+
 def annotation_ocr_json(**modifications):
     bloc = {
         "type_de_bloc": "paragraphe",
@@ -89,6 +126,32 @@ def test_decode_une_reponse_json_valide(un_convertisseur_ocr_json):
     assert resultat_ocr.nombre_de_pages == 1
     assert resultat_ocr.pages[0].numero_page == 1
     assert resultat_ocr.pages[0].blocs[0].texte == "Texte OCR"
+
+
+def test_continue_apres_une_erreur_ocr_sur_une_page(
+    un_rendeur_de_page_pdf_de_test,
+) -> None:
+    transport_http = TransportHttpOcrJsonParPage(
+        {
+            1: annotation_ocr_json(),
+            2: "réponse tronquée",
+            3: annotation_ocr_json(texte="Page 3"),
+        }
+    )
+    convertisseur = ExtracteurDeBlocsOcrDepuisUnPdf(
+        cle_api="cle-secrete",
+        url_albert="https://albert.local/v1",
+        transport_http=transport_http,
+        rendeur_de_pages=un_rendeur_de_page_pdf_de_test(nombre_de_pages=3),
+    )
+
+    resultat_ocr = convertisseur.convertit("document.pdf", None)
+
+    assert [page.numero_page for page in resultat_ocr.pages] == [1, 3]
+    assert resultat_ocr.pages_non_indexees == (2,)
+    assert resultat_ocr.erreurs[0].detail == (
+        "La sortie OCR ne respecte pas le contrat JSON"
+    )
 
 
 def test_decode_une_reponse_contenant_un_tableau_html(un_convertisseur_ocr_json):
@@ -188,8 +251,10 @@ def test_refuse_une_reponse_ocr_invalide(
 ):
     convertisseur, _ = un_convertisseur_ocr_json(contenu, code_http)
 
-    with pytest.raises(ErreurOcrJson):
-        convertisseur.convertit("document.pdf", None)
+    resultat_ocr = convertisseur.convertit("document.pdf", None)
+
+    assert resultat_ocr.pages == ()
+    assert resultat_ocr.pages_non_indexees == (1,)
 
 
 def test_normalise_un_code_de_recommandation_avec_des_tirets_de_fin(
@@ -244,10 +309,9 @@ def test_ignore_un_identifiant_de_bloc_qui_n_est_pas_une_recommandation(
 def test_ne_retourne_jamais_la_cle_api_dans_une_erreur(un_convertisseur_ocr_json):
     convertisseur, _ = un_convertisseur_ocr_json({}, code_http=500)
 
-    with pytest.raises(ErreurOcrJson) as erreur:
-        convertisseur.convertit("document.pdf", None)
+    resultat_ocr = convertisseur.convertit("document.pdf", None)
 
-    assert "cle-secrete" not in str(erreur.value)
+    assert "cle-secrete" not in resultat_ocr.erreurs[0].detail
 
 
 def test_le_schema_accepte_une_table_des_matieres():
