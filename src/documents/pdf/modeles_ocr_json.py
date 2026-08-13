@@ -33,9 +33,20 @@ class PageOcr:
 
 
 @dataclass(frozen=True)
+class ErreurPageOcr:
+    numero_page: int
+    detail: str
+
+
+@dataclass(frozen=True)
 class ResultatOcrPdf:
     nombre_de_pages: int
     pages: tuple[PageOcr, ...]
+    erreurs: tuple[ErreurPageOcr, ...] = ()
+
+    @property
+    def pages_non_indexees(self) -> tuple[int, ...]:
+        return tuple(erreur.numero_page for erreur in self.erreurs)
 
 
 @dataclass(frozen=True)

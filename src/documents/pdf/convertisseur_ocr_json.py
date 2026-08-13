@@ -16,6 +16,7 @@ from documents.pdf.assembleur_blocs_json import (
     ResultatOcrPdf,
     TypeDeBlocOcr,
 )
+from documents.pdf.modeles_ocr_json import ErreurPageOcr
 from documents.pdf._contrat_ocr_json import SCHEMA_BLOCS_OCR, _ReponseOcrJson
 from documents.pdf._rendeur_pages_pdf import (
     RendeurDePagesPdf,
@@ -100,15 +101,25 @@ class ExtracteurDeBlocsOcrDepuisUnPdf:
             nombre_de_pages,
             plages_de_pages,
         )
-        pages_ocr = []
+        pages_ocr: list[PageOcr] = []
+        erreurs: list[ErreurPageOcr] = []
         for numero_page in pages_a_ocr:
             _log.info("Début OCR de la page %s/%s", numero_page, nombre_de_pages)
             debut_ocr = time.perf_counter()
-            blocs_ocr = self._decode_les_blocs(
-                self._appelle_ocr(
-                    self.rendeur_de_pages.encode_l_image(chemin, numero_page)
+            try:
+                blocs_ocr = self._decode_les_blocs(
+                    self._appelle_ocr(
+                        self.rendeur_de_pages.encode_l_image(chemin, numero_page)
+                    )
                 )
-            )
+            except ErreurOcrJson as erreur:
+                _log.exception(
+                    "Échec OCR de la page %s/%s", numero_page, nombre_de_pages
+                )
+                erreurs.append(
+                    ErreurPageOcr(numero_page=numero_page, detail=str(erreur))
+                )
+                continue
             _log.info(
                 "Fin OCR de la page %s/%s en %.1f secondes",
                 numero_page,
@@ -116,7 +127,11 @@ class ExtracteurDeBlocsOcrDepuisUnPdf:
                 time.perf_counter() - debut_ocr,
             )
             pages_ocr.append(PageOcr(numero_page=numero_page, blocs=tuple(blocs_ocr)))
-        return ResultatOcrPdf(nombre_de_pages=nombre_de_pages, pages=tuple(pages_ocr))
+        return ResultatOcrPdf(
+            nombre_de_pages=nombre_de_pages,
+            pages=tuple(pages_ocr),
+            erreurs=tuple(erreurs),
+        )
 
     @staticmethod
     def _determine_les_pages_a_ocr(
