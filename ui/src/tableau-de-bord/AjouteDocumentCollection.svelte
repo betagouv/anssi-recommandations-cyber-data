@@ -1,4 +1,9 @@
 <script lang="ts">
+  import {
+    messageResultatIndexation,
+    type DocumentPartiel,
+  } from './indexation';
+
   let fichiersAAjouter = $state<string>('');
   let urlAAjouter = $state<string>('');
   let fichiersAModifier = $state<string>('');
@@ -6,6 +11,7 @@
   let reponseMiseAJourDocuments = $state<string | undefined>(undefined);
   let indexationEnCours = $state(false);
   let erreursIndexation = $state<{ document: string; detail: string }[]>([]);
+  let documentsPartiels = $state<DocumentPartiel[]>([]);
 
   const attendsUneSeconde = () =>
     new Promise((resolve) => {
@@ -25,10 +31,12 @@
 
       if (statutIndexation !== 'en_cours') {
         erreursIndexation = contenuStatut.erreurs ?? [];
+        documentsPartiels = contenuStatut.documents_partiels ?? [];
         indexationEnCours = false;
-        reponseMiseAJourDocuments = erreursIndexation.length
-          ? 'L’indexation est terminée avec des erreurs.'
-          : 'Tous les documents ont été indexés avec succès.';
+        reponseMiseAJourDocuments = messageResultatIndexation(
+          erreursIndexation,
+          documentsPartiels,
+        );
       }
     }
   };
@@ -56,6 +64,7 @@
     const contenuReponse = await reponse.json();
     reponseMiseAJourDocuments = contenuReponse.message;
     erreursIndexation = [];
+    documentsPartiels = [];
     indexationEnCours = true;
     await suitLIndexation(contenuReponse.identifiant_operation);
   };
@@ -154,11 +163,39 @@
       </div>
     {/if}
 
-    {#if reponseMiseAJourDocuments && !indexationEnCours && erreursIndexation.length === 0}
+    {#if
+      reponseMiseAJourDocuments &&
+      !indexationEnCours &&
+      erreursIndexation.length === 0 &&
+      documentsPartiels.length === 0
+    }
       <div
         class="mt-4 p-4 bg-blue-50 text-blue-700 rounded-lg border border-blue-100 flex items-center animate-in fade-in slide-in-from-top-2"
       >
         <p class="text-sm">{reponseMiseAJourDocuments}</p>
+      </div>
+    {/if}
+
+    {#if !indexationEnCours && documentsPartiels.length > 0}
+      <div
+        class="mt-4 p-4 bg-amber-50 text-amber-800 rounded-lg border border-amber-200 animate-in fade-in slide-in-from-top-2"
+      >
+        <p class="text-sm font-medium">{reponseMiseAJourDocuments}</p>
+        <ul class="mt-2 list-disc list-inside text-sm">
+          {#each documentsPartiels as documentPartiel (documentPartiel.id)}
+            <li>
+              <strong>{documentPartiel.document}</strong> — pages non indexées :
+              {documentPartiel.pages_non_indexees.join(', ')}
+              {#if documentPartiel.erreurs.length > 0}
+                <ul class="ml-5 list-disc">
+                  {#each documentPartiel.erreurs as erreur}
+                    <li>{erreur}</li>
+                  {/each}
+                </ul>
+              {/if}
+            </li>
+          {/each}
+        </ul>
       </div>
     {/if}
 
