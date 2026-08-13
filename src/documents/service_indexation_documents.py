@@ -38,8 +38,12 @@ class ServiceIndexationNouveauxDocuments:
         documents_a_supprimer: list[str] = [],
         url_a_ajouter: str | None = None,
         id_collection_indexee: str | None = None,
+        id_collection_jeopardy: str | None = None,
     ) -> list[ReponseDocument]:
         id_collection = id_collection_indexee or self._id_collection
+        id_collection_jeopardy = (
+            id_collection_jeopardy or self._id_collection_jeopardy
+        )
         self._client_indexation.attribue_collection(id_collection)
         documents_a_indexer: list[DocumentAIndexer] = [
             DocumentPDFDistant(document, normalise_url(document, self._configuration_MSC))
@@ -61,7 +65,7 @@ class ServiceIndexationNouveauxDocuments:
                     )
                 identifiant_document_jeopardy_existant = (
                     self._client_indexation.document_existe(
-                        document.nom_document, self._id_collection_jeopardy
+                        document.nom_document, id_collection_jeopardy
                     )
                 )
                 if identifiant_document_jeopardy_existant:
@@ -94,7 +98,7 @@ class ServiceIndexationNouveauxDocuments:
             self._service_jeopardy.jeopardyse(
                 ListeDeDocuments(
                     noms_documents=noms_documents_indexes,
-                    id_collection_jeopardy=self._id_collection_jeopardy,
+                    id_collection_jeopardy=id_collection_jeopardy,
                     id_collection_mqc=id_collection,
                 )
             )
@@ -107,7 +111,7 @@ class ServiceIndexationNouveauxDocuments:
 
             identifiant_document_jeopardy_existant = (
                 self._client_indexation.document_existe(
-                    document_a_supprimer, self._id_collection_jeopardy
+                    document_a_supprimer, id_collection_jeopardy
                 )
             )
 

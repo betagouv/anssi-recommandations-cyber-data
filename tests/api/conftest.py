@@ -334,6 +334,7 @@ class ServiceIndexationNouveauxDocumentsDeTest(ServiceIndexationNouveauxDocument
         self.documents_supprimes = []
         self.url_a_ajouter = None
         self.id_collection_indexee = None
+        self.id_collection_jeopardy = None
         self.resultats_indexation: list[ReponseDocument] = []
 
     def indexe_documents(
@@ -342,12 +343,14 @@ class ServiceIndexationNouveauxDocumentsDeTest(ServiceIndexationNouveauxDocument
         documents_a_supprimer: list[str] = [],
         url_a_ajouter: str | None = None,
         id_collection_indexee: str | None = None,
+        id_collection_jeopardy: str | None = None,
     ):
         self.appele = True
         self.documents_ajoutes = documents_a_ajouter
         self.documents_supprimes = documents_a_supprimer
         self.url_a_ajouter = url_a_ajouter
         self.id_collection_indexee = id_collection_indexee
+        self.id_collection_jeopardy = id_collection_jeopardy
         return self.resultats_indexation
 
 
@@ -448,6 +451,22 @@ class ServiceCollectionsDeTest(ServiceCollections):
                 ),
             ],
         )
+
+    def les_documents_d_une_collection(self, id_collection: str) -> list[Document]:
+        return [
+            Document(
+                id="2",
+                nom="doc-2.pdf",
+                date_de_creation="2023-01-01T00:00:00",
+                chunks=3,
+            ),
+            Document(
+                id="1",
+                nom="doc-1.pdf",
+                date_de_creation="2023-01-01T00:00:00",
+                chunks=2,
+            ),
+        ]
 
 
 class ConstructeurServeur:

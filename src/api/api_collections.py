@@ -84,3 +84,20 @@ def recupere_collections_disponibles(
     _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
 ):
     return {"collections": service.les_collections_disponibles()}
+
+
+@api_collections.get("/{id_collection}/documents", status_code=200)
+def recupere_documents_d_une_collection(
+    id_collection: str,
+    service: ServiceCollections = Depends(fabrique_service_collections),  # type: ignore[assignment]
+    _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
+):
+    return {
+        "documents": [
+            document._asdict()
+            for document in sorted(
+                service.les_documents_d_une_collection(id_collection),
+                key=lambda document: document.nom.lower(),
+            )
+        ]
+    }

@@ -1,13 +1,21 @@
 <script lang="ts">
-  import { filtreCollectionsSource } from './collection-filters';
+  import {
+    filtreCollectionsJeopardy,
+    filtreCollectionsSource,
+  } from './collection-filters';
   import { collectionsDisponiblesStore } from './store/collections-disponibles.store';
 
   interface Props {
     value: string;
     exclutJeopardy?: boolean;
+    uniquementJeopardy?: boolean;
   }
 
-  let { value = $bindable(''), exclutJeopardy = false }: Props = $props();
+  let {
+    value = $bindable(''),
+    exclutJeopardy = false,
+    uniquementJeopardy = false,
+  }: Props = $props();
 
   $effect(() => {
     collectionsDisponiblesStore
@@ -25,7 +33,9 @@
   let collections = $derived(
     exclutJeopardy
       ? filtreCollectionsSource($collectionsDisponiblesStore ?? [])
-      : ($collectionsDisponiblesStore ?? []),
+      : uniquementJeopardy
+        ? filtreCollectionsJeopardy($collectionsDisponiblesStore ?? [])
+        : ($collectionsDisponiblesStore ?? []),
   );
 </script>
 
@@ -35,7 +45,7 @@
 >
   <option value="" disabled selected>Sélectionner une collection</option>
   {#each collections as collection (collection.id)}
-    <option value={collection.id}>
+    <option value={String(collection.id)}>
       {collection.nom} (id : {collection.id}) — {formaterDate(collection.date_de_creation)}
     </option>
   {/each}

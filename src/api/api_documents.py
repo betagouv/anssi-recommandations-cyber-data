@@ -31,6 +31,7 @@ class RequeteIndexationDocument(BaseModel):
     fichiers_supprimes: list[str] = []
     url_a_ajouter: str | None = None
     id_collection_indexee: str | None = None
+    id_collection_jeopardy: str | None = None
 
 
 class RequeteSuppressionDocuments(BaseModel):
@@ -44,6 +45,7 @@ def _indexe_les_documents_et_met_a_jour_le_suivi(
     documents_a_supprimer: list[str],
     url_a_ajouter: str | None,
     id_collection_indexee: str | None,
+    id_collection_jeopardy: str | None,
 ):
     try:
         resultats = service_indexation_document.indexe_documents(
@@ -51,6 +53,7 @@ def _indexe_les_documents_et_met_a_jour_le_suivi(
             documents_a_supprimer,
             url_a_ajouter,
             id_collection_indexee,
+            id_collection_jeopardy,
         ) or []
         termine_le_suivi(identifiant_operation, resultats)
     except Exception as erreur:
@@ -83,6 +86,7 @@ def indexe_documents(
         list(filter(lambda doc: doc.endswith(".pdf"), requete.fichiers_supprimes)),
         requete.url_a_ajouter,
         requete.id_collection_indexee,
+        requete.id_collection_jeopardy,
     )
     return {
         "message": "Indexation en cours d’exécution...",

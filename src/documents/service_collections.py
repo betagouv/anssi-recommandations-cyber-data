@@ -126,6 +126,22 @@ class ServiceCollections:
             jeopardy=mappe_en_document(les_documents.jeopardy),
         )
 
+    def les_documents_d_une_collection(self, id_collection: str) -> list[Document]:
+        return sorted(
+            [
+                Document(
+                    id=document.id,
+                    nom=document.name,
+                    date_de_creation=ServiceCollections.en_date(document.created),
+                    chunks=document.chunks,
+                )
+                for document in self.client_albert.liste_documents_d_une_collection(
+                    id_collection
+                )
+            ],
+            key=lambda document: document.nom.lower(),
+        )
+
     @staticmethod
     def en_date(date: str) -> str:
         return datetime.fromtimestamp(int(date)).astimezone(timezone.utc).isoformat()

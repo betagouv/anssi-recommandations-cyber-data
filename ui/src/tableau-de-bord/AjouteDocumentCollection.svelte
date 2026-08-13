@@ -4,8 +4,18 @@
     type DocumentPartiel,
   } from './indexation';
   import SelecteurCollection from './SelecteurCollection.svelte';
+  import { collectionStore } from './store/collection.store';
+  import {
+    creeRequeteJeopardyDocument,
+    recupereDocumentsDuneCollection,
+    type DocumentCollection,
+  } from './jeopardy-document';
 
   let idCollectionIndexee = $state('');
+  let idCollectionJeopardy = $state('');
+  let documentAJeopardyser = $state('');
+  let documentsCollection = $state<DocumentCollection[]>([]);
+  let reponseJeopardy = $state<string | undefined>(undefined);
   let fichiersAAjouter = $state<string>('');
   let urlAAjouter = $state<string>('');
   let fichiersAModifier = $state<string>('');
@@ -14,6 +24,46 @@
   let indexationEnCours = $state(false);
   let erreursIndexation = $state<{ document: string; detail: string }[]>([]);
   let documentsPartiels = $state<DocumentPartiel[]>([]);
+
+  const detailErreurApi = (detail: unknown, statut: number) => {
+    if (typeof detail === 'string') return detail;
+    if (Array.isArray(detail)) {
+      return detail
+        .map((erreur) =>
+          typeof erreur === 'object' && erreur !== null && 'msg' in erreur
+            ? String(erreur.msg)
+            : JSON.stringify(erreur),
+        )
+        .join('; ');
+    }
+    return `Erreur HTTP ${statut}`;
+  };
+
+  $effect(() => {
+    if (!idCollectionIndexee && $collectionStore?.indexee.id) {
+      idCollectionIndexee = String($collectionStore.indexee.id);
+    }
+    if (!idCollectionJeopardy && $collectionStore?.jeopardy.id) {
+      idCollectionJeopardy = String($collectionStore.jeopardy.id);
+    }
+  });
+
+  $effect(() => {
+    const idCollection = idCollectionIndexee;
+    documentAJeopardyser = '';
+    if (!idCollection) {
+      documentsCollection = [];
+      return;
+    }
+
+    recupereDocumentsDuneCollection(idCollection)
+      .then((documents) => {
+        if (idCollectionIndexee === idCollection) documentsCollection = documents;
+      })
+      .catch(() => {
+        if (idCollectionIndexee === idCollection) documentsCollection = [];
+      });
+  });
 
   const attendsUneSeconde = () =>
     new Promise((resolve) => {
@@ -29,6 +79,19 @@
         `/api/documents/indexation/${identifiantOperation}`,
       );
       const contenuStatut = await reponseStatut.json();
+
+      if (!reponseStatut.ok) {
+        indexationEnCours = false;
+        erreursIndexation = [
+          {
+            document: 'suivi de l’indexation',
+            detail: detailErreurApi(contenuStatut.detail, reponseStatut.status),
+          },
+        ];
+        reponseMiseAJourDocuments = 'Le suivi de l’indexation a échoué.';
+        return;
+      }
+
       statutIndexation = contenuStatut.statut;
 
       if (statutIndexation !== 'en_cours') {
@@ -60,16 +123,56 @@
         fichiers_modifies: fichiersModifies,
         fichiers_supprimes: fichiersSupprimes,
         url_a_ajouter: urlAAjouter.trim() || null,
-        id_collection_indexee: idCollectionIndexee || null,
+        id_collection_indexee: idCollectionIndexee
+          ? String(idCollectionIndexee)
+          : null,
+        id_collection_jeopardy: idCollectionJeopardy
+          ? String(idCollectionJeopardy)
+          : null,
       }),
     });
 
     const contenuReponse = await reponse.json();
+
+    if (!reponse.ok) {
+      const detail = detailErreurApi(contenuReponse.detail, reponse.status);
+      reponseMiseAJourDocuments = 'La mise à jour des documents a échoué.';
+      erreursIndexation = [{ document: 'requête', detail }];
+      indexationEnCours = false;
+      return;
+    }
+
+    if (typeof contenuReponse.identifiant_operation !== 'string') {
+      reponseMiseAJourDocuments =
+        'La mise à jour des documents a échoué : identifiant de suivi absent.';
+      erreursIndexation = [
+        { document: 'requête', detail: 'Réponse API invalide.' },
+      ];
+      indexationEnCours = false;
+      return;
+    }
+
     reponseMiseAJourDocuments = contenuReponse.message;
     erreursIndexation = [];
     documentsPartiels = [];
     indexationEnCours = true;
     await suitLIndexation(contenuReponse.identifiant_operation);
+  };
+
+  const jeopardyseLeDocument = async () => {
+    if (!idCollectionIndexee || !idCollectionJeopardy || !documentAJeopardyser) return;
+
+    const requete = creeRequeteJeopardyDocument(
+      idCollectionIndexee,
+      idCollectionJeopardy,
+      documentAJeopardyser,
+    );
+    const reponse = await fetch(requete.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requete.body),
+    });
+    reponseJeopardy = (await reponse.json()).message;
   };
 </script>
 
@@ -79,11 +182,23 @@
   </div>
 
   <section class="grid gap-6">
-    <div class="flex flex-col gap-1.5">
-      <label for="id-collection-indexee" class="text-sm font-medium text-gray-700"
-        >Collection à modifier :</label
-      >
-      <SelecteurCollection bind:value={idCollectionIndexee} exclutJeopardy />
+    <div class="flex flex-wrap gap-4">
+      <div class="flex min-w-72 flex-1 flex-col gap-1.5">
+        <label for="id-collection-indexee" class="text-sm font-medium text-gray-700"
+          >Collection à modifier :</label
+        >
+        <SelecteurCollection bind:value={idCollectionIndexee} exclutJeopardy />
+      </div>
+
+      <div class="flex min-w-72 flex-1 flex-col gap-1.5">
+        <label for="id-collection-jeopardy" class="text-sm font-medium text-gray-700"
+          >Collection Jeopardy :</label
+        >
+        <SelecteurCollection bind:value={idCollectionJeopardy} uniquementJeopardy />
+        {#if !idCollectionJeopardy}
+          <p class="text-sm text-red-700">Sélectionnez une collection Jeopardy cible.</p>
+        {/if}
+      </div>
     </div>
 
     <div class="flex flex-col gap-1.5">
@@ -148,11 +263,46 @@
       <button
         type="button"
         onclick={metsAJourLaCollection}
-        disabled={!idCollectionIndexee || indexationEnCours}
+        disabled={!idCollectionIndexee || !idCollectionJeopardy || indexationEnCours}
         class="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Mettre à jour les documents
       </button>
+    </div>
+
+    <div class="rounded-lg border border-violet-200 bg-violet-50 p-4">
+      <h5 class="mb-3 text-base font-medium text-violet-900">Jeopardyser un document</h5>
+      <div class="flex flex-wrap items-end gap-4">
+        <div class="flex min-w-72 flex-1 flex-col gap-1.5">
+          <label for="document-a-jeopardyser" class="text-sm font-medium text-gray-700"
+            >Document de la collection source :</label
+          >
+          <select
+            id="document-a-jeopardyser"
+            bind:value={documentAJeopardyser}
+            disabled={!idCollectionIndexee || !idCollectionJeopardy}
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <option value="" disabled selected>Sélectionner un document</option>
+            {#each documentsCollection as document (document.id)}
+              <option value={document.nom}>{document.nom}</option>
+            {/each}
+          </select>
+        </div>
+
+        <button
+          type="button"
+          onclick={jeopardyseLeDocument}
+          disabled={!idCollectionIndexee || !idCollectionJeopardy || !documentAJeopardyser}
+          class="px-6 py-2.5 font-semibold text-white transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 bg-violet-600 rounded-lg shadow-md hover:bg-violet-700 focus:ring-4 focus:ring-violet-300 active:scale-95"
+        >
+          Jeopardyser le document
+        </button>
+      </div>
+
+      {#if reponseJeopardy}
+        <p class="mt-3 text-sm text-violet-800">{reponseJeopardy}</p>
+      {/if}
     </div>
 
     {#if reponseMiseAJourDocuments && indexationEnCours}

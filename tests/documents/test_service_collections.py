@@ -91,3 +91,13 @@ def test_recupere_les_documents_mqc(un_client_albert_collection):
             date_de_creation="2023-01-01T00:00:00+00:00",
         )
     ]
+
+
+def test_liste_les_documents_d_une_collection_tries_par_nom(
+    un_client_albert_collection,
+):
+    service = ServiceCollections(un_client_albert_collection)
+
+    documents = service.les_documents_d_une_collection("collection-1")
+
+    assert [document.nom for document in documents] == ["doc-1.pdf", "doc-2.pdf"]
