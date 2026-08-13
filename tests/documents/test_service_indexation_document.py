@@ -151,6 +151,22 @@ def test_indexe_un_document(un_service_jeopardy):
     assert client_indexation.documents_ajoutes[0]._type == "PDF"
 
 
+def test_indexe_un_document_dans_la_collection_source_fournie(un_service_jeopardy):
+    client_indexation = ClientAlbertIndexationDeTest()
+
+    ServiceIndexationNouveauxDocuments(
+        client_indexation,
+        CollectionsMQC(
+            id_collection_indexee="collection-configuree",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents(["doc-1.pdf"], id_collection_indexee="collection-selectionnee")
+
+    assert client_indexation.id_collection == "collection-selectionnee"
+
+
 def test_jeopardyse_les_documents_indexes(un_service_jeopardy):
     ServiceIndexationNouveauxDocuments(
         ClientAlbertIndexationDeTest(),

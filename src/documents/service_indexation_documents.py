@@ -37,8 +37,10 @@ class ServiceIndexationNouveauxDocuments:
         documents: list[str],
         documents_a_supprimer: list[str] = [],
         url_a_ajouter: str | None = None,
+        id_collection_indexee: str | None = None,
     ) -> list[ReponseDocument]:
-        self._client_indexation.attribue_collection(self._id_collection)
+        id_collection = id_collection_indexee or self._id_collection
+        self._client_indexation.attribue_collection(id_collection)
         documents_a_indexer: list[DocumentAIndexer] = [
             DocumentPDFDistant(document, normalise_url(document, self._configuration_MSC))
             for document in documents
@@ -51,7 +53,7 @@ class ServiceIndexationNouveauxDocuments:
         for document in documents_a_indexer:
             try:
                 identifiant_document_existant = self._client_indexation.document_existe(
-                    document.nom_document, self._id_collection
+                    document.nom_document, id_collection
                 )
                 if identifiant_document_existant:
                     self._client_indexation.supprime_document(
@@ -93,12 +95,12 @@ class ServiceIndexationNouveauxDocuments:
                 ListeDeDocuments(
                     noms_documents=noms_documents_indexes,
                     id_collection_jeopardy=self._id_collection_jeopardy,
-                    id_collection_mqc=self._id_collection,
+                    id_collection_mqc=id_collection,
                 )
             )
         for document_a_supprimer in documents_a_supprimer:
             identifiant_document_existant = self._client_indexation.document_existe(
-                document_a_supprimer, self._id_collection
+                document_a_supprimer, id_collection
             )
             if identifiant_document_existant:
                 self._client_indexation.supprime_document(identifiant_document_existant)
