@@ -8,6 +8,7 @@ from typing import Generator
 from urllib.parse import unquote
 
 from documents.docling.chunker_docling import TypeFichier, ChunkerDocling
+from documents.docling.document import Document
 from documents.docling.chunker_docling_mqc import ChunkerDoclingMQC
 from documents.docling.multi_processeur import Multiprocesseur
 from documents.html.document_html import BlocPageReponse
@@ -32,6 +33,43 @@ for name in (
     "docling.chunking",
 ):
     logging.getLogger(name).setLevel(logging.CRITICAL)
+
+
+def _trouve_une_metadata_trop_longue(metadata: object, emplacement: str) -> str | None:
+    if not isinstance(metadata, dict):
+        return None
+    for nom, valeur in metadata.items():
+        if isinstance(valeur, str) and len(valeur) > 255:
+            return (
+                f"La métadonnée {nom} {emplacement} dépasse la longueur maximale "
+                "de 255 caractères"
+            )
+    return None
+
+
+def _prepare_les_payloads(
+    document: Document,
+    les_blocs_non_vides: list[BlocPage],
+) -> tuple[list[dict[str, object]], dict[str, object], str | None]:
+    payloads_chunks: list[dict[str, object]] = [
+        {"content": bloc.texte, "metadata": document.metadata(bloc)}
+        for bloc in les_blocs_non_vides
+    ]
+    for numero_chunk, chunk in enumerate(payloads_chunks):
+        erreur_metadata = _trouve_une_metadata_trop_longue(
+            chunk["metadata"], f"du chunk {numero_chunk}"
+        )
+        if erreur_metadata is not None:
+            return [], {}, erreur_metadata
+
+    metadata_document = {
+        "source_url": document.url,
+        "nom_document": unquote(document.nom_document),
+    }
+    erreur_metadata = _trouve_une_metadata_trop_longue(
+        metadata_document, "du document"
+    )
+    return payloads_chunks, metadata_document, erreur_metadata
 
 
 @dataclass
@@ -125,17 +163,26 @@ class IndexeurDocling(Indexeur):
             if not les_blocs_non_vides:
                 return reponses
 
+            payloads_chunks, metadata_document, erreur_metadata = _prepare_les_payloads(
+                document, les_blocs_non_vides
+            )
+            if erreur_metadata is not None:
+                reponses.append(
+                    ReponseDocumentEnErreur(
+                        detail=erreur_metadata,
+                        document_en_erreur=nom_du_document,
+                    )
+                )
+                return reponses
+            if not payloads_chunks:
+                return reponses
+
             self.executeur_de_requete.initialise_connexion_securisee(self.clef_api)
 
             payload = {
                 "collection_id": int(id_collection),
                 "name": unquote(nom_du_document),
-                "metadata": json.dumps(
-                    {
-                        "source_url": document.url,
-                        "nom_document": unquote(document.nom_document),
-                    }
-                ),
+                "metadata": json.dumps(metadata_document),
                 "disable_chunking": True,
             }
             reponse_document = self.executeur_de_requete.poste(
@@ -163,17 +210,13 @@ class IndexeurDocling(Indexeur):
                 resultat_indexation = ReponseDocumentIndexePartiellement(
                     id=resultat["id"],
                     nom=resultat.get("name", nom_du_document),
-                    id_collection=resultat.get(
-                        "collection_id", str(id_collection)
-                    ),
+                    id_collection=resultat.get("collection_id", str(id_collection)),
                     date_creation=resultat.get("created_at", ""),
                     date_mise_a_jour=resultat.get("updated_at", ""),
                     pages_non_indexees=tuple(
                         erreur.numero_page for erreur in document.erreurs_pages
                     ),
-                    erreurs=tuple(
-                        erreur.detail for erreur in document.erreurs_pages
-                    ),
+                    erreurs=tuple(erreur.detail for erreur in document.erreurs_pages),
                 )
             elif mapping:
                 resultat_indexation = ReponseDocumentMaitriseEnSucces(
@@ -194,23 +237,8 @@ class IndexeurDocling(Indexeur):
                     updated_at=resultat.get("updated_at", ""),
                 )
 
-            def _en_payload(bloc: BlocPage) -> dict:
-                return {"content": bloc.texte, "metadata": document.metadata(bloc)}
-
-            it = iter(les_blocs_non_vides)
-            while True:
-                sous_ensemble_de_blocs = list(islice(it, 64))
-                if not sous_ensemble_de_blocs:
-                    break
-
-                payload_chunks = {
-                    "chunks": list(
-                        map(
-                            lambda bloc: _en_payload(bloc),
-                            sous_ensemble_de_blocs,
-                        )
-                    )
-                }
+            for debut in range(0, len(payloads_chunks), 64):
+                payload_chunks = {"chunks": payloads_chunks[debut : debut + 64]}
                 reponse_chunk = self.executeur_de_requete.poste(
                     f"{self.url}/documents/{resultat['id']}/chunks",
                     payload_chunks,

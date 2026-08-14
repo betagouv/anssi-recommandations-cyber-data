@@ -11,6 +11,7 @@ from documents.indexeur.indexeur import (
     ReponseDocumentIndexePartiellement,
 )
 from documents.indexeur.indexeur_docling import IndexeurDocling
+from documents.page import ContexteDuBloc
 from documents.pdf.document_pdf import BlocPagePDF, DocumentPDF, PagePDF
 from documents.pdf.modeles_ocr_json import ErreurPageOcr
 
@@ -21,6 +22,32 @@ class MultiProcesseurDeTest(Multiprocesseur):
         for chunk in iterable:
             resultats.append(func(chunk))
         return resultats
+
+
+class ChunkerAvecDesCheminsDeSectionsLongsDeTest(ChunkerDoclingMQC):
+    def applique(self, document_a_indexer: DocumentAIndexer) -> Document:
+        document = Document(document_a_indexer)
+        page = PagePDF(1)
+        for numero_chunk in range(54):
+            page.ajoute_bloc(
+                BlocPagePDF(
+                    texte=f"Contenu du chunk {numero_chunk}",
+                    numero_page=1,
+                    position_page=numero_chunk,
+                    contexte=ContexteDuBloc(
+                        chemin_des_sections=(
+                            "Phase 1 : sécurité pré-quantique",
+                            "Phase 2 : sécurité pré-quantique obligatoire, "
+                            "PQC en option avec le cas échéant reconnaissance "
+                            "d’une assurance de résistance à la menace quantique.",
+                            "Phase 3 : PQC avec hybridation optionnelle.",
+                            "Quel est l’impact sur la délivrance des visas de sécurité ?",
+                        )
+                    ),
+                )
+            )
+        document.pages = {1: page}
+        return document
 
 
 class ChunkerPartielDeTest(ChunkerDoclingMQC):
@@ -138,6 +165,47 @@ def test_peut_indexer_un_document_puis_ajouter_un_chunk(
         "position_page": 0,
         "nom_document": "test.pdf",
     }
+
+
+def test_indexe_les_chunks_avec_un_chemin_de_sections_long(
+    une_reponse_document,
+    une_reponse_chunk,
+    fichier_pdf,
+    un_executeur_de_requete,
+    une_reponse_attendue_OK,
+):
+    chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
+    executeur_de_requete = un_executeur_de_requete(
+        [
+            une_reponse_attendue_OK(une_reponse_document),
+            une_reponse_attendue_OK(une_reponse_chunk),
+        ]
+    )
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        ChunkerAvecDesCheminsDeSectionsLongsDeTest(),
+        executeur_de_requete,
+        MultiProcesseurDeTest(),
+    )
+
+    reponses = indexeur.ajoute_documents(
+        [DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")],
+        "12345",
+    )
+
+    assert len(reponses) == 1
+    assert reponses[0].id == "doc123"
+    chunks = executeur_de_requete.payload_recu[
+        "http://albert.local/documents/doc123/chunks"
+    ]["chunks"]
+    assert len(chunks) == 54
+    assert all(
+        len(valeur) <= 255
+        for chunk in chunks
+        for valeur in chunk["metadata"].values()
+        if isinstance(valeur, str)
+    )
 
 
 def test_transmet_le_contexte_json_dans_les_metadonnees_du_chunk(
