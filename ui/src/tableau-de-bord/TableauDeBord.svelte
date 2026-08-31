@@ -4,8 +4,9 @@
   import JeopardyseCollectionEntiere from './JeopardyseCollectionEntiere.svelte';
   import SupprimeDocuments from './SupprimeDocuments.svelte';
   import PageInformationsCollections from './PageInformationsCollections.svelte';
+  import PageEvaluation from "./PageEvaluation.svelte";
 
-  type Tabulation = 'collections' | 'autre';
+  type Tabulation = 'collections' | 'autre' | 'evaluation';
 
   let activeTab = $state<Tabulation>('collections');
 </script>
@@ -36,6 +37,15 @@
             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
         >
           Informations collections
+        </button>
+        <button
+                onclick={() => (activeTab = 'evaluation')}
+                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {activeTab ===
+          'autre'
+            ? 'border-blue-600 text-blue-600'
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
+        >
+          Évaluation
         </button>
       </nav>
     </div>
@@ -68,6 +78,8 @@
         </div>
       {:else if activeTab === 'autre'}
         <PageInformationsCollections />
+        {:else if activeTab === 'evaluation'}
+        <PageEvaluation />
       {/if}
     </section>
   </div>
