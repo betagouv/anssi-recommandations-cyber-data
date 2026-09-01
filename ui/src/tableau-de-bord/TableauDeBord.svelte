@@ -9,6 +9,9 @@
   type Tabulation = 'collections' | 'autre' | 'evaluation';
 
   let activeTab = $state<Tabulation>('collections');
+
+  const affichePageEvaluation = () =>
+          import.meta.env.VITE_EVALUATION_ACTIVEE === 'true';
 </script>
 
 <main class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -38,6 +41,7 @@
         >
           Informations collections
         </button>
+        {#if affichePageEvaluation()}
         <button
                 onclick={() => (activeTab = 'evaluation')}
                 class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {activeTab ===
@@ -47,6 +51,7 @@
         >
           Évaluation
         </button>
+          {/if}
       </nav>
     </div>
 
@@ -78,7 +83,7 @@
         </div>
       {:else if activeTab === 'autre'}
         <PageInformationsCollections />
-        {:else if activeTab === 'evaluation'}
+        {:else if activeTab === 'evaluation' && affichePageEvaluation()}
         <PageEvaluation />
       {/if}
     </section>
