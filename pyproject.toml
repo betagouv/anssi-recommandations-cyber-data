@@ -68,3 +68,4 @@ target-version = "py313"
 
 [tool.uv]
 exclude-newer = "1 week"
+constraint-dependencies = ["transformers>=5.10.0"]
