@@ -1,7 +1,9 @@
 <script lang="ts">
   import {
     apercuDuContenu,
+    informationsDeSource,
     recupereLesChunks,
+    separeLesMetadonneesDeSource,
     type Chunk,
   } from './exploration-chunks';
 
@@ -97,12 +99,24 @@
             <th
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
+              Source
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               Métadonnées
             </th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
           {#each chunks as chunk (chunk.id)}
+            {@const metadonneesDeSource = separeLesMetadonneesDeSource(
+              chunk.metadonnees
+            )}
+            {@const source = informationsDeSource(
+              metadonneesDeSource.sourceUrl,
+              metadonneesDeSource.page
+            )}
             <tr class="hover:bg-gray-50">
               <td
                 class="px-6 py-4 align-top text-sm font-mono text-gray-700 break-all"
@@ -115,9 +129,24 @@
                 {apercuDuContenu(chunk.contenu)}
               </td>
               <td
+                class="px-6 py-4 align-top text-sm text-gray-700 whitespace-pre-wrap break-all min-w-96"
+              >
+                {#if source.url}
+                  <a
+                    href={source.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    class="text-blue-700 underline hover:text-blue-900"
+                    >{source.libelle}</a
+                  >
+                {:else}
+                  {source.libelle}
+                {/if}
+              </td>
+              <td
                 class="px-6 py-4 align-top text-sm font-mono text-gray-700 whitespace-pre-wrap break-words min-w-96"
               >
-                {afficheLesMetadonnees(chunk.metadonnees)}
+                {afficheLesMetadonnees(metadonneesDeSource.metadonnees)}
               </td>
             </tr>
           {/each}
