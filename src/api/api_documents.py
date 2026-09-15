@@ -14,6 +14,10 @@ from documents.service_indexation_documents import (
     fabrique_service_indexation_de_documents,
     ServiceIndexationNouveauxDocuments,
 )
+from documents.service_exploration_chunks import (
+    ServiceExplorationChunks,
+    fabrique_service_exploration_chunks,
+)
 from infra.logger import log
 from api.suivi_indexation import (
     cree_un_suivi,
@@ -36,6 +40,21 @@ class RequeteIndexationDocument(BaseModel):
 
 class RequeteSuppressionDocuments(BaseModel):
     documents: list[str] = []
+
+
+@api_documents.get("/{id_document}/chunks", status_code=200)
+def recupere_les_chunks_du_document(
+    id_document: str,
+    service: ServiceExplorationChunks = Depends(  # type: ignore[assignment]
+        fabrique_service_exploration_chunks  # type: ignore[assignment]
+    ),
+    _token: str = Depends(fabrique_verifie_token_jwt()),  # type: ignore[assignment]
+):
+    return {
+        "chunks": [
+            chunk._asdict() for chunk in service.les_chunks_du_document(id_document)
+        ]
+    }
 
 
 def _indexe_les_documents_et_met_a_jour_le_suivi(
