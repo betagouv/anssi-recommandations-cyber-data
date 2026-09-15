@@ -4,14 +4,15 @@
   import JeopardyseCollectionEntiere from './JeopardyseCollectionEntiere.svelte';
   import SupprimeDocuments from './SupprimeDocuments.svelte';
   import PageInformationsCollections from './PageInformationsCollections.svelte';
-  import PageEvaluation from "./PageEvaluation.svelte";
+  import PageEvaluation from './PageEvaluation.svelte';
+  import PageExplorationChunks from './PageExplorationChunks.svelte';
 
-  type Tabulation = 'collections' | 'autre' | 'evaluation';
+  type Tabulation = 'collections' | 'autre' | 'evaluation' | 'exploration-chunks';
 
   let activeTab = $state<Tabulation>('collections');
 
   const affichePageEvaluation = () =>
-          import.meta.env.VITE_EVALUATION_ACTIVEE === 'true';
+    import.meta.env.VITE_EVALUATION_ACTIVEE === 'true';
 </script>
 
 <main class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -41,17 +42,26 @@
         >
           Informations collections
         </button>
-        {#if affichePageEvaluation()}
         <button
-                onclick={() => (activeTab = 'evaluation')}
-                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {activeTab ===
-          'autre'
+          onclick={() => (activeTab = 'exploration-chunks')}
+          class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {activeTab ===
+          'exploration-chunks'
             ? 'border-blue-600 text-blue-600'
             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
         >
-          Évaluation
+          Exploration de chunks
         </button>
-          {/if}
+        {#if affichePageEvaluation()}
+          <button
+            onclick={() => (activeTab = 'evaluation')}
+            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {activeTab ===
+            'autre'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
+          >
+            Évaluation
+          </button>
+        {/if}
       </nav>
     </div>
 
@@ -83,7 +93,9 @@
         </div>
       {:else if activeTab === 'autre'}
         <PageInformationsCollections />
-        {:else if activeTab === 'evaluation' && affichePageEvaluation()}
+      {:else if activeTab === 'exploration-chunks'}
+        <PageExplorationChunks />
+      {:else if activeTab === 'evaluation' && affichePageEvaluation()}
         <PageEvaluation />
       {/if}
     </section>
