@@ -13,7 +13,7 @@ importers:
     dependencies:
       '@lab-anssi/ui-kit':
         specifier: ^1.44.2
-        version: 1.60.8(svelte@5.56.10(@typescript-eslint/types@8.64.0))
+        version: 1.60.11(svelte@5.56.10(@typescript-eslint/types@8.64.0))
       '@simplewebauthn/browser':
         specifier: ^13.3.0
         version: 13.3.0
@@ -348,8 +348,8 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@lab-anssi/ui-kit@1.60.8':
-    resolution: {integrity: sha512-iNg3H+HGm8OlzLECHIO0y/hDlLZzhn3bzjZj4xU4TJrP4447kUA7aid7scSYYGXjbMzr8H1wHsTjGyra28gb5A==}
+  '@lab-anssi/ui-kit@1.60.11':
+    resolution: {integrity: sha512-X0XZbLhdvWzIy6VJTpCWMrDoX8uVP9nPQftXrFoBhe72JrgcyyQlz078m9//NMe6IFrE2TqsBTCYX+nXoft3XA==}
     engines: {node: '>=24.18.0'}
     peerDependencies:
       svelte: ~5.55.10 || ~5.56.0
@@ -2024,7 +2024,7 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@lab-anssi/ui-kit@1.60.8(svelte@5.56.10(@typescript-eslint/types@8.64.0))':
+  '@lab-anssi/ui-kit@1.60.11(svelte@5.56.10(@typescript-eslint/types@8.64.0))':
     dependencies:
       svelte: 5.56.10(@typescript-eslint/types@8.64.0)
 
