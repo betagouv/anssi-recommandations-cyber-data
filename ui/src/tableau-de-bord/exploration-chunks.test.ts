@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { apercuDuContenu, recupereLesChunks } from './exploration-chunks';
+import {
+  apercuDuContenu,
+  construitUrlDeSource,
+  informationsDeSource,
+  recupereLesChunks,
+  separeLesMetadonneesDeSource,
+} from './exploration-chunks';
 
 describe('aperçu du contenu d’un chunk', () => {
   it('conserve le contenu qui ne dépasse pas deux cents caractères', () => {
@@ -49,5 +55,46 @@ describe('aperçu du contenu d’un chunk', () => {
     await expect(recupereLesChunks('document-42', effectueRequete)).rejects.toThrow(
       'Impossible de récupérer les chunks.'
     );
+  });
+});
+
+describe('métadonnées de source', () => {
+  it('sépare la source et la page des autres métadonnées', () => {
+    const metadonnees = {
+      source_url: 'https://example.test/guide.pdf',
+      page: 7,
+      nom_document: 'guide.pdf',
+      position_page: 3,
+    };
+
+    expect(separeLesMetadonneesDeSource(metadonnees)).toEqual({
+      sourceUrl: 'https://example.test/guide.pdf',
+      page: 7,
+      metadonnees: {
+        nom_document: 'guide.pdf',
+        position_page: 3,
+      },
+    });
+  });
+
+  it('construit une URL qui ouvre la page demandée', () => {
+    expect(construitUrlDeSource('https://example.test/guide.pdf#sommaire', 7)).toBe(
+      'https://example.test/guide.pdf#page=7'
+    );
+  });
+
+  it.each([
+    [
+      'https://example.test/guide.pdf',
+      undefined,
+      {
+        libelle: 'https://example.test/guide.pdf',
+        url: 'https://example.test/guide.pdf',
+      },
+    ],
+    [undefined, 7, { libelle: 'Page 7' }],
+    [undefined, undefined, { libelle: '—' }],
+  ])('affiche l’information de source disponible', (sourceUrl, page, attendu) => {
+    expect(informationsDeSource(sourceUrl, page)).toEqual(attendu);
   });
 });
