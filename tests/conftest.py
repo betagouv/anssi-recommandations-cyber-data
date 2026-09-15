@@ -8,6 +8,7 @@ from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
 from deepeval.tracing.api import MetricData
 
+from adaptateurs.client_albert_chunks import ClientAlbertChunks, ReponseChunkAlbert
 from adaptateurs.clients_albert import (
     ClientAlbertReformulation,
     ClientAlbertCollections,
@@ -392,6 +393,22 @@ def frise_interval() -> None:
     Interval.frise()
 
 
+class ClientAlbertChunksDeTest(ClientAlbertChunks):
+    def __init__(self):
+        self._chunks_par_document: dict[str, list[ReponseChunkAlbert]] = {}
+
+    def avec_les_chunks_du_document(
+        self, id_document: str, chunks: list[ReponseChunkAlbert]
+    ) -> "ClientAlbertChunksDeTest":
+        self._chunks_par_document[id_document] = chunks
+        return self
+
+    def recupere_les_chunks_du_document(
+        self, id_document: str
+    ) -> list[ReponseChunkAlbert]:
+        return self._chunks_par_document.get(id_document, [])
+
+
 class ClientAlbertCollectionsDeTest(ClientAlbertCollections):
     def __init__(self):
         super().__init__(
@@ -492,3 +509,11 @@ class ClientAlbertCollectionsDeTest(ClientAlbertCollections):
 @pytest.fixture()
 def un_client_albert_collection() -> ClientAlbertCollections:
     return ClientAlbertCollectionsDeTest()
+
+
+@pytest.fixture()
+def un_client_albert_chunks() -> Callable[[], ClientAlbertChunksDeTest]:
+    def _un_client_albert_chunks() -> ClientAlbertChunksDeTest:
+        return ClientAlbertChunksDeTest()
+
+    return _un_client_albert_chunks
