@@ -329,6 +329,66 @@ def test_ne_prends_que_les_fichiers_pdf_fournis_dans_la_requete(
     assert service_indexation_document.documents_ajoutes == ["doc-1.pdf", "doc-4.pdf"]
 
 
+def test_transmet_un_pdf_distant_avec_des_parametres_au_service_d_indexation(
+    un_serveur_de_test_complet,
+):
+    (serveur, _, _, _, _, _, service_indexation_document) = un_serveur_de_test_complet(
+        None
+    )
+    client: TestClient = TestClient(serveur)
+    url_pdf = "https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-002-1.pdf?download=1"
+
+    client.post(
+        "/api/documents/",
+        json={"fichiers_ajoutes": [url_pdf]},
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert service_indexation_document.documents_ajoutes == [url_pdf]
+
+
+def test_refuse_une_url_distante_qui_n_est_pas_un_pdf(
+    un_serveur_de_test_complet,
+):
+    (serveur, _, _, _, _, _, service_indexation_document) = un_serveur_de_test_complet(
+        None
+    )
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.post(
+        "/api/documents/",
+        json={
+            "fichiers_ajoutes": [
+                "https://cert.ssi.gouv.fr/telecharger?fichier=CERTFR-2024-RFX-002-1.pdf"
+            ]
+        },
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert reponse.status_code == 422
+    assert not service_indexation_document.appele
+
+
+def test_refuse_une_url_distante_mal_formee(un_serveur_de_test_complet):
+    (serveur, _, _, _, _, _, service_indexation_document) = un_serveur_de_test_complet(
+        None
+    )
+    client: TestClient = TestClient(serveur)
+
+    reponse = client.post(
+        "/api/documents/",
+        json={
+            "fichiers_ajoutes": [
+                "https:/cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-002-1.pdf"
+            ]
+        },
+        headers={"Authorization": "Bearer token-valide"},
+    )
+
+    assert reponse.status_code == 422
+    assert not service_indexation_document.appele
+
+
 def test_ne_prends_que_les_fichiers_pdf_fournis_dans_la_requete_pour_les_fichiers_a_supprimer(
     un_serveur_de_test_complet,
 ):
