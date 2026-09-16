@@ -1,5 +1,8 @@
 from adaptateurs.clients_albert import ClientAlbertIndexation
 from configuration import recupere_configuration, MSC, CollectionsMQC
+from pathlib import PurePosixPath
+from urllib.parse import unquote, urlsplit
+
 from documents.html.document_html import DocumentHTML
 from documents.indexe_documents_rag import fabrique_client_albert
 from documents.indexeur.indexeur import DocumentAIndexer
@@ -9,12 +12,47 @@ from documents.indexeur.indexeur import (
     ReponseDocumentMaitriseEnSucces,
     ReponseDocumentIndexePartiellement,
 )
-from documents.pdf.cree_document_pdf import normalise_url
+from documents.pdf.cree_document_pdf import cree_document_pdf_distant, normalise_url
 from documents.pdf.document_pdf import DocumentPDFDistant
 from jeopardy.service import ServiceJeopardyse, ListeDeDocuments
 from jeopardy.service_jeopardyse_liste_de_documents import (
     fabrique_service_jeopardise_documents,
 )
+
+
+def _est_une_url_msc(url: str, configuration_msc: MSC) -> bool:
+    url_source = urlsplit(url)
+    url_msc = urlsplit(configuration_msc.url)
+    chemin_guides = configuration_msc.chemin_guides.strip("/")
+    chemin_msc = f"{url_msc.path.rstrip('/')}/{chemin_guides}/"
+    return (
+        url_source.scheme == url_msc.scheme
+        and url_source.netloc == url_msc.netloc
+        and url_source.path.startswith(chemin_msc)
+    )
+
+
+def est_une_url_pdf_distante(source: str) -> bool:
+    url = urlsplit(source)
+    return (
+        url.scheme in {"http", "https"}
+        and bool(url.netloc)
+        and url.path.lower().endswith(".pdf")
+    )
+
+
+def analyse_url(source: str, configuration_msc: MSC) -> DocumentPDFDistant:
+    url = urlsplit(source)
+    if url.scheme or url.netloc:
+        if not est_une_url_pdf_distante(source):
+            raise ValueError("L'URL d'un document distant doit être un PDF HTTP(S)")
+        nom_document = unquote(PurePosixPath(url.path).name)
+        if _est_une_url_msc(source, configuration_msc):
+            return DocumentPDFDistant(
+                nom_document, normalise_url(nom_document, configuration_msc)
+            )
+        return cree_document_pdf_distant(nom_document, source)
+    return DocumentPDFDistant(source, normalise_url(source, configuration_msc))
 
 
 class ServiceIndexationNouveauxDocuments:
@@ -46,12 +84,15 @@ class ServiceIndexationNouveauxDocuments:
         )
         self._client_indexation.attribue_collection(id_collection)
         documents_a_indexer: list[DocumentAIndexer] = [
-            DocumentPDFDistant(document, normalise_url(document, self._configuration_MSC))
+            analyse_url(document, self._configuration_MSC)
             for document in documents
         ]
         if url_a_ajouter:
             nom_document = url_a_ajouter.rstrip("/").rsplit("/", 1)[-1]
-            documents_a_indexer.append(DocumentHTML(nom_document, url_a_ajouter))
+            if urlsplit(url_a_ajouter).path.lower().endswith(".pdf"):
+                documents_a_indexer.append(analyse_url(url_a_ajouter, self._configuration_MSC))
+            else:
+                documents_a_indexer.append(DocumentHTML(nom_document, url_a_ajouter))
 
         documents_indexes: list[DocumentAIndexer] = []
         for document in documents_a_indexer:

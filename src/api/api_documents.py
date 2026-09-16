@@ -1,6 +1,7 @@
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 from fastapi.params import Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
+from urllib.parse import urlsplit
 
 from api.securite import fabrique_verifie_token_jwt
 from documents.indexe_documents_rag import fabrique_client_albert
@@ -13,6 +14,7 @@ from documents.service_collections import (
 from documents.service_indexation_documents import (
     fabrique_service_indexation_de_documents,
     ServiceIndexationNouveauxDocuments,
+    est_une_url_pdf_distante,
 )
 from documents.service_exploration_chunks import (
     ServiceExplorationChunks,
@@ -29,6 +31,12 @@ from api.suivi_indexation import (
 api_documents = APIRouter(prefix="/documents")
 
 
+def _est_un_pdf(document: str) -> bool:
+    url = urlsplit(document)
+    chemin = url.path if url.scheme or url.netloc else document
+    return chemin.lower().endswith(".pdf")
+
+
 class RequeteIndexationDocument(BaseModel):
     fichiers_ajoutes: list[str] = []
     fichiers_modifies: list[str] = []
@@ -36,6 +44,16 @@ class RequeteIndexationDocument(BaseModel):
     url_a_ajouter: str | None = None
     id_collection_indexee: str | None = None
     id_collection_jeopardy: str | None = None
+
+    @field_validator("fichiers_ajoutes", "fichiers_modifies")
+    @classmethod
+    def valide_les_urls_pdf_distantes(cls, documents: list[str]) -> list[str]:
+        for document in documents:
+            url = urlsplit(document)
+            if url.scheme or url.netloc:
+                if not est_une_url_pdf_distante(document):
+                    raise ValueError("L'URL d'un document distant doit être un PDF HTTP(S)")
+        return documents
 
 
 class RequeteSuppressionDocuments(BaseModel):
@@ -90,7 +108,7 @@ def indexe_documents(
 ):
     les_documents = list(
         filter(
-            lambda doc: doc.endswith(".pdf"),
+            _est_un_pdf,
             [*requete.fichiers_ajoutes, *requete.fichiers_modifies],
         )
     )

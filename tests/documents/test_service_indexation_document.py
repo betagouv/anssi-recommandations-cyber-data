@@ -1,4 +1,6 @@
 from adaptateurs.clients_albert import ClientAlbertIndexation, ReponseCreationCollection
+import pytest
+
 from configuration import MSC, CollectionsMQC
 from documents.indexeur.indexeur import (
     DocumentAIndexer,
@@ -8,7 +10,11 @@ from documents.indexeur.indexeur import (
     ReponseDocumentEnSucces,
 )
 from documents.html.document_html import DocumentHTML
-from documents.service_indexation_documents import ServiceIndexationNouveauxDocuments
+from documents.pdf.document_pdf import DocumentPDFDistant
+from documents.service_indexation_documents import (
+    ServiceIndexationNouveauxDocuments,
+    analyse_url,
+)
 from infra.memoire.executeur_de_requete_memoire import ExecuteurDeRequeteDeTest
 from jeopardy.service import ListeDeDocuments
 
@@ -209,6 +215,96 @@ def test_indexe_un_document_html_depuis_son_url(un_service_jeopardy):
     assert client_indexation.documents_ajoutes[0].nom_document == "cyberdico"
     assert client_indexation.documents_ajoutes[0].url == "https://cyber.gouv.fr/cyberdico/"
     assert un_service_jeopardy.donnees_recues.noms_documents == ["cyberdico"]
+
+
+def test_indexe_un_document_pdf_distant_depuis_son_url(un_service_jeopardy):
+    client_indexation = ClientAlbertIndexationDeTest()
+
+    ServiceIndexationNouveauxDocuments(
+        client_indexation,
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents(
+        ["https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-002-1.pdf"]
+    )
+
+    assert len(client_indexation.documents_ajoutes) == 1
+    assert isinstance(client_indexation.documents_ajoutes[0], DocumentPDFDistant)
+    assert (
+        client_indexation.documents_ajoutes[0].nom_document
+        == "CERTFR-2024-RFX-002-1.pdf"
+    )
+    assert (
+        client_indexation.documents_ajoutes[0].url
+        == "https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-002-1.pdf"
+    )
+
+
+def test_indexe_un_document_pdf_distant_depuis_son_url_avec_des_parametres(
+    un_service_jeopardy,
+):
+    client_indexation = ClientAlbertIndexationDeTest()
+    url_pdf = "https://cert.ssi.gouv.fr/uploads/CERTFR-2024-RFX-002-1.pdf?download=1"
+
+    ServiceIndexationNouveauxDocuments(
+        client_indexation,
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        MSC(url="http://documents.local", chemin_guides="guides"),
+        un_service_jeopardy,
+    ).indexe_documents([url_pdf])
+
+    assert isinstance(client_indexation.documents_ajoutes[0], DocumentPDFDistant)
+    assert client_indexation.documents_ajoutes[0].nom_document == "CERTFR-2024-RFX-002-1.pdf"
+    assert client_indexation.documents_ajoutes[0].url == url_pdf
+
+
+def test_indexe_une_url_msc_comme_un_document_msc(un_service_jeopardy):
+    client_indexation = ClientAlbertIndexationDeTest()
+    configuration_msc = MSC(url="http://msc.local", chemin_guides="guides")
+
+    ServiceIndexationNouveauxDocuments(
+        client_indexation,
+        CollectionsMQC(
+            id_collection_indexee="collection-1",
+            id_collection_jeopardy="collection-jeopardy",
+        ),
+        configuration_msc,
+        un_service_jeopardy,
+    ).indexe_documents(["http://msc.local/guides/guide%20de%20securite.pdf?version=2"])
+
+    assert client_indexation.documents_ajoutes[0].nom_document == "guide de securite.pdf"
+    assert (
+        client_indexation.documents_ajoutes[0].url
+        == "http://msc.local/guides/guide%20de%20securite.pdf"
+    )
+
+
+def test_refuse_une_url_distante_qui_n_est_pas_un_pdf():
+    with pytest.raises(ValueError, match="PDF HTTP\(S\)"):
+        analyse_url(
+            "https://cert.ssi.gouv.fr/telecharger?fichier=CERTFR-2024-RFX-002-1.pdf",
+            MSC(url="http://msc.local", chemin_guides="guides"),
+        )
+
+
+def test_extrait_le_nom_decode_d_un_pdf_distant():
+    document = analyse_url(
+        "https://cert.ssi.gouv.fr/uploads/CERTFR%202024%20RFX%20002%201.pdf",
+        MSC(url="http://msc.local", chemin_guides="guides"),
+    )
+
+    assert document.nom_document == "CERTFR 2024 RFX 002 1.pdf"
+    assert (
+        document.url
+        == "https://cert.ssi.gouv.fr/uploads/CERTFR%202024%20RFX%20002%201.pdf"
+    )
 
 
 def test_modifie_un_document_deja_indexe(un_service_jeopardy):
