@@ -14,6 +14,12 @@ table_des_matieres pour un sommaire, autre pour un contenu informatif ou un
 encadré qui ne correspond pas aux autres catégories et pied_de_page pour un pied
 de page ou un numéro de page décoratif.
 
+Une légende de figure, de schéma, d'illustration ou de tableau n'est jamais un
+titre de la hiérarchie documentaire, même si elle est visuellement mise en
+évidence. Par exemple, « Figure 9 – Proposition de passerelle IT vers OT » est
+un bloc autre : conserve la légende dans titre, mets niveau à null et ne la
+transforme jamais en section.
+
 Une page qui est la suite d'une table des matières doit rester une unique table
 des matières même si son titre n'est pas répété. Reconnais cette suite par une
 succession structurée d'entrées de sections, généralement numérotées, alignées
