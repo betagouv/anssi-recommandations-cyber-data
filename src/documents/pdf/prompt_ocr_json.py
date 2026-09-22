@@ -26,7 +26,11 @@ de pointillés servant de guide visuel entre un libellé et une pagination ne fo
 jamais partie du contenu : ne les transcris pas, même si elles sont très longues,
 et ne les remplace pas par une autre suite de points. Supprime aussi le numéro
 de page terminal de chaque entrée et conserve uniquement son numéro de section
-et son libellé lisible.
+et son libellé lisible. Cette règle est prioritaire sur la transcription exacte
+des éléments visibles. Par exemple, transforme « 3.3.5 Secrets d'accès des API
+........................................ 42 » en « 3.3.5 Secrets d'accès des API ».
+Si une ligne ne contient que des pointillés, un numéro de page ou des éléments
+graphiques de liaison, ignore entièrement cette ligne.
 
 Le champ code_recommandation vaut null pour tous les blocs sauf recommandation,
 pour laquelle il contient obligatoirement un code R suivi de chiffres. N'invente
@@ -84,8 +88,8 @@ Transcris sans omission tous les textes informatifs, notamment les partenaires,
 les noms, les chiffres et les libellés des infographies. Transcris exactement
 les numéros, codes, libellés et termes visibles, sans les reformuler, les
 compléter ni en inventer. Exclus uniquement les vrais en-têtes répétés, pieds de
-page, numéros de page et logos sans contenu informatif, tout en conservant les
-légendes de figures.
+page, numéros de page, pointillés de pagination et logos sans contenu informatif,
+tout en conservant les légendes de figures.
 
 Pour un tableau, restitue l'intégralité du tableau dans texte sous la forme d'un
 tableau HTML bien formé, avec les balises table, thead, tbody, tr, th et td
