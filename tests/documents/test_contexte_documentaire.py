@@ -60,14 +60,14 @@ def test_construit_un_contexte_avec_nom_de_fichier_normalise() -> None:
     }
 
     contexte = construit_le_contexte_documentaire(
-        "250129_np_anssi_guide_ebios_fr_final_collection_WEB.pdf",
+        "guide-homologation_securite-web-04-2025.pdf",
         sommaire,
         bloc,
     )
 
     assert contexte == (
         "[Contexte documentaire]\n"
-        "Document : 250129 np anssi guide ebios fr final collection WEB\n"
+        "Document : guide homologation securite web 04 2025\n"
         "Sections : Cadrage et socle de sécurité > Atelier 1 > "
         "Les participants à l'atelier\n"
         "[/Contexte documentaire]"
