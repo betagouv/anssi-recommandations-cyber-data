@@ -111,5 +111,5 @@ def _normalise_un_titre(titre: str | None) -> str:
 
 
 def _normalise_le_nom_document(nom_document: str) -> str:
-    nom = Path(unquote(nom_document)).stem.replace("_", " ")
+    nom = Path(unquote(nom_document)).stem.replace("_", " ").replace("-", " ")
     return " ".join(nom.split())
