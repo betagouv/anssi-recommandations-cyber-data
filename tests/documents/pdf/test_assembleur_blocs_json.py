@@ -437,6 +437,26 @@ def test_met_a_jour_le_chemin_des_sections_selon_le_niveau_du_titre(
     )
 
 
+def test_ne_remplace_pas_la_section_par_une_legende_de_figure(
+    assemble_les_blocs,
+):
+    blocs_indexables = assemble_les_blocs(
+        _une_page(
+            _un_titre("4 Assurer la confiance", 1),
+            _un_titre("4.2 Architecture sécurisée", 2),
+            _un_titre("4.2.2 Passerelle IT vers OT", 3),
+            _un_titre("Figure 9 – Proposition de passerelle IT vers OT", None),
+            _une_liste("- Transformation de format"),
+        )
+    )
+
+    assert blocs_indexables[-1].contexte.chemin_des_sections == (
+        "4 Assurer la confiance",
+        "4.2 Architecture sécurisée",
+        "4.2.2 Passerelle IT vers OT",
+    )
+
+
 def test_deduit_le_niveau_d_un_titre_numerote_meme_si_le_niveau_ocr_est_errone(
     assemble_les_blocs,
 ):
