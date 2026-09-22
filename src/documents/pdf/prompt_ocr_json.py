@@ -21,7 +21,12 @@ avec des pointillés ou une pagination terminale. Dans ce cas, type_de_bloc vaut
 table_des_matieres, titre vaut null, texte vaut une chaîne vide,
 est_une_continuation vaut true et toutes les entrées sont dans
 elements_de_liste. Ne confonds pas une liste ordinaire avec une table des
-matières : sans ces indices de structure documentaire, utilise liste.
+matières : sans ces indices de structure documentaire, utilise liste. Les suites
+de pointillés servant de guide visuel entre un libellé et une pagination ne font
+jamais partie du contenu : ne les transcris pas, même si elles sont très longues,
+et ne les remplace pas par une autre suite de points. Supprime aussi le numéro
+de page terminal de chaque entrée et conserve uniquement son numéro de section
+et son libellé lisible.
 
 Le champ code_recommandation vaut null pour tous les blocs sauf recommandation,
 pour laquelle il contient obligatoirement un code R suivi de chiffres. N'invente
