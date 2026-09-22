@@ -24,7 +24,9 @@
 
     chargement = true;
     try {
-      chunks = await recupereLesChunks(identifiantDocument);
+      chunks = (await recupereLesChunks(identifiantDocument)).sort((premier, second) =>
+        premier.id.localeCompare(second.id, 'fr', { numeric: true })
+      );
     } catch (erreurDeRecuperation) {
       chunks = [];
       erreur =
