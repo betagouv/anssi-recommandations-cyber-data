@@ -620,6 +620,37 @@ def test_conserve_la_table_des_matieres_dans_un_unique_bloc(assemble_les_blocs):
     assert blocs_indexables[0].contexte.chemin_des_sections == ()
 
 
+def test_conserve_une_suite_de_tables_des_matieres_sans_titre(
+    assemble_les_blocs,
+):
+    blocs_indexables = assemble_les_blocs(
+        _une_page(
+            {
+                "type_de_bloc": TypeDeBlocOcr.TABLE_DES_MATIERES,
+                "titre": "Sommaire",
+                "texte": "",
+                "elements_de_liste": ("1 Introduction",),
+            }
+        ),
+        _une_page(
+            {
+                "type_de_bloc": TypeDeBlocOcr.TABLE_DES_MATIERES,
+                "titre": None,
+                "texte": "",
+                "elements_de_liste": ("2 Authentification",),
+                "est_une_continuation": True,
+            },
+            numero_page=2,
+        ),
+    )
+
+    assert [bloc.texte for bloc in blocs_indexables] == [
+        "- 1 Introduction",
+        "- 2 Authentification",
+    ]
+    assert blocs_indexables[1].page_debut == 2
+
+
 def test_ne_fusionne_pas_une_recommandation_avec_un_paragraphe(
     assemble_les_blocs,
 ):
