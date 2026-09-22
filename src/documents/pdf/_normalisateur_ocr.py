@@ -26,6 +26,8 @@ class _NormalisateurDeBlocsOcr:
             return not texte and not bloc_ocr.elements_de_liste
         if bloc_ocr.type_de_bloc == TypeDeBlocOcr.TABLEAU:
             return not texte and not bloc_ocr.lignes_de_tableau
+        if bloc_ocr.type_de_bloc == TypeDeBlocOcr.TABLE_DES_MATIERES:
+            return not texte and not bloc_ocr.titre and not bloc_ocr.elements_de_liste
         return not texte and not bloc_ocr.titre and not bloc_ocr.code
 
     def prepare_le_texte_indexable(self, bloc_ocr: BlocOcr) -> str:
