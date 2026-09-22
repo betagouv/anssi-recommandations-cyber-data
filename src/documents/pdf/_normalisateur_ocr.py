@@ -13,6 +13,8 @@ class _NormalisateurDeBlocsOcr:
         bloc_ocr: BlocOcr,
         chemin_des_sections: list[str],
     ) -> BlocOcr:
+        if self._est_une_legende_de_figure(bloc_ocr):
+            return replace(bloc_ocr, type_de_bloc=TypeDeBlocOcr.AUTRE)
         if not self._doit_promouvoir_le_titre_local_en_section(
             bloc_ocr,
             chemin_des_sections,
@@ -124,6 +126,11 @@ class _NormalisateurDeBlocsOcr:
                 int(chapitre_courant) + 1,
             }
         return chapitre_du_titre == chapitre_courant
+
+    def _est_une_legende_de_figure(self, bloc_ocr: BlocOcr) -> bool:
+        if bloc_ocr.type_de_bloc != TypeDeBlocOcr.TITRE or not bloc_ocr.titre:
+            return False
+        return re.match(r"^\s*(?:fig(?:ure)?\.?)[ ]+\d+\b", bloc_ocr.titre, re.IGNORECASE) is not None
 
 
 def _extrait_le_numero_de_section(titre: str) -> str | None:
