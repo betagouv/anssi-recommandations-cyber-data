@@ -8,6 +8,7 @@ from documents.docling.chunker_docling import ChunkerDocling, TypeFichier
 from documents.docling.document import Document
 from documents.docling.filtre_resultat import filtre_les_resultats
 from documents.pdf.assembleur_blocs_json import AssembleurDeBlocsJson
+from documents.pdf._sommaire_hierarchique import extrait_le_sommaire_hierarchique
 from documents.pdf.convertisseur_ocr_json import (
     ExtracteurDeBlocsOcr,
     ExtracteurDeBlocsOcrDepuisUnPdf,
@@ -70,6 +71,7 @@ class ChunkerDoclingMQC(ChunkerDocling):
             plages_de_pages_avec_du_contenu,
         )
         document.erreurs_pages = resultat_ocr.erreurs
+        document.sommaire_hierarchique = extrait_le_sommaire_hierarchique(resultat_ocr)
         blocs_indexables = AssembleurDeBlocsJson().assemble(resultat_ocr)
         pages: dict[int, Page] = {
             numero_page: PagePDF(numero_page)

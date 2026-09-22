@@ -294,6 +294,38 @@ def test_conserve_la_table_des_matieres_comme_un_chunk_pdf_unique(
     assert "chemin_sections" not in metadata
 
 
+def test_conserve_le_sommaire_hierarchique_dans_le_document_pdf(
+    un_chunker_ocr_json,
+    un_resultat_ocr,
+    un_bloc_ocr_json,
+):
+    document = DocumentPDF("mon_document.pdf", url_pdf="http://mon-document.pdf")
+    resultat_ocr = un_resultat_ocr(
+        blocs_par_page=(
+            (
+                un_bloc_ocr_json(
+                    type_de_bloc=TypeDeBlocOcr.TABLE_DES_MATIERES,
+                    titre="Sommaire",
+                    texte="",
+                    elements_de_liste=(
+                        "1 Introduction",
+                        "1.1 Objectif du guide",
+                    ),
+                ),
+            ),
+        )
+    )
+    chunker, _ = un_chunker_ocr_json(resultat_ocr)
+
+    document = chunker.applique(document)
+
+    assert document.sommaire_hierarchique == {
+        "Introduction": {
+            "Objectif du guide": {},
+        },
+    }
+
+
 def test_conserve_une_recommandation_codee_coupee_sur_deux_pages(
     un_chunker_ocr_json,
     un_resultat_ocr,
