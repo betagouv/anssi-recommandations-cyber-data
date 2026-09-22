@@ -6,6 +6,7 @@ class ReponseChunkAlbert(NamedTuple):
     id: str
     contenu: str
     metadonnees: dict[str, Any]
+    contexte_documentaire: str | None = None
 
 
 class ClientAlbertChunks(ABC):

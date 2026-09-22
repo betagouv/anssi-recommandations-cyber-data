@@ -99,6 +99,11 @@
             <th
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
+              Contexte documentaire
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
               Source
             </th>
             <th
@@ -127,6 +132,11 @@
                 class="px-6 py-4 align-top text-sm text-gray-700 whitespace-pre-wrap break-words min-w-96"
               >
                 {apercuDuContenu(chunk.contenu)}
+              </td>
+              <td
+                class="px-6 py-4 align-top text-sm text-gray-700 whitespace-pre-wrap break-words min-w-96"
+              >
+                {chunk.contexte_documentaire ?? '—'}
               </td>
               <td
                 class="px-6 py-4 align-top text-sm text-gray-700 whitespace-pre-wrap break-all min-w-96"

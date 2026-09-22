@@ -1,6 +1,7 @@
 export type Chunk = {
   id: string;
   contenu: string;
+  contexte_documentaire: string | null;
   metadonnees: Record<string, unknown>;
 };
 

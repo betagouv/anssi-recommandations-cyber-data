@@ -60,6 +60,36 @@ class ChunkerPartielDeTest(ChunkerDoclingMQC):
         return document
 
 
+class ChunkerAvecSommaireDeTest(ChunkerDoclingMQC):
+    def applique(self, document_a_indexer: DocumentAIndexer) -> Document:
+        document = Document(document_a_indexer)
+        document.sommaire_hierarchique = {"Introduction": {}}
+        document.pages = {
+            1: PagePDF(
+                1,
+                [
+                    BlocPagePDF(
+                        texte="1 Introduction",
+                        numero_page=1,
+                        contexte=ContexteDuBloc(
+                            type_de_bloc="table_des_matieres",
+                        ),
+                    ),
+                    BlocPagePDF(
+                        texte="Contenu de l'introduction.",
+                        numero_page=2,
+                        contexte=ContexteDuBloc(
+                            type_de_bloc="paragraphe",
+                            titre="1 Introduction",
+                            chemin_des_sections=("1 Introduction",),
+                        ),
+                    ),
+                ],
+            )
+        }
+        return document
+
+
 def test_retourne_un_document_partiel_quand_une_page_a_echoue(
     une_reponse_document,
     fichier_pdf,
@@ -206,6 +236,12 @@ def test_indexe_les_chunks_avec_un_chemin_de_sections_long(
         for valeur in chunk["metadata"].values()
         if isinstance(valeur, str)
     )
+    assert all("chemin_sections" not in chunk["metadata"] for chunk in chunks)
+    assert (
+        "Phase 2 : sécurité pré-quantique obligatoire, PQC en option avec le cas "
+        "échéant reconnaissance d’une assurance de résistance à la menace quantique."
+        in chunks[0]["content"]
+    )
 
 
 def test_transmet_le_contexte_json_dans_les_metadonnees_du_chunk(
@@ -239,7 +275,6 @@ def test_transmet_le_contexte_json_dans_les_metadonnees_du_chunk(
     chunks = executeur_de_requete.payload_recu[
         "http://albert.local/documents/doc123/chunks"
     ]["chunks"]
-    assert chunks[0]["content"] == "R24\nTitre\nContenu"
     assert chunks[0]["metadata"] == {
         "source_url": "https://example.com/test.pdf",
         "page": 2,
@@ -249,9 +284,82 @@ def test_transmet_le_contexte_json_dans_les_metadonnees_du_chunk(
         "type_de_bloc": "recommandation",
         "code_recommandation": "R24",
         "titre": "Titre",
-        "chemin_sections": '["Section 5"]',
         "niveau": 1,
     }
+
+
+def test_indexe_le_contexte_documentaire_dans_le_contenu_du_chunk(
+    une_reponse_document,
+    une_reponse_chunk,
+    fichier_pdf,
+    un_executeur_de_requete,
+    une_reponse_attendue_OK,
+    un_chunker_avec_un_bloc_json,
+):
+    chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
+    executeur_de_requete = un_executeur_de_requete(
+        [
+            une_reponse_attendue_OK(une_reponse_document),
+            une_reponse_attendue_OK(une_reponse_chunk),
+        ]
+    )
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        un_chunker_avec_un_bloc_json(),
+        executeur_de_requete,
+        MultiProcesseurDeTest(),
+    )
+
+    indexeur.ajoute_documents(
+        [DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")],
+        "12345",
+    )
+
+    chunks = executeur_de_requete.payload_recu[
+        "http://albert.local/documents/doc123/chunks"
+    ]["chunks"]
+    assert chunks[0]["content"] == (
+        "R24\nTitre\nContenu\n\n"
+        "[Contexte documentaire]\n"
+        "Document : test\n"
+        "Sections : Section 5\n"
+        "[/Contexte documentaire]"
+    )
+
+
+def test_n_indexe_pas_les_blocs_de_table_des_matieres(
+    une_reponse_document,
+    une_reponse_chunk,
+    fichier_pdf,
+    un_executeur_de_requete,
+    une_reponse_attendue_OK,
+):
+    chemin_fichier_de_test = str(fichier_pdf("test.pdf").resolve())
+    executeur_de_requete = un_executeur_de_requete(
+        [
+            une_reponse_attendue_OK(une_reponse_document),
+            une_reponse_attendue_OK(une_reponse_chunk),
+        ]
+    )
+    indexeur = IndexeurDocling(
+        "http://albert.local",
+        "une_clef",
+        ChunkerAvecSommaireDeTest(),
+        executeur_de_requete,
+        MultiProcesseurDeTest(),
+    )
+
+    indexeur.ajoute_documents(
+        [DocumentPDF(chemin_fichier_de_test, "https://example.com/test.pdf")],
+        "12345",
+    )
+
+    chunks = executeur_de_requete.payload_recu[
+        "http://albert.local/documents/doc123/chunks"
+    ]["chunks"]
+    assert len(chunks) == 1
+    assert chunks[0]["content"].startswith("Contenu de l'introduction.")
 
 
 def test_peut_indexer_plusieurs_documents(

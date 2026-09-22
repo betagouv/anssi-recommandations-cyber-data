@@ -36,6 +36,7 @@ def test_retourne_les_chunks_du_document_demande(
             {
                 "id": "chunk-1",
                 "contenu": "Un contenu",
+                "contexte_documentaire": None,
                 "metadonnees": {"page": 3},
             }
         ]
