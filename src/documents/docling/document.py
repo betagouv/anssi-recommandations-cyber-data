@@ -80,6 +80,7 @@ class Document:
         self._reponse_maitrisee = reponse_maitrisee
         self.pages: dict[int, Page] = {}
         self.erreurs_pages: tuple[ErreurPageOcr, ...] = ()
+        self.sommaire_hierarchique: dict[str, dict] = {}
 
     @property
     def nom_document(self):

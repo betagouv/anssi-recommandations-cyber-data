@@ -14,6 +14,15 @@ table_des_matieres pour un sommaire, autre pour un contenu informatif ou un
 encadré qui ne correspond pas aux autres catégories et pied_de_page pour un pied
 de page ou un numéro de page décoratif.
 
+Une page qui est la suite d'une table des matières doit rester une unique table
+des matières même si son titre n'est pas répété. Reconnais cette suite par une
+succession structurée d'entrées de sections, généralement numérotées, alignées
+avec des pointillés ou une pagination terminale. Dans ce cas, type_de_bloc vaut
+table_des_matieres, titre vaut null, texte vaut une chaîne vide,
+est_une_continuation vaut true et toutes les entrées sont dans
+elements_de_liste. Ne confonds pas une liste ordinaire avec une table des
+matières : sans ces indices de structure documentaire, utilise liste.
+
 Le champ code_recommandation vaut null pour tous les blocs sauf recommandation,
 pour laquelle il contient obligatoirement un code R suivi de chiffres. N'invente
 jamais la lettre R devant un numéro.
