@@ -8,7 +8,7 @@ from documents.page import BlocPage, ContexteDuBloc
 
 
 def test_resout_le_chemin_hierarchique_depuis_un_titre_local_normalise() -> None:
-    sommaire = {
+    sommaire: dict[str, dict] = {
         "Cadrage et socle de sécurité": {
             "Atelier 1": {
                 "Les participants à l'atelier": {},
@@ -30,7 +30,7 @@ def test_resout_le_chemin_hierarchique_depuis_un_titre_local_normalise() -> None
 
 
 def test_replie_sur_le_chemin_ocr_quand_le_titre_est_ambigu() -> None:
-    sommaire = {
+    sommaire: dict[str, dict] = {
         "Partie A": {"Introduction": {}},
         "Partie B": {"Introduction": {}},
     }
@@ -53,7 +53,7 @@ def test_construit_un_contexte_avec_nom_de_fichier_normalise() -> None:
             chemin_des_sections=("2/ LES PARTICIPANTS À L’ATELIER",),
         ),
     )
-    sommaire = {
+    sommaire: dict[str, dict] = {
         "Cadrage et socle de sécurité": {
             "Atelier 1": {"Les participants à l'atelier": {}},
         },
