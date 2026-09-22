@@ -12,6 +12,7 @@ from documents.docling.document import Document
 from documents.docling.chunker_docling_mqc import ChunkerDoclingMQC
 from documents.docling.multi_processeur import Multiprocesseur
 from documents.html.document_html import BlocPageReponse
+from documents.contexte_documentaire import enrichit_le_contenu_indexe
 from documents.indexeur.indexeur import (
     DocumentAIndexer,
     Indexeur,
@@ -47,12 +48,26 @@ def _trouve_une_metadata_trop_longue(metadata: object, emplacement: str) -> str 
     return None
 
 
+def _est_un_bloc_de_table_des_matieres(bloc: BlocPage) -> bool:
+    return (
+        bloc.contexte is not None
+        and bloc.contexte.type_de_bloc == "table_des_matieres"
+    )
+
+
 def _prepare_les_payloads(
     document: Document,
     les_blocs_non_vides: list[BlocPage],
 ) -> tuple[list[dict[str, object]], dict[str, object], str | None]:
     payloads_chunks: list[dict[str, object]] = [
-        {"content": bloc.texte, "metadata": document.metadata(bloc)}
+        {
+            "content": enrichit_le_contenu_indexe(
+                document.nom_document,
+                document.sommaire_hierarchique,
+                bloc,
+            ),
+            "metadata": document.metadata(bloc),
+        }
         for bloc in les_blocs_non_vides
     ]
     for numero_chunk, chunk in enumerate(payloads_chunks):
@@ -158,7 +173,7 @@ class IndexeurDocling(Indexeur):
                 bloc
                 for page in document.pages.values()
                 for bloc in page.blocs
-                if len(bloc.texte) > 1
+                if len(bloc.texte) > 1 and not _est_un_bloc_de_table_des_matieres(bloc)
             ]
             if not les_blocs_non_vides:
                 return reponses

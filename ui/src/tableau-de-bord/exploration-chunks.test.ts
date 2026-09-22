@@ -29,6 +29,7 @@ describe('aperçu du contenu d’un chunk', () => {
           {
             id: 'chunk-1',
             contenu: 'Un contenu',
+            contexte_documentaire: 'Document : guide test\nSections : Introduction',
             metadonnees: { page: 3 },
           },
         ],
@@ -41,6 +42,7 @@ describe('aperçu du contenu d’un chunk', () => {
       {
         id: 'chunk-1',
         contenu: 'Un contenu',
+        contexte_documentaire: 'Document : guide test\nSections : Introduction',
         metadonnees: { page: 3 },
       },
     ]);

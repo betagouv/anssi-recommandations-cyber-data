@@ -257,7 +257,9 @@ def test_conserve_les_sections_et_recommandations_dans_le_chunker(
     )
     assert metadata["type_de_bloc"] == "recommandation"
     assert metadata["code_recommandation"] == "R24"
-    assert metadata["chemin_sections"] == '["Section 5"]'
+    assert bloc.contexte is not None
+    assert bloc.contexte.chemin_des_sections == ("Section 5",)
+    assert "chemin_sections" not in metadata
 
 
 def test_conserve_la_table_des_matieres_comme_un_chunk_pdf_unique(

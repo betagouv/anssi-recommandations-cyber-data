@@ -1,5 +1,3 @@
-import json
-
 from unittest.mock import MagicMock
 
 from documents.docling.document import Document
@@ -107,7 +105,7 @@ def test_metadata_contient_le_contexte_de_section():
 
     assert metadata["type_de_bloc"] == "paragraphe"
     assert metadata["titre"] == "Titre de section"
-    assert metadata["chemin_sections"] == '["Section 1", "Titre de section"]'
+    assert "chemin_sections" not in metadata
     assert metadata["niveau"] == 2
     assert "section" not in metadata
 
@@ -143,7 +141,7 @@ def test_metadata_limite_la_longueur_du_titre():
     assert metadata["titre"] == "a" * 255
 
 
-def test_metadata_resume_un_chemin_de_sections_trop_long():
+def test_metadata_ne_contient_pas_un_chemin_de_sections_trop_long():
     document = Document(_un_document_a_indexer())
     bloc = BlocPage(
         texte="contenu",
@@ -153,25 +151,4 @@ def test_metadata_resume_un_chemin_de_sections_trop_long():
         ),
     )
 
-    chemin = document.metadata(bloc)["chemin_sections"]
-
-    assert isinstance(chemin, str)
-    assert len(chemin) <= 255
-    assert json.loads(chemin) == ["Racine", "…", "Feuille"]
-
-
-def test_metadata_resume_un_intitule_de_section_trop_long():
-    document = Document(_un_document_a_indexer())
-    bloc = BlocPage(
-        texte="contenu",
-        numero_page=1,
-        contexte=ContexteDuBloc(chemin_des_sections=("a" * 500,)),
-    )
-
-    chemin = document.metadata(bloc)["chemin_sections"]
-    section = json.loads(chemin)[0]
-
-    assert len(chemin) <= 255
-    assert section.startswith("a")
-    assert section.endswith("a")
-    assert "…" in section
+    assert "chemin_sections" not in document.metadata(bloc)

@@ -2,6 +2,7 @@ from math import ceil
 from typing import Any
 
 from adaptateurs.client_albert_chunks import ClientAlbertChunks, ReponseChunkAlbert
+from documents.contexte_documentaire import separe_le_contenu_indexe
 from infra.executeur_requete import ExecuteurDeRequete
 
 LIMITE_CHUNKS_PAR_PAGE = 100
@@ -35,11 +36,19 @@ class ClientAlbertChunksReel(ClientAlbertChunks):
             )
             chunks: list[dict[str, Any]] = reponse.json()["data"]
             resultat.extend(
-                ReponseChunkAlbert(
-                    id=str(chunk["id"]),
-                    contenu=str(chunk.get("content", "")),
-                    metadonnees=chunk.get("metadata", {}),
-                )
+                _mappe_un_chunk(chunk)
                 for chunk in chunks
             )
         return resultat
+
+
+def _mappe_un_chunk(chunk: dict[str, Any]) -> ReponseChunkAlbert:
+    contenu, contexte_documentaire = separe_le_contenu_indexe(
+        str(chunk.get("content", ""))
+    )
+    return ReponseChunkAlbert(
+        id=str(chunk["id"]),
+        contenu=contenu,
+        metadonnees=chunk.get("metadata", {}),
+        contexte_documentaire=contexte_documentaire,
+    )

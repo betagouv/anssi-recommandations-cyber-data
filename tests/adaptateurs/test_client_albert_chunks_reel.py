@@ -33,6 +33,44 @@ def test_recupere_les_chunks_d_un_document(un_executeur_albert_memoire):
     ]
 
 
+def test_separe_le_contexte_documentaire_du_contenu_recu_d_albert(
+    un_executeur_albert_memoire,
+):
+    executeur = (
+        un_executeur_albert_memoire()
+        .avec_le_nombre_de_chunks(1)
+        .avec_les_pages_de_chunks(
+            [
+                [
+                    {
+                        "id": "chunk-1",
+                        "content": (
+                            "Le contenu du chunk\n\n"
+                            "[Contexte documentaire]\n"
+                            "Document : guide ebios\n"
+                            "Sections : Atelier 1\n"
+                            "[/Contexte documentaire]"
+                        ),
+                        "metadata": {"page": 4},
+                    }
+                ]
+            ]
+        )
+    )
+    client = ClientAlbertChunksReel("https://albert.test/v1", "clef", executeur)
+
+    resultat = client.recupere_les_chunks_du_document("document-42")
+
+    assert resultat == [
+        ReponseChunkAlbert(
+            id="chunk-1",
+            contenu="Le contenu du chunk",
+            metadonnees={"page": 4},
+            contexte_documentaire="Document : guide ebios\nSections : Atelier 1",
+        )
+    ]
+
+
 def test_recupere_les_chunks_apres_la_premiere_page(un_executeur_albert_memoire):
     executeur = (
         un_executeur_albert_memoire()
