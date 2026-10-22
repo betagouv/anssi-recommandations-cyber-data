@@ -27,13 +27,13 @@ jobs:
           persist-credentials: false
 
       - name: Checkov GitHub Action
-        uses: bridgecrewio/checkov-action@f967808197a8d784d3e72919f38c3ff0cda7884e # v12.3122.0
+        uses: bridgecrewio/checkov-action@6f26dc90000b74feb589a906cdfae540f5119895 # v12.3134.0
         with:
           output_format: cli,sarif
           output_file_path: console,results.sarif
 
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@411c4c9a36b3fca4d674f06b6396b2c6d23522c6 # v3.36.3
+        uses: github/codeql-action/upload-sarif@9f759ee644a3e7c15c1390abf49868036c00067b # v3.38.3
 
         if: success() || failure()
         with:
@@ -50,6 +50,6 @@ jobs:
         with:
           persist-credentials: false
       - name: zizmor GitHub Action
-        uses: zizmorcore/zizmor-action@e639db99335bc9038abc0e066dfcd72e23d26fb4 # v0.3.0
+        uses: zizmorcore/zizmor-action@f9597c869b2e67095f9b527070297a13a6efe928 # v0.7.0
         with:
           advanced-security: true
