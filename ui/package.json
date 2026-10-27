@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "@lab-anssi/ui-kit": "^1.44.2",
-    "@simplewebauthn/browser": "^13.3.0"
+    "@simplewebauthn/browser": "^14.0.0"
   },
   "pnpm": {
     "overrides": {
