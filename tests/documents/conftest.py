@@ -330,12 +330,13 @@ def un_convertisseur_avec_un_texte() -> Callable[[], Type[DocumentConverter]]:
     class ConverterDeTest(DocumentConverter):
         def convert(
             self,
-            document: Union[Path, str, DocumentStream, HttpSource],
+            source: Union[Path, str, DocumentStream, HttpSource],
             headers: Optional[dict[str, str]] = None,
             raises_on_error: bool = True,
             max_num_pages: int = sys.maxsize,
             max_file_size: int = sys.maxsize,
             page_range: PageRange = (1, 1),
+            progress_callback: Optional[Callable[..., None]] = None,
         ) -> ConversionResult:
             texte = "Un texte"
             bbox = BoundingBox(l=100.0, t=200.0, r=300.0, b=400.0)
@@ -375,14 +376,15 @@ def un_convertisseur_de_test() -> Callable[[], Type[DocumentConverter]]:
 
         def convert(
             self,
-            document: Union[Path, str, DocumentStream, HttpSource],
+            source: Union[Path, str, DocumentStream, HttpSource],
             headers: Optional[dict[str, str]] = None,
             raises_on_error: bool = True,
             max_num_pages: int = sys.maxsize,
             max_file_size: int = sys.maxsize,
             page_range: PageRange = (1, 1),
+            progress_callback: Optional[Callable[..., None]] = None,
         ) -> ConversionResult:
-            self.document_recu = document  # type: ignore[assignment]
+            self.document_recu = source  # type: ignore[assignment]
             texte = "Un document HTML"
             bbox = BoundingBox(l=100.0, t=200.0, r=300.0, b=400.0)
             prov = ProvenanceItem(page_no=1, bbox=bbox, charspan=(0, len(texte)))
@@ -399,7 +401,7 @@ def un_convertisseur_de_test() -> Callable[[], Type[DocumentConverter]]:
                 input=InputDocument(
                     format=InputFormat.HTML,
                     backend=HTMLDocumentBackend,  # type: ignore[type-abstract]
-                    path_or_stream=document,  # type: ignore[arg-type]
+                    path_or_stream=source,  # type: ignore[arg-type]
                 ),
             )
 
@@ -617,12 +619,13 @@ def un_convertisseur_avec_un_titre_et_un_texte() -> Callable[
     class ConverterDeTestAvecContenuSimple(DocumentConverter):
         def convert(
             self,
-            document: Union[Path, str, DocumentStream, HttpSource],
+            source: Union[Path, str, DocumentStream, HttpSource],
             headers: Optional[dict[str, str]] = None,
             raises_on_error: bool = True,
             max_num_pages: int = sys.maxsize,
             max_file_size: int = sys.maxsize,
             page_range: PageRange = (1, 1),
+            progress_callback: Optional[Callable[..., None]] = None,
         ) -> ConversionResult:
             premier_texte = (
                 ConstructeurDeSectionHeaderItem().avec_titre("Titre").construis()
