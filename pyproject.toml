@@ -12,7 +12,7 @@ dependencies = [
     "httpx",
     "json-repair",
     "openai",
-    "pandas==2.3.3",
+    "pandas==3.1.0",
     "pikepdf",
     "pypdfium2>=4.30.0",
     "protobuf>=5.29.6",
