@@ -1,0 +1,339 @@
+' Modèle C4 — MQC-Data (niveaux 1 à 3 : Contexte, Conteneurs, Composants)
+' Le niveau 4 (code) correspond aux modules de src/ eux-mêmes.
+' Rendu : PlantUML avec la bibliothèque standard C4-PlantUML (aucun téléchargement requis).
+' Même convention que le C4 de MesQuestionsCyber (dépôt anssi-recommandations-cyber, docs/C4.puml).
+'
+' Deux domaines fonctionnels, distingués partout par un code couleur (et un style de trait pour les flux) :
+'   - vert, trait plein    : ÉVALUATION de MQC (qualité des réponses et de la reformulation) ;
+'   - orange, trait tireté : GESTION DES COLLECTIONS (alimenter et maintenir le RAG dans Albert,
+'                            y compris la génération Jeopardy / HyDE) ;
+'   - gris foncé           : éléments communs aux deux domaines (API, tableau de bord, bus, journal).
+' Chaque diagramme porte sa propre légende (bloc `legend`), écrite à la main : la légende
+' automatique de C4-PlantUML (LAYOUT_WITH_LEGEND) ne décrit que les types d'éléments, pas ces catégories.
+' Les systèmes externes gardent le gris clair par défaut de C4-PlantUML.
+' Un diagramme de composants par sujet : Évaluation, Collections et documents, Jeopardy.
+' Choix : la base du journal est modélisée comme un système externe (hébergée hors du périmètre applicatif).
+
+@startuml C4-1-Contexte
+!include <C4/C4_Context>
+!include <logos/postgresql>
+
+AddElementTag("eval", $bgColor="#15803d", $fontColor="#ffffff", $borderColor="#14532d", $legendText="Évaluation de MQC")
+AddElementTag("collections", $bgColor="#c2410c", $fontColor="#ffffff", $borderColor="#7c2d12", $legendText="Gestion des collections (indexation, Jeopardy)")
+AddRelTag("flux_eval", $textColor="#15803d", $lineColor="#15803d", $legendText="Flux d'évaluation")
+AddRelTag("flux_collections", $textColor="#c2410c", $lineColor="#c2410c", $lineStyle=DashedLine(), $legendText="Flux de gestion des collections")
+
+AddElementTag("commun", $bgColor="#4b5563", $fontColor="#ffffff", $borderColor="#1f2937", $legendText="Commun aux deux domaines")
+
+hide stereotype
+title Niveau 1 — Contexte : MQC-Data
+
+legend right
+  |= Légende |
+  |<#08427B><color:#ffffff> Personne </color>|
+  |<#15803d><color:#ffffff> Évaluation de MQC </color>|
+  |<#c2410c><color:#ffffff> Gestion des collections </color>|
+  |<#4b5563><color:#ffffff> Commun aux deux domaines </color>|
+  |<#999999><color:#ffffff> Système externe </color>|
+  | Flux d'évaluation : trait plein vert |
+  | Flux de gestion des collections : tirets orange |
+endlegend
+
+Person(equipe, "Équipe MQC (lab ANSSI)", "Gère les collections de documents, lance et analyse les évaluations")
+Person(expertise, "Expertise cyber", "Rédige la vérité terrain : questions, réponses de référence et documents attendus", $tags="eval")
+
+System(mqc_data, "MQC-Data", "Back-office de MQC : évalue la qualité des réponses du chatbot et gère les collections de documents du RAG dans Albert (indexation, Jeopardy / HyDE)", $tags="commun")
+
+System_Ext(mqc, "MesQuestionsCyber (MQC)", "Chatbot qui répond aux questions de cybersécurité à partir des guides de l'ANSSI", $tags="eval")
+System_Ext(albert, "Albert (DINUM)", "LLM + RAG : stocke les collections, documents et chunks ; sert aussi de modèle de génération, de reformulation et de juge")
+System_Ext(msc, "MesServicesCyber et sources distantes", "Hébergent les guides PDF et les pages HTML de services à indexer", $tags="collections")
+System_Ext(github, "GitHub Actions", "Déploiement (push sur main) et lancement manuel des évaluations")
+System_Ext(clever, "Clever Cloud", "Héberge MQC-Data (DEMO puis PROD) et exécute les évaluations")
+System_Ext(metabase, "Metabase", "Exploitation des résultats d'évaluation", $tags="eval")
+SystemDb_Ext(journal, "Base Journal PostgreSQL", "Schéma journal_mqc : résultats d'évaluation (optionnelle : sans base configurée, le journal reste en mémoire)", $sprite="postgresql", $tags="eval")
+
+Rel(expertise, mqc_data, "Fournit la vérité terrain", "Fichiers CSV", $tags="flux_eval")
+Rel(equipe, mqc_data, "Lance les évaluations et consulte les résultats", "HTTPS, clé de sécurité WebAuthn", $tags="flux_eval")
+Rel(equipe, github, "Déclenche une évaluation à la demande", "workflow_dispatch", $tags="flux_eval")
+Rel(equipe, mqc_data, "Crée des collections, ajoute ou supprime des documents, explore les chunks", "HTTPS, clé de sécurité WebAuthn", $tags="flux_collections")
+
+Rel(github, clever, "Déploie et relance l'application pour évaluer", "clever-tools")
+Rel(clever, mqc_data, "Héberge et exécute")
+
+Rel(mqc_data, mqc, "Pose les questions de la vérité terrain", "HTTPS POST /pose_question (paramètre type_utilisateur chiffré)", $tags="flux_eval")
+Rel(mqc_data, albert, "Sert de juge (métriques) et de modèle de reformulation", "HTTPS REST /v1", $tags="flux_eval")
+Rel(mqc_data, journal, "Consigne les résultats d'évaluation", "psycopg2", $tags="flux_eval")
+Rel(metabase, journal, "Lit les résultats", "SQL", $tags="flux_eval")
+
+Rel(mqc_data, albert, "Crée les collections, indexe documents et chunks, génère les questions Jeopardy", "HTTPS REST /v1", $tags="flux_collections")
+Rel(mqc_data, msc, "Télécharge les documents à indexer", "HTTPS", $tags="flux_collections")
+
+Rel(mqc, albert, "Interroge les collections ANSSI gérées par MQC-Data", "HTTPS")
+@enduml
+
+
+@startuml C4-2-Conteneurs
+!include <C4/C4_Container>
+!include <logos/postgresql>
+!include <logos/svelte-icon>
+
+AddElementTag("eval", $bgColor="#15803d", $fontColor="#ffffff", $borderColor="#14532d", $legendText="Évaluation de MQC")
+AddElementTag("collections", $bgColor="#c2410c", $fontColor="#ffffff", $borderColor="#7c2d12", $legendText="Gestion des collections (indexation, Jeopardy)")
+AddRelTag("flux_eval", $textColor="#15803d", $lineColor="#15803d", $legendText="Flux d'évaluation")
+AddRelTag("flux_collections", $textColor="#c2410c", $lineColor="#c2410c", $lineStyle=DashedLine(), $legendText="Flux de gestion des collections")
+
+AddElementTag("commun", $bgColor="#4b5563", $fontColor="#ffffff", $borderColor="#1f2937", $legendText="Commun aux deux domaines")
+
+hide stereotype
+title Niveau 2 — Conteneurs : MQC-Data
+
+legend right
+  |= Légende |
+  |<#08427B><color:#ffffff> Personne </color>|
+  |<#15803d><color:#ffffff> Évaluation de MQC </color>|
+  |<#c2410c><color:#ffffff> Gestion des collections </color>|
+  |<#4b5563><color:#ffffff> Commun aux deux domaines </color>|
+  |<#999999><color:#ffffff> Système externe </color>|
+  | Flux d'évaluation : trait plein vert |
+  | Flux de gestion des collections : tirets orange |
+endlegend
+
+Person(equipe, "Équipe MQC (lab ANSSI)", "Navigateur web")
+
+System_Boundary(mqc_data, "MQC-Data") {
+    Container(front, "Tableau de bord", "Svelte 5 / TypeScript (build Vite)", "SPA protégée : page Évaluation, collections, documents, exploration des chunks, Jeopardy. Servie en statique par l'API.", $sprite="svelte-icon", $tags="commun")
+    Container(api, "API back-office", "Python 3.14 / FastAPI / uvicorn", "Routes /api/evaluation (évaluation) ; /api/collections, /api/documents, /api/jeopardy (collections) ; /auth. Traitements longs en tâches de fond. Sécurité : WebAuthn + JWT, limitation de débit, CSP à nonce.", $tags="commun")
+    Container(commandes_eval, "Commandes d'évaluation", "Python (uv run)", "evaluateur_mqc.py (réponses de MQC) et evaluateur_reformulation.py (reformulation)", $tags="eval")
+    Container(commandes_collections, "Commandes de gestion des collections", "Python (uv run)", "indexe_documents_rag.py, ajoute_document_a_la_collection.py et scripts/admin (token, liste et suppression de collections)", $tags="collections")
+    ContainerDb(donnees_eval, "Vérité terrain", "Fichiers du dossier donnees/", "questions_avec_verite_terrain*.csv, jointure-nom-*.csv, dataset_reformulation.csv", $tags="eval")
+    ContainerDb(donnees_collections, "Documents sources", "Fichiers du dossier donnees/", "guides_de_lANSSI (PDF), documents_distants.json, collection_reponses_maitrisees (FAQ HTML)", $tags="collections")
+}
+
+System_Ext(mqc, "MesQuestionsCyber (MQC)", "Chatbot, route /pose_question")
+System_Ext(albert, "Albert (DINUM)", "LLM + RAG")
+System_Ext(msc, "MesServicesCyber et sources distantes", "Guides PDF, pages HTML")
+System_Ext(github, "GitHub Actions", "Déploiement, évaluations à la demande")
+System_Ext(clever, "Clever Cloud", "Hébergement DEMO et PROD")
+SystemDb_Ext(journal, "Base Journal PostgreSQL", "Schéma journal_mqc, événements d'évaluation", $sprite="postgresql")
+
+Rel(equipe, front, "Utilise", "HTTPS")
+Rel(front, api, "Appelle", "JSON /api/…, HTTPS")
+Rel(api, front, "Sert la page du tableau de bord (nonce CSP injecté)", "HTTPS")
+
+' --- Évaluation ---
+Rel(commandes_eval, donnees_eval, "Lit la vérité terrain et les mappings", "Fichiers", $tags="flux_eval")
+Rel(api, mqc, "Pose les questions de l'évaluation", "HTTPS POST /pose_question", $tags="flux_eval")
+Rel(commandes_eval, mqc, "Pose les questions de l'évaluation", "HTTPS POST /pose_question", $tags="flux_eval")
+Rel(api, albert, "Juge (métriques) et reformulation", "HTTPS REST /v1", $tags="flux_eval")
+Rel(commandes_eval, albert, "Juge (métriques) et reformulation", "HTTPS REST /v1", $tags="flux_eval")
+Rel(api, journal, "Consigne les évaluations", "psycopg2", $tags="flux_eval")
+Rel(commandes_eval, journal, "Consigne les évaluations", "psycopg2", $tags="flux_eval")
+Rel(github, clever, "Lance les évaluations", "clever-tools, CC_RUN_COMMAND", $tags="flux_eval")
+Rel(clever, commandes_eval, "Exécute", $tags="flux_eval")
+
+' --- Gestion des collections ---
+Rel(api, donnees_collections, "Lit les documents distants, la FAQ et les guides locaux", "Fichiers", $tags="flux_collections")
+Rel(commandes_collections, donnees_collections, "Lit les documents à indexer", "Fichiers", $tags="flux_collections")
+Rel(api, albert, "Collections, documents, chunks, génération Jeopardy", "HTTPS REST /v1", $tags="flux_collections")
+Rel(commandes_collections, albert, "Collections, documents, chunks", "HTTPS REST /v1", $tags="flux_collections")
+Rel(api, msc, "Télécharge les documents à indexer", "HTTPS", $tags="flux_collections")
+Rel(commandes_collections, msc, "Télécharge les documents à indexer", "HTTPS", $tags="flux_collections")
+
+' --- Déploiement (commun) ---
+Rel(github, clever, "Déploie (push sur main)", "clever-tools")
+Rel(clever, api, "Héberge")
+@enduml
+
+
+@startuml C4-3-Composants-Evaluation
+!include <C4/C4_Component>
+!include <logos/postgresql>
+
+AddElementTag("eval", $bgColor="#15803d", $fontColor="#ffffff", $borderColor="#14532d", $legendText="Évaluation de MQC")
+
+AddElementTag("commun", $bgColor="#4b5563", $fontColor="#ffffff", $borderColor="#1f2937", $legendText="Commun aux deux domaines")
+
+hide stereotype
+title Niveau 3 — Composants : évaluation de MQC (conteneur « API back-office » et commandes)
+
+legend right
+  |= Légende |
+  |<#15803d><color:#ffffff> Évaluation de MQC </color>|
+  |<#4b5563><color:#ffffff> Commun aux deux domaines </color>|
+  |<#999999><color:#ffffff> Système externe </color>|
+endlegend
+
+Container(front, "Tableau de bord", "Svelte 5 / TypeScript", "Page Évaluation", $tags="commun")
+Container(commandes, "Commandes d'évaluation", "evaluateur_mqc.py, evaluateur_reformulation.py", "Enchaînent collecte, évaluation et consignation sans passer par le Service d'évaluation", $tags="eval")
+System_Ext(mqc, "MesQuestionsCyber (MQC)", "Chatbot, route /pose_question")
+System_Ext(albert, "Albert (DINUM)", "LLM : reformulation et juge")
+System_Ext(prompt, "Prompt de reformulation", "Fichier publié dans le dépôt MQC, URL fournie à l'évaluation")
+SystemDb_Ext(journal_db, "Base Journal PostgreSQL", "journal_mqc.evenements", $sprite="postgresql")
+
+Container_Boundary(api, "API back-office") {
+    Component(routeur, "Routeur Évaluation", "api/api_evaluation.py", "POST /api/evaluation (CSV de vérité terrain + mapping, tâche de fond) et POST /api/evaluation/reformulation (CSV + URL du prompt)", $tags="eval")
+    Component(service, "Service d'évaluation", "evaluation/service_evaluation.py", "Orchestre : collecte des réponses, évaluation, consignation ; lance aussi l'évaluation de la reformulation", $tags="eval")
+
+    Component(collecteur, "Collecteur de réponses", "evaluation/mqc/collecte_reponses_mqc.py, remplisseur_reponses.py", "Lit le CSV par lots, pose les questions en parallèle, écrit un CSV enrichi (réponse, contexte, noms de documents, numéros de page)", $tags="eval")
+    Component(client_mqc, "Client MQC", "evaluation/mqc/remplisseur_reponses.py", "ClientMQCHTTPAsync : POST /pose_question", $tags="eval")
+
+    Component(lanceur, "Lanceur DeepEval", "evaluation/mqc/lanceur_deepeval.py", "Joint le CSV au mapping des noms de guides, crée les cas de test, calcule les métriques : hallucination, pertinence de la réponse, toxicité, longueur, bon nom de document et bon numéro de page dans le contexte", $tags="eval")
+    Component(multiprocessus, "Évaluateur DeepEval multi-processus", "infra/evaluation/evaluateur_deepeval_multi_processus.py", "Répartit les cas de test sur N processus", $tags="eval")
+    Component(juge, "Client juge Albert", "evaluation/mqc/client_deepeval_albert.py", "LLM juge des métriques DeepEval : POST /chat/completions, réponse JSON stricte", $tags="eval")
+    Component(entrepot, "Entrepôt d'évaluation", "journalisation/evaluation.py", "Conserve en mémoire les scores par question le temps du traitement", $tags="eval")
+    Component(consignateur, "Consignateur d'évaluation", "journalisation/consignateur_evaluation.py", "Rapproche chaque score de sa ligne du CSV et consigne un événement EVALUATION_CALCULEE par question", $tags="eval")
+
+    Component(evaluateur_reformulation, "Évaluateur de reformulation", "evaluation/reformulation/evaluation.py", "Reformule chaque question avec le prompt, puis mesure : suppression des parasites, conservation des contraintes, autoportance, fidélité métier", $tags="eval")
+    Component(client_reformulation, "Client Albert de reformulation", "adaptateurs/client_albert_reformulation_reel.py", "Appelle le modèle de reformulation d'Albert", $tags="eval")
+    Component(bus, "Bus d'événements", "evenement/bus.py", "En processus, synchrone", $tags="commun")
+    Component(consommateur, "Consommateur de journalisation", "evaluation/reformulation/evenements/journal.py", "Abonné à EVALUATION_REFORMULATION_TERMINEE", $tags="eval")
+    Component(adaptateur_journal, "Adaptateur journal", "adaptateurs/journal.py", "Postgres si DB_HOST est défini, sinon mémoire", $tags="commun")
+}
+
+Rel(front, routeur, "Envoie la vérité terrain et le mapping, ou le CSV de reformulation", "multipart, HTTPS")
+Rel(routeur, service, "Lance l'évaluation")
+Rel(routeur, prompt, "Télécharge le prompt à évaluer", "HTTPS")
+
+Rel(service, collecteur, "1. Collecte les réponses")
+Rel(collecteur, client_mqc, "Pose chaque question")
+Rel(client_mqc, mqc, "POST /pose_question", "HTTPS")
+Rel(service, lanceur, "2. Évalue le CSV de réponses")
+Rel(lanceur, multiprocessus, "Répartit les cas de test")
+Rel(lanceur, juge, "Fournit le LLM juge aux métriques")
+Rel(lanceur, entrepot, "Persiste les scores")
+Rel(juge, albert, "POST /chat/completions", "HTTPS")
+Rel(service, consignateur, "3. Consigne les résultats")
+Rel(consignateur, entrepot, "Relit les scores")
+Rel(consignateur, adaptateur_journal, "EVALUATION_CALCULEE")
+
+Rel(commandes, collecteur, "1. Collecte")
+Rel(commandes, lanceur, "2. Évalue")
+Rel(commandes, consignateur, "3. Consigne")
+
+Rel(service, evaluateur_reformulation, "Évalue la reformulation")
+Rel(evaluateur_reformulation, client_reformulation, "Reformule la question")
+Rel(evaluateur_reformulation, multiprocessus, "Évalue les cas de test")
+Rel(client_reformulation, albert, "Modèle de reformulation", "HTTPS")
+Rel(evaluateur_reformulation, bus, "Publie EVALUATION_REFORMULATION_TERMINEE")
+Rel(bus, consommateur, "Notifie")
+Rel(consommateur, adaptateur_journal, "Enregistre")
+
+Rel(adaptateur_journal, journal_db, "INSERT", "SQL")
+@enduml
+
+
+@startuml C4-3-Composants-Collections
+!include <C4/C4_Component>
+
+AddElementTag("collections", $bgColor="#c2410c", $fontColor="#ffffff", $borderColor="#7c2d12", $legendText="Gestion des collections (indexation, Jeopardy)")
+
+AddElementTag("commun", $bgColor="#4b5563", $fontColor="#ffffff", $borderColor="#1f2937", $legendText="Commun aux deux domaines")
+
+hide stereotype
+title Niveau 3 — Composants : gestion des collections et des documents (conteneur « API back-office »)
+
+legend right
+  |= Légende |
+  |<#c2410c><color:#ffffff> Gestion des collections </color>|
+  |<#4b5563><color:#ffffff> Commun aux deux domaines </color>|
+  |<#999999><color:#ffffff> Système externe </color>|
+endlegend
+
+Container(front, "Tableau de bord", "Svelte 5 / TypeScript", "Pages Collections, Documents, Exploration des chunks", $tags="commun")
+Container(commandes, "Commandes de gestion des collections", "indexe_documents_rag.py, ajoute_document_a_la_collection.py", "Création d'une collection et ajout de documents en ligne de commande", $tags="collections")
+ContainerDb(donnees, "Documents sources", "Dossier donnees/", "guides_de_lANSSI, documents_distants.json, FAQ de réponses maîtrisées", $tags="collections")
+System_Ext(albert, "Albert (DINUM)", "Collections, documents, chunks ; modèle de vision pour l'OCR des PDF")
+System_Ext(msc, "MesServicesCyber et sources distantes", "Guides PDF, pages HTML")
+
+Container_Boundary(api, "API back-office") {
+    Component(routeur_collections, "Routeur Collections", "api/api_collections.py", "POST /api/collections (création + indexation en tâche de fond), GET /api/collections, /disponibles et /{id}/documents", $tags="collections")
+    Component(routeur_documents, "Routeur Documents", "api/api_documents.py", "POST /api/documents (ajout, remplacement, suppression), POST /supprimer, GET /api/documents, GET /{id}/chunks, GET /indexation/{id}", $tags="collections")
+    Component(suivi, "Suivi d'indexation", "api/suivi_indexation.py", "Statut des tâches de fond, en mémoire : en_cours, terminee, terminee_partiellement, terminee_avec_erreurs", $tags="collections")
+
+    Component(service_collections, "Service Collections", "documents/service_collections.py", "Lit les collections de MQC (indexée et Jeopardy), leurs documents et leurs chunks", $tags="collections")
+    Component(service_chunks, "Service d'exploration des chunks", "documents/service_exploration_chunks.py", "Chunks d'un document", $tags="collections")
+    Component(indexation_collections, "Service d'indexation de collections", "documents/service_indexation_collections.py", "Crée la collection, indexe les documents, puis déclenche Jeopardy sur la collection entière", $tags="collections")
+    Component(indexation_documents, "Service d'indexation de documents", "documents/service_indexation_documents.py", "Ajoute ou remplace (suppression puis ré-indexation) des documents dans la collection indexée et dans la collection Jeopardy, ou les supprime", $tags="collections")
+    Component(collecte, "Collecte des documents", "documents/collecte/collecte.py", "Guides PDF locaux, documents distants (PDF ou HTML), FAQ de réponses maîtrisées", $tags="collections")
+    Component(indexeur, "Indexeur", "documents/indexeur/indexeur_docling.py, documents/docling, documents/pdf, documents/html", "Découpe en chunks (PDF : OCR page par page en blocs typés ; HTML : Docling), ajoute le sommaire hiérarchique, crée le document, envoie les chunks par paquets de 64", $tags="collections")
+    Component(client_albert, "Clients Albert", "adaptateurs/client_albert_*_reel.py", "REST /collections, /documents, /documents/{id}/chunks", $tags="collections")
+    Component(service_jeopardy, "Service Jeopardy", "jeopardy/service.py", "Génère la collection miroir de questions (détaillé dans le diagramme Jeopardy)", $tags="collections")
+}
+
+Rel(front, routeur_collections, "Crée une collection, liste les collections et leurs documents", "JSON, HTTPS")
+Rel(front, routeur_documents, "Ajoute, remplace, supprime des documents ; explore les chunks ; suit l'indexation", "JSON, HTTPS")
+Rel(commandes, indexeur, "Indexe les documents d'une collection")
+
+Rel(routeur_collections, service_collections, "Consulte")
+Rel(routeur_collections, indexation_collections, "Crée et indexe (tâche de fond)")
+Rel(routeur_documents, service_collections, "Liste les documents")
+Rel(routeur_documents, service_chunks, "Lit les chunks")
+Rel(routeur_documents, indexation_documents, "Indexe ou supprime (tâche de fond)")
+Rel(routeur_collections, suivi, "Crée et clôt le suivi")
+Rel(routeur_documents, suivi, "Crée, clôt et expose le suivi")
+
+Rel(indexation_collections, collecte, "Collecte les documents distants et la FAQ")
+Rel(collecte, donnees, "Lit", "Fichiers")
+Rel(indexation_collections, client_albert, "Crée et attribue la collection")
+Rel(indexation_documents, client_albert, "Vérifie, supprime et ajoute les documents")
+Rel(client_albert, indexeur, "Délègue le découpage et l'envoi des chunks")
+Rel(indexation_collections, service_jeopardy, "Génère les questions de la collection")
+Rel(indexation_documents, service_jeopardy, "Génère les questions des documents indexés")
+
+Rel(service_collections, client_albert, "Lit collections et documents")
+Rel(service_chunks, client_albert, "Lit les chunks")
+Rel(client_albert, albert, "REST /collections, /documents", "HTTPS")
+Rel(indexeur, albert, "OCR des pages PDF, création du document et envoi des chunks", "HTTPS")
+Rel(indexeur, msc, "Télécharge les PDF et pages HTML", "HTTPS")
+@enduml
+
+
+@startuml C4-3-Composants-Jeopardy
+!include <C4/C4_Component>
+
+AddElementTag("collections", $bgColor="#c2410c", $fontColor="#ffffff", $borderColor="#7c2d12", $legendText="Gestion des collections (indexation, Jeopardy)")
+
+AddElementTag("commun", $bgColor="#4b5563", $fontColor="#ffffff", $borderColor="#1f2937", $legendText="Commun aux deux domaines")
+
+hide stereotype
+title Niveau 3 — Composants : Jeopardy / HyDE, collection miroir de questions (conteneur « API back-office »)
+
+legend right
+  |= Légende |
+  |<#c2410c><color:#ffffff> Gestion des collections </color>|
+  |<#4b5563><color:#ffffff> Commun aux deux domaines </color>|
+  |<#999999><color:#ffffff> Système externe </color>|
+endlegend
+
+Container(front, "Tableau de bord", "Svelte 5 / TypeScript", "Action « Jeopardyser »", $tags="commun")
+Container(indexation, "Services d'indexation", "documents/service_indexation_*.py", "Déclenchent Jeopardy après une indexation", $tags="collections")
+System_Ext(albert, "Albert (DINUM)", "Collection indexée (chunks des documents), collection Jeopardy (une question par chunk généré, avec la référence du chunk d'origine), LLM de génération")
+
+Container_Boundary(api, "API back-office") {
+    Component(routeur, "Routeur Jeopardy", "api/api_jeopardy.py", "POST /api/jeopardy (collection entière) et POST /api/jeopardy/{id}/documents (liste de documents), en tâche de fond", $tags="collections")
+    Component(entiere, "Jeopardy de collection entière", "jeopardy/service_jeopardyse_collection_entiere.py", "Crée une nouvelle collection Jeopardy puis traite tous les documents de la collection source", $tags="collections")
+    Component(liste, "Jeopardy de liste de documents", "jeopardy/service_jeopardyse_liste_de_documents.py", "Ajoute les documents choisis dans une collection Jeopardy existante", $tags="collections")
+    Component(service, "Service Jeopardy", "jeopardy/service.py", "Par document : lit les chunks, génère les questions, crée le document miroir, ajoute les questions comme chunks par paquets de 64", $tags="collections")
+    Component(collecteur, "Collecteur de questions", "jeopardy/collecteur.py", "Paquets de 10 chunks traités en parallèle (multi-processus)", $tags="collections")
+    Component(prompt, "Prompt de génération", "jeopardy/prompt_generation_question.py", "Consigne de génération de N questions par paragraphe", $tags="collections")
+    Component(entrepot, "Entrepôt de questions générées", "jeopardy/questions.py", "En mémoire", $tags="collections")
+    Component(client, "Client Albert Jeopardy", "jeopardy/client_albert_jeopardy_reel.py", "Collections, documents, chunks et POST /chat/completions", $tags="collections")
+    Component(bus, "Bus d'événements et consommateurs", "evenement/bus.py, jeopardy/consommateurs_jeopardy.py", "Journalisent en logs les questions générées et les erreurs", $tags="commun")
+}
+
+Rel(front, routeur, "Jeopardyse une collection ou des documents", "JSON, HTTPS")
+Rel(indexation, service, "Jeopardyse les documents indexés")
+Rel(routeur, entiere, "Collection entière")
+Rel(routeur, liste, "Liste de documents")
+Rel(entiere, service, "Hérite du service")
+Rel(liste, service, "Hérite du service")
+
+Rel(service, client, "1. Récupère les chunks des documents source")
+Rel(service, collecteur, "2. Génère les questions de chaque document")
+Rel(collecteur, prompt, "Utilise")
+Rel(collecteur, client, "Demande N questions par chunk")
+Rel(collecteur, entrepot, "Persiste les questions générées")
+Rel(service, client, "3. Crée le document miroir et ajoute les questions")
+Rel(service, bus, "Publie les événements de génération")
+Rel(client, albert, "REST /collections, /documents, /chat/completions", "HTTPS")
+@enduml
