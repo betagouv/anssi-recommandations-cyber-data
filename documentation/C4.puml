@@ -47,17 +47,16 @@ System(mqc_data, "MQC-Data", "Back-office de MQC : évalue la qualité des répo
 System_Ext(mqc, "MesQuestionsCyber (MQC)", "Chatbot qui répond aux questions de cybersécurité à partir des guides de l'ANSSI", $tags="eval")
 System_Ext(albert, "Albert (DINUM)", "LLM + RAG : stocke les collections, documents et chunks ; sert aussi de modèle de génération, de reformulation et de juge")
 System_Ext(msc, "MesServicesCyber et sources distantes", "Hébergent les guides PDF et les pages HTML de services à indexer", $tags="collections")
-System_Ext(github, "GitHub Actions", "Déploiement (push sur main) et lancement manuel des évaluations")
-System_Ext(clever, "Clever Cloud", "Héberge MQC-Data (DEMO puis PROD) et exécute les évaluations")
+System_Ext(github, "GitHub Actions", "Déploiement (push sur main)")
+System_Ext(clever, "Clever Cloud", "Héberge MQC-Data (DEMO puis PROD)")
 System_Ext(metabase, "Metabase", "Exploitation des résultats d'évaluation", $tags="eval")
 SystemDb_Ext(journal, "Base Journal PostgreSQL", "Schéma journal_mqc : résultats d'évaluation (optionnelle : sans base configurée, le journal reste en mémoire)", $sprite="postgresql", $tags="eval")
 
 Rel(expertise, mqc_data, "Fournit la vérité terrain", "Fichiers CSV", $tags="flux_eval")
 Rel(equipe, mqc_data, "Lance les évaluations et consulte les résultats", "HTTPS, clé de sécurité WebAuthn", $tags="flux_eval")
-Rel(equipe, github, "Déclenche une évaluation à la demande", "workflow_dispatch", $tags="flux_eval")
 Rel(equipe, mqc_data, "Crée des collections, ajoute ou supprime des documents, explore les chunks", "HTTPS, clé de sécurité WebAuthn", $tags="flux_collections")
 
-Rel(github, clever, "Déploie et relance l'application pour évaluer", "clever-tools")
+Rel(github, clever, "Déploie (push sur main)", "clever-tools")
 Rel(clever, mqc_data, "Héberge et exécute")
 
 Rel(mqc_data, mqc, "Pose les questions de la vérité terrain", "HTTPS POST /pose_question (paramètre type_utilisateur chiffré)", $tags="flux_eval")
@@ -112,7 +111,7 @@ System_Boundary(mqc_data, "MQC-Data") {
 System_Ext(mqc, "MesQuestionsCyber (MQC)", "Chatbot, route /pose_question")
 System_Ext(albert, "Albert (DINUM)", "LLM + RAG")
 System_Ext(msc, "MesServicesCyber et sources distantes", "Guides PDF, pages HTML")
-System_Ext(github, "GitHub Actions", "Déploiement, évaluations à la demande")
+System_Ext(github, "GitHub Actions", "Déploiement (push sur main)")
 System_Ext(clever, "Clever Cloud", "Hébergement DEMO et PROD")
 SystemDb_Ext(journal, "Base Journal PostgreSQL", "Schéma journal_mqc, événements d'évaluation", $sprite="postgresql")
 
@@ -128,8 +127,6 @@ Rel(api, albert, "Juge (métriques) et reformulation", "HTTPS REST /v1", $tags="
 Rel(commandes_eval, albert, "Juge (métriques) et reformulation", "HTTPS REST /v1", $tags="flux_eval")
 Rel(api, journal, "Consigne les évaluations", "psycopg2", $tags="flux_eval")
 Rel(commandes_eval, journal, "Consigne les évaluations", "psycopg2", $tags="flux_eval")
-Rel(github, clever, "Lance les évaluations", "clever-tools, CC_RUN_COMMAND", $tags="flux_eval")
-Rel(clever, commandes_eval, "Exécute", $tags="flux_eval")
 
 ' --- Gestion des collections ---
 Rel(api, donnees_collections, "Lit les documents distants, la FAQ et les guides locaux", "Fichiers", $tags="flux_collections")
